@@ -87,7 +87,7 @@ export default function ModulePage() {
           <section>
             <div className="flex items-baseline justify-between">
               <p className="workbook-label">Steps</p>
-              <span className="text-[12.5px] text-ink-faint">{lessons.length} steps in this module</span>
+              <span className="text-[12.5px] text-ink-faint">{lessons.length} steps {module.kind === "orientation" ? "before the modules" : "in this module"}</span>
             </div>
             <ol className="mt-4 divide-y divide-natural border-y border-natural">
               {lessons.map((lesson) => {
