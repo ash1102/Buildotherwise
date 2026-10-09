@@ -13,6 +13,7 @@ const LINKS = [
   { to: "/program-library", label: "Library" },
   { to: "/tribe-threads", label: "Tribe Threads" },
   { to: "/journal-reflection", label: "Reflection" },
+  { to: "/connect", label: "Connect" },
 ];
 
 const ADMIN_LINKS = [

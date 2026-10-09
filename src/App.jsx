@@ -23,6 +23,7 @@ import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import OAuthConsent from '@/pages/OAuthConsent';
 import AgentAccess from '@/pages/AgentAccess';
+import Connect from '@/pages/Connect';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -62,6 +63,7 @@ const AuthenticatedApp = () => {
         <Route path="/journal-reflection" element={<JournalReflection />} />
         <Route path="/content-review" element={<ContentReview />} />
         <Route path="/agent-access" element={<AgentAccess />} />
+        <Route path="/connect" element={<Connect />} />
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
