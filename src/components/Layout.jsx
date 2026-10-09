@@ -12,6 +12,7 @@ const LINKS = [
   { to: "/record", label: "Discovery Record" },
   { to: "/program-library", label: "Library" },
   { to: "/tribe-threads", label: "Tribe Threads" },
+  { to: "/journal-reflection", label: "Reflection" },
 ];
 
 export default function Layout() {
