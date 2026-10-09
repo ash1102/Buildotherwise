@@ -15,9 +15,14 @@ const LINKS = [
   { to: "/journal-reflection", label: "Reflection" },
 ];
 
+const ADMIN_LINKS = [
+  { to: "/content-review", label: "Content review" },
+  { to: "/agent-access", label: "Agent access" },
+];
+
 export default function Layout() {
   const { user } = useAuth();
-  const links = user?.role === "admin" ? [...LINKS, { to: "/content-review", label: "Content review" }] : LINKS;
+  const links = user?.role === "admin" ? [...LINKS, ...ADMIN_LINKS] : LINKS;
 
   return (
     <JournalProvider>
