@@ -2,21 +2,47 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useCurriculum from "@/hooks/useCurriculum";
-import { KIND_LABELS, loadLibraryResources, moduleTitle } from "@/lib/library";
+import {
+  KIND_LABELS,
+  loadLibraryResources,
+  loadReadingSteps,
+  loadResearchBriefs,
+  moduleTitle,
+} from "@/lib/library";
 import { downloadText } from "@/lib/download";
 import LibraryCard from "@/components/library/LibraryCard";
+import LibraryFilters from "@/components/library/LibraryFilters";
+import ResearchBriefCard from "@/components/library/ResearchBriefCard";
 import DashedMotif from "@/components/workbook/DashedMotif";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 
 export default function ProgramLibrary() {
-  const { modules, loading: curriculumLoading } = useCurriculum();
-  const [resources, setResources] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { modules, lessonsByCode, loading: curriculumLoading } = useCurriculum();
+  const [search, setSearch] = useState("");
+  const [term, setTerm] = useState("");
   const [activeModule, setActiveModule] = useState("all");
+  const [activeStep, setActiveStep] = useState("all");
+  const [steps, setSteps] = useState([]);
+  const [resources, setResources] = useState(null);
+  const [research, setResearch] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  /** Typing settles first, so each search is one request rather than one per keystroke. */
+  useEffect(() => {
+    const timer = setTimeout(() => setTerm(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const moduleOrder = activeModule === "all" ? null : Number(activeModule);
 
   useEffect(() => {
     let active = true;
-    loadLibraryResources()
+    setLoading(true);
+    loadLibraryResources({
+      search: term,
+      moduleOrder,
+      lessonCode: activeStep === "all" ? null : activeStep,
+    })
       .then((items) => {
         if (active) setResources(items);
       })
@@ -26,28 +52,71 @@ export default function ProgramLibrary() {
     return () => {
       active = false;
     };
+  }, [term, moduleOrder, activeStep]);
+
+  /** Choosing a module clears the step narrowing and offers that module's own steps. */
+  useEffect(() => {
+    let active = true;
+    setActiveStep("all");
+    if (moduleOrder === null) {
+      setSteps([]);
+      return () => {
+        active = false;
+      };
+    }
+    loadReadingSteps(moduleOrder).then((codes) => {
+      if (active) setSteps(codes);
+    });
+    return () => {
+      active = false;
+    };
+  }, [moduleOrder]);
+
+  useEffect(() => {
+    let active = true;
+    loadResearchBriefs().then((items) => {
+      if (active) setResearch(items);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const readings = useMemo(() => resources.filter((item) => item.audience !== "program_team"), [resources]);
-  const research = useMemo(() => resources.filter((item) => item.audience === "program_team"), [resources]);
+  const groups = useMemo(() => {
+    const grouped = new Map();
+    (resources || []).forEach((item) => {
+      const key = item.module_order === undefined || item.module_order === null ? null : item.module_order;
+      if (!grouped.has(key)) grouped.set(key, []);
+      grouped.get(key).push(item);
+    });
+    return [...grouped.entries()].sort((a, b) => (a[0] ?? 999) - (b[0] ?? 999));
+  }, [resources]);
 
   const moduleOrders = useMemo(
-    () => [...new Set(readings.map((item) => item.module_order))].sort((a, b) => a - b),
-    [readings]
+    () => [...new Set((resources || []).map((item) => item.module_order).filter((order) => order !== null && order !== undefined))].sort((a, b) => a - b),
+    [resources]
   );
-  const shownOrders = activeModule === "all" ? moduleOrders : moduleOrders.filter((order) => String(order) === activeModule);
+
+  const narrowed = term.trim().length > 0 || activeModule !== "all" || activeStep !== "all";
 
   const download = () => {
-    const lines = resources.map((item) => {
-      const where = item.module_order === undefined || item.module_order === null ? "Program research" : moduleTitle(modules, item.module_order);
+    const readingLines = (resources || []).map((item) => {
+      const where =
+        item.module_order === undefined || item.module_order === null ? "Program research" : moduleTitle(modules, item.module_order);
       return `## ${item.title}\n_${KIND_LABELS[item.kind] || "Reading"} · ${where}${item.lesson_code ? ` · ${item.lesson_code}` : ""}_\n\n${
         item.body || item.summary || ""
       }\n${item.source_label ? `\nSource: ${item.source_label}\n` : ""}`;
     });
-    downloadText("entrepalooza-program-library.md", `# Program Library\n\n${lines.join("\n\n")}`);
+    const briefLines = research.map((brief) => {
+      const head = `## ${brief.title}\n_Program research · summary_\n\n${brief.summary || ""}`;
+      const source = brief.source_label ? `\n\nSource: ${brief.source_label}` : "";
+      const status = brief.review_status ? `\n\nReview status: ${brief.review_status}` : "";
+      return `${head}${source}${status}\n`;
+    });
+    downloadText("entrepalooza-program-library.md", `# Program Library\n\n${[...readingLines, ...briefLines].join("\n\n")}`);
   };
 
-  const busy = loading || curriculumLoading;
+  const busy = curriculumLoading || resources === null;
 
   return (
     <div className="space-y-12">
@@ -72,54 +141,42 @@ export default function ProgramLibrary() {
         </div>
       </header>
 
-      <section>
-        <div className="no-print flex flex-wrap gap-2">
-          <button
-            type="button"
-            aria-pressed={activeModule === "all"}
-            onClick={() => setActiveModule("all")}
-            className={`rounded-full border px-3 py-1.5 text-[12.5px] transition ${
-              activeModule === "all"
-                ? "border-teal-deep bg-teal-deep text-ivory"
-                : "border-natural bg-white text-ink-soft hover:border-teal-deep/50"
-            }`}
-          >
-            Everything
-          </button>
-          {moduleOrders.map((order) => (
-            <button
-              key={order}
-              type="button"
-              aria-pressed={String(order) === activeModule}
-              onClick={() => setActiveModule(String(order))}
-              className={`rounded-full border px-3 py-1.5 text-[12.5px] transition ${
-                String(order) === activeModule
-                  ? "border-teal-deep bg-teal-deep text-ivory"
-                  : "border-natural bg-white text-ink-soft hover:border-teal-deep/50"
-              }`}
-            >
-              {order === 0 ? "Getting Started" : `Module ${order}`}
-            </button>
-          ))}
+      <section className="space-y-7">
+        <div>
+          <p className="workbook-label">Participant readings</p>
+          <h2 className="mt-2 font-heading text-xl">Find what the step asked you to read</h2>
         </div>
+
+        <LibraryFilters
+          search={search}
+          onSearchChange={setSearch}
+          moduleOrders={moduleOrders}
+          activeModule={activeModule}
+          onModuleChange={setActiveModule}
+          steps={steps}
+          activeStep={activeStep}
+          onStepChange={setActiveStep}
+          stepLabel={(code) => (lessonsByCode[code] ? lessonsByCode[code].title : code)}
+          busy={loading && resources !== null}
+        />
 
         {busy ? (
           <p className="py-8 text-[14px] text-ink-faint">Opening the library…</p>
-        ) : readings.length === 0 ? (
-          <p className="mt-6 rounded-lg border border-dashed border-natural-deep bg-white/60 p-6 text-[14px] leading-relaxed text-ink-soft">
-            No readings have been imported yet. When they are, each one appears here under the step it belongs to.
+        ) : resources.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-natural-deep bg-white/60 p-6 text-[14px] leading-relaxed text-ink-soft">
+            {narrowed
+              ? "No readings match that yet. Try fewer words, or choose Everything to see the whole library."
+              : "No readings have been imported yet. When they are, each one appears here under the step it belongs to."}
           </p>
         ) : (
-          <div className="mt-7 space-y-9">
-            {shownOrders.map((order) => (
+          <div className="space-y-9">
+            {groups.map(([order, items]) => (
               <section key={order}>
-                <h2 className="font-heading text-xl">{moduleTitle(modules, order)}</h2>
+                <h2 className="font-heading text-xl">{order === null ? "Program research" : moduleTitle(modules, order)}</h2>
                 <div className="mt-3 space-y-4">
-                  {readings
-                    .filter((item) => item.module_order === order)
-                    .map((item) => (
-                      <LibraryCard key={item.id} resource={item} />
-                    ))}
+                  {items.map((item) => (
+                    <LibraryCard key={item.id} resource={item} />
+                  ))}
                 </div>
               </section>
             ))}
@@ -129,19 +186,16 @@ export default function ProgramLibrary() {
 
       {research.length ? (
         <section className="rounded-lg border border-dashed border-natural-deep bg-white/60 p-6">
-          <p className="workbook-label">Program research</p>
-          <h2 className="mt-2 font-heading text-xl">Research behind the curriculum</h2>
+          <p className="workbook-label">Research behind the program</p>
+          <h2 className="mt-2 font-heading text-xl">What the curriculum is built on</h2>
           <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-ink-soft">
-            The program team's own research notes, listed here so you can see what the curriculum is built on. They are
-            design documents, not lessons, and the full versions stay with the program creator.
+            The program team's own research documents, listed here so you can see what the curriculum is built on. Each one
+            shows where it came from and the status it states for itself. They are design documents, not lessons — the full
+            text is there if you want it, and it is optional reading.
           </p>
           <ul className="mt-5 space-y-4">
-            {research.map((item) => (
-              <li key={item.id} className="border-t border-natural pt-4">
-                <h3 className="font-heading text-[17px]">{item.title}</h3>
-                {item.summary ? <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">{item.summary}</p> : null}
-                {item.source_label ? <p className="mt-1.5 text-[12px] text-ink-faint">{item.source_label}</p> : null}
-              </li>
+            {research.map((brief) => (
+              <ResearchBriefCard key={brief.id} brief={brief} />
             ))}
           </ul>
         </section>

@@ -13,13 +13,64 @@ export function moduleTitle(modules, order) {
   return order === 0 ? "Getting Started" : `Module ${order}`;
 }
 
-/** Readings and notes stay in the order the curriculum teaches them. */
-export async function loadLibraryResources() {
+/**
+ * Search, module and step are all resolved by the server, so the page never
+ * narrows a list it has already loaded.
+ */
+export async function loadLibraryResources({ search = "", moduleOrder = null, lessonCode = null } = {}) {
+  const query = { status: "published", audience: { $ne: "program_team" } };
+  if (moduleOrder !== null && moduleOrder !== undefined) query.module_order = moduleOrder;
+  if (lessonCode) query.lesson_code = lessonCode;
+  const term = search.trim();
+  if (term) {
+    query.$or = [
+      { title: { $regex: term, $options: "i" } },
+      { summary: { $regex: term, $options: "i" } },
+      { body: { $regex: term, $options: "i" } },
+    ];
+  }
+  const page = await base44.entities.LibraryResource.filter(query, { sort: "order", limit: 200 });
+  return page.items;
+}
+
+/** Only the steps a module actually holds a reading for, so the step filter is never empty. */
+export async function loadReadingSteps(moduleOrder) {
   const page = await base44.entities.LibraryResource.filter(
-    { status: "published" },
-    { sort: "order", limit: 200 }
+    {
+      status: "published",
+      audience: { $ne: "program_team" },
+      module_order: moduleOrder,
+      lesson_code: { $exists: true },
+    },
+    { distinct: "lesson_code" }
+  );
+  return page.items
+    .filter(Boolean)
+    .sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }));
+}
+
+/** The research shelf loads summaries only; a brief's full text is read when it is opened. */
+export async function loadResearchBriefs() {
+  const page = await base44.entities.LibraryResource.filter(
+    { status: "published", audience: "program_team" },
+    { sort: "order", limit: 20, fields: ["title", "summary", "source_label", "review_status", "full_text_uri", "order"] }
   );
   return page.items;
+}
+
+/** A full brief lives in private storage and is opened through a short-lived signed link. */
+export async function loadBriefText(fileUri) {
+  const { signed_url: signedUrl } = await base44.integrations.Core.CreateFileSignedUrl({ file_uri: fileUri });
+  const response = await fetch(signedUrl);
+  return response.text();
+}
+
+/** Source documents keep Notion's callout wrapper. That is formatting, not content. */
+export function cleanSourceText(text) {
+  return (text || "")
+    .replace(/<\/?callout[^>]*>/gi, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 export async function loadTribeThreads() {

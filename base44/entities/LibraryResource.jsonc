@@ -39,9 +39,17 @@
       "type": "string",
       "description": "The reading itself, kept in the source's own words."
     },
+    "full_text_uri": {
+      "type": "string",
+      "description": "Private storage reference for a long research brief's full text. Opened through a short-lived signed link when someone chooses to read it, never fetched with the shelf."
+    },
     "source_label": {
       "type": "string",
       "description": "Where this text came from, kept for auditability."
+    },
+    "review_status": {
+      "type": "string",
+      "description": "The status the source document states for itself, kept in its own words. Never an approval claim made by this app."
     },
     "order": {
       "type": "number"

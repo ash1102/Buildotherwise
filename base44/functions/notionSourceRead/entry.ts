@@ -116,7 +116,8 @@ export default async function (req) {
     }
 
     if (action === 'blocks') {
-      const response = await fetch(`${NOTION}/blocks/${payload.id}/children?page_size=100`, {
+      const cursorParam = payload.cursor ? `&start_cursor=${encodeURIComponent(payload.cursor)}` : '';
+      const response = await fetch(`${NOTION}/blocks/${payload.id}/children?page_size=100${cursorParam}`, {
         headers,
         signal: AbortSignal.timeout(20000),
       });
