@@ -2,6 +2,7 @@ import React from "react";
 import { useAuth } from "@/lib/AuthContext";
 import AgentBoundaries from "@/components/agent/AgentBoundaries";
 import ConnectionSteps from "@/components/agent/ConnectionSteps";
+import NotionWorkspace from "@/components/agent/NotionWorkspace";
 
 export default function AgentAccess() {
   const { user } = useAuth();
@@ -24,7 +25,8 @@ export default function AgentAccess() {
         <h1 className="font-heading text-4xl leading-tight">Connecting to the app's agent</h1>
         <p className="workbook-prose">
           Entrepalooza offers one agent through its API: the conversation journal reflection companion. These are the
-          instructions a connection needs, in the order they are used.
+          instructions a connection needs, in the order they are used. The last section covers a separate connection, for
+          a client that should also reach the Notion workspace where the curriculum is written.
         </p>
       </header>
 
@@ -39,6 +41,11 @@ export default function AgentAccess() {
         Connections from outside the app work once the app is published, and the token is the only key they need. If a
         token is ever shared by mistake, manage it from the API page in the dashboard.
       </p>
+
+      <section className="space-y-4">
+        <h2 className="font-heading text-2xl">Also connect your client to Notion</h2>
+        <NotionWorkspace />
+      </section>
     </div>
   );
 }
