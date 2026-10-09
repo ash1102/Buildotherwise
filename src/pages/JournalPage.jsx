@@ -6,8 +6,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
 import { base44 } from "@/api/base44Client";
 import { removeEntry, useJournalEntries } from "@/lib/journal";
+import { createDiscovery, listDiscoveries } from "@/lib/discoveries";
 import { downloadText } from "@/lib/download";
 import EntryCard from "@/components/journal/EntryCard";
+import AddFromJournalDialog from "@/components/discovery/AddFromJournalDialog";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import DashedMotif from "@/components/workbook/DashedMotif";
 
@@ -22,6 +24,7 @@ export default function JournalPage() {
   const [tab, setTab] = useState("all");
   const [selected, setSelected] = useState([]);
   const [pending, setPending] = useState(null);
+  const [copying, setCopying] = useState(null);
   const [sending, setSending] = useState(false);
   const { toast } = useToast();
 
@@ -58,6 +61,28 @@ export default function JournalPage() {
       toast({ title: "That didn't send. Please try again." });
     } finally {
       setSending(false);
+    }
+  };
+
+  /** Copies only the wording confirmed in the dialog; the journal entry is untouched. */
+  const addToRecord = (body) => {
+    if (!copying) return;
+    const created = createDiscovery({
+      body,
+      source: {
+        kind: copying.kind === "free" ? "journal" : "lesson",
+        label: copying.prompt_label || (copying.kind === "free" ? "Written freely" : "Lesson reflection"),
+        lesson_code: copying.lesson_code || "",
+        lesson_title: copying.lesson_title || "",
+        journal_entry_id: copying.id,
+        date: copying.created_date,
+      },
+    });
+    if (listDiscoveries().some((item) => item.id === created.id)) {
+      setCopying(null);
+      toast({ title: "Added to your Discovery Record." });
+    } else {
+      toast({ title: "That did not save in this browser, so nothing was copied." });
     }
   };
 
@@ -160,6 +185,15 @@ export default function JournalPage() {
         </section>
       ) : null}
 
+      {copying ? (
+        <AddFromJournalDialog
+          key={copying.id}
+          entry={copying}
+          onClose={() => setCopying(null)}
+          onConfirm={addToRecord}
+        />
+      ) : null}
+
       {entries.length === 0 ? (
         <p className="rounded-lg border border-dashed border-natural-deep bg-white/60 p-6 text-[14px] leading-relaxed text-ink-soft">
           Nothing here yet. The journal button in the corner is always available — write freely at any moment, or save a
@@ -201,6 +235,7 @@ export default function JournalPage() {
                         <div className="min-w-0 flex-1">
                           <EntryCard
                             entry={entry}
+                            onAddToRecord={setCopying}
                             onShare={(item) =>
                               setPending({
                                 label: `One entry — ${item.prompt_label || "written freely"}${

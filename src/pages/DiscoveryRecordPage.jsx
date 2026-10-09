@@ -1,167 +1,154 @@
-import React from "react";
-import { Download, Printer } from "lucide-react";
+import React, { useState } from "react";
+import moment from "moment";
+import { Download, Plus, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  setDiscoveryNote,
-  useDecisions,
-  useDiscoveryNotes,
-  useLifeMap,
-  useWorkbook,
-} from "@/lib/workbook";
-import { entriesFromAnswers, tryLogValues } from "@/lib/discovery";
+import { useToast } from "@/components/ui/use-toast";
+import { contextRows, createDiscovery, listDiscoveries, useDiscoveries } from "@/lib/discoveries";
+import { GROUP_LABELS, entriesFromAnswers, tryLogValues } from "@/lib/discovery";
+import { useDecisions, useDiscoveryNotes, useWorkbook } from "@/lib/workbook";
 import { downloadText } from "@/lib/download";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import DashedMotif from "@/components/workbook/DashedMotif";
-
-const GROUP_LABELS = {
-  curiosity: "Where your attention went",
-  try_plan: "The try plan and its stop rule",
-  observed: "What you observed, and what you made of it",
-  unknown: "Still unknown",
-  conditions: "Conditions worth keeping or changing",
-  cost: "What it cost",
-  revised: "Revised statements",
-  decide_next: "Next action and review point",
-  close: "What you are keeping from Pilot 1",
-};
-
-function RecordGroup({ title, items, empty }) {
-  return (
-    <section className="rounded-lg border border-natural bg-white p-5 sm:p-6">
-      <p className="workbook-label">{title}</p>
-      {items.length ? (
-        <dl className="mt-3 space-y-3">
-          {items.map((item) => (
-            <div key={`${item.key}-${item.label}`}>
-              <dt className="text-[12.5px] text-ink-faint">{item.label}</dt>
-              <dd className="mt-0.5 whitespace-pre-wrap text-[14px] leading-relaxed text-ink-soft">{item.value}</dd>
-            </div>
-          ))}
-        </dl>
-      ) : (
-        <p className="mt-2 text-[13.5px] text-ink-faint">{empty}</p>
-      )}
-    </section>
-  );
-}
+import DiscoveryForm from "@/components/discovery/DiscoveryForm";
+import DiscoveryCard from "@/components/discovery/DiscoveryCard";
+import WorkbookSources from "@/components/discovery/WorkbookSources";
 
 export default function DiscoveryRecordPage() {
+  const discoveries = useDiscoveries();
   const { answers } = useWorkbook();
   const decisions = useDecisions();
-  const map = useLifeMap();
   const notes = useDiscoveryNotes();
+  const [adding, setAdding] = useState(false);
+  const [status, setStatus] = useState("");
+  const { toast } = useToast();
 
-  const fromAnswers = entriesFromAnswers(answers);
-  const pick = (section) => fromAnswers.filter((item) => item.section === section);
-  const tryLog = tryLogValues(answers).filter((item) => item.value);
-  const mapCount = Object.values(map || {}).reduce((count, list) => count + (Array.isArray(list) ? list.length : 0), 0);
-  const decided = Object.entries(decisions || {}).filter(([, value]) => value);
+  /** The form stays open when the browser refuses the write, so nothing typed is lost. */
+  const add = (values) => {
+    const created = createDiscovery(values);
+    const kept = listDiscoveries().some((item) => item.id === created.id);
+    if (kept) {
+      setAdding(false);
+      setStatus("Added to your Discovery Record.");
+      toast({ title: "Added to your Discovery Record." });
+    } else {
+      setStatus("This browser did not keep the entry, so it is still open below.");
+      toast({ title: "That did not save in this browser." });
+    }
+  };
 
   const download = () => {
     const blocks = [];
+
+    if (discoveries.length) {
+      const lines = discoveries.map((entry) => {
+        const parts = [`### ${entry.title || moment(entry.created_date).format("D MMMM YYYY")}`];
+        parts.push(entry.body || "(no words yet)");
+        if (entry.decision) parts.push(`Next decision: ${entry.decision}`);
+        (entry.decision_updates || []).forEach((update) =>
+          parts.push(`Earlier decision: ${update.decision} (${moment(update.date).format("D MMMM YYYY")})`)
+        );
+        if (entry.source && entry.source.label) {
+          parts.push(`From: ${entry.source.lesson_title || entry.source.label}`);
+        }
+        contextRows(entry.context).forEach((row) => parts.push(`- ${row.label} ${row.value}`));
+        return parts.join("\n");
+      });
+      blocks.push(`## Discoveries you chose to keep\n${lines.join("\n\n")}`);
+    }
+
     blocks.push(`## Current life context\n${notes.context || "(nothing written yet)"}`);
+    const fromAnswers = entriesFromAnswers(answers);
     Object.entries(GROUP_LABELS).forEach(([section, label]) => {
-      const items = pick(section);
-      blocks.push(`## ${label}\n${items.length ? items.map((item) => `- ${item.label}: ${item.value}`).join("\n") : "- (nothing yet)"}`);
+      const items = fromAnswers.filter((item) => item.section === section);
+      blocks.push(
+        `## ${label}\n${
+          items.length ? items.map((item) => `- ${item.label}: ${item.value}`).join("\n") : "- (nothing yet)"
+        }`
+      );
     });
+    const tryLog = tryLogValues(answers).filter((item) => item.value);
     if (tryLog.length) {
       blocks.push(`## Try log\n${tryLog.map((item) => `- ${item.label}: ${item.value}`).join("\n")}`);
     }
+    const decided = Object.entries(decisions || {}).filter(([, value]) => value);
     if (decided.length) {
       blocks.push(`## Next decisions\n${decided.map(([code, value]) => `- ${code}: ${value}`).join("\n")}`);
     }
-    downloadText("entrepalooza-discovery-record.md", `# Builder Discovery Record\n\n${blocks.join("\n\n")}`);
+
+    downloadText("entrepalooza-discovery-record.md", `# Discovery Record\n\n${blocks.join("\n\n")}`);
   };
 
   return (
-    <div className="space-y-8">
-      <header className="border-b border-natural pb-6">
-        <div className="flex items-start gap-4">
-          <DashedMotif size="lg" />
+    <div className="space-y-7">
+      <header className="border-b border-natural pb-5">
+        <div className="flex items-start gap-3">
+          <DashedMotif />
           <div>
-            <p className="workbook-label">Builder Discovery Record</p>
-            <h1 className="mt-2 font-heading text-3xl sm:text-4xl">One running record, filled in as you go</h1>
-            <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-ink-soft">
-              Nothing on this page is entered twice. Every line comes from an activity you already did, so the record keeps
-              up with you instead of asking again.
+            <p className="workbook-label">Discovery Record</p>
+            <h1 className="mt-1.5 font-heading text-2xl sm:text-3xl">Discovery Record</h1>
+            <p className="mt-3 max-w-2xl text-[14.5px] leading-relaxed text-ink-soft">
+              Keep what you want to carry forward: something you noticed, a question, what a try taught you, or a decision
+              you may revisit.
+            </p>
+            <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-ink-faint">
+              This is not a score or a finished account of who you are. A few words, uncertainty, or nothing to add yet are
+              all okay.
             </p>
           </div>
         </div>
-        <div className="mt-5 flex flex-wrap items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <Button
+            type="button"
+            aria-expanded={adding}
+            onClick={() => setAdding(!adding)}
+            className="rounded-full bg-teal-deep text-ivory hover:bg-teal-deep/90"
+          >
+            <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+            Add a discovery
+          </Button>
           <Button type="button" variant="outline" onClick={download} className="rounded-full border-natural bg-white">
             <Download className="mr-2 h-4 w-4" aria-hidden="true" />
             Download
           </Button>
-          <Button type="button" variant="outline" onClick={() => window.print()} className="rounded-full border-natural bg-white">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => window.print()}
+            className="rounded-full border-natural bg-white"
+          >
             <Printer className="mr-2 h-4 w-4" aria-hidden="true" />
             Print
           </Button>
-          <PrivacyNote>{mapCount ? `${mapCount} lines on your Life Map feed the context below.` : null}</PrivacyNote>
+        </div>
+        <div className="mt-3">
+          <PrivacyNote>Kept in this browser on this device. Nothing here is sent to Entrepalooza.</PrivacyNote>
         </div>
       </header>
 
-      <section className="rounded-lg border border-natural bg-white p-5 sm:p-6">
-        <p className="workbook-label">Current life context</p>
-        <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
-          A few lines about the life this work sits inside — what already takes your time, what you are protecting, and what
-          is in reach right now. Your Life Map has {mapCount} {mapCount === 1 ? "line" : "lines"} in it so far.
+      <section className="space-y-4">
+        {adding ? <DiscoveryForm onSubmit={add} onCancel={() => setAdding(false)} /> : null}
+
+        <p aria-live="polite" className="text-[13px] text-teal-deep">
+          {status}
         </p>
-        <Textarea
-          value={notes.context || ""}
-          onChange={(event) => setDiscoveryNote("context", event.target.value)}
-          rows={3}
-          placeholder="What your weeks actually look like right now."
-          className="mt-3 min-h-[5rem] border-natural bg-ivory/60 text-[14px]"
-        />
-      </section>
 
-      <RecordGroup title={GROUP_LABELS.curiosity} items={pick("curiosity")} empty="Notice what holds your attention in Module 1 and it will appear here." />
-
-      <RecordGroup
-        title={GROUP_LABELS.try_plan}
-        items={[...pick("try_plan"), ...tryLog]}
-        empty="Design one small try in Module 2 and the plan, boundary and stop rule will appear here."
-      />
-
-      <RecordGroup
-        title={GROUP_LABELS.observed}
-        items={[...pick("observed"), ...pick("unknown")]}
-        empty="After your try, this fills in from your short review."
-      />
-
-      <RecordGroup
-        title={GROUP_LABELS.conditions}
-        items={[...pick("conditions"), ...pick("cost")]}
-        empty="Your review in Module 2 fills this in, and Module 3 adds what changed when you adjust one condition."
-      />
-
-      <RecordGroup
-        title={GROUP_LABELS.revised}
-        items={pick("revised")}
-        empty="Revise a statement with evidence in Module 4 and the earlier and later wording both stay visible."
-      />
-
-      <section className="rounded-lg border border-copper/30 bg-copper-wash/50 p-5 sm:p-6">
-        <p className="workbook-label text-copper">Next decisions you have recorded</p>
-        {decided.length ? (
-          <ul className="mt-3 space-y-2">
-            {decided.map(([code, value]) => (
-              <li key={code} className="flex flex-wrap items-baseline gap-2 text-[14px]">
-                <span className="text-teal-deep">{code}</span>
-                <span className="font-medium text-ink">{value}</span>
-              </li>
+        {discoveries.length ? (
+          <div className="space-y-3">
+            {discoveries.map((entry) => (
+              <DiscoveryCard key={entry.id} entry={entry} />
             ))}
-          </ul>
-        ) : (
-          <p className="mt-2 text-[13.5px] text-ink-faint">
-            No decisions recorded yet. Every one you make — including pause, stop and continue looking — is a complete
-            answer and shows up here.
-          </p>
+          </div>
+        ) : adding ? null : (
+          <div className="rounded-lg border border-dashed border-natural-deep bg-white/60 p-6">
+            <p className="font-heading text-[16px] leading-snug text-ink">Nothing added yet.</p>
+            <p className="mt-1.5 text-[14px] leading-relaxed text-ink-soft">
+              You can add a discovery now or return when there is something you want to keep.
+            </p>
+          </div>
         )}
       </section>
 
-      <RecordGroup title={GROUP_LABELS.close} items={pick("close")} empty="The Pilot 1 close in Module 5 fills this in." />
+      <WorkbookSources />
     </div>
   );
 }

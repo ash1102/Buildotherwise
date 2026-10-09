@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import moment from "moment";
 import { BookOpen } from "lucide-react";
 
-export default function EntryCard({ entry, onShare, onDelete, compact = false }) {
+export default function EntryCard({ entry, onShare, onDelete, onAddToRecord, compact = false }) {
   const from = entry.lesson_title || entry.lesson_code;
   return (
     <article className="rounded-lg border border-natural/80 bg-white p-4">
@@ -39,8 +39,17 @@ export default function EntryCard({ entry, onShare, onDelete, compact = false })
         <p className="mt-2 text-[12px] text-copper">Revised from an earlier entry — both are kept.</p>
       ) : null}
 
-      {onShare || onDelete ? (
-        <div className="mt-3 flex gap-4 text-[12px]">
+      {onAddToRecord || onShare || onDelete ? (
+        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-[12px]">
+          {onAddToRecord ? (
+            <button
+              type="button"
+              className="text-copper underline decoration-natural underline-offset-2"
+              onClick={() => onAddToRecord(entry)}
+            >
+              Add to Discovery Record
+            </button>
+          ) : null}
           {onShare ? (
             <button type="button" className="text-teal-deep underline decoration-natural underline-offset-2" onClick={() => onShare(entry)}>
               Share this entry

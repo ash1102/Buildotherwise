@@ -33,6 +33,22 @@ export const DISCOVERY_SOURCES = {
   "M5-L3#7": { section: "close", label: "One question for later" },
 };
 
+/**
+ * The record's section labels, shared by the record page's export and the
+ * folded view of what the steps already saved.
+ */
+export const GROUP_LABELS = {
+  curiosity: "Where your attention went",
+  try_plan: "The try plan and its stop rule",
+  observed: "What you observed, and what you made of it",
+  unknown: "Still unknown",
+  conditions: "Conditions worth keeping or changing",
+  cost: "What it cost",
+  revised: "Revised statements",
+  decide_next: "Next action and review point",
+  close: "What you are keeping from Pilot 1",
+};
+
 /** The named try-log fields the curriculum's own build notes specify. */
 export const TRY_LOG_FIELDS = [
   { key: "disc_try_question", source: "M2-L1#0", label: "What it should teach" },
