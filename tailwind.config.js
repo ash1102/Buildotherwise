@@ -60,6 +60,29 @@ module.exports = {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
+  			},
+  			ivory: {
+  				DEFAULT: '#F5F2EC',
+  				deep: '#EDE9E0'
+  			},
+  			ink: {
+  				DEFAULT: '#1A2826',
+  				soft: '#41514E',
+  				faint: '#6B7C78'
+  			},
+  			'teal-deep': {
+  				DEFAULT: '#2D5451',
+  				soft: '#3E6F6B',
+  				wash: '#E4EDEB'
+  			},
+  			copper: {
+  				DEFAULT: '#A34F35',
+  				soft: '#C4765C',
+  				wash: '#F6E9E3'
+  			},
+  			natural: {
+  				DEFAULT: '#DEDBD3',
+  				deep: '#C9C4B8'
   			}
   		},
   		fontFamily: {

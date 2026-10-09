@@ -6,7 +6,13 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
-// Add page imports here
+import Layout from '@/components/Layout';
+import CurriculumHome from '@/pages/CurriculumHome';
+import ModulePage from '@/pages/ModulePage';
+import LessonPage from '@/pages/LessonPage';
+import JournalPage from '@/pages/JournalPage';
+import LifeMapPage from '@/pages/LifeMapPage';
+import DiscoveryRecordPage from '@/pages/DiscoveryRecordPage';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -34,7 +40,14 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<CurriculumHome />} />
+        <Route path="/module/:slug" element={<ModulePage />} />
+        <Route path="/lesson/:code" element={<LessonPage />} />
+        <Route path="/journal" element={<JournalPage />} />
+        <Route path="/map" element={<LifeMapPage />} />
+        <Route path="/record" element={<DiscoveryRecordPage />} />
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

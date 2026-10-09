@@ -1,0 +1,129 @@
+{
+  "name": "Lesson",
+  "type": "object",
+  "properties": {
+    "module_order": {
+      "type": "number",
+      "description": "Order of the parent module (0 = Getting Started)."
+    },
+    "order": {
+      "type": "number",
+      "description": "Position of this step inside its module."
+    },
+    "code": {
+      "type": "string",
+      "description": "Stable step code used in the URL. Old lesson numbers are kept as aliases."
+    },
+    "alias": {
+      "type": "string",
+      "description": "Previous lesson number, kept for auditability."
+    },
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "orientation",
+        "reading",
+        "activity",
+        "experiment",
+        "reflection",
+        "next_decision",
+        "tool"
+      ],
+      "default": "activity"
+    },
+    "duration_min": {
+      "type": "number"
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "teach": {
+      "type": "string",
+      "description": "The teaching block for this step."
+    },
+    "show": {
+      "type": "string",
+      "description": "Neutral demonstration. Never a participant story."
+    },
+    "routes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Equal ways to take part. All count the same."
+    },
+    "try_prompts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reflect_prompts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "has_decision": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the shared Next Decision words are offered here."
+    },
+    "what_comes_out": {
+      "type": "string"
+    },
+    "boundary": {
+      "type": "string"
+    },
+    "carry_forward": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Codes of earlier steps whose saved answers may be selected as context here. Nothing moves without an explicit choice."
+    },
+    "readings_note": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "ready",
+        "published"
+      ],
+      "default": "draft"
+    },
+    "internal_notes": {
+      "type": "string",
+      "description": "Facilitator-only. Never rendered to participants."
+    }
+  },
+  "required": [
+    "module_order",
+    "order",
+    "code",
+    "title"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

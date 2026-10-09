@@ -1,0 +1,51 @@
+{
+  "name": "Feedback",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": [
+        "confusing_step",
+        "usability",
+        "shared_entry"
+      ],
+      "default": "usability"
+    },
+    "module_order": {
+      "type": "number"
+    },
+    "lesson_code": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string",
+      "description": "What the person chose to send. Only ever what they explicitly submitted."
+    },
+    "entry_label": {
+      "type": "string",
+      "description": "Set only when a journal entry is deliberately shared, so the scope is stated."
+    }
+  },
+  "required": [
+    "kind",
+    "message"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

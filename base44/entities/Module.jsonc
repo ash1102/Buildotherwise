@@ -1,0 +1,66 @@
+{
+  "name": "Module",
+  "type": "object",
+  "properties": {
+    "order": {
+      "type": "number",
+      "description": "Position in the ratified ten-module program. 0 is Getting Started."
+    },
+    "slug": {
+      "type": "string",
+      "description": "URL slug used for the module page."
+    },
+    "title": {
+      "type": "string",
+      "description": "Participant-facing module name."
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "orientation",
+        "module"
+      ],
+      "default": "module"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "live",
+        "coming_later",
+        "in_development"
+      ],
+      "default": "live",
+      "description": "Only live modules can be entered or marked complete."
+    },
+    "purpose": {
+      "type": "string",
+      "description": "One honest sentence on what the module does."
+    },
+    "subtitle": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "order",
+    "slug",
+    "title"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
