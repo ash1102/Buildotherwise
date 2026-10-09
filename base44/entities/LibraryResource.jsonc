@@ -1,0 +1,84 @@
+{
+  "name": "LibraryResource",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "reading",
+        "research_brief",
+        "note"
+      ],
+      "default": "reading",
+      "description": "Reading, supplemental note, or program research brief."
+    },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "participant",
+        "program_team"
+      ],
+      "default": "participant",
+      "description": "Program-team research is shown in its own labelled shelf, never mixed into the participant readings."
+    },
+    "module_order": {
+      "type": "number",
+      "description": "Module this reading belongs to. 0 is Getting Started."
+    },
+    "lesson_code": {
+      "type": "string",
+      "description": "The step this reading came from, when it came from one."
+    },
+    "summary": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string",
+      "description": "The reading itself, kept in the source's own words."
+    },
+    "source_label": {
+      "type": "string",
+      "description": "Where this text came from, kept for auditability."
+    },
+    "order": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "published",
+        "draft"
+      ],
+      "default": "published"
+    },
+    "internal_notes": {
+      "type": "string",
+      "description": "Facilitator-only. Never rendered to participants."
+    }
+  },
+  "required": [
+    "title",
+    "kind"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

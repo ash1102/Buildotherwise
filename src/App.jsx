@@ -13,6 +13,12 @@ import LessonPage from '@/pages/LessonPage';
 import JournalPage from '@/pages/JournalPage';
 import LifeMapPage from '@/pages/LifeMapPage';
 import DiscoveryRecordPage from '@/pages/DiscoveryRecordPage';
+import ProgramLibrary from '@/pages/ProgramLibrary';
+import TribeThreads from '@/pages/TribeThreads';
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword from '@/pages/ResetPassword';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -47,7 +53,13 @@ const AuthenticatedApp = () => {
         <Route path="/journal" element={<JournalPage />} />
         <Route path="/map" element={<LifeMapPage />} />
         <Route path="/record" element={<DiscoveryRecordPage />} />
+        <Route path="/program-library" element={<ProgramLibrary />} />
+        <Route path="/tribe-threads" element={<TribeThreads />} />
       </Route>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

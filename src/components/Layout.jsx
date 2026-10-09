@@ -9,6 +9,8 @@ const LINKS = [
   { to: "/journal", label: "Journal" },
   { to: "/map", label: "Life Map" },
   { to: "/record", label: "Discovery Record" },
+  { to: "/program-library", label: "Library" },
+  { to: "/tribe-threads", label: "Tribe Threads" },
 ];
 
 export default function Layout() {

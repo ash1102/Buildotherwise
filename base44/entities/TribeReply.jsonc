@@ -1,0 +1,59 @@
+{
+  "name": "TribeReply",
+  "type": "object",
+  "properties": {
+    "thread_id": {
+      "type": "string",
+      "description": "The thread this reply belongs to."
+    },
+    "thread_title": {
+      "type": "string",
+      "description": "Kept alongside the reply so a reply always names the thread it answered."
+    },
+    "module_order": {
+      "type": "number"
+    },
+    "display_name": {
+      "type": "string",
+      "description": "The name shown with the reply, filled from the signed-in account."
+    },
+    "body": {
+      "type": "string",
+      "description": "What the person chose to post. Never copied from a private journal entry."
+    }
+  },
+  "required": [
+    "thread_id",
+    "body"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

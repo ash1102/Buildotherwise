@@ -1,0 +1,64 @@
+{
+  "name": "TribeThread",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "module_order": {
+      "type": "number",
+      "description": "Module this thread belongs to. 0 is Getting Started."
+    },
+    "lesson_code": {
+      "type": "string",
+      "description": "The step that carries this peer practice."
+    },
+    "prompt": {
+      "type": "string",
+      "description": "The question the cohort answers together, in the curriculum's own words."
+    },
+    "practice": {
+      "type": "string",
+      "description": "The peer practice, taken from the step that carries it."
+    },
+    "guidance": {
+      "type": "string",
+      "description": "How to take part, including what is optional."
+    },
+    "order": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "coming_later"
+      ],
+      "default": "open",
+      "description": "Only open threads accept replies."
+    }
+  },
+  "required": [
+    "title",
+    "prompt",
+    "module_order"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
