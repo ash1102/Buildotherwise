@@ -65,10 +65,14 @@ export async function loadBriefText(fileUri) {
   return response.text();
 }
 
-/** Source documents keep Notion's callout wrapper. That is formatting, not content. */
+/** Source documents carry Notion's own markup. That is formatting, not content. */
 export function cleanSourceText(text) {
   return (text || "")
-    .replace(/<\/?callout[^>]*>/gi, "")
+    .replace(/<\/?(?:mention-page|mention-user|callout|table_of_contents|synced_block|column_list|column|divider|page)\b[^>]*\/?>/gi, "")
+    .replace(/\*\*(.+?)\*\*/gs, "$1")
+    .replace(/(^|\s)\*(?!\s)([^*\n]+?)\*(?=\s|$)/g, "$1$2")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/[ \t]+$/gm, "")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
