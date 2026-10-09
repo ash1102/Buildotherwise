@@ -77,16 +77,30 @@ export function saveAnswer({ lessonCode, lessonTitle, promptKey, promptLabel, bo
 /** Revision keeps the earlier wording visible instead of overwriting it. */
 export function reviseEntry(id, body) {
   const earlier = getEntry(id);
-  updateEntry(id, { body });
   if (!earlier) return null;
   return addEntry({
-    kind: "lesson",
+    kind: earlier.kind,
     lesson_code: earlier.lesson_code,
     lesson_title: earlier.lesson_title,
     prompt: earlier.prompt,
     prompt_label: earlier.prompt_label,
+    route: earlier.route,
     revision_of: id,
     body,
+  });
+}
+
+/** A follow-up is its own dated entry, linked to the one it answers. */
+export function addFollowUp(parent, body) {
+  return addEntry({
+    kind: parent.kind,
+    body,
+    follow_up_of: parent.id,
+    lesson_code: parent.lesson_code || "",
+    lesson_title: parent.lesson_title || "",
+    // A distinct prompt key keeps a lesson reopening on its own saved answer.
+    prompt: parent.prompt ? `${parent.prompt}#followup` : "followup",
+    prompt_label: "Follow-up",
   });
 }
 
