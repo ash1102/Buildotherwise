@@ -22,6 +22,7 @@ const BLOCK_KINDS = [
   'quote',
   'callout',
   'toggle',
+  'table_row',
 ];
 
 function prefixFor(type) {
@@ -49,8 +50,12 @@ export default async function (req) {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
     if (user.role !== 'admin') return Response.json({ error: 'Forbidden' }, { status: 403 });
 
-    const read = async (payload) => {
-      const response = await base44.functions.invoke('notionSourceRead', payload);
+    const payload = await req.json().catch(() => ({}));
+    /** Only the sources named in `only` are imported; everything else is left as it stands. */
+    const only = Array.isArray(payload.only) ? payload.only : null;
+
+    const read = async (request) => {
+      const response = await base44.functions.invoke('notionSourceRead', request);
       return response.data;
     };
 
@@ -69,17 +74,29 @@ export default async function (req) {
     };
 
     const blocksText = async (objectId) => {
-      let cursor;
       const lines = [];
-      for (let page = 0; page < 12; page += 1) {
-        const result = await read({ action: 'blocks', id: objectId, cursor, kinds: BLOCK_KINDS });
-        (result.blocks || []).forEach((block) => {
-          const text = (block.text || '').trim();
-          if (text) lines.push(`${prefixFor(block.type)}${text}`);
-        });
-        if (!result.has_more || !result.next_cursor) break;
-        cursor = result.next_cursor;
-      }
+      let reads = 0;
+      /** Toggles, columns and callouts keep their text one level deeper, so the walk follows them down. */
+      const walk = async (blockId, depth) => {
+        if (depth > 4 || reads > 40) return;
+        let cursor;
+        for (let page = 0; page < 12; page += 1) {
+          reads += 1;
+          const result = await read({ action: 'blocks', id: blockId, cursor });
+          const blocks = result.blocks || [];
+          blocks.forEach((block) => {
+            const text = (block.text || '').trim();
+            if (text && BLOCK_KINDS.includes(block.type)) lines.push(`${prefixFor(block.type)}${text}`);
+          });
+          for (const block of blocks) {
+            if (block.type === 'child_page' || block.type === 'child_database') continue;
+            if (block.has_children) await walk(block.id, depth + 1);
+          }
+          if (!result.has_more || !result.next_cursor) break;
+          cursor = result.next_cursor;
+        }
+      };
+      await walk(objectId, 0);
       return lines.join('\n');
     };
 
@@ -91,6 +108,7 @@ export default async function (req) {
     const imported = [];
 
     for (const source of SOURCES) {
+      if (only && !only.includes(source.needle)) continue;
       const record = library.find((item) => (item.title || '').includes(source.needle));
       if (!record) {
         imported.push({ source: source.needle, status: 'no matching library record' });
@@ -111,7 +129,8 @@ export default async function (req) {
       const reviewStatus = statusOf(text);
       const updated = await base44.entities.LibraryResource.update(record.id, {
         full_text_uri: uploaded.file_uri,
-        review_status: reviewStatus,
+        // A re-import never blanks a status the source already stated once.
+        ...(reviewStatus ? { review_status: reviewStatus } : {}),
       });
 
       imported.push({

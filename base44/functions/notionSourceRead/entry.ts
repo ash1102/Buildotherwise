@@ -131,7 +131,8 @@ export default async function (req) {
       return Response.json({
         blocks: results.map((block) => {
           const body = block[block.type] || {};
-          const text = body.rich_text ? plainText(body.rich_text) : body.title ? plainText(body.title) : '';
+          let text = body.rich_text ? plainText(body.rich_text) : body.title ? plainText(body.title) : '';
+          if (!text && Array.isArray(body.cells)) text = body.cells.map((cell) => plainText(cell)).join(' | ');
           const fileUrl = body.file ? body.file.url : body.external ? body.external.url : null;
           return { id: block.id, type: block.type, text, name: body.name || '', file_url: fileUrl, has_children: block.has_children };
         }),
