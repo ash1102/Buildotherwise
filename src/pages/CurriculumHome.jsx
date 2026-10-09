@@ -27,40 +27,40 @@ export default function CurriculumHome() {
       <section>
         <div className="flex items-center gap-4">
           <DashedMotif size="lg" />
-          <p className="workbook-label">Pilot 1 · Getting Started and Modules 1–5</p>
+          <p className="workbook-label">BUILD OTHERWISE · ENTREPALOOZA · PILOT 1</p>
         </div>
-        <h1 className="mt-5 max-w-3xl font-heading text-4xl leading-[1.1] sm:text-5xl">Notice. Try. Reflect. Decide.
-
+        <h1 className="mt-4 max-w-3xl font-heading text-3xl leading-[1.15] sm:text-4xl">
+          Notice. Try. Reflect. Decide.
         </h1>
-        <p className="mt-6 max-w-2xl text-[16px] leading-relaxed text-ink-soft">Start with a question, an ordinary task, or “I don’t know yet.” Explore what holds your attention, try something small if you choose, and decide what comes next.
-
-
-
+        <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-ink-soft">
+          Start with a question, an ordinary task, or “I don’t know yet.” Explore what holds your attention, try
+          something small if you choose, and decide what comes next.
         </p>
-        <div className="mt-8 flex flex-wrap items-center gap-3">
+        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-faint">
+          A job, training, a project, a pause, or continued exploration are all valid directions. Entrepreneurship is
+          one possibility — not a requirement.
+        </p>
+        <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <Link
             to="/module/getting-started"
-            className="inline-flex items-center gap-2 rounded-full bg-teal-deep px-5 py-2.5 text-[14px] text-ivory transition hover:bg-teal-deep/90">
-            
-            Start with Enter with Agency
+            className="inline-flex items-center gap-2 rounded-full bg-teal-deep px-5 py-2.5 text-[14px] text-ivory transition hover:bg-teal-deep/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper">
+            Start with Getting Started
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
           <Link
             to="/journal"
-            className="inline-flex items-center gap-2 rounded-full border border-natural bg-white px-5 py-2.5 text-[14px] text-teal-deep transition hover:border-teal-deep/50">
-            
+            className="inline-flex items-center gap-2 rounded-full border border-natural bg-white px-5 py-2.5 text-[14px] text-teal-deep transition hover:border-teal-deep/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper">
             <BookOpen className="h-4 w-4" aria-hidden="true" />
-            Your Conversation Journal
+            Open your Journal
           </Link>
           <Link
             to="/map"
-            className="inline-flex items-center gap-2 px-2 py-2.5 text-[14px] text-ink-soft transition hover:text-teal-deep">
-            
+            className="inline-flex items-center gap-2 rounded-full px-2 py-2.5 text-[14px] text-ink-soft transition hover:text-teal-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper">
             <Map className="h-4 w-4" aria-hidden="true" />
-            The Life Map
+            View your Life Map
           </Link>
         </div>
-        <div className="mt-8 max-w-2xl">
+        <div className="mt-6 max-w-2xl">
           <PrivacyNote>
             Nothing you type here is sent to Entrepalooza. Every answer is saved in this browser and joined to your
             private journal, and it only leaves this browser if you deliberately share an entry or send feedback.

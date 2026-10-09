@@ -60,7 +60,8 @@ export default function Layout() {
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-5xl flex-1 px-5 py-8 sm:py-12">
+        {/* The extra bottom room keeps the floating journal button clear of the last controls on a page. */}
+        <main className="mx-auto w-full max-w-5xl flex-1 px-5 pt-8 pb-24 sm:pt-12 sm:pb-28">
           <Outlet />
         </main>
 

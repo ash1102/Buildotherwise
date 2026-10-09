@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { BookOpen } from "lucide-react";
 import JournalPanel from "./JournalPanel";
 import { useJournalContext } from "./JournalContext";
@@ -7,6 +8,10 @@ import { useJournalContext } from "./JournalContext";
 export default function JournalWidget() {
   const [open, setOpen] = useState(false);
   const { lesson } = useJournalContext();
+  const { pathname } = useLocation();
+
+  /** The header already carries the journal link, so on the homepage the floating button would only repeat it. */
+  if (pathname === "/") return null;
 
   return (
     <>
