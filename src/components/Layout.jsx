@@ -3,7 +3,6 @@ import { NavLink, Outlet } from "react-router-dom";
 import { JournalProvider } from "@/components/journal/JournalContext";
 import JournalWidget from "@/components/journal/JournalWidget";
 import DashedMotif from "@/components/workbook/DashedMotif";
-import { useAuth } from "@/lib/AuthContext";
 
 const LINKS = [
   { to: "/", label: "Workbook", end: true },
@@ -15,12 +14,7 @@ const LINKS = [
   { to: "/journal-reflection", label: "Reflection" },
 ];
 
-const ADMIN_LINKS = [{ to: "/content-review", label: "Content review" }];
-
 export default function Layout() {
-  const { user } = useAuth();
-  const links = user?.role === "admin" ? [...LINKS, ...ADMIN_LINKS] : LINKS;
-
   return (
     <JournalProvider>
       <div className="flex min-h-screen flex-col">
@@ -36,7 +30,7 @@ export default function Layout() {
               </span>
             </NavLink>
             <nav className="flex flex-wrap gap-x-5 gap-y-2">
-              {links.map((link) => (
+              {LINKS.map((link) => (
                 <NavLink
                   key={link.to}
                   to={link.to}

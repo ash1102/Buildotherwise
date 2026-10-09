@@ -16,7 +16,6 @@ import DiscoveryRecordPage from '@/pages/DiscoveryRecordPage';
 import ProgramLibrary from '@/pages/ProgramLibrary';
 import TribeThreads from '@/pages/TribeThreads';
 import JournalReflection from '@/pages/JournalReflection';
-import ContentReview from '@/pages/ContentReview';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -59,7 +58,6 @@ const AuthenticatedApp = () => {
         <Route path="/program-library" element={<ProgramLibrary />} />
         <Route path="/tribe-threads" element={<TribeThreads />} />
         <Route path="/journal-reflection" element={<JournalReflection />} />
-        <Route path="/content-review" element={<ContentReview />} />
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
