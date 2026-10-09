@@ -133,7 +133,7 @@ export default function DiscoveryRecordPage() {
       <RecordGroup
         title={GROUP_LABELS.conditions}
         items={[...pick("conditions"), ...pick("cost")]}
-        empty="Change one condition in Module 3 and the result and cost will land here."
+        empty="Your review in Module 2 fills this in, and Module 3 adds what changed when you adjust one condition."
       />
 
       <RecordGroup

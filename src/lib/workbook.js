@@ -19,6 +19,19 @@ export const PARTICIPATION_ROUTES = [
   "Pause or stop",
 ];
 
+/** Available on every step, whichever routes the step itself names. */
+export const UNIVERSAL_ROUTES = ["Pass", "Pause or stop"];
+
+/**
+ * A step's own equal routes come first, then the two that are always available.
+ * Falls back to the shared list when a step names none.
+ */
+export function participationRoutesFor(lesson) {
+  const own = (lesson && lesson.routes) || [];
+  if (!own.length) return PARTICIPATION_ROUTES;
+  return [...own, ...UNIVERSAL_ROUTES].filter((route, index, list) => list.indexOf(route) === index);
+}
+
 export const ANSWER_KEY = "answers";
 export const DECISION_KEY = "decisions";
 export const STATE_KEY = "stepState";

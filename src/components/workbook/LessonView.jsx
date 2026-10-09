@@ -11,6 +11,7 @@ import StepNav from "./StepNav";
 import StepHeader from "./StepHeader";
 import DashedMotif from "./DashedMotif";
 import FeedbackForm from "./FeedbackForm";
+import { participationRoutesFor } from "@/lib/workbook";
 
 function Section({ label, children, tone = "plain" }) {
   const tones = {
@@ -47,6 +48,7 @@ export default function LessonView({
 }) {
   const tryPrompts = lesson.try_prompts || [];
   const reflectPrompts = lesson.reflect_prompts || [];
+  const routes = participationRoutesFor(lesson);
 
   return (
     <article className="space-y-8">
@@ -61,9 +63,9 @@ export default function LessonView({
       />
 
       {lesson.readings_note ? (
-        <p className="rounded-lg border border-dashed border-natural-deep bg-white/60 px-4 py-3 text-[13px] text-ink-faint">
-          {lesson.readings_note}
-        </p>
+        <Section label="Reference for this step" tone="out">
+          <Prose text={lesson.readings_note} className="text-[13.5px]" />
+        </Section>
       ) : null}
 
       {lesson.teach ? (
@@ -90,7 +92,7 @@ export default function LessonView({
         </Section>
       ) : null}
 
-      <RouteChips value={route} onChange={onRouteChange} />
+      <RouteChips routes={routes} value={route} onChange={onRouteChange} />
 
       {carrySources && carrySources.length ? (
         <CarryForward sources={carrySources} selected={carried} onChange={onCarriedChange} />

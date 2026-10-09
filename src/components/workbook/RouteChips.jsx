@@ -1,7 +1,7 @@
 import React from "react";
 import { PARTICIPATION_ROUTES } from "@/lib/workbook";
 
-export default function RouteChips({ value, onChange }) {
+export default function RouteChips({ routes = PARTICIPATION_ROUTES, value, onChange }) {
   return (
     <div className="rounded-lg border border-natural bg-teal-deep-wash/60 p-4">
       <p className="workbook-label">Your participation choices</p>
@@ -10,7 +10,7 @@ export default function RouteChips({ value, onChange }) {
         reason.
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
-        {PARTICIPATION_ROUTES.map((route) => {
+        {routes.map((route) => {
           const active = value === route;
           return (
             <button
