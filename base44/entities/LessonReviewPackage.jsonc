@@ -1,0 +1,131 @@
+{
+  "name": "LessonReviewPackage",
+  "type": "object",
+  "properties": {
+    "lesson_code": {
+      "type": "string",
+      "description": "The existing workbook card this package reviews. Review only \u2014 it never replaces the card."
+    },
+    "lesson_id": {
+      "type": "string",
+      "description": "Record id of the existing card, kept so the link survives a code change."
+    },
+    "module_order": {
+      "type": "number"
+    },
+    "module_title": {
+      "type": "string"
+    },
+    "lesson_title": {
+      "type": "string"
+    },
+    "review_scope": {
+      "type": "string",
+      "description": "What this module's candidate content covers. A review scope, not replacement lesson text."
+    },
+    "current_card_note": {
+      "type": "string",
+      "description": "The existing card and the status of any approved teaching in it."
+    },
+    "proposed_draft_label": {
+      "type": "string",
+      "description": "Always names the draft text as a review candidate, never as current teaching."
+    },
+    "proposed_draft_text": {
+      "type": "string",
+      "description": "Proposed draft text held for review only. Never rendered to participants and never inserted into the card by this record."
+    },
+    "changes_requested": {
+      "type": "string",
+      "description": "What the draft asks to change, in the source's own wording."
+    },
+    "instructional_purpose": {
+      "type": "string"
+    },
+    "research_rationale": {
+      "type": "string",
+      "description": "Research the draft cites, kept as rationale for reviewers."
+    },
+    "research_limitations": {
+      "type": "string"
+    },
+    "facilitator_boundaries": {
+      "type": "string",
+      "description": "Facilitator guidance, guardrails, and what not to do, proposed for review."
+    },
+    "participation_alternatives": {
+      "type": "string"
+    },
+    "reviewer_notes": {
+      "type": "string",
+      "description": "Recommendations only \u2014 proposed prompts and peer practice. Never approved participant instructions."
+    },
+    "review_status": {
+      "type": "string",
+      "enum": [
+        "pending_evaluator_and_clinical_review",
+        "pending_program_review",
+        "rehearsal_draft",
+        "approved",
+        "not_required"
+      ],
+      "default": "pending_program_review"
+    },
+    "approval_decision": {
+      "type": "string",
+      "description": "Recorded by the program team only. Reviewing is not approving."
+    },
+    "approver": {
+      "type": "string"
+    },
+    "approved_version": {
+      "type": "string"
+    },
+    "decision_note": {
+      "type": "string"
+    },
+    "decided_date": {
+      "type": "string"
+    },
+    "source_label": {
+      "type": "string"
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "source_date": {
+      "type": "string"
+    },
+    "internal_notes": {
+      "type": "string",
+      "description": "Program-team only. Never rendered to participants."
+    }
+  },
+  "required": [
+    "lesson_code",
+    "module_order",
+    "lesson_title"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

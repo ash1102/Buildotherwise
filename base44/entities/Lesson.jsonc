@@ -97,6 +97,27 @@
       ],
       "default": "draft"
     },
+    "approval_state": {
+      "type": "string",
+      "enum": [
+        "approved",
+        "pending_approval"
+      ],
+      "default": "pending_approval",
+      "description": "Whether the teaching on this card is approved for participant delivery. A complete workbook structure is not the same as approved lesson content."
+    },
+    "approval_note": {
+      "type": "string",
+      "description": "Shown on the card while its teaching is not yet approved. Never a claim of approval."
+    },
+    "approved_source": {
+      "type": "string",
+      "description": "The approved curriculum source this card's content comes from, when the content is approved."
+    },
+    "approved_version": {
+      "type": "string",
+      "description": "The exact approved source version this card's content comes from."
+    },
     "internal_notes": {
       "type": "string",
       "description": "Facilitator-only. Never rendered to participants."

@@ -62,6 +62,15 @@ export default function LessonView({
         status={status}
       />
 
+      {lesson.approval_state === "pending_approval" ? (
+        <div className="rounded-lg border border-copper/40 bg-copper-wash/50 p-4 sm:p-5">
+          <p className="workbook-label text-copper">Not for participant delivery</p>
+          <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
+            {lesson.approval_note || "Lesson content pending approval—not ready for participant delivery."}
+          </p>
+        </div>
+      ) : null}
+
       {lesson.readings_note ? (
         <Section label="Reference for this step" tone="out">
           <Prose text={lesson.readings_note} className="text-[13.5px]" />
@@ -152,6 +161,13 @@ export default function LessonView({
         <Section label="Source and boundaries" tone="boundary">
           <Prose text={lesson.boundary} className="text-[13.5px]" />
         </Section>
+      ) : null}
+
+      {lesson.approval_state === "approved" && lesson.approved_source ? (
+        <p className="text-[12px] leading-relaxed text-ink-faint">
+          Approved source: {lesson.approved_source}
+          {lesson.approved_version ? ` · ${lesson.approved_version}` : ""}
+        </p>
       ) : null}
 
       <div className="rounded-lg border border-natural bg-white/60 p-4">
