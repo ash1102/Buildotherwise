@@ -17,6 +17,10 @@ const CYCLE = [
 export default function CurriculumHome() {
   const { modules, lessonsByOrder, loading } = useCurriculum();
   const { answers, decisions, states } = useWorkbook();
+  /** Getting Started is the doorway, not a module, so it sits apart from the numbered list. */
+  const gettingStarted = modules.find((module) => module.kind === "orientation");
+  const numberedModules = modules.filter((module) => module.kind !== "orientation");
+  const gettingStartedSteps = gettingStarted ? (lessonsByOrder[gettingStarted.order] || []).length : 0;
 
   return (
     <div className="space-y-14">
@@ -77,6 +81,26 @@ export default function CurriculumHome() {
         </div>
       </section>
 
+      {gettingStarted ?
+      <section>
+          <p className="workbook-label">Before the modules</p>
+          <Link
+          to={`/module/${gettingStarted.slug}`}
+          className="mt-4 flex flex-col gap-3 rounded-lg border border-natural bg-teal-deep-wash/60 p-6 transition hover:border-teal-deep/50 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+          
+            <div className="min-w-0">
+              <h2 className="font-heading text-2xl">Getting Started</h2>
+              <p className="mt-1 font-heading text-[16px] italic text-teal-deep">{gettingStarted.subtitle || gettingStarted.title}</p>
+              <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-ink-soft">{gettingStarted.purpose}</p>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-2 text-[12.5px] text-teal-deep">
+              {gettingStartedSteps} steps
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </span>
+          </Link>
+        </section> :
+      null}
+
       <section>
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -93,7 +117,7 @@ export default function CurriculumHome() {
           <p className="py-8 text-[14px] text-ink-faint">Loading the program…</p> :
 
           <ModuleMap
-            modules={modules}
+            modules={numberedModules}
             lessonsByOrder={lessonsByOrder}
             answers={answers}
             decisions={decisions}
