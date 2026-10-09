@@ -28,10 +28,10 @@ export default function CurriculumHome() {
         <h1 className="mt-5 max-w-3xl font-heading text-4xl leading-[1.1] sm:text-5xl">Notice. Try. Reflect. Decide.
 
         </h1>
-        <p className="mt-6 max-w-2xl text-[16px] leading-relaxed text-ink-soft">
-          This is not a course you pass. It is a structured way to notice what holds your attention, run one small real
-          try, look honestly at what it cost, and decide what comes next. A job, training, a project, a pause, or still
-          looking all count as full finishes. Entrepreneurship is one possible outcome, never a requirement.
+        <p className="mt-6 max-w-2xl text-[16px] leading-relaxed text-ink-soft">Start with a question, an ordinary task, or “I don’t know yet.” Explore what holds your attention, try something small if you choose, and decide what comes next.A job, training, a project, a pause, or continued exploration are all valid directions. Entrepreneurship is one possibility—not a requirement.
+
+
+
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <Link
