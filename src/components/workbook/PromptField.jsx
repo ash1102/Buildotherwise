@@ -3,6 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { getAnswer, setAnswer } from "@/lib/workbook";
 import { saveAnswer } from "@/lib/journal";
 import PrivacyNote from "./PrivacyNote";
+import DictateButton from "./DictateButton";
 
 /**
  * One question. The answer autosaves and joins the Conversation Journal as an
@@ -54,7 +55,10 @@ export default function PromptField({ lessonCode, lessonTitle, index, label, rou
         className="mt-3 min-h-[5rem] resize-y border-natural bg-ivory/60 text-[14px] leading-relaxed"
       />
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-        <PrivacyNote />
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <DictateButton value={value} onText={handleChange} />
+          <PrivacyNote />
+        </div>
         <span aria-live="polite" className="text-[12px] text-teal-deep">
           {state === "saved" ? "Saved to your journal" : state === "saving" ? "Saving…" : ""}
         </span>
