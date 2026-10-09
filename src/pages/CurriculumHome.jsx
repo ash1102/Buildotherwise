@@ -8,11 +8,11 @@ import DashedMotif from "@/components/workbook/DashedMotif";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 
 const CYCLE = [
-  { label: "Notice", line: "What keeps holding your attention — without turning it into identity." },
-  { label: "Try", line: "One small, bounded, reversible try with a stop rule written before you start." },
-  { label: "Reflect", line: "What actually happened, what it cost, and what is still unknown." },
-  { label: "Decide", line: "Keep, change, test again, pause, stop, another direction, or continue looking." },
-];
+{ label: "Notice", line: "What keeps holding your attention — without turning it into identity." },
+{ label: "Try", line: "One small, bounded, reversible try with a stop rule written before you start." },
+{ label: "Reflect", line: "What actually happened, what it cost, and what is still unknown." },
+{ label: "Decide", line: "Keep, change, test again, pause, stop, another direction, or continue looking." }];
+
 
 export default function CurriculumHome() {
   const { modules, lessonsByOrder, loading } = useCurriculum();
@@ -25,8 +25,8 @@ export default function CurriculumHome() {
           <DashedMotif size="lg" />
           <p className="workbook-label">Pilot 1 · Getting Started and Modules 1–5</p>
         </div>
-        <h1 className="mt-5 max-w-3xl font-heading text-4xl leading-[1.1] sm:text-5xl">
-          A workbook for noticing, trying, reflecting, and deciding.
+        <h1 className="mt-5 max-w-3xl font-heading text-4xl leading-[1.1] sm:text-5xl">Notice. Try. Reflect. Decide.
+
         </h1>
         <p className="mt-6 max-w-2xl text-[16px] leading-relaxed text-ink-soft">
           This is not a course you pass. It is a structured way to notice what holds your attention, run one small real
@@ -36,22 +36,22 @@ export default function CurriculumHome() {
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <Link
             to="/module/getting-started"
-            className="inline-flex items-center gap-2 rounded-full bg-teal-deep px-5 py-2.5 text-[14px] text-ivory transition hover:bg-teal-deep/90"
-          >
+            className="inline-flex items-center gap-2 rounded-full bg-teal-deep px-5 py-2.5 text-[14px] text-ivory transition hover:bg-teal-deep/90">
+            
             Start with Enter with Agency
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
           <Link
             to="/journal"
-            className="inline-flex items-center gap-2 rounded-full border border-natural bg-white px-5 py-2.5 text-[14px] text-teal-deep transition hover:border-teal-deep/50"
-          >
+            className="inline-flex items-center gap-2 rounded-full border border-natural bg-white px-5 py-2.5 text-[14px] text-teal-deep transition hover:border-teal-deep/50">
+            
             <BookOpen className="h-4 w-4" aria-hidden="true" />
             Your Conversation Journal
           </Link>
           <Link
             to="/map"
-            className="inline-flex items-center gap-2 px-2 py-2.5 text-[14px] text-ink-soft transition hover:text-teal-deep"
-          >
+            className="inline-flex items-center gap-2 px-2 py-2.5 text-[14px] text-ink-soft transition hover:text-teal-deep">
+            
             <Map className="h-4 w-4" aria-hidden="true" />
             The Life Map
           </Link>
@@ -67,13 +67,13 @@ export default function CurriculumHome() {
       <section>
         <p className="workbook-label">The cycle you will use again and again</p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {CYCLE.map((step, index) => (
-            <div key={step.label} className="rounded-lg border border-natural bg-white p-5">
+          {CYCLE.map((step, index) =>
+          <div key={step.label} className="rounded-lg border border-natural bg-white p-5">
               <span className="font-heading text-[13px] text-copper">{`0${index + 1}`}</span>
               <h2 className="mt-2 font-heading text-xl">{step.label}</h2>
               <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">{step.line}</p>
             </div>
-          ))}
+          )}
         </div>
       </section>
 
@@ -89,17 +89,17 @@ export default function CurriculumHome() {
           </p>
         </div>
         <div className="mt-6">
-          {loading ? (
-            <p className="py-8 text-[14px] text-ink-faint">Loading the program…</p>
-          ) : (
-            <ModuleMap
-              modules={modules}
-              lessonsByOrder={lessonsByOrder}
-              answers={answers}
-              decisions={decisions}
-              states={states}
-            />
-          )}
+          {loading ?
+          <p className="py-8 text-[14px] text-ink-faint">Loading the program…</p> :
+
+          <ModuleMap
+            modules={modules}
+            lessonsByOrder={lessonsByOrder}
+            answers={answers}
+            decisions={decisions}
+            states={states} />
+
+          }
         </div>
       </section>
 
@@ -119,6 +119,6 @@ export default function CurriculumHome() {
           </p>
         </div>
       </section>
-    </div>
-  );
+    </div>);
+
 }
