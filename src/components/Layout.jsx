@@ -23,6 +23,9 @@ export default function Layout() {
               <Link to="/contact" className="font-medium text-accent-ink underline underline-offset-2">
                 Contact the program team
               </Link>
+              <Link to="/connect" className="font-medium text-accent-ink underline underline-offset-2">
+                Connect an AI assistant
+              </Link>
             </div>
             <p>
               Pilot 1 covers Getting Started and Modules 1–5. Nothing you type on these pages is sent to Entrepalooza —

@@ -27,6 +27,7 @@ import ResetPassword from '@/pages/ResetPassword';
 import OAuthConsent from '@/pages/OAuthConsent';
 import About from '@/pages/About';
 import Contact from '@/pages/Contact';
+import Connect from '@/pages/Connect';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -71,6 +72,7 @@ const AuthenticatedApp = () => {
         <Route path="/aspect/:slug" element={<AspectPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/connect" element={<Connect />} />
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
