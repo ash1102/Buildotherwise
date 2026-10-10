@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 import { JournalProvider } from "@/components/journal/JournalContext";
 import JournalWidget from "@/components/journal/JournalWidget";
 import DashedMotif from "@/components/workbook/DashedMotif";
@@ -58,6 +58,20 @@ export default function Layout() {
 
         <footer className="no-print border-t border-natural bg-ivory/70">
           <div className="mx-auto max-w-5xl px-5 py-6 text-[12px] leading-relaxed text-ink-faint">
+            <div className="mb-3 flex flex-wrap gap-x-5 gap-y-2 text-[12.5px]">
+              <Link
+                to="/about"
+                className="text-teal-deep underline decoration-natural underline-offset-4 transition hover:text-copper"
+              >
+                About Entrepalooza
+              </Link>
+              <Link
+                to="/contact"
+                className="text-teal-deep underline decoration-natural underline-offset-4 transition hover:text-copper"
+              >
+                Contact the program team
+              </Link>
+            </div>
             <p>
               Pilot 1 covers Getting Started and Modules 1–5. Nothing you type on these pages is sent to Entrepalooza —
               it stays in this browser until you choose to share it.

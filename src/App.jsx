@@ -24,6 +24,8 @@ import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import OAuthConsent from '@/pages/OAuthConsent';
+import About from '@/pages/About';
+import Contact from '@/pages/Contact';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -64,6 +66,8 @@ const AuthenticatedApp = () => {
         <Route path="/journal-reflection" element={<JournalReflection />} />
         <Route path="/aspects" element={<AspectIndex />} />
         <Route path="/aspect/:slug" element={<AspectPage />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
