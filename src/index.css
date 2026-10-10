@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,106 +6,117 @@
 
 /*
  * Entrepalooza theme tokens.
- * Palette: #F9FAFB paper, #111827 ink, #1F2937 soft ink, #6D28D9 primary, #A78BFA light violet.
+ * Palette: #FFFBEB paper, #FEEFCE wash, #F59E0B light amber, #D97706 primary, #451A03 ink.
+ * #915108 ("accent ink") is the deep shade of the primary, used for small accent text and
+ * accent fills so labels stay crisp on the cream paper.
  * Every color in the app resolves to one of these tokens — change a value here and the whole app follows.
  */
 @layer base {
   :root {
-    --background: 210 20% 98.04%; /* #F9FAFB */
-    --foreground: 220.91 39.29% 10.98%; /* #111827 */
+    --background: 48 100% 96.08%; /* #FFFBEB */
+    --foreground: 20.9 91.7% 14.1%; /* #451A03 */
 
     --card: 0 0% 100%;
-    --card-foreground: 220.91 39.29% 10.98%;
+    --card-foreground: 20.9 91.7% 14.1%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220.91 39.29% 10.98%;
+    --popover-foreground: 20.9 91.7% 14.1%;
 
-    --primary: 263.39 69.96% 50.39%; /* #6D28D9 */
-    --primary-foreground: 210 20% 98.04%; /* #F9FAFB */
-    --primary-soft: 255.14 91.74% 76.27%; /* #A78BFA */
-    --primary-wash: 250 100% 97.65%; /* #F5F3FF */
+    --primary: 32.1 94.6% 43.7%; /* #D97706 */
+    --primary-foreground: 48 100% 96.08%; /* #FFFBEB */
+    --primary-soft: 37.7 92.1% 50.2%; /* #F59E0B */
+    --primary-wash: 41.3 96% 90.2%; /* #FEEFCE */
 
-    --secondary: 220 14.29% 95.88%; /* #F3F4F6 */
-    --secondary-foreground: 220.91 39.29% 10.98%;
+    --secondary: 41.3 96% 90.2%; /* #FEEFCE */
+    --secondary-foreground: 20.9 91.7% 14.1%;
 
-    --muted: 220 14.29% 95.88%;
-    --muted-foreground: 215 27.91% 16.86%; /* #1F2937 */
-    --muted-faint: 215.38 16.32% 46.86%; /* #64748B */
+    --muted: 41.3 96% 90.2%;
+    --muted-foreground: 20.9 91.7% 14.1%; /* #451A03 */
+    --muted-faint: 32 60% 38%; /* warm brown for faint supporting text */
 
-    --accent: 251.43 91.3% 95.49%; /* #EDE9FE */
-    --accent-foreground: 263.36 69.3% 42.16%; /* #5B21B6 */
-    --accent-ink: 262.12 83.26% 57.84%; /* #7C3AED */
-    --accent-ink-soft: 255.14 91.74% 76.27%; /* #A78BFA */
-    --accent-ink-wash: 250 100% 97.65%;
+    --accent: 41.3 96% 90.2%; /* #FEEFCE */
+    --accent-foreground: 20.9 91.7% 14.1%;
+    --accent-ink: 32 90% 30%; /* #915108, deep shade of #D97706 */
+    --accent-ink-soft: 37.7 92.1% 50.2%; /* #F59E0B */
+    --accent-ink-wash: 41.3 96% 90.2%;
 
     --destructive: 0 72.22% 50.59%; /* #DC2626 */
-    --destructive-foreground: 210 20% 98.04%;
+    --destructive-foreground: 48 100% 96.08%;
 
-    --border: 220 13.04% 90.98%; /* #E5E7EB */
-    --input: 216 12.2% 83.92%; /* #D1D5DB */
-    --ring: 263.39 69.96% 50.39%;
+    --border: 41 70% 88%; /* warm hairline */
+    --input: 41 50% 80%;
+    --ring: 32.1 94.6% 43.7%;
 
-    --chart-1: 263.39 69.96% 50.39%;
-    --chart-2: 255.14 91.74% 76.27%;
-    --chart-3: 262.12 83.26% 57.84%;
-    --chart-4: 215 27.91% 16.86%;
-    --chart-5: 215.38 16.32% 46.86%;
+    --chart-1: 32.1 94.6% 43.7%;
+    --chart-2: 37.7 92.1% 50.2%;
+    --chart-3: 32 90% 30%;
+    --chart-4: 20.9 91.7% 14.1%;
+    --chart-5: 32 60% 38%;
 
     --radius: 0.75rem;
 
-    --font-heading: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
-    --font-body: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --font-heading: "Playfair Display", "Iowan Old Style", Georgia, serif;
+    --font-body: "Lora", Georgia, "Times New Roman", serif;
+    --font-display: "Playfair Display", Georgia, serif;
+    --font-mono: "Lora", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 220.91 39.29% 10.98%;
-    --sidebar-primary: 263.39 69.96% 50.39%;
-    --sidebar-primary-foreground: 210 20% 98.04%;
-    --sidebar-accent: 251.43 91.3% 95.49%;
-    --sidebar-accent-foreground: 263.36 69.3% 42.16%;
-    --sidebar-border: 220 13.04% 90.98%;
-    --sidebar-ring: 263.39 69.96% 50.39%;
+    --sidebar-foreground: 20.9 91.7% 14.1%;
+    --sidebar-primary: 32.1 94.6% 43.7%;
+    --sidebar-primary-foreground: 48 100% 96.08%;
+    --sidebar-accent: 41.3 96% 90.2%;
+    --sidebar-accent-foreground: 20.9 91.7% 14.1%;
+    --sidebar-border: 41 70% 88%;
+    --sidebar-ring: 32.1 94.6% 43.7%;
   }
 
   .dark {
-    --background: 220.91 39.29% 10.98%; /* #111827 */
-    --foreground: 210 20% 98.04%; /* #F9FAFB */
+    --background: 24 45% 9%;
+    --foreground: 48 100% 96.08%; /* #FFFBEB */
 
-    --card: 215 27.91% 16.86%; /* #1F2937 */
-    --card-foreground: 210 20% 98.04%;
-    --popover: 215 27.91% 16.86%;
-    --popover-foreground: 210 20% 98.04%;
+    --card: 24 40% 13%;
+    --card-foreground: 48 100% 96.08%;
+    --popover: 24 40% 13%;
+    --popover-foreground: 48 100% 96.08%;
 
-    --primary: 255.14 91.74% 76.27%; /* #A78BFA */
-    --primary-foreground: 220.91 39.29% 10.98%;
-    --primary-soft: 263.39 69.96% 50.39%;
-    --primary-wash: 215 27.91% 22%;
+    --primary: 37.7 92.1% 50.2%; /* #F59E0B */
+    --primary-foreground: 20.9 91.7% 14.1%;
+    --primary-soft: 32.1 94.6% 43.7%;
+    --primary-wash: 24 40% 18%;
 
-    --secondary: 215 27.91% 22%;
-    --secondary-foreground: 210 20% 98.04%;
+    --secondary: 24 35% 18%;
+    --secondary-foreground: 48 100% 96.08%;
 
-    --muted: 215 27.91% 22%;
-    --muted-foreground: 220 13.04% 90.98%;
-    --muted-faint: 215.38 16.32% 70%;
+    --muted: 24 35% 18%;
+    --muted-foreground: 44 30% 88%;
+    --muted-faint: 40 30% 66%;
 
-    --accent: 263.36 69.3% 28%;
-    --accent-foreground: 251.43 91.3% 95.49%;
-    --accent-ink: 255.14 91.74% 82%;
-    --accent-ink-soft: 263.39 69.96% 50.39%;
-    --accent-ink-wash: 215 27.91% 22%;
+    --accent: 24 40% 20%;
+    --accent-foreground: 48 100% 96.08%;
+    --accent-ink: 37.7 92.1% 62%;
+    --accent-ink-soft: 32.1 94.6% 50%;
+    --accent-ink-wash: 24 40% 18%;
 
-    --border: 215 27.91% 25%;
-    --input: 215 27.91% 30%;
-    --ring: 255.14 91.74% 76.27%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 48 100% 96%;
 
-    --sidebar-background: 220.91 39.29% 10.98%;
-    --sidebar-foreground: 210 20% 96%;
-    --sidebar-primary: 255.14 91.74% 76.27%;
-    --sidebar-primary-foreground: 220.91 39.29% 10.98%;
-    --sidebar-accent: 263.36 69.3% 28%;
-    --sidebar-accent-foreground: 251.43 91.3% 95.49%;
-    --sidebar-border: 215 27.91% 25%;
-    --sidebar-ring: 255.14 91.74% 76.27%;
+    --border: 24 35% 22%;
+    --input: 24 35% 26%;
+    --ring: 37.7 92.1% 50.2%;
+
+    --chart-1: 37.7 92.1% 50.2%;
+    --chart-2: 32.1 94.6% 43.7%;
+    --chart-3: 48 100% 80%;
+    --chart-4: 48 100% 96.08%;
+    --chart-5: 40 30% 66%;
+
+    --sidebar-background: 24 45% 9%;
+    --sidebar-foreground: 48 100% 96%;
+    --sidebar-primary: 37.7 92.1% 50.2%;
+    --sidebar-primary-foreground: 20.9 91.7% 14.1%;
+    --sidebar-accent: 24 40% 20%;
+    --sidebar-accent-foreground: 48 100% 96%;
+    --sidebar-border: 24 35% 22%;
+    --sidebar-ring: 37.7 92.1% 50.2%;
   }
 }
 
@@ -142,7 +153,7 @@
 
 @layer components {
   .workbook-label {
-    @apply text-[11px] font-semibold uppercase text-primary/70;
+    @apply text-[11px] font-semibold uppercase text-accent-ink;
     letter-spacing: 0.18em;
   }
 
