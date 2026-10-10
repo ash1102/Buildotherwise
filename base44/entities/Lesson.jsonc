@@ -38,7 +38,12 @@
       "type": "number"
     },
     "purpose": {
-      "type": "string"
+      "type": "string",
+      "description": "One honest sentence on what the step does."
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional short text about this step (up to 1000 characters), used for search and previews."
     },
     "teach": {
       "type": "string",

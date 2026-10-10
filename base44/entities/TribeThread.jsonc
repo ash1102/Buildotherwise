@@ -25,6 +25,10 @@
       "type": "string",
       "description": "How to take part, including what is optional."
     },
+    "description": {
+      "type": "string",
+      "description": "Optional short text about this thread (up to 1000 characters), used for search and previews."
+    },
     "order": {
       "type": "number"
     },

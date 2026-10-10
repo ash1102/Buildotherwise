@@ -23,6 +23,10 @@
       "type": "string",
       "description": "What this module's candidate content covers. A review scope, not replacement lesson text."
     },
+    "description": {
+      "type": "string",
+      "description": "Optional short text about this review package (up to 1000 characters), used for search and previews."
+    },
     "current_card_note": {
       "type": "string",
       "description": "The existing card and the status of any approved teaching in it."

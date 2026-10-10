@@ -36,6 +36,10 @@
       "type": "string",
       "description": "One honest sentence on what the module does."
     },
+    "description": {
+      "type": "string",
+      "description": "Optional short text about this module (up to 1000 characters), used for search and previews."
+    },
     "subtitle": {
       "type": "string"
     }
