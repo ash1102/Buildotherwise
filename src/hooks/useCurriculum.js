@@ -2,10 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
 
 /** Modules and lessons are content records, so a new module is data, not a redesign. */
+/** The curriculum is content, so it is fetched once per session and reused by every page. */
+let curriculumCache = null;
+
 export default function useCurriculum() {
-  const [modules, setModules] = useState([]);
-  const [lessons, setLessons] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [modules, setModules] = useState(curriculumCache?.modules || []);
+  const [lessons, setLessons] = useState(curriculumCache?.lessons || []);
+  const [loading, setLoading] = useState(!curriculumCache);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -17,12 +20,13 @@ export default function useCurriculum() {
           base44.entities.Lesson.list("module_order", 200),
         ]);
         if (!active) return;
-        setModules([...moduleRows].sort((a, b) => a.order - b.order));
-        setLessons(
-          [...lessonRows].sort((a, b) =>
-            a.module_order === b.module_order ? a.order - b.order : a.module_order - b.module_order
-          )
+        const sortedModules = [...moduleRows].sort((a, b) => a.order - b.order);
+        const sortedLessons = [...lessonRows].sort((a, b) =>
+          a.module_order === b.module_order ? a.order - b.order : a.module_order - b.module_order
         );
+        curriculumCache = { modules: sortedModules, lessons: sortedLessons };
+        setModules(sortedModules);
+        setLessons(sortedLessons);
       } catch (loadError) {
         if (active) setError(loadError);
       } finally {

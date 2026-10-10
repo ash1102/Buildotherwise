@@ -4,7 +4,36 @@ import { ArrowRight } from "lucide-react";
 import { isComingLater } from "@/lib/curriculum";
 import { describeStep } from "@/lib/workbook";
 
-export default function ModuleMap({ modules, lessonsByOrder, answers, decisions, states }) {
+/** Placeholder rows keep the list's height while the curriculum loads, so nothing jumps under a reaching cursor. */
+const SKELETON_ROWS = 10;
+
+function SkeletonRow() {
+  return (
+    <li className="py-5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+        <div className="min-w-0 flex-1">
+          <div className="h-3.5 w-24 animate-pulse rounded bg-natural" />
+          <div className="mt-2.5 h-6 w-60 max-w-full animate-pulse rounded bg-natural" />
+          <div className="mt-3 h-4 w-full max-w-2xl animate-pulse rounded bg-natural/70" />
+          <div className="mt-2 h-4 w-2/3 max-w-xl animate-pulse rounded bg-natural/70" />
+        </div>
+        <div className="mt-1 h-4 w-28 shrink-0 animate-pulse rounded bg-natural/70 sm:mt-2" />
+      </div>
+    </li>
+  );
+}
+
+export default function ModuleMap({ modules, lessonsByOrder, answers, decisions, states, loading }) {
+  if (loading) {
+    return (
+      <ol aria-busy="true" className="divide-y divide-natural border-y border-natural">
+        {Array.from({ length: SKELETON_ROWS }).map((_, index) => (
+          <SkeletonRow key={index} />
+        ))}
+      </ol>
+    );
+  }
+
   return (
     <ol className="divide-y divide-natural border-y border-natural">
       {modules.map((module) => {

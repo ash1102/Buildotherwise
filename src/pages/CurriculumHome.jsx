@@ -87,9 +87,16 @@ export default function CurriculumHome() {
         </div>
       </section>
 
-      {gettingStarted ?
+      {loading || gettingStarted ?
       <section>
           <p className="workbook-label">Start here · its own short sequence</p>
+          {loading ?
+          <div aria-busy="true" className="mt-4 min-h-[168px] rounded-lg border border-natural bg-white/60 p-6">
+            <div className="h-7 w-52 animate-pulse rounded bg-natural" />
+            <div className="mt-3 h-4 w-44 animate-pulse rounded bg-natural/70" />
+            <div className="mt-3 h-3.5 w-full max-w-2xl animate-pulse rounded bg-natural/70" />
+            <div className="mt-2 h-3.5 w-2/3 max-w-xl animate-pulse rounded bg-natural/70" />
+          </div> :
           <Link
           to="/getting-started"
           className="mt-4 flex flex-col gap-3 rounded-lg border border-natural bg-teal-deep-wash/60 p-6 transition hover:border-teal-deep/50 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
@@ -103,7 +110,7 @@ export default function CurriculumHome() {
               {gettingStartedSteps} steps
               <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </span>
-          </Link>
+          </Link>}
         </section> :
       null}
 
@@ -119,17 +126,13 @@ export default function CurriculumHome() {
           </p>
         </div>
         <div className="mt-6">
-          {loading ?
-          <p className="py-8 text-[14px] text-ink-faint">Loading the program…</p> :
-
           <ModuleMap
+            loading={loading}
             modules={numberedModules}
             lessonsByOrder={lessonsByOrder}
             answers={answers}
             decisions={decisions}
             states={states} />
-
-          }
         </div>
       </section>
 
