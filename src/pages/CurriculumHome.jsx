@@ -145,7 +145,8 @@ export default function CurriculumHome() {
             exactly what the program creator receives, and you can see the scope before you send it.
           </p>
           <p>
-            Passing, pausing, and stopping are complete answers. They are recorded as choices, not as gaps.
+            <strong className="font-medium text-ink">Writing</strong> is part of every step, and one line is enough. No
+            step is passed over: you write something, even when you pause and come back to it.
           </p>
         </div>
       </section>

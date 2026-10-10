@@ -9,7 +9,16 @@ import DictateButton from "./DictateButton";
  * One question. The answer autosaves and joins the Conversation Journal as an
  * entry linked to this step, so it is never typed twice.
  */
-export default function PromptField({ lessonCode, lessonTitle, index, label, route, onSaved }) {
+export default function PromptField({
+  lessonCode,
+  lessonTitle,
+  index,
+  label,
+  route,
+  onSaved,
+  variant = "card",
+  compact = false,
+}) {
   const [value, setValue] = useState(() => getAnswer(lessonCode, index));
   const [state, setState] = useState("idle");
   const timer = useRef(null);
@@ -42,7 +51,7 @@ export default function PromptField({ lessonCode, lessonTitle, index, label, rou
   };
 
   return (
-    <div className="rounded-lg border border-natural bg-white p-4 sm:p-5">
+    <div className={variant === "inline" ? "" : "rounded-lg border border-natural bg-white p-4 sm:p-5"}>
       <label className="block font-heading text-[16px] leading-snug text-ink" htmlFor={`${lessonCode}-${index}`}>
         {label}
       </label>
@@ -50,9 +59,15 @@ export default function PromptField({ lessonCode, lessonTitle, index, label, rou
         id={`${lessonCode}-${index}`}
         value={value}
         onChange={(event) => handleChange(event.target.value)}
-        rows={3}
-        placeholder="Write as much or as little as you want. “I don't know yet” is a complete answer."
-        className="mt-3 min-h-[5rem] resize-y border-natural bg-ivory/60 text-[14px] leading-relaxed"
+        rows={compact ? 1 : 3}
+        placeholder={
+          compact
+            ? "One line is enough."
+            : "Write as much or as little as you want. “I don't know yet” is a complete answer."
+        }
+        className={`mt-3 resize-y border-natural bg-ivory/60 text-[14px] leading-relaxed ${
+          compact ? "min-h-[2.75rem]" : "min-h-[5rem]"
+        }`}
       />
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">

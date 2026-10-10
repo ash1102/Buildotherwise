@@ -7,7 +7,7 @@ export default function DecisionPicker({ value, onChange, note }) {
       <p className="workbook-label text-copper">Next decision</p>
       <p className="mt-2 text-[13px] leading-relaxed text-ink-soft">
         {note ||
-          "Every one of these is a complete answer. Pass and “I don't know yet” are always available and never need a reason."}
+          "Every one of these is a complete answer. “I don't know yet” is always available and never needs a reason."}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
         {NEXT_DECISIONS.map((decision) => {

@@ -19,13 +19,11 @@ export default function StepHeader({ moduleTitle, stepNumber, stepCount, title, 
       {status && status !== "not answered" ? (
         <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-natural bg-white px-3 py-1 text-[12px] text-ink-soft">
           <span className="h-1.5 w-1.5 rounded-full bg-teal-deep" aria-hidden="true" />
-          {status === "passed"
-            ? "You passed on this step — that counts, and nothing else is required."
-            : status === "paused"
-              ? "You paused this step. It stays here whenever you want it."
-              : status === "decided"
-                ? "You recorded a Next Decision here."
-                : "You have something saved on this step."}
+          {status === "paused"
+            ? "You wrote your line and paused this step. It stays here whenever you want it."
+            : status === "decided"
+              ? "You recorded a Next Decision here."
+              : "You have something saved on this step."}
         </p>
       ) : null}
     </header>

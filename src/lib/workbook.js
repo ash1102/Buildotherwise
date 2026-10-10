@@ -11,25 +11,66 @@ export const NEXT_DECISIONS = [
   "Continue Looking",
 ];
 
-export const PARTICIPATION_ROUTES = [
-  "Work privately",
-  "Observe only",
-  "Use the neutral example",
-  "Pass",
-  "Pause or stop",
+/**
+ * Every participation route writes something. There is no pass, and no route
+ * that skips the journal: one line is what makes a step yours, so the writing
+ * routes are the shared set, and pausing keeps the line before it pauses.
+ */
+export const WRITING_ROUTES = [
+  {
+    label: "Write it in my own words",
+    blurb: "Your own words, kept in this browser.",
+    cue: "Say it your way. One line is enough to count.",
+    field: "full",
+  },
+  {
+    label: "Write from the neutral example",
+    blurb: "Start from the example on this step instead of your own material.",
+    cue: "Use the neutral example as your starting point, then swap in what fits you.",
+    field: "full",
+  },
+  {
+    label: "Write one line only",
+    blurb: "One line, written now. That is the whole ask.",
+    cue: "One line only. Short is fine.",
+    field: "line",
+  },
 ];
 
+/** Write the line, then leave the step for later. */
+export const PAUSE_ROUTE = "Write one line, then pause";
+
 /** Available on every step, whichever routes the step itself names. */
-export const UNIVERSAL_ROUTES = ["Pass", "Pause or stop"];
+export const UNIVERSAL_ROUTES = [PAUSE_ROUTE];
+
+export const PARTICIPATION_ROUTES = [...WRITING_ROUTES.map((route) => route.label), ...UNIVERSAL_ROUTES];
+
+/** Older wording that let a step be taken without writing. It has no place now. */
+const RETIRED_ROUTES = /^(pass|observe|observe only|pause or stop|come back later|observe:)/i;
+
+/** How a chosen route answers the page: field shape, wording, and pause state. */
+export function routeGuidanceFor(route) {
+  if (route === PAUSE_ROUTE) {
+    return {
+      label: PAUSE_ROUTE,
+      blurb: "Write a line now and come back to this step later.",
+      cue: "Your line is saved, and this step waits here for you.",
+      field: "line",
+      paused: true,
+    };
+  }
+  return WRITING_ROUTES.find((item) => item.label === route) || null;
+}
 
 /**
- * A step's own equal routes come first, then the two that are always available.
- * Falls back to the shared list when a step names none.
+ * A step's own routes come first, then the writing routes that are always
+ * available. Anything that once meant "take no part and write nothing" is left
+ * out. Falls back to the writing routes when a step names none.
  */
 export function participationRoutesFor(lesson) {
-  const own = (lesson && lesson.routes) || [];
+  const own = ((lesson && lesson.routes) || []).filter((route) => !RETIRED_ROUTES.test(String(route).trim()));
   if (!own.length) return PARTICIPATION_ROUTES;
-  return [...own, ...UNIVERSAL_ROUTES].filter((route, index, list) => list.indexOf(route) === index);
+  return [...own, ...PARTICIPATION_ROUTES].filter((route, index, list) => list.indexOf(route) === index);
 }
 
 export const ANSWER_KEY = "answers";
@@ -128,8 +169,7 @@ export function useWorkbook() {
 /** Distinguishes "not answered" from a deliberate pass or pause. */
 export function describeStep(code, answers, decisions, states) {
   if (decisions && decisions[code]) return "decided";
-  if (states && states[code] === "Pass") return "passed";
-  if (states && states[code] === "Pause or stop") return "paused";
+  if (states && states[code] === PAUSE_ROUTE) return "paused";
   const saved = Object.keys(answers || {}).some(
     (key) => key.startsWith(`${code}#`) && String(answers[key] || "").trim()
   );
@@ -139,8 +179,7 @@ export function describeStep(code, answers, decisions, states) {
 export function stepStatusLabel(status) {
   return {
     decided: "Next Decision recorded",
-    passed: "Passed — counts fully",
-    paused: "Paused",
+    paused: "One line written, then paused",
     answered: "Answered",
     "not answered": "Not answered yet",
   }[status];
