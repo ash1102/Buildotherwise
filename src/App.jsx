@@ -18,6 +18,7 @@ import TribeThreads from '@/pages/TribeThreads';
 import JournalReflection from '@/pages/JournalReflection';
 import AspectIndex from '@/pages/AspectIndex';
 import AspectPage from '@/pages/AspectPage';
+import DiscoveryMapPage from '@/pages/DiscoveryMapPage';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -56,6 +57,7 @@ const AuthenticatedApp = () => {
         <Route path="/lesson/:code" element={<LessonPage />} />
         <Route path="/journal" element={<JournalPage />} />
         <Route path="/map" element={<LifeMapPage />} />
+        <Route path="/discovery-map" element={<DiscoveryMapPage />} />
         <Route path="/record" element={<DiscoveryRecordPage />} />
         <Route path="/program-library" element={<ProgramLibrary />} />
         <Route path="/tribe-threads" element={<TribeThreads />} />

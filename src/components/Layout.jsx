@@ -8,6 +8,7 @@ const LINKS = [
   { to: "/", label: "Workbook", end: true },
   { to: "/journal", label: "Journal" },
   { to: "/map", label: "Life Map" },
+  { to: "/discovery-map", label: "Discovery Map" },
   { to: "/record", label: "Discovery Record" },
   { to: "/program-library", label: "Library" },
   { to: "/tribe-threads", label: "Tribe Threads" },
