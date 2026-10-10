@@ -36,6 +36,9 @@ export default function DiscoveryMapPage() {
   }
 
   const trail = buildTrail({ modules, lessonsByOrder, answers, decisions, states, carried });
+  /** Getting Started has its own container, so it is kept out of the module trail. */
+  const introRows = trail.filter((row) => row.module.kind === "orientation");
+  const moduleRows = trail.filter((row) => row.module.kind !== "orientation");
   const { decisionRows, routeRows } = buildChoiceTally({ decisions, states, lessonsByCode });
   const gathering = buildGathering({ answers, discoveries, journal, map });
 
@@ -81,14 +84,27 @@ export default function DiscoveryMapPage() {
         </div>
       ) : null}
 
+      {introRows.length ? (
+        <section>
+          <SectionHeading
+            label="Start here"
+            title="Getting Started"
+            intro="Its own short sequence rather than a module. It sits before Module 1 and stays open to you at any time."
+          />
+          <div className="mt-6">
+            <MapTrail trail={introRows} />
+          </div>
+        </section>
+      ) : null}
+
       <section>
         <SectionHeading
           label="The trail"
           title="Where you have been, and what is next"
-          intro="Every step in Pilot 1, in order. Open any of them to pick it up again."
+          intro="Every module of Pilot 1, in order. Open any of them to pick it up again."
         />
         <div className="mt-6">
-          <MapTrail trail={trail} />
+          <MapTrail trail={moduleRows} />
         </div>
       </section>
 

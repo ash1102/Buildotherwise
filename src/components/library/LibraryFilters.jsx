@@ -7,6 +7,14 @@ const pillClass = (active) =>
     active ? "border-teal-deep bg-teal-deep text-ivory" : "border-natural bg-white text-ink-soft hover:border-teal-deep/50"
   }`;
 
+function FilterPill({ active, onClick, children }) {
+  return (
+    <button type="button" aria-pressed={active} onClick={onClick} className={pillClass(active)}>
+      {children}
+    </button>
+  );
+}
+
 /** Search, module and the optional step narrowing, all in one quiet block above the readings. */
 export default function LibraryFilters({
   search,
@@ -20,6 +28,10 @@ export default function LibraryFilters({
   stepLabel,
   busy,
 }) {
+  /** Getting Started is its own sequence, so it is kept apart from the numbered modules here too. */
+  const hasIntro = moduleOrders.includes(0);
+  const numberedOrders = moduleOrders.filter((order) => order !== 0);
+
   return (
     <div className="no-print space-y-4">
       <div className="relative max-w-md">
@@ -34,39 +46,42 @@ export default function LibraryFilters({
         />
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <button type="button" aria-pressed={activeModule === "all"} onClick={() => onModuleChange("all")} className={pillClass(activeModule === "all")}>
+      <div className="flex flex-wrap items-center gap-2">
+        <FilterPill active={activeModule === "all"} onClick={() => onModuleChange("all")}>
           Everything
-        </button>
-        {moduleOrders.map((order) => (
-          <button
+        </FilterPill>
+
+        {hasIntro ? (
+          <FilterPill active={activeModule === "0"} onClick={() => onModuleChange("0")}>
+            Getting Started
+          </FilterPill>
+        ) : null}
+
+        {hasIntro && numberedOrders.length ? (
+          <span aria-hidden="true" className="mx-1 h-6 w-px bg-natural" />
+        ) : null}
+
+        {numberedOrders.map((order) => (
+          <FilterPill
             key={order}
-            type="button"
-            aria-pressed={String(order) === activeModule}
+            active={String(order) === activeModule}
             onClick={() => onModuleChange(String(order))}
-            className={pillClass(String(order) === activeModule)}
           >
-            {order === 0 ? "Getting Started" : `Module ${order}`}
-          </button>
+            {`Module ${order}`}
+          </FilterPill>
         ))}
       </div>
 
       {steps.length ? (
         <div className="flex flex-wrap items-center gap-2 border-t border-natural pt-3">
           <span className="workbook-label">Step</span>
-          <button type="button" aria-pressed={activeStep === "all"} onClick={() => onStepChange("all")} className={pillClass(activeStep === "all")}>
+          <FilterPill active={activeStep === "all"} onClick={() => onStepChange("all")}>
             All steps
-          </button>
+          </FilterPill>
           {steps.map((code) => (
-            <button
-              key={code}
-              type="button"
-              aria-pressed={activeStep === code}
-              onClick={() => onStepChange(code)}
-              className={pillClass(activeStep === code)}
-            >
+            <FilterPill key={code} active={activeStep === code} onClick={() => onStepChange(code)}>
               {stepLabel(code)}
-            </button>
+            </FilterPill>
           ))}
         </div>
       ) : null}

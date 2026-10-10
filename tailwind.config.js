@@ -71,14 +71,14 @@ module.exports = {
   				faint: '#6B7C78'
   			},
   			'teal-deep': {
-  				DEFAULT: '#2D5451',
-  				soft: '#3E6F6B',
-  				wash: '#E4EDEB'
+  				DEFAULT: '#E11D48',
+  				soft: '#F43F5E',
+  				wash: '#FCE7E9'
   			},
   			copper: {
-  				DEFAULT: '#A34F35',
-  				soft: '#C4765C',
-  				wash: '#F6E9E3'
+  				DEFAULT: '#9F1239',
+  				soft: '#BE123C',
+  				wash: '#FDF2F4'
   			},
   			natural: {
   				DEFAULT: '#DEDBD3',

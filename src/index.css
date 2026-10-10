@@ -10,24 +10,24 @@
     --card-foreground: 171 21% 13%;
     --popover: 0 0% 100%;
     --popover-foreground: 171 21% 13%;
-    --primary: 175 30% 25%;
+    --primary: 347 77% 50%;
     --primary-foreground: 40 31% 96%;
     --secondary: 40 12% 90%;
     --secondary-foreground: 171 21% 16%;
     --muted: 40 3% 85%;
     --muted-foreground: 171 12% 38%;
-    --accent: 14 51% 42%;
+    --accent: 343 80% 35%;
     --accent-foreground: 40 31% 97%;
     --destructive: 0 62% 42%;
     --destructive-foreground: 40 31% 97%;
     --border: 40 8% 84%;
     --input: 40 8% 80%;
-    --ring: 175 30% 25%;
-    --chart-1: 175 30% 25%;
-    --chart-2: 14 51% 42%;
-    --chart-3: 171 21% 40%;
-    --chart-4: 40 20% 60%;
-    --chart-5: 190 20% 45%;
+    --ring: 347 77% 50%;
+    --chart-1: 347 77% 50%;
+    --chart-2: 343 80% 35%;
+    --chart-3: 350 87% 59%;
+    --chart-4: 35 18% 62%;
+    --chart-5: 340 22% 45%;
     --radius: 0.75rem;
     --font-heading: "Newsreader", Georgia, "Times New Roman", serif;
     --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -35,12 +35,12 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     --sidebar-background: 40 31% 96%;
     --sidebar-foreground: 171 21% 20%;
-    --sidebar-primary: 175 30% 25%;
+    --sidebar-primary: 347 77% 50%;
     --sidebar-primary-foreground: 40 31% 96%;
     --sidebar-accent: 40 12% 91%;
     --sidebar-accent-foreground: 171 21% 16%;
     --sidebar-border: 40 8% 84%;
-    --sidebar-ring: 175 30% 25%;
+    --sidebar-ring: 347 77% 50%;
   }
 }
 
