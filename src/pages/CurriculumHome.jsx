@@ -42,7 +42,7 @@ export default function CurriculumHome() {
         </p>
         <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <Link
-            to="/module/getting-started"
+            to="/getting-started"
             className="inline-flex items-center gap-2 rounded-full bg-teal-deep px-5 py-2.5 text-[14px] text-ivory transition hover:bg-teal-deep/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper">
             Start with Getting Started
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -89,9 +89,9 @@ export default function CurriculumHome() {
 
       {gettingStarted ?
       <section>
-          <p className="workbook-label">Before the modules</p>
+          <p className="workbook-label">Start here · its own short sequence</p>
           <Link
-          to={`/module/${gettingStarted.slug}`}
+          to="/getting-started"
           className="mt-4 flex flex-col gap-3 rounded-lg border border-natural bg-teal-deep-wash/60 p-6 transition hover:border-teal-deep/50 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
           
             <div className="min-w-0">

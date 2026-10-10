@@ -51,7 +51,7 @@ export default function OnboardingSteps() {
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-4">
           <Link
-            to="/module/getting-started"
+            to="/getting-started"
             className="inline-flex items-center gap-2 rounded-full bg-teal-deep px-5 py-2.5 text-[14px] text-ivory transition hover:bg-teal-deep/90"
           >
             Start Getting Started

@@ -15,7 +15,7 @@ export const ASPECTS = [
     note: "This demonstration is kept in this browser only. Nothing here is sent anywhere.",
     places: [
       { to: "/", label: "The workbook" },
-      { to: "/module/getting-started", label: "Getting Started" },
+      { to: "/getting-started", label: "Getting Started" },
     ],
   },
   {
@@ -70,7 +70,7 @@ export const ASPECTS = [
     tryLabel: "Try it: three questions",
     note: "Your answers to this demonstration stay in this browser. The real sequence lives in Getting Started.",
     places: [
-      { to: "/module/getting-started", label: "Getting Started" },
+      { to: "/getting-started", label: "Getting Started" },
       { to: "/", label: "The workbook" },
     ],
   },

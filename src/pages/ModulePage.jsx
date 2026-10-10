@@ -1,15 +1,14 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowRight, BookOpen, Map } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
-import { describeStep, stepStatusLabel, useWorkbook } from "@/lib/workbook";
 import { isComingLater } from "@/lib/curriculum";
 import DashedMotif from "@/components/workbook/DashedMotif";
+import StepList from "@/components/workbook/StepList";
 
 export default function ModulePage() {
   const { slug } = useParams();
   const { modules, lessonsByOrder, loading } = useCurriculum();
-  const { answers, decisions, states } = useWorkbook();
 
   const module = modules.find((item) => item.slug === slug);
 
@@ -37,9 +36,7 @@ export default function ModulePage() {
         <div className="flex items-start gap-4">
           <DashedMotif size="lg" />
           <div>
-            <p className="workbook-label">
-              {module.kind === "orientation" ? "Getting Started" : `Module ${module.order}`}
-            </p>
+            <p className="workbook-label">{`Module ${module.order}`}</p>
             <h1 className="mt-2 font-heading text-3xl leading-tight sm:text-4xl">{module.title}</h1>
           </div>
         </div>
@@ -59,71 +56,7 @@ export default function ModulePage() {
         </section>
       ) : (
         <>
-          {module.kind === "orientation" ? (
-            <section className="grid gap-4 sm:grid-cols-3">
-              <div className="rounded-lg border border-natural bg-white p-5 sm:col-span-2">
-                <p className="workbook-label">The Conversation Journal</p>
-                <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
-                  The journal is beside you on every page — the small button in the corner. Write at any moment, mid-reading
-                  or mid-activity, without losing your place. Everything you save here joins it.
-                </p>
-              </div>
-              <Link
-                to="/map"
-                className="flex flex-col justify-between rounded-lg border border-natural bg-teal-deep-wash/60 p-5 transition hover:border-teal-deep/50"
-              >
-                <span className="workbook-label">
-                  <Map className="mb-2 h-4 w-4" aria-hidden="true" />
-                  Life Map
-                </span>
-                <span className="mt-3 text-[13.5px] leading-relaxed text-ink-soft">
-                  Map the life you are actually living — places, activity, energy, barriers, threads.
-                </span>
-                <ArrowRight className="mt-4 h-4 w-4 text-teal-deep" aria-hidden="true" />
-              </Link>
-            </section>
-          ) : null}
-
-          <section>
-            <div className="flex items-baseline justify-between">
-              <p className="workbook-label">Steps</p>
-              <span className="text-[12.5px] text-ink-faint">{lessons.length} steps {module.kind === "orientation" ? "before the modules" : "in this module"}</span>
-            </div>
-            <ol className="mt-4 divide-y divide-natural border-y border-natural">
-              {lessons.map((lesson) => {
-                const status = describeStep(lesson.code, answers, decisions, states);
-                return (
-                  <li key={lesson.id || lesson.code}>
-                    <Link
-                      to={`/lesson/${lesson.code}`}
-                      className="flex items-start gap-4 py-4 transition hover:bg-white/60"
-                    >
-                      <span className="mt-0.5 font-heading text-[15px] text-copper">
-                        {String(lesson.order).padStart(2, "0")}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-heading text-[18px] leading-snug text-ink">{lesson.title}</span>
-                        <span className="mt-1 block text-[13px] leading-relaxed text-ink-soft">
-                          {lesson.purpose}
-                        </span>
-                        <span className="mt-2 flex flex-wrap items-center gap-3 text-[12px] text-ink-faint">
-                          <span>{lesson.duration_min ? `About ${lesson.duration_min} min` : lesson.type}</span>
-                          <span
-                            className={
-                              status === "not answered" ? "text-ink-faint" : "text-teal-deep"
-                            }
-                          >
-                            {stepStatusLabel(status)}
-                          </span>
-                        </span>
-                      </span>
-                      <ArrowRight className="mt-2 h-4 w-4 shrink-0 text-natural-deep" aria-hidden="true" />
-                    </Link>
-                  </li>
-                );
-              })}
-            </ol>
-          </section>
+          <StepList lessons={lessons} scopeLabel="in this module" />
 
           {module.order === 5 ? (
             <section className="rounded-lg border border-dashed border-copper/40 bg-copper-wash/50 p-6">

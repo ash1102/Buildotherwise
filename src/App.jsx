@@ -1,13 +1,14 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import Layout from '@/components/Layout';
 import CurriculumHome from '@/pages/CurriculumHome';
+import GettingStartedPage from '@/pages/GettingStartedPage';
 import ModulePage from '@/pages/ModulePage';
 import LessonPage from '@/pages/LessonPage';
 import JournalPage from '@/pages/JournalPage';
@@ -55,6 +56,8 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<CurriculumHome />} />
+        <Route path="/getting-started" element={<GettingStartedPage />} />
+        <Route path="/module/getting-started" element={<Navigate to="/getting-started" replace />} />
         <Route path="/module/:slug" element={<ModulePage />} />
         <Route path="/lesson/:code" element={<LessonPage />} />
         <Route path="/journal" element={<JournalPage />} />
