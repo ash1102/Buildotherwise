@@ -1,74 +1,26 @@
 import React from "react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { JournalProvider } from "@/components/journal/JournalContext";
 import JournalWidget from "@/components/journal/JournalWidget";
-import DashedMotif from "@/components/workbook/DashedMotif";
-
-const LINKS = [
-  { to: "/", label: "Workbook", end: true },
-  { to: "/journal", label: "Journal" },
-  { to: "/map", label: "Life Map" },
-  { to: "/discovery-map", label: "Discovery Map" },
-  { to: "/record", label: "Discovery Record" },
-  { to: "/program-library", label: "Library" },
-  { to: "/tribe-threads", label: "Tribe Threads" },
-  { to: "/journal-reflection", label: "Reflection" },
-];
+import SiteHeader from "@/components/SiteHeader";
 
 export default function Layout() {
   return (
     <JournalProvider>
       <div className="flex min-h-screen flex-col">
-        <header className="no-print sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
-          <div className="mx-auto flex max-w-5xl flex-col gap-3 px-5 py-3 sm:flex-row sm:items-center sm:justify-between sm:py-4">
-            <NavLink to="/" className="flex items-center gap-3">
-              <DashedMotif />
-              <span>
-                <span className="block font-heading text-lg leading-none text-foreground">Entrepalooza</span>
-                <span className="mt-1 block text-[11px] uppercase tracking-[0.16em] text-muted-faint">
-                  Build Otherwise · Pilot 1
-                </span>
-              </span>
-            </NavLink>
-            <nav className="flex flex-wrap gap-x-5 gap-y-2">
-              {LINKS.map((link) => (
-                <NavLink
-                  key={link.to}
-                  to={link.to}
-                  end={link.end}
-                  className={({ isActive }) =>
-                    `text-[13px] transition ${
-                      isActive
-                        ? "text-primary underline decoration-accent-soft decoration-2 underline-offset-4"
-                        : "text-muted-foreground hover:text-primary"
-                    }`
-                  }
-                >
-                  {link.label}
-                </NavLink>
-              ))}
-            </nav>
-          </div>
-        </header>
+        <SiteHeader />
 
-        {/* The extra bottom room keeps the floating journal button clear of the last controls on a page. */}
-        <main className="mx-auto w-full max-w-5xl flex-1 px-5 pt-8 pb-24 sm:pt-12 sm:pb-28">
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-16 sm:px-6 sm:pt-8 sm:pb-20 lg:px-8">
           <Outlet />
         </main>
 
-        <footer className="no-print border-t border-border bg-background/70">
-          <div className="mx-auto max-w-5xl px-5 py-6 text-[12px] leading-relaxed text-muted-faint">
-            <div className="mb-3 flex flex-wrap gap-x-5 gap-y-2 text-[12.5px]">
-              <Link
-                to="/about"
-                className="text-primary underline decoration-border underline-offset-4 transition hover:text-accent-ink"
-              >
+        <footer className="no-print border-t border-border bg-card">
+          <div className="mx-auto w-full max-w-6xl px-4 py-6 text-[14px] leading-relaxed text-muted-faint sm:px-6 lg:px-8">
+            <div className="mb-3 flex flex-wrap gap-x-5 gap-y-2">
+              <Link to="/about" className="font-medium text-accent-ink underline underline-offset-2">
                 About Entrepalooza
               </Link>
-              <Link
-                to="/contact"
-                className="text-primary underline decoration-border underline-offset-4 transition hover:text-accent-ink"
-              >
+              <Link to="/contact" className="font-medium text-accent-ink underline underline-offset-2">
                 Contact the program team
               </Link>
             </div>

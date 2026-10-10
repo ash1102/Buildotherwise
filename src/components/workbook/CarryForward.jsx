@@ -4,7 +4,7 @@ import { getAnswer } from "@/lib/workbook";
 
 /**
  * Carry-forward: earlier answers appear as optional, selectable context.
- * Nothing moves forward unless it is chosen here.
+ * Nothing moves forward unless it is chosen here, and nothing is retyped.
  */
 export default function CarryForward({ sources, selected, onChange }) {
   const items = sources
@@ -18,13 +18,12 @@ export default function CarryForward({ sources, selected, onChange }) {
   };
 
   return (
-    <section className="rounded-lg border border-dashed border-teal-deep/40 bg-white/70 p-4 sm:p-5">
-      <p className="workbook-label">Bring forward, only if you want it</p>
-      <p className="mt-2 text-[13px] leading-relaxed text-ink-soft">
-        These are things you already wrote. Tick anything that belongs in this step. Nothing moves unless you choose it,
-        and nothing is retyped.
+    <section className="rounded-xl border border-border bg-secondary p-4 sm:p-5">
+      <h4 className="text-[16px]">Bring forward, only if you want it</h4>
+      <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
+        These are things you already wrote. Tick anything that belongs in this step. Nothing moves unless you choose it.
       </p>
-      <ul className="mt-4 space-y-3">
+      <ul className="mt-3 space-y-3">
         {items.map((item) => {
           const key = `${item.code}#${item.index}`;
           const checked = selected.includes(key);
@@ -34,13 +33,15 @@ export default function CarryForward({ sources, selected, onChange }) {
                 id={key}
                 checked={checked}
                 onCheckedChange={(next) => toggle(key, Boolean(next))}
-                className="mt-1 border-teal-deep/40 data-[state=checked]:bg-teal-deep"
+                className="mt-1 border-input data-[state=checked]:bg-primary"
               />
               <div className="min-w-0">
-                <label htmlFor={key} className="block text-[13px] font-medium text-ink">
+                <label htmlFor={key} className="block text-[15px] font-medium text-foreground">
                   {item.label}
                 </label>
-                <p className="mt-1 line-clamp-3 whitespace-pre-wrap text-[13px] text-ink-faint">{item.value}</p>
+                <p className="mt-1 whitespace-pre-wrap break-words text-[15px] leading-relaxed text-muted-foreground">
+                  {item.value}
+                </p>
               </div>
             </li>
           );

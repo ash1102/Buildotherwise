@@ -4,15 +4,14 @@ import { ArrowRight, BookOpen, Compass, Map } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
 import { useWorkbook } from "@/lib/workbook";
 import ModuleMap from "@/components/workbook/ModuleMap";
-import DashedMotif from "@/components/workbook/DashedMotif";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 
 const CYCLE = [
-{ label: "Notice", line: "What keeps holding your attention — without turning it into identity." },
-{ label: "Try", line: "One small, bounded, reversible try with a stop rule written before you start." },
-{ label: "Reflect", line: "What actually happened, what it cost, and what is still unknown." },
-{ label: "Decide", line: "Keep, change, test again, pause, stop, another direction, or continue looking." }];
-
+  { label: "Notice", line: "What keeps holding your attention — without turning it into identity." },
+  { label: "Try", line: "One small, bounded, reversible try with a stop rule written before you start." },
+  { label: "Reflect", line: "What actually happened, what it cost, and what is still unknown." },
+  { label: "Decide", line: "Keep, change, test again, pause, stop, another direction, or continue looking." },
+];
 
 export default function CurriculumHome() {
   const { modules, lessonsByOrder, loading } = useCurriculum();
@@ -23,136 +22,133 @@ export default function CurriculumHome() {
   const gettingStartedSteps = gettingStarted ? (lessonsByOrder[gettingStarted.order] || []).length : 0;
 
   return (
-    <div className="space-y-14">
-      <section>
-        <div className="flex items-center gap-4">
-          <DashedMotif size="lg" />
-          <p className="workbook-label">BUILD OTHERWISE · ENTREPALOOZA · PILOT 1</p>
-        </div>
-        <h1 className="mt-4 max-w-3xl font-heading text-3xl leading-[1.15] sm:text-4xl">
-          Notice. Try. Reflect. Decide.
-        </h1>
-        <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-muted-foreground">
-          Start with a question, an ordinary task, or “I don’t know yet.” Explore what holds your attention, try
-          something small if you choose, and decide what comes next.
+    <div className="space-y-10">
+      <section className="max-w-[68ch]">
+        <p className="workbook-label">Build Otherwise · Entrepalooza · Pilot 1</p>
+        <h1 className="mt-2">Notice. Try. Reflect. Decide.</h1>
+        <p className="mt-3 text-[18px] leading-relaxed text-muted-foreground">
+          Start with a question, an ordinary task, or “I don’t know yet.” Explore what holds your attention, try something
+          small if you choose, and decide what comes next. A job, training, a project, a pause, or continued exploration
+          are all valid directions — entrepreneurship is one possibility, not a requirement.
         </p>
-        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-faint">
-          A job, training, a project, a pause, or continued exploration are all valid directions. Entrepreneurship is
-          one possibility — not a requirement.
-        </p>
-        <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
           <Link
             to="/getting-started"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-[14px] text-primary-foreground transition hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-ink">
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-[15px] font-medium text-primary-foreground transition hover:bg-primary/90"
+          >
             Start with Getting Started
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
           <Link
             to="/journal"
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-[14px] text-primary transition hover:border-primary/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-ink">
+            className="inline-flex items-center gap-2 rounded-md border border-input bg-card px-4 py-2.5 text-[15px] font-medium text-foreground transition hover:bg-secondary"
+          >
             <BookOpen className="h-4 w-4" aria-hidden="true" />
             Open your Journal
           </Link>
-          <Link
-            to="/map"
-            className="inline-flex items-center gap-2 rounded-full px-2 py-2.5 text-[14px] text-muted-foreground transition hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-ink">
+          <Link to="/map" className="inline-flex items-center gap-2 text-[15px] font-medium text-accent-ink underline underline-offset-2">
             <Map className="h-4 w-4" aria-hidden="true" />
             View your Life Map
           </Link>
           <Link
             to="/aspects"
-            className="inline-flex items-center gap-2 rounded-full px-2 py-2.5 text-[14px] text-muted-foreground transition hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-ink">
+            className="inline-flex items-center gap-2 text-[15px] font-medium text-accent-ink underline underline-offset-2"
+          >
             <Compass className="h-4 w-4" aria-hidden="true" />
             How the workbook works
           </Link>
         </div>
-        <div className="mt-6 max-w-2xl">
-          <PrivacyNote>
-            Nothing you type here is sent to Entrepalooza. Every answer is saved in this browser and joined to your
-            private journal, and it only leaves this browser if you deliberately share an entry or send feedback.
-          </PrivacyNote>
+        <div className="mt-5">
+          <PrivacyNote />
         </div>
       </section>
 
       <section>
-        <p className="workbook-label">The cycle you will use again and again</p>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {CYCLE.map((step, index) =>
-          <div key={step.label} className="rounded-lg border border-border bg-card p-5">
-              <span className="font-heading text-[13px] text-accent-ink">{`0${index + 1}`}</span>
-              <h2 className="mt-2 font-heading text-xl">{step.label}</h2>
-              <p className="mt-2 text-[13.5px] leading-relaxed text-muted-foreground">{step.line}</p>
+        <h2 className="workbook-label">The cycle you will use again and again</h2>
+        <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {CYCLE.map((step, index) => (
+            <div key={step.label} className="rounded-xl border border-border bg-card p-4">
+              <span className="text-[14px] font-semibold text-accent-ink">{`0${index + 1}`}</span>
+              <h3 className="mt-1.5 text-[18px]">{step.label}</h3>
+              <p className="mt-1.5 text-[16px] leading-relaxed text-muted-foreground">{step.line}</p>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {loading || gettingStarted ? (
+        <section>
+          <h2 className="workbook-label">Start here · its own short sequence</h2>
+          {loading ? (
+            <div aria-busy="true" className="mt-3 min-h-[120px] rounded-xl border border-border bg-card p-5">
+              <div className="h-6 w-52 animate-pulse rounded bg-border" />
+              <div className="mt-3 h-4 w-full max-w-xl animate-pulse rounded bg-border/70" />
+              <div className="mt-2 h-4 w-2/3 max-w-md animate-pulse rounded bg-border/70" />
+            </div>
+          ) : (
+            <Link
+              to="/getting-started"
+              className="mt-3 flex flex-col gap-2 rounded-xl border border-border bg-card p-5 transition hover:bg-secondary sm:flex-row sm:items-center sm:justify-between sm:gap-8"
+            >
+              <span className="min-w-0">
+                <span className="block text-[19px] font-semibold text-foreground">
+                  {gettingStarted.subtitle || "Getting Started"}
+                </span>
+                {gettingStarted.purpose ? (
+                  <span className="mt-1 block max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
+                    {gettingStarted.purpose}
+                  </span>
+                ) : null}
+              </span>
+              <span className="inline-flex shrink-0 items-center gap-2 text-[15px] font-medium text-accent-ink">
+                {gettingStartedSteps} steps
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </span>
+            </Link>
           )}
-        </div>
-      </section>
-
-      {loading || gettingStarted ?
-      <section>
-          <p className="workbook-label">Start here · its own short sequence</p>
-          {loading ?
-          <div aria-busy="true" className="mt-4 min-h-[168px] rounded-lg border border-border bg-card/60 p-6">
-            <div className="h-7 w-52 animate-pulse rounded bg-border" />
-            <div className="mt-3 h-4 w-44 animate-pulse rounded bg-border/70" />
-            <div className="mt-3 h-3.5 w-full max-w-2xl animate-pulse rounded bg-border/70" />
-            <div className="mt-2 h-3.5 w-2/3 max-w-xl animate-pulse rounded bg-border/70" />
-          </div> :
-          <Link
-          to="/getting-started"
-          className="mt-4 flex flex-col gap-3 rounded-lg border border-border bg-primary-wash/60 p-6 transition hover:border-primary/50 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
-          
-            <div className="min-w-0">
-              <h2 className="font-heading text-2xl">Getting Started</h2>
-              <p className="mt-1 font-heading text-[16px] italic text-primary">{gettingStarted.subtitle || gettingStarted.title}</p>
-              <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-muted-foreground">{gettingStarted.purpose}</p>
-            </div>
-            <span className="inline-flex shrink-0 items-center gap-2 text-[12.5px] text-primary">
-              {gettingStartedSteps} steps
-              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-            </span>
-          </Link>}
-        </section> :
-      null}
+        </section>
+      ) : null}
 
       <section>
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="workbook-label">The program</p>
-            <h2 className="mt-2 font-heading text-2xl">Ten modules, one calm list</h2>
+            <h2 className="workbook-label">The program</h2>
+            <h2 className="mt-1.5">Getting Started, then ten modules</h2>
           </div>
-          <p className="max-w-md text-[13px] leading-relaxed text-muted-faint">
-            Modules 6–10 are not built yet, and nothing here pretends otherwise. They are listed plainly so you can see
-            where the program is going.
+          <p className="max-w-[46ch] text-[15px] leading-relaxed text-muted-faint">
+            Pilot 1 covers Getting Started and Modules 1–5. Modules 6–10 are still being built, and they are listed
+            plainly so you can see where the program is going.
           </p>
         </div>
-        <div className="mt-6">
+        <div className="mt-5">
           <ModuleMap
             loading={loading}
             modules={numberedModules}
             lessonsByOrder={lessonsByOrder}
             answers={answers}
             decisions={decisions}
-            states={states} />
+            states={states}
+          />
         </div>
       </section>
 
-      <section className="rounded-lg border border-dashed border-primary/40 bg-card/60 p-6">
-        <p className="workbook-label">How your writing is treated</p>
-        <div className="mt-3 space-y-3 text-[14px] leading-relaxed text-muted-foreground">
+      <section className="rounded-xl border border-dashed border-input bg-card p-5 sm:p-6">
+        <h2 className="workbook-label">How your writing is treated</h2>
+        <div className="mt-3 space-y-3 text-[17px] leading-relaxed text-muted-foreground">
           <p>
-            <strong className="font-medium text-foreground">Saving</strong> keeps your words on this device, attached to the step
-            where you wrote them.
+            <strong className="font-semibold text-foreground">Saving</strong> keeps your words on this device, attached to the
+            step where you wrote them.
           </p>
           <p>
-            <strong className="font-medium text-foreground">Sharing</strong> is separate, voluntary, and per entry — you choose
-            exactly what the program creator receives, and you can see the scope before you send it.
+            <strong className="font-semibold text-foreground">Sharing</strong> is separate, voluntary, and per entry — you
+            choose exactly what the program creator receives, and you can see the scope before you send it.
           </p>
           <p>
-            <strong className="font-medium text-foreground">Writing</strong> is part of every step, and one line is enough. No
-            step is passed over: you write something, even when you pause and come back to it.
+            <strong className="font-semibold text-foreground">Writing</strong> is part of every step, and one line is enough.
+            No step is passed over: you write something, even when you pause and come back to it.
           </p>
         </div>
       </section>
-    </div>);
-
+    </div>
+  );
 }

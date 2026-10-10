@@ -10,9 +10,8 @@ export default function RouteChips({ routes = PARTICIPATION_ROUTES, value, onCha
 
   return (
     <div>
-      <p className="text-[13px] leading-relaxed text-ink-soft">
-        Every route below writes something into your journal. One line is enough, and that is the whole ask. Pick how you
-        want to write, and this step takes that shape.
+      <p className="max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
+        Every route below writes something into your journal. One line is enough, and that is the whole ask.
       </p>
 
       <div className="mt-3 flex flex-wrap gap-2">
@@ -26,10 +25,10 @@ export default function RouteChips({ routes = PARTICIPATION_ROUTES, value, onCha
               aria-pressed={active}
               title={detail ? detail.blurb : undefined}
               onClick={() => onChange(active ? "" : route)}
-              className={`rounded-full border px-3 py-1.5 text-[12.5px] transition ${
+              className={`rounded-md border px-3.5 py-2 text-[15px] transition ${
                 active
-                  ? "border-teal-deep bg-teal-deep text-ivory"
-                  : "border-natural bg-white text-ink-soft hover:border-teal-deep/50 hover:text-teal-deep"
+                  ? "border-accent-ink bg-accent-ink text-white"
+                  : "border-input bg-card text-foreground hover:bg-secondary"
               }`}
             >
               {route}
@@ -38,13 +37,13 @@ export default function RouteChips({ routes = PARTICIPATION_ROUTES, value, onCha
         })}
       </div>
 
-      <div className="mt-4 rounded-md border border-dashed border-teal-deep/40 bg-white/80 p-3">
+      <div className="mt-3 rounded-md border border-dashed border-input bg-secondary p-3">
         {guidance ? (
-          <p className="text-[13px] leading-relaxed text-ink">
+          <p className="text-[15px] leading-relaxed text-foreground">
             <span className="font-medium">{guidance.label}:</span> {guidance.cue}
           </p>
         ) : (
-          <p className="text-[13px] leading-relaxed text-ink-faint">
+          <p className="text-[15px] leading-relaxed text-muted-faint">
             Choose a route and the writing below changes to match it.
           </p>
         )}

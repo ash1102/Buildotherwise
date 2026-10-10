@@ -1,26 +1,20 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import DashedMotif from "@/components/workbook/DashedMotif";
 
 export default function About() {
   return (
-    <article className="space-y-10">
-      <header>
-        <div className="flex items-center gap-4">
-          <DashedMotif size="lg" />
-          <p className="workbook-label">ABOUT · BUILD OTHERWISE · PILOT 1</p>
-        </div>
-        <h1 className="mt-4 max-w-3xl font-heading text-3xl leading-[1.15] sm:text-4xl">
-          About Entrepalooza
-        </h1>
-        <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-ink-soft">
+    <article className="space-y-8">
+      <header className="border-b border-border pb-5">
+        <p className="workbook-label">About</p>
+        <h1 className="mt-2">About Entrepalooza</h1>
+        <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
           A self-paced workbook for adults who are in the middle of a change and want to test what comes next in real
           life, rather than plan it in theory.
         </p>
       </header>
 
-      <div className="workbook-prose max-w-2xl space-y-4">
+      <div className="workbook-prose space-y-4">
         <p>
           Entrepalooza is a guided workbook built around four moves: Notice, Try, Reflect and Decide. You start with a
           question, an ordinary task or simply “I don’t know yet.” You notice what keeps holding your attention. If you
@@ -49,23 +43,23 @@ export default function About() {
         </p>
       </div>
 
-      <div className="rounded-lg border border-natural bg-white p-5 sm:p-6">
-        <p className="workbook-label">Reach the program team</p>
-        <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-ink-soft">
+      <div className="workbook-section">
+        <h2 className="text-[18px]">Reach the program team</h2>
+        <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
           Questions about the workbook, the pilot, or how your writing is stored are welcome. There is a contact form on
           the contact page, and every step also carries a separate feedback box.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Link
             to="/contact"
-            className="inline-flex items-center gap-2 rounded-full bg-teal-deep px-4 py-2 text-[13px] text-ivory transition hover:bg-teal-deep/90"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-[15px] font-medium text-primary-foreground transition hover:bg-primary/90"
           >
             Contact the program team
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 rounded-full border border-natural bg-white px-4 py-2 text-[13px] text-teal-deep transition hover:border-teal-deep/50"
+            className="inline-flex items-center gap-2 rounded-md border border-input bg-card px-4 py-2 text-[15px] text-foreground transition hover:bg-secondary"
           >
             Start the workbook
           </Link>

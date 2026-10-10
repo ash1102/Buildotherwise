@@ -40,7 +40,7 @@ function SafeLink({ node, href = "", children, ...props }) {
   return (
     <a
       href={href}
-      className="text-teal-deep underline underline-offset-2 transition hover:text-copper"
+      className="font-medium text-accent-ink underline underline-offset-2"
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       {...props}
     >
@@ -51,23 +51,21 @@ function SafeLink({ node, href = "", children, ...props }) {
 
 const COMPONENTS = {
   p: ({ node, ...props }) => <p className="mt-4 first:mt-0" {...props} />,
-  h1: ({ node, ...props }) => <h2 className="mt-7 font-heading text-[24px] leading-snug first:mt-0" {...props} />,
-  h2: ({ node, ...props }) => <h3 className="mt-6 font-heading text-[21px] leading-snug first:mt-0" {...props} />,
-  h3: ({ node, ...props }) => <h3 className="mt-6 font-heading text-[19px] leading-snug first:mt-0" {...props} />,
-  h4: ({ node, ...props }) => <h4 className="mt-5 font-heading text-[17px] leading-snug first:mt-0" {...props} />,
-  h5: ({ node, ...props }) => <h4 className="mt-5 font-heading text-[16px] leading-snug first:mt-0" {...props} />,
-  h6: ({ node, ...props }) => (
-    <h4 className="mt-5 font-heading text-[15px] leading-snug text-ink-soft first:mt-0" {...props} />
-  ),
+  h1: ({ node, ...props }) => <h3 className="mt-6 text-[20px] first:mt-0" {...props} />,
+  h2: ({ node, ...props }) => <h3 className="mt-6 text-[20px] first:mt-0" {...props} />,
+  h3: ({ node, ...props }) => <h4 className="mt-5 text-[18px] first:mt-0" {...props} />,
+  h4: ({ node, ...props }) => <h4 className="mt-5 text-[17px] first:mt-0" {...props} />,
+  h5: ({ node, ...props }) => <h4 className="mt-4 text-[16px] first:mt-0" {...props} />,
+  h6: ({ node, ...props }) => <h4 className="mt-4 text-[16px] first:mt-0" {...props} />,
   ul: ({ node, ...props }) => <ul className="mt-4 list-disc space-y-2 pl-5 first:mt-0" {...props} />,
   ol: ({ node, ...props }) => <ol className="mt-4 list-decimal space-y-2 pl-5 first:mt-0" {...props} />,
   li: ({ node, ...props }) => <li className="pl-0.5" {...props} />,
-  strong: ({ node, ...props }) => <strong className="font-semibold text-ink" {...props} />,
+  strong: ({ node, ...props }) => <strong className="font-semibold text-foreground" {...props} />,
   em: ({ node, ...props }) => <em className="italic" {...props} />,
   blockquote: ({ node, ...props }) => (
-    <blockquote className="mt-4 border-l-2 border-copper/40 pl-4 text-ink-soft first:mt-0" {...props} />
+    <blockquote className="mt-4 border-l-2 border-border pl-4 text-muted-foreground first:mt-0" {...props} />
   ),
-  hr: ({ node, ...props }) => <hr className="my-6 border-natural" {...props} />,
+  hr: ({ node, ...props }) => <hr className="my-6 border-border" {...props} />,
   a: SafeLink,
   img: () => null,
 };

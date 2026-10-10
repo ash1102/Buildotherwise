@@ -76,7 +76,7 @@ export default function JournalComposer() {
             onClick={() => chooseOpener(label)}
             className={`rounded-full border px-3 py-1.5 text-[12.5px] transition ${
               opener === label
-                ? "border-teal-deep bg-teal-deep text-ivory"
+                ? "border-primary bg-primary text-primary-foreground"
                 : "border-natural bg-white text-ink-soft hover:border-teal-deep/50"
             }`}
           >
@@ -91,7 +91,7 @@ export default function JournalComposer() {
           type="button"
           onClick={save}
           disabled={!draft.trim()}
-          className="rounded-full bg-teal-deep text-ivory hover:bg-teal-deep/90"
+          className="rounded-full bg-primary text-primary-foreground hover:bg-teal-deep/90"
         >
           <PenLine className="mr-2 h-4 w-4" aria-hidden="true" />
           Save this entry

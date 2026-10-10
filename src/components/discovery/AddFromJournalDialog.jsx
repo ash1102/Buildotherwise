@@ -51,7 +51,7 @@ export default function AddFromJournalDialog({ entry, onClose, onConfirm }) {
             type="button"
             disabled={!body.trim()}
             onClick={() => onConfirm(body.trim())}
-            className="rounded-full bg-teal-deep text-ivory hover:bg-teal-deep/90"
+            className="rounded-full bg-primary text-primary-foreground hover:bg-teal-deep/90"
           >
             Add to Discovery Record
           </Button>

@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { getAnswer, setAnswer } from "@/lib/workbook";
 import { saveAnswer } from "@/lib/journal";
-import PrivacyNote from "./PrivacyNote";
 import DictateButton from "./DictateButton";
 
 /**
- * One question. The answer autosaves and joins the Conversation Journal as an
- * entry linked to this step, so it is never typed twice.
+ * One question, with the question itself as the label above the box. The answer is
+ * saved as it is typed and joins the Conversation Journal as an entry linked to
+ * this step, so it is never typed twice.
  */
 export default function PromptField({
   lessonCode,
@@ -45,14 +45,15 @@ export default function PromptField({
         body: next,
         route,
       });
-      setState("saved");
+      // "Saved" is only shown once the words really read back from the browser's storage.
+      setState(String(getAnswer(lessonCode, index)) === String(next) ? "saved" : "error");
       if (onSaved) onSaved();
     }, 650);
   };
 
   return (
-    <div className={variant === "inline" ? "" : "rounded-lg border border-natural bg-white p-4 sm:p-5"}>
-      <label className="block font-heading text-[16px] leading-snug text-ink" htmlFor={`${lessonCode}-${index}`}>
+    <div className={variant === "inline" ? "" : "rounded-xl border border-border bg-card p-4 sm:p-5"}>
+      <label htmlFor={`${lessonCode}-${index}`} className="block text-[16px] font-medium leading-snug text-foreground">
         {label}
       </label>
       <Textarea
@@ -60,22 +61,15 @@ export default function PromptField({
         value={value}
         onChange={(event) => handleChange(event.target.value)}
         rows={compact ? 1 : 3}
-        placeholder={
-          compact
-            ? "One line is enough."
-            : "Write as much or as little as you want. “I don't know yet” is a complete answer."
-        }
-        className={`mt-3 resize-y border-natural bg-ivory/60 text-[14px] leading-relaxed ${
+        placeholder={compact ? "One line is enough." : "A few words are enough."}
+        className={`mt-2 resize-y border-input bg-card text-[16px] leading-relaxed ${
           compact ? "min-h-[2.75rem]" : "min-h-[5rem]"
         }`}
       />
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-          <DictateButton value={value} onText={handleChange} />
-          <PrivacyNote />
-        </div>
-        <span aria-live="polite" className="text-[12px] text-teal-deep">
-          {state === "saved" ? "Saved to your journal" : state === "saving" ? "Saving…" : ""}
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+        <DictateButton value={value} onText={handleChange} compact />
+        <span aria-live="polite" className="text-[14px] text-accent-ink">
+          {state === "saved" ? "Saved" : state === "saving" ? "Saving…" : state === "error" ? "Not saved — try again" : ""}
         </span>
       </div>
     </div>

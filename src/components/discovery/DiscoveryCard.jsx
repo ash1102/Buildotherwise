@@ -160,7 +160,7 @@ export default function DiscoveryCard({ entry }) {
                 setNote("");
                 setMode("view");
               }}
-              className="rounded-full bg-teal-deep text-ivory hover:bg-teal-deep/90"
+              className="rounded-full bg-primary text-primary-foreground hover:bg-teal-deep/90"
             >
               Save update
             </Button>

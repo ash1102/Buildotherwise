@@ -8,9 +8,9 @@ import moment from "moment";
 export default function EntryActions({ entry, onFollowUp, onEdit, onExport, onShare, onDelete, onAddToRecord }) {
   const when = moment(entry.created_date).format("D MMM YYYY");
   const items = [
-    onFollowUp && { label: "Add a follow-up", tone: "text-teal-deep", run: onFollowUp },
-    onEdit && { label: "Edit", tone: "text-teal-deep", run: onEdit },
-    onExport && { label: "Export", tone: "text-teal-deep", run: onExport },
+    onFollowUp && { label: "Add a follow-up", tone: "text-accent-ink", run: onFollowUp },
+    onEdit && { label: "Edit", tone: "text-accent-ink", run: onEdit },
+    onExport && { label: "Export", tone: "text-accent-ink", run: onExport },
     onShare && { label: "Share", tone: "text-copper", run: onShare },
     onDelete && { label: "Delete", tone: "text-ink-faint", run: onDelete },
     onAddToRecord && { label: "Add to Discovery Record", tone: "text-copper", run: onAddToRecord },

@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { base44 } from "@/api/base44Client";
-import DashedMotif from "@/components/workbook/DashedMotif";
 
 export default function Contact() {
   const [email, setEmail] = useState("");
@@ -36,25 +35,22 @@ export default function Contact() {
 
   return (
     <article className="space-y-8">
-      <header>
-        <div className="flex items-center gap-4">
-          <DashedMotif size="lg" />
-          <p className="workbook-label">CONTACT</p>
-        </div>
-        <h1 className="mt-4 max-w-3xl font-heading text-3xl leading-[1.15] sm:text-4xl">Contact the program team</h1>
-        <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-ink-soft">
+      <header className="border-b border-border pb-5">
+        <p className="workbook-label">Contact</p>
+        <h1 className="mt-2">Contact the program team</h1>
+        <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
           Send a question, a concern, or something the workbook should do better. Messages go to the Entrepalooza
           program team at Build Otherwise.
         </p>
       </header>
 
-      <form onSubmit={submit} className="max-w-2xl rounded-lg border border-natural bg-white p-5 sm:p-6">
-        <p className="text-[13px] leading-relaxed text-ink-soft">
+      <form onSubmit={submit} className="workbook-section max-w-[42rem]">
+        <p className="text-[16px] leading-relaxed text-muted-foreground">
           Nothing from your workbook or journal is sent with this message. You decide what to write here.
         </p>
 
-        <label className="mt-5 block font-heading text-[15px] text-ink" htmlFor="contact-email">
-          Your email address <span className="text-ink-faint">(optional, if you would like a reply)</span>
+        <label className="mt-5 block text-[16px] font-medium text-foreground" htmlFor="contact-email">
+          Your email address <span className="font-normal text-muted-faint">(optional, if you would like a reply)</span>
         </label>
         <Input
           id="contact-email"
@@ -62,10 +58,10 @@ export default function Contact() {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           placeholder="you@example.com"
-          className="mt-2 border-natural bg-ivory/60 text-[14px]"
+          className="mt-2"
         />
 
-        <label className="mt-5 block font-heading text-[15px] text-ink" htmlFor="contact-message">
+        <label className="mt-5 block text-[16px] font-medium text-foreground" htmlFor="contact-message">
           Your message
         </label>
         <Textarea
@@ -73,26 +69,26 @@ export default function Contact() {
           value={message}
           onChange={(event) => setMessage(event.target.value)}
           rows={5}
-          placeholder="What would you like the program team to know?"
-          className="mt-2 min-h-[7rem] border-natural bg-ivory/60 text-[14px] leading-relaxed"
+          placeholder="A few words are enough."
+          className="mt-2 min-h-[7rem]"
         />
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Button
             type="submit"
             disabled={sending || !message.trim()}
-            className="rounded-full bg-teal-deep text-ivory hover:bg-teal-deep/90"
+            className="rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
           >
-            <Send className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+            <Send className="mr-2 h-4 w-4" aria-hidden="true" />
             {sending ? "Sending…" : "Send message"}
           </Button>
-          {sent ? <span className="text-[12.5px] text-teal-deep">Received. Thank you.</span> : null}
+          {sent ? <span className="text-[15px] text-accent-ink">Received. Thank you.</span> : null}
         </div>
       </form>
 
-      <div className="max-w-2xl rounded-lg border border-dashed border-teal-deep/40 bg-white/60 p-5">
-        <p className="workbook-label">If you need support now</p>
-        <p className="mt-3 text-[13.5px] leading-relaxed text-ink-soft">
+      <div className="max-w-[42rem] rounded-xl border border-dashed border-input bg-card p-5">
+        <h2 className="text-[17px]">If you need support now</h2>
+        <p className="mt-2 text-[16px] leading-relaxed text-muted-foreground">
           Entrepalooza is an educational workbook, not therapy or treatment, and this form is not monitored around the
           clock. If you are in crisis or need clinical support, please contact your local emergency services or a
           qualified professional rather than this form.

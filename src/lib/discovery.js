@@ -62,6 +62,39 @@ export function entriesFromAnswers(answers = {}) {
     .filter((item) => item.value);
 }
 
+/**
+ * The answer key a record source comes from, e.g. "M1-L1#0" → step code and prompt
+ * position. Kept so every saved answer can name and link to the step it came from.
+ */
+export function parseSourceKey(key) {
+  const [code, index] = String(key || "").split("#");
+  return { code: code || "", index: Number(index) };
+}
+
+/** The same saved answers, each carrying the step and question it came from. */
+export function sourcesFromAnswers(answers = {}, lessonsByCode = {}) {
+  return entriesFromAnswers(answers).map((item) => {
+    const { code, index } = parseSourceKey(item.key);
+    const lesson = lessonsByCode[code];
+    const prompts = [...((lesson && lesson.try_prompts) || []), ...((lesson && lesson.reflect_prompts) || [])];
+    return {
+      ...item,
+      lesson_code: code,
+      lesson_title: (lesson && lesson.title) || code,
+      question: prompts[index] || item.label,
+    };
+  });
+}
+
+/**
+ * Lines saved in the steps that are not part of the Discovery Record's own
+ * questions. Counted separately so "saved in a step" and "feeds your record" are
+ * never read as the same thing.
+ */
+export function savedLineCount(answers = {}) {
+  return Object.values(answers || {}).filter((value) => String(value || "").trim()).length;
+}
+
 export function tryLogValues(answers) {
   return TRY_LOG_FIELDS.map((field) => ({
     ...field,

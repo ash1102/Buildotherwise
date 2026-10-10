@@ -14,7 +14,6 @@ import EditEntryPanel from "@/components/journal/EditEntryPanel";
 import FollowUpPanel from "@/components/journal/FollowUpPanel";
 import AddFromJournalDialog from "@/components/discovery/AddFromJournalDialog";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
-import DashedMotif from "@/components/workbook/DashedMotif";
 
 const TABS = [
   { key: "all", label: "All entries" },
@@ -174,20 +173,15 @@ export default function JournalPage() {
 
   return (
     <div className="space-y-8">
-      <header className="border-b border-natural pb-6">
-        <div className="flex items-start gap-4">
-          <DashedMotif size="lg" />
-          <div>
-            <p className="workbook-label">Conversation Journal</p>
-            <h1 className="mt-2 font-heading text-3xl sm:text-4xl">Your Conversation Journal</h1>
-            <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-ink-soft">
-              Keep your lesson responses, observations, and questions together. Return to an earlier entry when you want
-              to add something or see what has changed.
-            </p>
-          </div>
-        </div>
-        <div className="mt-5 flex flex-wrap items-center gap-3">
-          <Button type="button" variant="outline" onClick={downloadAll} className="rounded-full border-natural bg-white">
+      <header className="border-b border-border pb-5">
+        <p className="workbook-label">Conversation Journal</p>
+        <h1 className="mt-2">Your Conversation Journal</h1>
+        <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
+          Keep your lesson responses, observations, and questions together. Return to an earlier entry when you want to
+          add something or see what has changed.
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <Button type="button" variant="outline" onClick={downloadAll} className="rounded-md border-input bg-card">
             <Download className="mr-2 h-4 w-4" aria-hidden="true" />
             Download
           </Button>
@@ -195,11 +189,13 @@ export default function JournalPage() {
             type="button"
             variant="outline"
             onClick={() => window.print()}
-            className="rounded-full border-natural bg-white"
+            className="rounded-md border-input bg-card"
           >
             <Printer className="mr-2 h-4 w-4" aria-hidden="true" />
             Print
           </Button>
+        </div>
+        <div className="mt-3">
           <PrivacyNote>Your journal lives in this browser until you share an entry.</PrivacyNote>
         </div>
       </header>
@@ -214,10 +210,10 @@ export default function JournalPage() {
               type="button"
               aria-pressed={tab === item.key}
               onClick={() => setTab(item.key)}
-              className={`rounded-full border px-3 py-1.5 text-[12.5px] transition ${
+              className={`rounded-md border px-3.5 py-2 text-[15px] transition ${
                 tab === item.key
-                  ? "border-teal-deep bg-teal-deep text-ivory"
-                  : "border-natural bg-white text-ink-soft hover:border-teal-deep/50"
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-input bg-card text-foreground hover:bg-secondary"
               }`}
             >
               {item.label}
@@ -227,7 +223,7 @@ export default function JournalPage() {
         {selected.length ? (
           <Button
             type="button"
-            className="rounded-full bg-copper text-ivory hover:bg-copper/90"
+            className="rounded-md bg-accent-ink text-white hover:bg-accent-ink/90"
             onClick={() => {
               const chosen = entries.filter((entry) => selected.includes(entry.id));
               setPending({
@@ -247,18 +243,18 @@ export default function JournalPage() {
       </div>
 
       {pending ? (
-        <section className="rounded-lg border border-copper/40 bg-copper-wash/60 p-5">
-          <p className="workbook-label text-copper">Confirm exactly what you are sharing</p>
-          <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
-            Scope: <strong className="font-medium text-ink">{pending.label}</strong>. Nothing else goes with it, and no
-            other part of your journal is visible. You can withdraw this later by telling the program creator.
+        <section className="rounded-xl border border-border bg-secondary p-5">
+          <p className="workbook-label">Confirm exactly what you are sharing</p>
+          <p className="mt-2 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
+            Scope: <strong className="font-semibold text-foreground">{pending.label}</strong>. Nothing else goes with it,
+            and no other part of your journal is visible. You can withdraw this later by telling the program creator.
           </p>
-          <div className="mt-4 flex gap-3">
+          <div className="mt-4 flex flex-wrap gap-3">
             <Button
               type="button"
               onClick={send}
               disabled={sending}
-              className="rounded-full bg-copper text-ivory hover:bg-copper/90"
+              className="rounded-md bg-accent-ink text-white hover:bg-accent-ink/90"
             >
               <Send className="mr-2 h-4 w-4" aria-hidden="true" />
               {sending ? "Sending…" : "Send this"}
@@ -267,7 +263,7 @@ export default function JournalPage() {
               type="button"
               variant="outline"
               onClick={() => setPending(null)}
-              className="rounded-full border-natural bg-white"
+              className="rounded-md border-input bg-card"
             >
               Cancel
             </Button>
@@ -288,15 +284,15 @@ export default function JournalPage() {
       ) : null}
 
       {entries.length === 0 ? (
-        <section className="rounded-lg border border-dashed border-natural-deep bg-white/60 p-6">
-          <p className="font-heading text-xl text-ink">Start wherever you are.</p>
-          <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-ink-soft">
+        <section className="rounded-xl border border-dashed border-input bg-card p-5">
+          <h2 className="text-[19px]">Start wherever you are.</h2>
+          <p className="mt-2 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
             Write a thought, question, or observation. Responses you save from lessons will appear here too.
           </p>
           <Button
             type="button"
             onClick={focusComposer}
-            className="mt-4 rounded-full bg-teal-deep text-ivory hover:bg-teal-deep/90"
+            className="mt-4 rounded-full bg-primary text-primary-foreground hover:bg-teal-deep/90"
           >
             <PenLine className="mr-2 h-4 w-4" aria-hidden="true" />
             Write an entry
@@ -305,7 +301,7 @@ export default function JournalPage() {
       ) : (
         <div className="space-y-8">
           {topLevel.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-natural-deep bg-white/60 p-6 text-[14px] leading-relaxed text-ink-soft">
+            <p className="rounded-xl border border-dashed border-input bg-card p-5 text-[17px] leading-relaxed text-muted-foreground">
               Nothing in this view yet. Your other entries are still here under a different filter.
             </p>
           ) : null}
@@ -321,9 +317,9 @@ export default function JournalPage() {
                   return (
                     <div key={entry.id} className="space-y-3">
                       {earlier ? (
-                        <div className="rounded-lg border border-dashed border-natural-deep bg-ivory-deep/60 p-4">
+                        <div className="rounded-xl border border-dashed border-input bg-secondary p-4">
                           <p className="workbook-label">Earlier wording, kept</p>
-                          <p className="mt-2 whitespace-pre-wrap text-[13.5px] leading-relaxed text-ink-faint">
+                          <p className="mt-2 whitespace-pre-wrap break-words text-[16px] leading-relaxed text-muted-foreground">
                             {earlier.body}
                           </p>
                         </div>
@@ -331,7 +327,7 @@ export default function JournalPage() {
                       <div className="flex items-start gap-3">
                         {tab === "all" ? (
                           <Checkbox
-                            className="mt-4 border-teal-deep/40 data-[state=checked]:bg-teal-deep"
+                            className="mt-4 border-input data-[state=checked]:bg-primary"
                             aria-label="Select this entry to share"
                             checked={selected.includes(entry.id)}
                             onCheckedChange={(checked) =>
@@ -373,12 +369,12 @@ export default function JournalPage() {
         </div>
       )}
 
-      <section className="no-print rounded-lg border border-natural bg-white/60 p-5">
-        <p className="workbook-label">
+      <section className="no-print rounded-xl border border-border bg-card p-5">
+        <h2 className="workbook-label">
           <Trash2 className="mb-2 h-4 w-4" aria-hidden="true" />
           Changing your mind
-        </p>
-        <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
+        </h2>
+        <p className="mt-2 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
           Deleting an entry here removes it from this browser. Sharing only ever sends what you confirm above — one entry
           or the entries you ticked — and never your whole journal.
         </p>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { PenLine, X } from "lucide-react";
@@ -22,34 +22,66 @@ const STATUS_TEXT = {
 };
 
 const STATUS_TONE = {
-  draft: "text-ink-faint",
-  saving: "text-ink-faint",
-  saved: "text-teal-deep",
-  error: "text-copper",
+  draft: "text-muted-faint",
+  saving: "text-muted-faint",
+  saved: "text-accent-ink",
+  error: "text-destructive",
 };
 
+const FOCUSABLE = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+
 /**
- * The slide-over panel. It is mounted once in the layout, so the journal is on
- * every page, and an unfinished draft survives being closed.
+ * The slide-over panel. Bounded to the viewport, its own scrolling, a visible close
+ * button, Escape to dismiss, and focus moved in on open and returned on close.
  */
 export default function JournalPanel({ open, onClose, lesson }) {
   const entries = useJournalEntries();
   const [draft, setDraft] = useState(() => readStore(DRAFT_KEY, ""));
   const [status, setStatus] = useState("draft");
   const [replyTo, setReplyTo] = useState(null);
-  const areaRef = useRef(null);
+  const panelRef = useRef(null);
+  const closeRef = useRef(null);
+  const openerRef = useRef(null);
 
   useEffect(() => {
-    if (open && areaRef.current) areaRef.current.focus();
+    if (!open) return undefined;
+    openerRef.current = document.activeElement;
+    closeRef.current?.focus();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      const opener = openerRef.current;
+      // Deferred, because the panel's own nodes are still being removed at this point.
+      window.requestAnimationFrame(() => {
+        const trigger = document.getElementById("journal-trigger");
+        if (trigger) trigger.focus();
+        else if (opener && document.contains(opener)) opener.focus();
+      });
+    };
   }, [open]);
 
-  useEffect(() => {
-    const onKey = (event) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  const onKeyDown = useCallback(
+    (event) => {
+      if (event.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab" || !panelRef.current) return;
+      const nodes = [...panelRef.current.querySelectorAll(FOCUSABLE)].filter((node) => node.offsetParent !== null);
+      if (!nodes.length) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    },
+    [onClose]
+  );
 
   const handleChange = (value) => {
     setDraft(value);
@@ -96,89 +128,92 @@ export default function JournalPanel({ open, onClose, lesson }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-50 flex justify-end" onKeyDown={onKeyDown}>
       <button
         type="button"
         aria-label="Close the journal"
         onClick={onClose}
-        className="absolute inset-0 bg-ink/25"
+        className="absolute inset-0 bg-foreground/30"
       />
       <aside
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Conversation Journal"
-        className="animate-journal-slide absolute right-0 top-0 flex h-full w-full max-w-[27rem] flex-col border-l border-natural bg-ivory shadow-xl"
+        aria-labelledby="journal-panel-title"
+        className="animate-journal-slide relative ml-auto flex h-full w-full max-w-full flex-col border-l border-border bg-card shadow-xl sm:max-w-[26rem]"
       >
-        <header className="flex items-start justify-between gap-4 border-b border-natural px-5 py-4">
-          <div>
-            <p className="workbook-label">Conversation Journal</p>
-            <h2 className="mt-1 font-heading text-xl">What’s on your mind?</h2>
-            <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-soft">
-              Write a thought, question, observation, or something you want to return to.
+        <header className="flex items-start justify-between gap-3 border-b border-border px-5 py-4">
+          <div className="min-w-0">
+            <h2 id="journal-panel-title" className="text-[20px]">
+              Add a note
+            </h2>
+            <p className="mt-1 text-[14px] leading-relaxed text-muted-foreground">
+              Write a thought, question, observation, or something to return to.
             </p>
             {lesson ? (
-              <p className="mt-1 text-[12px] text-ink-faint">
+              <p className="mt-1 break-words text-[13px] text-muted-faint">
                 From {lesson.code} · {lesson.title}
               </p>
             ) : null}
           </div>
           <button
+            ref={closeRef}
             type="button"
             onClick={onClose}
             aria-label="Close the journal"
-            className="rounded-full border border-natural bg-white p-1.5 text-ink-soft transition hover:border-teal-deep hover:text-teal-deep"
+            className="shrink-0 rounded-md border border-input bg-card p-2 text-foreground transition hover:bg-secondary"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-5 py-4">
+        <div className="flex-1 overscroll-contain overflow-y-auto px-5 py-4">
+          <label htmlFor="journal-note" className="block text-[15px] font-medium text-foreground">
+            What’s on your mind?
+          </label>
           <Textarea
-            ref={areaRef}
+            id="journal-note"
             value={draft}
             onChange={(event) => handleChange(event.target.value)}
             rows={5}
-            aria-label="What’s on your mind?"
-            placeholder="Start anywhere. A few words are enough."
-            className="min-h-[8rem] resize-y border-natural bg-white text-[14px] leading-relaxed"
+            placeholder="A few words are enough."
+            className="mt-2 min-h-[7rem] resize-y border-input bg-card text-[16px] leading-relaxed"
           />
 
-          <p aria-live="polite" className={`mt-2 text-[12px] ${STATUS_TONE[status]}`}>
+          <p aria-live="polite" className={`mt-2 text-[13px] ${STATUS_TONE[status]}`}>
             {STATUS_TEXT[status]}
           </p>
 
-          <div className="mt-3 flex items-center gap-3">
+          <div className="mt-3 flex flex-wrap items-center gap-3">
             <Button
               type="button"
               onClick={handleSave}
               disabled={!draft.trim() || status === "saving"}
-              className="rounded-full bg-teal-deep text-ivory hover:bg-teal-deep/90"
+              className="rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <PenLine className="mr-2 h-4 w-4" aria-hidden="true" />
               Save to journal
             </Button>
-          </div>
-
-          <div className="mt-3">
-            <PrivacyNote>
-              Saved in this browser, not automatically synced between devices. Sharing an entry is a separate action.
-            </PrivacyNote>
             <button
               type="button"
               onClick={downloadCopy}
-              className="mt-1.5 ml-5 text-[12px] text-teal-deep underline decoration-natural underline-offset-2 hover:decoration-copper"
+              className="text-[14px] font-medium text-accent-ink underline underline-offset-2"
             >
-              Download a copy to keep a backup
+              Download a copy
             </button>
           </div>
 
+          <div className="mt-3">
+            <PrivacyNote />
+          </div>
+
           <section className="mt-7">
-            <div className="flex items-baseline justify-between">
-              <p className="workbook-label">Recent entries</p>
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h3 className="text-[16px]">Recent entries</h3>
               <Link
                 to="/journal"
                 onClick={onClose}
-                className="text-[12px] text-teal-deep underline decoration-natural underline-offset-2"
+                className="text-[14px] font-medium text-accent-ink underline underline-offset-2"
               >
                 Open the full journal
               </Link>
@@ -199,7 +234,7 @@ export default function JournalPanel({ open, onClose, lesson }) {
                 </div>
               ))}
               {entries.length === 0 ? (
-                <p className="text-[13px] text-ink-faint">
+                <p className="text-[15px] text-muted-faint">
                   Nothing here yet. The journal keeps every reflection answer you save, alongside anything you write here.
                 </p>
               ) : null}

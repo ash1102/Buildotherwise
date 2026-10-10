@@ -38,23 +38,23 @@ export default function FeedbackForm({ moduleOrder, lessonCode }) {
   };
 
   return (
-    <section className="no-print rounded-lg border border-natural bg-white/70 p-4 sm:p-5">
+    <section className="no-print rounded-xl border border-border bg-card p-4 sm:p-5">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between text-left"
+        className="flex w-full items-center justify-between gap-3 text-left"
       >
-        <span className="flex items-center gap-2 text-[13px] font-medium text-teal-deep">
-          <Flag className="h-3.5 w-3.5" aria-hidden="true" />
+        <span className="flex items-center gap-2 text-[15px] font-medium text-foreground">
+          <Flag className="h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
           Something confusing, or feedback about this step?
         </span>
-        <span className="text-[12px] text-ink-faint">{open ? "Close" : "Open"}</span>
+        <span className="shrink-0 text-[14px] text-muted-faint">{open ? "Close" : "Open"}</span>
       </button>
 
       {open ? (
         <div className="mt-4">
-          <p className="text-[13px] leading-relaxed text-ink-soft">
+          <p className="max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
             This form is separate from your journal. Whatever you send here is shared with the program creator; nothing
             from your journal comes with it.
           </p>
@@ -68,10 +68,10 @@ export default function FeedbackForm({ moduleOrder, lessonCode }) {
                 type="button"
                 aria-pressed={kind === option.value}
                 onClick={() => setKind(option.value)}
-                className={`rounded-full border px-3 py-1.5 text-[12.5px] transition ${
+                className={`rounded-md border px-3.5 py-2 text-[15px] transition ${
                   kind === option.value
-                    ? "border-teal-deep bg-teal-deep text-ivory"
-                    : "border-natural bg-white text-ink-soft hover:border-teal-deep/50"
+                    ? "border-accent-ink bg-accent-ink text-white"
+                    : "border-input bg-card text-foreground hover:bg-secondary"
                 }`}
               >
                 {option.label}
@@ -82,20 +82,21 @@ export default function FeedbackForm({ moduleOrder, lessonCode }) {
             value={message}
             onChange={(event) => setMessage(event.target.value)}
             rows={3}
-            placeholder="What got in the way? What would have helped?"
-            className="mt-3 min-h-[5rem] border-natural bg-ivory/60 text-[14px]"
+            aria-label="Your feedback"
+            placeholder="A few words are enough."
+            className="mt-3 min-h-[5rem] border-input bg-card text-[16px]"
           />
-          <div className="mt-3 flex items-center gap-3">
+          <div className="mt-3 flex flex-wrap items-center gap-3">
             <Button
               type="button"
               onClick={submit}
               disabled={sending || !message.trim()}
-              className="rounded-full bg-copper text-ivory hover:bg-copper/90"
+              className="rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              <Send className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+              <Send className="mr-2 h-4 w-4" aria-hidden="true" />
               {sending ? "Sending…" : "Send feedback"}
             </Button>
-            {sent ? <span className="text-[12px] text-teal-deep">Received. Thank you.</span> : null}
+            {sent ? <span className="text-[14px] text-accent-ink">Received. Thank you.</span> : null}
           </div>
         </div>
       ) : null}

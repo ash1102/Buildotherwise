@@ -10,19 +10,19 @@ import { NEXT_DECISIONS, describeStep } from "./workbook";
 
 /** How each step reads on the trail. Classes are written out so the build keeps them. */
 export const STATE_STYLE = {
-  decided: "border-copper/60 bg-copper-wash/70 text-copper",
-  answered: "border-teal-deep/40 bg-teal-deep-wash text-teal-deep",
-  paused: "border-dashed border-natural-deep bg-white text-ink-faint",
-  passed: "border-natural-deep bg-white text-ink-faint",
-  "not answered": "border-natural bg-ivory/60 text-ink-faint",
+  decided: "border-accent-ink bg-secondary text-accent-ink",
+  answered: "border-primary bg-primary-wash text-foreground",
+  paused: "border-dashed border-input bg-card text-muted-foreground",
+  passed: "border-input bg-card text-muted-foreground",
+  "not answered": "border-border bg-background text-muted-faint",
 };
 
 export const STATE_DOT = {
-  decided: "border-copper bg-copper",
-  answered: "border-teal-deep bg-teal-deep",
-  paused: "border-dashed border-natural-deep bg-white",
-  passed: "border-natural-deep bg-natural-deep",
-  "not answered": "border-natural bg-white",
+  decided: "border-accent-ink bg-accent-ink",
+  answered: "border-primary bg-primary",
+  paused: "border-dashed border-input bg-card",
+  passed: "border-input bg-input",
+  "not answered": "border-border bg-card",
 };
 
 export const STATE_LABEL = {

@@ -46,7 +46,7 @@ export default function MarkUpPage() {
       </ul>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="font-heading text-[14px] italic text-teal-deep">
+        <p className="text-[15px] text-muted-foreground">
           {marks.length === 0
             ? "Nothing marked yet."
             : `${marks.length} ${marks.length === 1 ? "line" : "lines"} marked and kept with this page.`}

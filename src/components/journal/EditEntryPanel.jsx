@@ -31,7 +31,7 @@ export default function EditEntryPanel({ entry, onSave, onCancel }) {
           type="button"
           disabled={empty}
           onClick={() => onSave("keep", text.trim())}
-          className="rounded-full bg-teal-deep text-ivory hover:bg-teal-deep/90"
+          className="rounded-full bg-primary text-primary-foreground hover:bg-teal-deep/90"
         >
           Keep the earlier wording
         </Button>

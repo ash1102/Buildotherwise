@@ -21,20 +21,20 @@ export default function EntryCard({
     entry.kind === "free" ? entry.prompt_label || "Personal entry" : entry.prompt_label || "Lesson response";
 
   return (
-    <article className="rounded-lg border border-natural/80 bg-white p-4">
+    <article className="rounded-xl border border-border bg-card p-4">
       <header className="flex flex-wrap items-baseline justify-between gap-2">
         <p className="workbook-label">{label}</p>
-        <time className="text-[11px] text-ink-faint" dateTime={entry.created_date}>
+        <time className="text-[14px] text-muted-faint" dateTime={entry.created_date}>
           {moment(entry.created_date).format("D MMM YYYY, HH:mm")}
         </time>
       </header>
 
       {from ? (
-        <p className="mt-1 flex items-center gap-1.5 text-[12px] text-teal-deep">
-          <BookOpen className="h-3 w-3" aria-hidden="true" />
+        <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[14px] text-muted-faint">
+          <BookOpen className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
           {entry.lesson_code ? (
             <Link
-              className="underline decoration-natural underline-offset-2 hover:text-copper"
+              className="font-medium text-accent-ink underline underline-offset-2"
               to={`/lesson/${entry.lesson_code}`}
             >
               {from}
@@ -46,17 +46,17 @@ export default function EntryCard({
       ) : null}
 
       <p
-        className={`mt-2 whitespace-pre-wrap text-[14px] leading-relaxed text-ink-soft ${
+        className={`mt-2 whitespace-pre-wrap break-words text-[17px] leading-relaxed text-foreground ${
           compact ? "line-clamp-4" : ""
         }`}
       >
-        {entry.body || <span className="italic text-ink-faint">Empty entry</span>}
+        {entry.body || <span className="italic text-muted-faint">Empty entry</span>}
       </p>
 
-      {entry.route ? <p className="mt-2 text-[12px] text-ink-faint">Route taken: {entry.route}</p> : null}
+      {entry.route ? <p className="mt-2 text-[14px] text-muted-faint">Route taken: {entry.route}</p> : null}
 
       {entry.revision_of ? (
-        <p className="mt-2 text-[12px] text-copper">Revised from an earlier entry — both are kept.</p>
+        <p className="mt-2 text-[14px] text-accent-ink">Revised from an earlier entry — both are kept.</p>
       ) : null}
 
       <EntryActions

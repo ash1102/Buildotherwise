@@ -110,7 +110,7 @@ export default function DiscoveryForm({
       ) : null}
 
       <div className="mt-5 flex flex-wrap items-center gap-3">
-        <Button type="submit" className="rounded-full bg-teal-deep text-ivory hover:bg-teal-deep/90">
+        <Button type="submit" className="rounded-full bg-primary text-primary-foreground hover:bg-teal-deep/90">
           {submitLabel}
         </Button>
         {onCancel ? (

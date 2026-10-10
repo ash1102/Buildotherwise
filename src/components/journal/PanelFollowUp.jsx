@@ -43,7 +43,7 @@ export default function PanelFollowUp({ onSave, onCancel }) {
           size="sm"
           disabled={!text.trim()}
           onClick={() => onSave(text.trim())}
-          className="rounded-full bg-teal-deep text-ivory hover:bg-teal-deep/90"
+          className="rounded-full bg-primary text-primary-foreground hover:bg-teal-deep/90"
         >
           Add follow-up
         </Button>

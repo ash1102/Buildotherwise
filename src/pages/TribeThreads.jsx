@@ -3,7 +3,6 @@ import { base44 } from "@/api/base44Client";
 import useCurriculum from "@/hooks/useCurriculum";
 import { groupBy, loadTribeReplies, loadTribeThreads, moduleTitle, subscribeTribeReplies } from "@/lib/library";
 import ThreadCard from "@/components/tribe/ThreadCard";
-import DashedMotif from "@/components/workbook/DashedMotif";
 
 export default function TribeThreads() {
   const { modules, loading: curriculumLoading } = useCurriculum();
@@ -56,30 +55,26 @@ export default function TribeThreads() {
   const busy = loading || curriculumLoading;
 
   return (
-    <div className="space-y-12">
-      <header className="border-b border-natural pb-7">
-        <div className="flex items-start gap-4">
-          <DashedMotif size="lg" />
-          <div>
-            <p className="workbook-label">Tribe Threads</p>
-            <h1 className="mt-2 font-heading text-3xl sm:text-4xl">The cohort's own conversation</h1>
-            <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-ink-soft">
-              A thread is one peer practice from the curriculum, opened up for the group. Answer in your own words, or
-              read what others noticed — taking part is always optional, and passing counts as a full answer.
-            </p>
-            <p className="mt-3 max-w-2xl text-[13.5px] leading-relaxed text-ink-faint">
-              Replies are posted with your name and are visible to everyone using this workbook. Your Conversation
-              Journal is separate and stays private: nothing from it is ever posted here, and a reply only exists if you
-              write one here yourself.
-            </p>
-          </div>
-        </div>
+    <div className="space-y-8">
+      <header className="border-b border-border pb-5">
+        <p className="workbook-label">Peer conversation</p>
+        <h1 className="mt-2">Tribe Threads</h1>
+        <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
+          A thread is one peer practice from the curriculum, opened up for the group. Each one shows the practice, the
+          prompt, and what others noticed. Answer in your own words, or just read — taking part is optional, and a short
+          reply counts as much as a long one.
+        </p>
+        <p className="mt-3 max-w-[68ch] text-[16px] leading-relaxed text-muted-faint">
+          Everyone with access to this workbook — the whole pilot cohort — can read replies, and they are posted with your
+          name. Your Conversation Journal is separate and stays private: nothing from it is ever posted here, and a reply
+          only exists if you write one on this page yourself.
+        </p>
       </header>
 
       {busy ? (
-        <p className="py-8 text-[14px] text-ink-faint">Opening the threads…</p>
+        <p className="py-8 text-[16px] text-muted-faint">Opening the threads…</p>
       ) : threads.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-natural-deep bg-white/60 p-6 text-[14px] leading-relaxed text-ink-soft">
+        <p className="rounded-xl border border-dashed border-input bg-card p-5 text-[16px] leading-relaxed text-muted-foreground">
           No threads yet. When the peer practices are published, each one appears here with its prompt and the cohort's
           replies.
         </p>
@@ -87,7 +82,7 @@ export default function TribeThreads() {
         <div className="space-y-10">
           {openOrders.map((order) => (
             <section key={order}>
-              <h2 className="font-heading text-xl">{moduleTitle(modules, order)}</h2>
+              <h2 className="text-[20px]">{moduleTitle(modules, order)}</h2>
               <div className="mt-3 space-y-5">
                 {openThreads
                   .filter((thread) => thread.module_order === order)
@@ -107,8 +102,8 @@ export default function TribeThreads() {
 
           {laterThreads.length ? (
             <section>
-              <h2 className="font-heading text-xl">Not open yet</h2>
-              <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-ink-soft">
+              <h2 className="text-[20px]">Not open yet</h2>
+              <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
                 The part of the program that brings the cohort together is still being written. These threads will open
                 when those steps are published.
               </p>

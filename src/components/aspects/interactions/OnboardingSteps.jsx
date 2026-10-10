@@ -52,7 +52,7 @@ export default function OnboardingSteps() {
         <div className="mt-4 flex flex-wrap items-center gap-4">
           <Link
             to="/getting-started"
-            className="inline-flex items-center gap-2 rounded-full bg-teal-deep px-5 py-2.5 text-[14px] text-ivory transition hover:bg-teal-deep/90"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-[15px] text-primary-foreground transition hover:bg-teal-deep/90"
           >
             Start Getting Started
             <ArrowRight className="h-4 w-4" aria-hidden="true" />

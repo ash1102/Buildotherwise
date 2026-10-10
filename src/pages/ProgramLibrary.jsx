@@ -13,7 +13,6 @@ import { downloadText } from "@/lib/download";
 import LibraryCard from "@/components/library/LibraryCard";
 import LibraryFilters from "@/components/library/LibraryFilters";
 import ResearchBriefCard from "@/components/library/ResearchBriefCard";
-import DashedMotif from "@/components/workbook/DashedMotif";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 
 export default function ProgramLibrary() {
@@ -119,32 +118,29 @@ export default function ProgramLibrary() {
   const busy = curriculumLoading || resources === null;
 
   return (
-    <div className="space-y-12">
-      <header className="border-b border-natural pb-7">
-        <div className="flex items-start gap-4">
-          <DashedMotif size="lg" />
-          <div>
-            <p className="workbook-label">Program Library</p>
-            <h1 className="mt-2 font-heading text-3xl sm:text-4xl">Everything you have read, in one place</h1>
-            <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-ink-soft">
-              The readings and notes that sit alongside the steps, kept in the curriculum's own words. Nothing here needs
-              filling in — it is material to come back to.
-            </p>
-          </div>
-        </div>
-        <div className="mt-5 flex flex-wrap items-center gap-3">
-          <Button type="button" variant="outline" onClick={download} className="rounded-full border-natural bg-white">
+    <div className="space-y-8">
+      <header className="border-b border-border pb-5">
+        <p className="workbook-label">Program Library</p>
+        <h1 className="mt-2">Everything you have read, in one place</h1>
+        <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
+          The readings and notes that sit alongside the steps, kept in the curriculum's own words. Nothing here needs
+          filling in — it is material to come back to.
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <Button type="button" variant="outline" onClick={download} className="rounded-md border-input bg-card">
             <Download className="mr-2 h-4 w-4" aria-hidden="true" />
             Download the library
           </Button>
+        </div>
+        <div className="mt-3">
           <PrivacyNote>Readings only. Your answers stay with the step you wrote them in.</PrivacyNote>
         </div>
       </header>
 
       <section className="space-y-7">
         <div>
-          <p className="workbook-label">Participant readings</p>
-          <h2 className="mt-2 font-heading text-xl">Find what the step asked you to read</h2>
+          <h2 className="workbook-label">Participant readings</h2>
+          <h3 className="mt-1.5 text-[20px]">Find what the step asked you to read</h3>
         </div>
 
         <LibraryFilters

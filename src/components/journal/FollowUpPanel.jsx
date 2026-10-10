@@ -33,7 +33,7 @@ export default function FollowUpPanel({ entry, onSave, onCancel }) {
           type="button"
           disabled={empty}
           onClick={() => onSave(text.trim())}
-          className="rounded-full bg-teal-deep text-ivory hover:bg-teal-deep/90"
+          className="rounded-full bg-primary text-primary-foreground hover:bg-teal-deep/90"
         >
           Add this follow-up
         </Button>

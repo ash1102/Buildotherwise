@@ -20,11 +20,11 @@ export default function AspectShell({ aspect, children }) {
         </Link>
 
         <p className="workbook-label mt-6">Aspect {aspect.number}</p>
-        <h1 className="mt-3 max-w-3xl font-heading text-3xl leading-[1.15] sm:text-4xl">{aspect.label}</h1>
-        <p className="mt-4 max-w-2xl font-heading text-[18px] italic leading-relaxed text-teal-deep">
+        <h1 className="mt-3">{aspect.label}</h1>
+        <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
           {aspect.promise}
         </p>
-        <Prose text={aspect.body} className="mt-5 max-w-2xl" />
+        <Prose text={aspect.body} className="mt-5" />
       </div>
 
       <section>

@@ -8,7 +8,6 @@ import { GROUP_LABELS, entriesFromAnswers, tryLogValues } from "@/lib/discovery"
 import { useDecisions, useDiscoveryNotes, useWorkbook } from "@/lib/workbook";
 import { downloadText } from "@/lib/download";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
-import DashedMotif from "@/components/workbook/DashedMotif";
 import DiscoveryForm from "@/components/discovery/DiscoveryForm";
 import DiscoveryCard from "@/components/discovery/DiscoveryCard";
 import WorkbookSources from "@/components/discovery/WorkbookSources";
@@ -80,33 +79,30 @@ export default function DiscoveryRecordPage() {
 
   return (
     <div className="space-y-7">
-      <header className="border-b border-natural pb-5">
-        <div className="flex items-start gap-3">
-          <DashedMotif />
-          <div>
-            <p className="workbook-label">Discovery Record</p>
-            <h1 className="mt-1.5 font-heading text-2xl sm:text-3xl">Discovery Record</h1>
-            <p className="mt-3 max-w-2xl text-[14.5px] leading-relaxed text-ink-soft">
-              Keep what you want to carry forward: something you noticed, a question, what a try taught you, or a decision
-              you may revisit.
-            </p>
-            <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-ink-faint">
-              This is not a score or a finished account of who you are. A few words, uncertainty, or nothing to add yet are
-              all okay.
-            </p>
-          </div>
-        </div>
+      <header className="border-b border-border pb-5">
+        <p className="workbook-label">Discovery Record</p>
+        <h1 className="mt-2">Discovery Record</h1>
+        <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
+          Two different things live on this page. <strong className="font-semibold text-foreground">Saved answers</strong> are
+          what the steps already hold, kept where you wrote them.{" "}
+          <strong className="font-semibold text-foreground">Discoveries you keep</strong> are the few things you choose to
+          carry forward yourself — nothing is added here on your behalf.
+        </p>
+        <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-faint">
+          This is not a score or a finished account of who you are. A few words, uncertainty, or nothing to add yet are all
+          okay.
+        </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Button
             type="button"
             aria-expanded={adding}
             onClick={() => setAdding(!adding)}
-            className="rounded-full bg-teal-deep text-ivory hover:bg-teal-deep/90"
+            className="rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
             Add a discovery
           </Button>
-          <Button type="button" variant="outline" onClick={download} className="rounded-full border-natural bg-white">
+          <Button type="button" variant="outline" onClick={download} className="rounded-md border-input bg-card">
             <Download className="mr-2 h-4 w-4" aria-hidden="true" />
             Download
           </Button>
@@ -114,7 +110,7 @@ export default function DiscoveryRecordPage() {
             type="button"
             variant="outline"
             onClick={() => window.print()}
-            className="rounded-full border-natural bg-white"
+            className="rounded-md border-input bg-card"
           >
             <Printer className="mr-2 h-4 w-4" aria-hidden="true" />
             Print
@@ -126,9 +122,11 @@ export default function DiscoveryRecordPage() {
       </header>
 
       <section className="space-y-4">
+        <h2 className="workbook-label">Discoveries you chose to keep</h2>
+
         {adding ? <DiscoveryForm onSubmit={add} onCancel={() => setAdding(false)} /> : null}
 
-        <p aria-live="polite" className="text-[13px] text-teal-deep">
+        <p aria-live="polite" className="text-[15px] text-accent-ink">
           {status}
         </p>
 
@@ -139,10 +137,11 @@ export default function DiscoveryRecordPage() {
             ))}
           </div>
         ) : adding ? null : (
-          <div className="rounded-lg border border-dashed border-natural-deep bg-white/60 p-6">
-            <p className="font-heading text-[16px] leading-snug text-ink">Nothing added yet.</p>
-            <p className="mt-1.5 text-[14px] leading-relaxed text-ink-soft">
-              You can add a discovery now or return when there is something you want to keep.
+          <div className="rounded-xl border border-dashed border-input bg-card p-5">
+            <p className="text-[17px] font-semibold text-foreground">Nothing kept yet.</p>
+            <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
+              Keep something when it is worth carrying forward. Answers you saved in the steps below are already yours and
+              do not need adding here.
             </p>
           </div>
         )}

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 
 const pillClass = (active) =>
   `rounded-full border px-3 py-1.5 text-[12.5px] transition ${
-    active ? "border-teal-deep bg-teal-deep text-ivory" : "border-natural bg-white text-ink-soft hover:border-teal-deep/50"
+    active ? "border-primary bg-primary text-primary-foreground" : "border-natural bg-white text-ink-soft hover:border-teal-deep/50"
   }`;
 
 function FilterPill({ active, onClick, children }) {

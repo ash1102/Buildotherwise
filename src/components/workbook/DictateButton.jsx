@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { Mic, Square } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 const Engine =
   typeof window === "undefined" ? null : window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -15,8 +16,9 @@ function join(head, tail) {
  * Dictation for one answer field. Words are added to whatever is already written,
  * so nothing typed is lost and nothing is overwritten. Speech goes to the browser's
  * own speech service — this app records nothing, keeps no audio, and costs nothing.
+ * The short note is the default so the explanation is not repeated under every box.
  */
-export default function DictateButton({ value, onText }) {
+export default function DictateButton({ value, onText, compact = false }) {
   const [listening, setListening] = useState(false);
   const [note, setNote] = useState("");
   const engine = useRef(null);
@@ -37,7 +39,7 @@ export default function DictateButton({ value, onText }) {
 
   const start = () => {
     if (!Engine) {
-      setNote("Dictation isn't available in this browser — you can keep typing.");
+      setNote("Dictation isn’t available in this browser — you can keep typing.");
       return;
     }
     const next = new Engine();
@@ -72,42 +74,33 @@ export default function DictateButton({ value, onText }) {
     try {
       next.start();
     } catch (error) {
-      setNote("Dictation couldn't start. Nothing you wrote was changed — you can keep typing.");
+      setNote("Dictation couldn’t start. Nothing you wrote was changed — you can keep typing.");
       setListening(false);
     }
   };
 
   return (
-    <span className="inline-flex flex-col items-start gap-1">
-      <span className="inline-flex items-center gap-2">
-        <button
-          type="button"
-          onClick={listening ? stop : start}
-          aria-pressed={listening}
-          aria-label={listening ? "Stop dictating this answer" : "Dictate this answer"}
-          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[12px] transition ${
-            listening
-              ? "border-accent-ink bg-accent text-accent-foreground"
-              : "border-border bg-background text-primary hover:border-primary/50"
-          }`}
-        >
-          {listening ? (
-            <Square className="h-3 w-3" aria-hidden="true" />
-          ) : (
-            <Mic className="h-3.5 w-3.5" aria-hidden="true" />
-          )}
-          {listening ? "Stop dictation" : "Dictate"}
-        </button>
-        {listening ? (
-          <span aria-live="polite" className="inline-flex items-center gap-1.5 text-[12px] text-accent-ink">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-ink" aria-hidden="true" />
-            Listening — speak, then stop when you're done.
-          </span>
-        ) : null}
-      </span>
-      <span aria-live="polite" className={`text-[11.5px] leading-snug ${note ? "text-accent-ink" : "text-muted-faint"}`}>
-        {note ||
-          "Typing stays open either way. The words come from your browser's own speech service, which may process speech outside this app; no audio is recorded or stored here."}
+    <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1">
+      <button
+        type="button"
+        onClick={listening ? stop : start}
+        aria-pressed={listening}
+        aria-label={listening ? "Stop dictating this answer" : "Dictate this answer"}
+        className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-[14px] transition ${
+          listening ? "border-primary bg-primary text-primary-foreground" : "border-input bg-card text-foreground hover:bg-secondary"
+        }`}
+      >
+        {listening ? <Square className="h-3 w-3" aria-hidden="true" /> : <Mic className="h-4 w-4" aria-hidden="true" />}
+        {listening ? "Stop dictation" : "Dictate"}
+      </button>
+      {listening ? (
+        <span aria-live="polite" className="inline-flex items-center gap-1.5 text-[14px] text-accent-ink">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" aria-hidden="true" />
+          Listening — speak, then stop when you’re done.
+        </span>
+      ) : null}
+      <span aria-live="polite" className={`text-[14px] leading-snug ${note ? "text-destructive" : "text-muted-faint"}`}>
+        {note || (compact ? "Typing stays open either way." : "Typing stays open either way. Speech goes to your browser’s own speech service; no audio is recorded or stored here.")}
       </span>
     </span>
   );

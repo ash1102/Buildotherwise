@@ -13,8 +13,10 @@ import {
   useWorkbook,
 } from "@/lib/workbook";
 import { saveAnswer } from "@/lib/journal";
+import { isComingLater } from "@/lib/curriculum";
 import { buildProgress } from "@/lib/progress";
 import LockedNotice from "@/components/workbook/LockedNotice";
+import ComingLaterNotice from "@/components/workbook/ComingLaterNotice";
 import LessonView from "@/components/workbook/LessonView";
 import { useJournalContext } from "@/components/journal/JournalContext";
 
@@ -53,30 +55,44 @@ export default function LessonPage() {
   );
 
   if (loading) {
-    return <p className="py-10 text-[14px] text-ink-faint">Opening the step…</p>;
+    return <p className="py-10 text-[16px] text-muted-faint">Opening the step…</p>;
   }
 
   if (!lesson || !module) {
     return (
       <div className="py-10">
-        <h1 className="font-heading text-2xl">That step isn’t part of Pilot 1.</h1>
-        <Link to="/" className="mt-4 inline-block text-[14px] text-teal-deep underline decoration-natural underline-offset-4">
+        <h1>That step isn’t part of Pilot 1.</h1>
+        <Link to="/" className="mt-4 inline-block text-[16px] font-medium text-accent-ink underline underline-offset-2">
           Back to the program list
         </Link>
       </div>
     );
   }
 
+  const moduleTitle = module.kind === "orientation" ? "Getting Started" : `Module ${module.order} — ${module.title}`;
+  const workbookLink = module.kind === "orientation" ? "/getting-started" : `/module/${module.slug}`;
+
+  // A module that was never built into the pilot is a different state from one that is waiting on writing.
+  if (isComingLater(module)) {
+    return (
+      <div className="space-y-6">
+        <header className="border-b border-border pb-5">
+          <p className="workbook-label">{moduleTitle}</p>
+          <h1 className="mt-2">{lesson.title}</h1>
+        </header>
+        <ComingLaterNotice module={module} />
+      </div>
+    );
+  }
+
   const row = progress.byOrder[module.order];
-  if (row && !row.unlocked && !row.coming) {
+  if (row && !row.unlocked) {
     const blocker = progress.blockingOrder === null ? null : progress.byOrder[progress.blockingOrder];
     return (
-      <div className="space-y-8">
-        <header className="border-b border-border pb-6">
-          <p className="workbook-label">
-            {module.kind === "orientation" ? "Getting Started" : `Module ${module.order}`}
-          </p>
-          <h1 className="mt-2 font-heading text-3xl leading-tight sm:text-4xl">{lesson.title}</h1>
+      <div className="space-y-6">
+        <header className="border-b border-border pb-5">
+          <p className="workbook-label">{moduleTitle}</p>
+          <h1 className="mt-2">{lesson.title}</h1>
         </header>
         <LockedNotice module={module} blocking={blocker} missing={blocker ? blocker.missing : []} />
       </div>
@@ -88,11 +104,13 @@ export default function LessonPage() {
   return (
     <LessonView
       lesson={lesson}
-      moduleTitle={module.kind === "orientation" ? "Getting Started" : `Module ${module.order} — ${module.title}`}
+      moduleTitle={moduleTitle}
       stepNumber={stepIndex}
       stepCount={siblings.length}
       prev={prev}
       next={next}
+      nextIsModule={Boolean(next && module && next.module_order !== lesson.module_order)}
+      workbookLink={workbookLink}
       answers={answers}
       decisions={decisionsMap}
       states={states}

@@ -20,7 +20,7 @@ export default function ReplyForm({ thread, user, onPosted }) {
         <Button
           type="button"
           onClick={() => base44.auth.redirectToLogin(window.location.href)}
-          className="mt-3 rounded-full bg-teal-deep text-ivory hover:bg-teal-deep/90"
+          className="mt-3 rounded-full bg-primary text-primary-foreground hover:bg-teal-deep/90"
         >
           Sign in to reply
         </Button>
@@ -65,7 +65,7 @@ export default function ReplyForm({ thread, user, onPosted }) {
           type="button"
           onClick={submit}
           disabled={saving || !body.trim()}
-          className="rounded-full bg-teal-deep text-ivory hover:bg-teal-deep/90"
+          className="rounded-full bg-primary text-primary-foreground hover:bg-teal-deep/90"
         >
           <Send className="mr-2 h-4 w-4" aria-hidden="true" />
           {saving ? "Posting…" : "Post reply"}
