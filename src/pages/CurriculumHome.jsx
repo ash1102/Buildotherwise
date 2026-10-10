@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, BookOpen, Map } from "lucide-react";
+import { ArrowRight, BookOpen, Compass, Map } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
 import { useWorkbook } from "@/lib/workbook";
 import ModuleMap from "@/components/workbook/ModuleMap";
@@ -58,6 +58,12 @@ export default function CurriculumHome() {
             className="inline-flex items-center gap-2 rounded-full px-2 py-2.5 text-[14px] text-ink-soft transition hover:text-teal-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper">
             <Map className="h-4 w-4" aria-hidden="true" />
             View your Life Map
+          </Link>
+          <Link
+            to="/aspects"
+            className="inline-flex items-center gap-2 rounded-full px-2 py-2.5 text-[14px] text-ink-soft transition hover:text-teal-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper">
+            <Compass className="h-4 w-4" aria-hidden="true" />
+            How the workbook works
           </Link>
         </div>
         <div className="mt-6 max-w-2xl">
