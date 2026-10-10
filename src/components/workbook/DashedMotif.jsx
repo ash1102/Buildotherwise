@@ -1,6 +1,6 @@
 import React from "react";
 
-const DOT_COLORS = ["bg-teal-deep", "bg-copper", "bg-natural-deep"];
+const DOT_COLORS = ["bg-primary", "bg-accent-soft", "bg-border"];
 
 /** The workbook's dashed circular motif, used as a quiet signature throughout. */
 export default function DashedMotif({ size = "md", dots = 3 }) {
@@ -9,7 +9,7 @@ export default function DashedMotif({ size = "md", dots = 3 }) {
   return (
     <span
       aria-hidden="true"
-      className={`inline-flex ${box} shrink-0 items-center justify-center gap-1 rounded-full border border-dashed border-teal-deep/40`}
+      className={`inline-flex ${box} shrink-0 items-center justify-center gap-1 rounded-full border border-dashed border-primary/40`}
     >
       {Array.from({ length: dots }).map((_, index) => (
         <span key={index} className={`${dot} ${DOT_COLORS[index % DOT_COLORS.length]} rounded-full`} />

@@ -8,14 +8,14 @@ import { Lock } from "lucide-react";
  */
 export default function PrivacyNote({ children }) {
   return (
-    <p className="flex items-start gap-2 text-[13px] leading-relaxed text-teal-deep/75">
+    <p className="flex items-start gap-2 text-[13px] leading-relaxed text-muted-faint">
       <span
         role="img"
         aria-label="Entrepalooza storage note"
         title="Added by Entrepalooza, about where your words are kept."
         className="mt-0.5 inline-flex shrink-0"
       >
-        <Lock className="h-3.5 w-3.5 text-copper" aria-hidden="true" />
+        <Lock className="h-3.5 w-3.5 text-accent-ink" aria-hidden="true" />
       </span>
       <span>
         {children ||

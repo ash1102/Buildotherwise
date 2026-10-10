@@ -27,7 +27,7 @@ export default function Composer({ value, onChange, onSend, busy }) {
           type="button"
           onClick={onSend}
           disabled={busy || !value.trim()}
-          className="rounded-full bg-teal-deep text-ivory hover:bg-teal-deep-soft"
+          className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
         >
           {busy ? "Reflecting…" : "Send"}
         </Button>

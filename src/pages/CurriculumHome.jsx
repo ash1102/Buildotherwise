@@ -32,36 +32,36 @@ export default function CurriculumHome() {
         <h1 className="mt-4 max-w-3xl font-heading text-3xl leading-[1.15] sm:text-4xl">
           Notice. Try. Reflect. Decide.
         </h1>
-        <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-ink-soft">
+        <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-muted-foreground">
           Start with a question, an ordinary task, or “I don’t know yet.” Explore what holds your attention, try
           something small if you choose, and decide what comes next.
         </p>
-        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-faint">
+        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-faint">
           A job, training, a project, a pause, or continued exploration are all valid directions. Entrepreneurship is
           one possibility — not a requirement.
         </p>
         <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <Link
             to="/getting-started"
-            className="inline-flex items-center gap-2 rounded-full bg-teal-deep px-5 py-2.5 text-[14px] text-ivory transition hover:bg-teal-deep/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper">
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-[14px] text-primary-foreground transition hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-ink">
             Start with Getting Started
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
           <Link
             to="/journal"
-            className="inline-flex items-center gap-2 rounded-full border border-natural bg-white px-5 py-2.5 text-[14px] text-teal-deep transition hover:border-teal-deep/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper">
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-[14px] text-primary transition hover:border-primary/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-ink">
             <BookOpen className="h-4 w-4" aria-hidden="true" />
             Open your Journal
           </Link>
           <Link
             to="/map"
-            className="inline-flex items-center gap-2 rounded-full px-2 py-2.5 text-[14px] text-ink-soft transition hover:text-teal-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper">
+            className="inline-flex items-center gap-2 rounded-full px-2 py-2.5 text-[14px] text-muted-foreground transition hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-ink">
             <Map className="h-4 w-4" aria-hidden="true" />
             View your Life Map
           </Link>
           <Link
             to="/aspects"
-            className="inline-flex items-center gap-2 rounded-full px-2 py-2.5 text-[14px] text-ink-soft transition hover:text-teal-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper">
+            className="inline-flex items-center gap-2 rounded-full px-2 py-2.5 text-[14px] text-muted-foreground transition hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-ink">
             <Compass className="h-4 w-4" aria-hidden="true" />
             How the workbook works
           </Link>
@@ -78,10 +78,10 @@ export default function CurriculumHome() {
         <p className="workbook-label">The cycle you will use again and again</p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {CYCLE.map((step, index) =>
-          <div key={step.label} className="rounded-lg border border-natural bg-white p-5">
-              <span className="font-heading text-[13px] text-copper">{`0${index + 1}`}</span>
+          <div key={step.label} className="rounded-lg border border-border bg-card p-5">
+              <span className="font-heading text-[13px] text-accent-ink">{`0${index + 1}`}</span>
               <h2 className="mt-2 font-heading text-xl">{step.label}</h2>
-              <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">{step.line}</p>
+              <p className="mt-2 text-[13.5px] leading-relaxed text-muted-foreground">{step.line}</p>
             </div>
           )}
         </div>
@@ -91,22 +91,22 @@ export default function CurriculumHome() {
       <section>
           <p className="workbook-label">Start here · its own short sequence</p>
           {loading ?
-          <div aria-busy="true" className="mt-4 min-h-[168px] rounded-lg border border-natural bg-white/60 p-6">
-            <div className="h-7 w-52 animate-pulse rounded bg-natural" />
-            <div className="mt-3 h-4 w-44 animate-pulse rounded bg-natural/70" />
-            <div className="mt-3 h-3.5 w-full max-w-2xl animate-pulse rounded bg-natural/70" />
-            <div className="mt-2 h-3.5 w-2/3 max-w-xl animate-pulse rounded bg-natural/70" />
+          <div aria-busy="true" className="mt-4 min-h-[168px] rounded-lg border border-border bg-card/60 p-6">
+            <div className="h-7 w-52 animate-pulse rounded bg-border" />
+            <div className="mt-3 h-4 w-44 animate-pulse rounded bg-border/70" />
+            <div className="mt-3 h-3.5 w-full max-w-2xl animate-pulse rounded bg-border/70" />
+            <div className="mt-2 h-3.5 w-2/3 max-w-xl animate-pulse rounded bg-border/70" />
           </div> :
           <Link
           to="/getting-started"
-          className="mt-4 flex flex-col gap-3 rounded-lg border border-natural bg-teal-deep-wash/60 p-6 transition hover:border-teal-deep/50 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+          className="mt-4 flex flex-col gap-3 rounded-lg border border-border bg-primary-wash/60 p-6 transition hover:border-primary/50 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
           
             <div className="min-w-0">
               <h2 className="font-heading text-2xl">Getting Started</h2>
-              <p className="mt-1 font-heading text-[16px] italic text-teal-deep">{gettingStarted.subtitle || gettingStarted.title}</p>
-              <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-ink-soft">{gettingStarted.purpose}</p>
+              <p className="mt-1 font-heading text-[16px] italic text-primary">{gettingStarted.subtitle || gettingStarted.title}</p>
+              <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-muted-foreground">{gettingStarted.purpose}</p>
             </div>
-            <span className="inline-flex shrink-0 items-center gap-2 text-[12.5px] text-teal-deep">
+            <span className="inline-flex shrink-0 items-center gap-2 text-[12.5px] text-primary">
               {gettingStartedSteps} steps
               <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </span>
@@ -120,7 +120,7 @@ export default function CurriculumHome() {
             <p className="workbook-label">The program</p>
             <h2 className="mt-2 font-heading text-2xl">Ten modules, one calm list</h2>
           </div>
-          <p className="max-w-md text-[13px] leading-relaxed text-ink-faint">
+          <p className="max-w-md text-[13px] leading-relaxed text-muted-faint">
             Modules 6–10 are not built yet, and nothing here pretends otherwise. They are listed plainly so you can see
             where the program is going.
           </p>
@@ -136,19 +136,19 @@ export default function CurriculumHome() {
         </div>
       </section>
 
-      <section className="rounded-lg border border-dashed border-teal-deep/40 bg-white/60 p-6">
+      <section className="rounded-lg border border-dashed border-primary/40 bg-card/60 p-6">
         <p className="workbook-label">How your writing is treated</p>
-        <div className="mt-3 space-y-3 text-[14px] leading-relaxed text-ink-soft">
+        <div className="mt-3 space-y-3 text-[14px] leading-relaxed text-muted-foreground">
           <p>
-            <strong className="font-medium text-ink">Saving</strong> keeps your words on this device, attached to the step
+            <strong className="font-medium text-foreground">Saving</strong> keeps your words on this device, attached to the step
             where you wrote them.
           </p>
           <p>
-            <strong className="font-medium text-ink">Sharing</strong> is separate, voluntary, and per entry — you choose
+            <strong className="font-medium text-foreground">Sharing</strong> is separate, voluntary, and per entry — you choose
             exactly what the program creator receives, and you can see the scope before you send it.
           </p>
           <p>
-            <strong className="font-medium text-ink">Writing</strong> is part of every step, and one line is enough. No
+            <strong className="font-medium text-foreground">Writing</strong> is part of every step, and one line is enough. No
             step is passed over: you write something, even when you pause and come back to it.
           </p>
         </div>

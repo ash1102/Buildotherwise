@@ -19,13 +19,13 @@ export default function Layout() {
   return (
     <JournalProvider>
       <div className="flex min-h-screen flex-col">
-        <header className="no-print sticky top-0 z-30 border-b border-natural bg-ivory/85 backdrop-blur">
+        <header className="no-print sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
           <div className="mx-auto flex max-w-5xl flex-col gap-3 px-5 py-3 sm:flex-row sm:items-center sm:justify-between sm:py-4">
             <NavLink to="/" className="flex items-center gap-3">
               <DashedMotif />
               <span>
-                <span className="block font-heading text-lg leading-none text-ink">Entrepalooza</span>
-                <span className="mt-1 block text-[11px] uppercase tracking-[0.16em] text-ink-faint">
+                <span className="block font-heading text-lg leading-none text-foreground">Entrepalooza</span>
+                <span className="mt-1 block text-[11px] uppercase tracking-[0.16em] text-muted-faint">
                   Build Otherwise · Pilot 1
                 </span>
               </span>
@@ -39,8 +39,8 @@ export default function Layout() {
                   className={({ isActive }) =>
                     `text-[13px] transition ${
                       isActive
-                        ? "text-teal-deep underline decoration-copper decoration-2 underline-offset-4"
-                        : "text-ink-soft hover:text-teal-deep"
+                        ? "text-primary underline decoration-accent-soft decoration-2 underline-offset-4"
+                        : "text-muted-foreground hover:text-primary"
                     }`
                   }
                 >
@@ -56,18 +56,18 @@ export default function Layout() {
           <Outlet />
         </main>
 
-        <footer className="no-print border-t border-natural bg-ivory/70">
-          <div className="mx-auto max-w-5xl px-5 py-6 text-[12px] leading-relaxed text-ink-faint">
+        <footer className="no-print border-t border-border bg-background/70">
+          <div className="mx-auto max-w-5xl px-5 py-6 text-[12px] leading-relaxed text-muted-faint">
             <div className="mb-3 flex flex-wrap gap-x-5 gap-y-2 text-[12.5px]">
               <Link
                 to="/about"
-                className="text-teal-deep underline decoration-natural underline-offset-4 transition hover:text-copper"
+                className="text-primary underline decoration-border underline-offset-4 transition hover:text-accent-ink"
               >
                 About Entrepalooza
               </Link>
               <Link
                 to="/contact"
-                className="text-teal-deep underline decoration-natural underline-offset-4 transition hover:text-copper"
+                className="text-primary underline decoration-border underline-offset-4 transition hover:text-accent-ink"
               >
                 Contact the program team
               </Link>

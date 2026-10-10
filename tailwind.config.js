@@ -23,7 +23,9 @@ module.exports = {
   			},
   			primary: {
   				DEFAULT: 'hsl(var(--primary))',
-  				foreground: 'hsl(var(--primary-foreground))'
+  				foreground: 'hsl(var(--primary-foreground))',
+  				soft: 'hsl(var(--primary-soft))',
+  				wash: 'hsl(var(--primary-wash))'
   			},
   			secondary: {
   				DEFAULT: 'hsl(var(--secondary))',
@@ -31,11 +33,15 @@ module.exports = {
   			},
   			muted: {
   				DEFAULT: 'hsl(var(--muted))',
-  				foreground: 'hsl(var(--muted-foreground))'
+  				foreground: 'hsl(var(--muted-foreground))',
+  				faint: 'hsl(var(--muted-faint))'
   			},
   			accent: {
   				DEFAULT: 'hsl(var(--accent))',
-  				foreground: 'hsl(var(--accent-foreground))'
+  				foreground: 'hsl(var(--accent-foreground))',
+  				ink: 'hsl(var(--accent-ink))',
+  				soft: 'hsl(var(--accent-ink-soft))',
+  				wash: 'hsl(var(--accent-ink-wash))'
   			},
   			destructive: {
   				DEFAULT: 'hsl(var(--destructive))',
@@ -61,28 +67,29 @@ module.exports = {
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
   			},
+  			/* Former names kept as aliases, all pointed at the tokens above so nothing hardcodes a color. */
   			ivory: {
-  				DEFAULT: '#F5F2EC',
-  				deep: '#EDE9E0'
+  				DEFAULT: 'hsl(var(--background))',
+  				deep: 'hsl(var(--secondary))'
   			},
   			ink: {
-  				DEFAULT: '#1A2826',
-  				soft: '#41514E',
-  				faint: '#6B7C78'
+  				DEFAULT: 'hsl(var(--foreground))',
+  				soft: 'hsl(var(--muted-foreground))',
+  				faint: 'hsl(var(--muted-faint))'
   			},
   			'teal-deep': {
-  				DEFAULT: '#E11D48',
-  				soft: '#F43F5E',
-  				wash: '#FCE7E9'
+  				DEFAULT: 'hsl(var(--primary))',
+  				soft: 'hsl(var(--primary-soft))',
+  				wash: 'hsl(var(--primary-wash))'
   			},
   			copper: {
-  				DEFAULT: '#9F1239',
-  				soft: '#BE123C',
-  				wash: '#FDF2F4'
+  				DEFAULT: 'hsl(var(--accent-ink))',
+  				soft: 'hsl(var(--accent-ink-soft))',
+  				wash: 'hsl(var(--accent-ink-wash))'
   			},
   			natural: {
-  				DEFAULT: '#DEDBD3',
-  				deep: '#C9C4B8'
+  				DEFAULT: 'hsl(var(--border))',
+  				deep: 'hsl(var(--input))'
   			}
   		},
   		fontFamily: {

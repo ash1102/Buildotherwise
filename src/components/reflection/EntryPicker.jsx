@@ -48,7 +48,7 @@ export default function EntryPicker({ entries, selectedIds, onToggle, onBring, b
           type="button"
           onClick={onBring}
           disabled={!count || busy}
-          className="rounded-full bg-teal-deep text-ivory hover:bg-teal-deep-soft"
+          className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
         >
           {count ? `Bring ${count} ${count === 1 ? "entry" : "entries"} in` : "Bring entries in"}
         </Button>
