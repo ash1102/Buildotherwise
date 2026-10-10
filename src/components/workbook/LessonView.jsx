@@ -203,8 +203,6 @@ export default function LessonView({
     });
   }
 
-  const startOpen = status && status !== "not answered" ? beats.length : 1;
-
   return (
     <article className="space-y-8">
       <StepHeader
@@ -226,7 +224,8 @@ export default function LessonView({
         </div>
       ) : null}
 
-      <LessonBeats beats={beats} startOpen={startOpen} />
+      {/* Keyed by step so a new step always starts on its own first beat. */}
+      <LessonBeats key={lesson.code} beats={beats} />
 
       {lesson.approval_state === "approved" && lesson.approved_source ? (
         <p className="text-[12px] leading-relaxed text-ink-faint">
