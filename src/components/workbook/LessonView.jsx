@@ -224,6 +224,11 @@ export default function LessonView({
         </div>
       ) : null}
 
+      <p className="text-[13px] leading-relaxed text-ink-faint">
+        What makes this step count: one line in any Try or Reflect box. Not every question — and a short line counts the
+        same as a long one, including “I don’t know yet.”
+      </p>
+
       {/* Keyed by step so a new step always starts on its own first beat. */}
       <LessonBeats key={lesson.code} beats={beats} />
 

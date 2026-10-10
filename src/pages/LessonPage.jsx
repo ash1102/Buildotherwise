@@ -13,6 +13,8 @@ import {
   useWorkbook,
 } from "@/lib/workbook";
 import { saveAnswer } from "@/lib/journal";
+import { buildProgress } from "@/lib/progress";
+import LockedNotice from "@/components/workbook/LockedNotice";
 import LessonView from "@/components/workbook/LessonView";
 import { useJournalContext } from "@/components/journal/JournalContext";
 
@@ -45,6 +47,11 @@ export default function LessonPage() {
     [lesson, lessonsByCode]
   );
 
+  const progress = useMemo(
+    () => buildProgress({ modules, lessonsByOrder, answers }),
+    [modules, lessonsByOrder, answers]
+  );
+
   if (loading) {
     return <p className="py-10 text-[14px] text-ink-faint">Opening the step…</p>;
   }
@@ -56,6 +63,22 @@ export default function LessonPage() {
         <Link to="/" className="mt-4 inline-block text-[14px] text-teal-deep underline decoration-natural underline-offset-4">
           Back to the program list
         </Link>
+      </div>
+    );
+  }
+
+  const row = progress.byOrder[module.order];
+  if (row && !row.unlocked && !row.coming) {
+    const blocker = progress.blockingOrder === null ? null : progress.byOrder[progress.blockingOrder];
+    return (
+      <div className="space-y-8">
+        <header className="border-b border-border pb-6">
+          <p className="workbook-label">
+            {module.kind === "orientation" ? "Getting Started" : `Module ${module.order}`}
+          </p>
+          <h1 className="mt-2 font-heading text-3xl leading-tight sm:text-4xl">{lesson.title}</h1>
+        </header>
+        <LockedNotice module={module} blocking={blocker} missing={blocker ? blocker.missing : []} />
       </div>
     );
   }

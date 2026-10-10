@@ -4,13 +4,18 @@ import { BookOpen } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
 import { isComingLater } from "@/lib/curriculum";
 import DashedMotif from "@/components/workbook/DashedMotif";
+import LockedNotice from "@/components/workbook/LockedNotice";
 import StepList from "@/components/workbook/StepList";
+import { useWorkbook } from "@/lib/workbook";
+import { buildProgress } from "@/lib/progress";
 
 export default function ModulePage() {
   const { slug } = useParams();
   const { modules, lessonsByOrder, loading } = useCurriculum();
+  const { answers } = useWorkbook();
 
   const module = modules.find((item) => item.slug === slug);
+  const progress = buildProgress({ modules, lessonsByOrder, answers });
 
   if (loading) {
     return <p className="py-10 text-[14px] text-ink-faint">Opening the module…</p>;
@@ -29,6 +34,27 @@ export default function ModulePage() {
 
   const lessons = lessonsByOrder[module.order] || [];
   const coming = isComingLater(module);
+  const row = progress.byOrder[module.order];
+  const locked = Boolean(row && !row.unlocked && !coming);
+  const blocker = progress.blockingOrder === null ? null : progress.byOrder[progress.blockingOrder];
+
+  if (locked) {
+    return (
+      <div className="space-y-10">
+        <header className="border-b border-border pb-6">
+          <div className="flex items-start gap-4">
+            <DashedMotif size="lg" />
+            <div>
+              <p className="workbook-label">{`Module ${module.order}`}</p>
+              <h1 className="mt-2 font-heading text-3xl leading-tight sm:text-4xl">{module.title}</h1>
+            </div>
+          </div>
+          <p className="mt-5 max-w-2xl font-heading text-[17px] italic leading-relaxed text-primary">{module.purpose}</p>
+        </header>
+        <LockedNotice module={module} blocking={blocker} missing={blocker ? blocker.missing : []} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10">
