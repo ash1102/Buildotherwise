@@ -28,8 +28,9 @@ export default function Layout() {
               </Link>
             </div>
             <p>
-              Pilot 1 covers Getting Started and Modules 1–5. Nothing you type on these pages is sent to Entrepalooza —
-              it stays in this browser until you choose to share it.
+              Pilot 1 covers Getting Started and Modules 1–5. What you write in the workbook and your journal stays in
+              this browser until you choose to share it. Contact messages, feedback and Tribe Thread replies are sent
+              only when you submit them.
             </p>
             <p className="mt-2">
               This is an educational workbook, not therapy or treatment. Support and concern contacts are still being
