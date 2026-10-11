@@ -137,7 +137,8 @@ export default function CurriculumHome() {
         <div className="mt-3 space-y-3 text-[17px] leading-relaxed text-muted-foreground">
           <p>
             <strong className="font-semibold text-foreground">Saving</strong> keeps your words on this device, attached to the
-            step where you wrote them.
+            step where you wrote them. Clearing this browser's site data or switching devices removes them, so use Export on
+            a journal entry if you want a copy.
           </p>
           <p>
             <strong className="font-semibold text-foreground">Sharing</strong> is separate, voluntary, and per entry — you
