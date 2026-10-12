@@ -1,123 +1,125 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /*
- * Entrepalooza theme tokens (temporary design — the permanent brand design comes later).
- * Palette: #FAF9F6 warm off-white page, #FFFFFF cards, #1C1917 near-black text,
- * #D97706 restrained amber accent used as a fill (with near-black text on it),
- * #92400E deep amber for small accent text and borders so labels stay crisp.
- * Typography: Inter everywhere, with a system UI fallback stack so a failed font
- * load never blocks rendering. Every color and font resolves to a token below.
+ * Entrepalooza theme tokens — from the "Entrepalooza (Draft)" design system.
+ * DRAFT, not a decided brand. Idea: "a gathering for the in-between."
+ * Chalk #F5F1EA page (public, meant to be written over), night ink #231E28 text,
+ * dusk plum #4A2D5C for buttons, links and headings (the in-between hour),
+ * marigold #E9A23B as the rare warm highlight (the porch light: someone showed up).
+ * Text on marigold is ink, never white. Typography: Bricolage Grotesque, with a
+ * system UI fallback so a failed font load never blocks rendering.
+ * Previous amber/Inter theme is saved as a checkpoint.
  */
 @layer base {
   :root {
-    --background: 40 33% 97%; /* #FAF9F6 */
-    --foreground: 24 10% 10%; /* #1C1917 */
+    --background: 38.2 35.5% 93.9%; /* chalk #F5F1EA */
+    --foreground: 270 14.3% 13.7%; /* night ink #231E28 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 24 10% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 24 10% 10%;
+    --card: 37.5 50% 96.9%; /* chalk-raised #FBF8F3 */
+    --card-foreground: 270 14.3% 13.7%;
+    --popover: 37.5 50% 96.9%;
+    --popover-foreground: 270 14.3% 13.7%;
 
-    --primary: 32.1 94.6% 43.7%; /* #D97706 */
-    --primary-foreground: 24 10% 10%; /* near-black on amber */
-    --primary-soft: 37.7 92.1% 50.2%; /* #F59E0B */
-    --primary-wash: 48 96% 89%; /* #FEF3C7 */
+    --primary: 277 34.3% 26.9%; /* dusk plum #4A2D5C */
+    --primary-foreground: 38.2 35.5% 93.9%; /* chalk on plum, 10:1 */
+    --primary-soft: 35.5 79.8% 57.3%; /* marigold #E9A23B, highlight fills only */
+    --primary-wash: 277.5 34.8% 91%; /* plum-soft #EAE0F0 */
 
-    --secondary: 40 6% 96%; /* #F5F5F4 */
-    --secondary-foreground: 24 10% 10%;
+    --secondary: 36 29.4% 90%; /* #EDE7DE */
+    --secondary-foreground: 270 14.3% 13.7%;
 
-    --muted: 40 6% 96%;
-    --muted-foreground: 30 6% 25%; /* #44403C */
-    --muted-faint: 25 5% 45%; /* #78716C */
+    --muted: 36 29.4% 90%;
+    --muted-foreground: 270 7.6% 36.1%; /* ink-muted #5C5563 */
+    --muted-faint: 270 7.8% 40%; /* #665E6E, 5:1 on muted */
 
-    --accent: 48 96% 89%; /* #FEF3C7 */
-    --accent-foreground: 24 10% 10%;
-    --accent-ink: 26 83% 31%; /* #92400E, accent text and fills */
-    --accent-ink-soft: 37.7 92.1% 50.2%;
-    --accent-ink-wash: 48 96% 89%;
+    --accent: 37.7 84.3% 90%; /* marigold-soft #FBEBD0: hover, today, selections */
+    --accent-foreground: 270 14.3% 13.7%;
+    --accent-ink: 277 34.3% 26.9%; /* links and labels in plum */
+    --accent-ink-soft: 35.5 79.8% 57.3%; /* marigold */
+    --accent-ink-wash: 37.7 84.3% 90%; /* marigold-soft */
 
-    --destructive: 0 72.22% 50.59%; /* #DC2626 */
+    --destructive: 3.6 68% 38%; /* #A3271F */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 24 6% 90%; /* #E7E5E4 */
-    --input: 20 6% 83%; /* #D6D3D1 */
-    --ring: 32.1 94.6% 43.7%;
+    --border: 28.2 20% 83.3%; /* line #DDD4CC */
+    --input: 276 6.4% 54.3%; /* #8C8392, 3:1 control borders */
+    --ring: 277 34.3% 26.9%;
 
-    --chart-1: 32.1 94.6% 43.7%;
-    --chart-2: 37.7 92.1% 50.2%;
-    --chart-3: 26 83% 31%;
-    --chart-4: 24 10% 10%;
-    --chart-5: 25 5% 45%;
+    --chart-1: 277 34.3% 26.9%;
+    --chart-2: 35.5 79.8% 57.3%;
+    --chart-3: 36.1 100% 27.1%;
+    --chart-4: 270 14.3% 13.7%;
+    --chart-5: 270 7.6% 36.1%;
 
-    --radius: 0.625rem;
+    --radius: 0.875rem; /* radius-md 14px */
 
-    --font-heading: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --font-body: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --font-display: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-heading: "Bricolage Grotesque", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-body: "Bricolage Grotesque", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-display: "Bricolage Grotesque", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 24 10% 10%;
-    --sidebar-primary: 32.1 94.6% 43.7%;
-    --sidebar-primary-foreground: 24 10% 10%;
-    --sidebar-accent: 40 6% 96%;
-    --sidebar-accent-foreground: 24 10% 10%;
-    --sidebar-border: 24 6% 90%;
-    --sidebar-ring: 32.1 94.6% 43.7%;
+    --sidebar-background: 37.5 50% 96.9%;
+    --sidebar-foreground: 270 14.3% 13.7%;
+    --sidebar-primary: 277 34.3% 26.9%;
+    --sidebar-primary-foreground: 38.2 35.5% 93.9%;
+    --sidebar-accent: 36 29.4% 90%;
+    --sidebar-accent-foreground: 270 14.3% 13.7%;
+    --sidebar-border: 28.2 20% 83.3%;
+    --sidebar-ring: 277 34.3% 26.9%;
   }
 
   .dark {
-    --background: 24 10% 8%; /* near-black, warm */
-    --foreground: 40 20% 96%;
+    --background: 266.7 16.4% 10.8%; /* #1B1720 */
+    --foreground: 34.3 35% 92.2%; /* #F2ECE4 */
 
-    --card: 24 8% 12%;
-    --card-foreground: 40 20% 96%;
-    --popover: 24 8% 12%;
-    --popover-foreground: 40 20% 96%;
+    --card: 267.3 14.7% 14.7%; /* #25202B */
+    --card-foreground: 34.3 35% 92.2%;
+    --popover: 267.3 14.7% 14.7%;
+    --popover-foreground: 34.3 35% 92.2%;
 
-    --primary: 37.7 92.1% 55%; /* brighter amber on dark */
-    --primary-foreground: 24 10% 8%;
-    --primary-soft: 37.7 92.1% 62%;
-    --primary-wash: 24 20% 16%;
+    --primary: 277.5 45.9% 76.1%; /* light plum #C9A6DE */
+    --primary-foreground: 266.7 16.4% 10.8%;
+    --primary-soft: 36 83.3% 64.7%; /* marigold #F0B45A */
+    --primary-wash: 272.7 24.4% 17.6%; /* #2E2238 */
 
-    --secondary: 24 8% 16%;
-    --secondary-foreground: 40 20% 96%;
+    --secondary: 270 14.3% 16.5%; /* #2A2430 */
+    --secondary-foreground: 34.3 35% 92.2%;
 
-    --muted: 24 8% 16%;
-    --muted-foreground: 40 15% 82%;
-    --muted-faint: 35 12% 66%;
+    --muted: 270 14.3% 16.5%;
+    --muted-foreground: 273.8 11.9% 73.7%; /* #BDB4C4 */
+    --muted-faint: 271.8 9.2% 63.7%; /* #A39AAB */
 
-    --accent: 24 20% 16%;
-    --accent-foreground: 40 20% 96%;
-    --accent-ink: 37.7 92.1% 68%;
-    --accent-ink-soft: 37.7 92.1% 60%;
-    --accent-ink-wash: 24 20% 16%;
+    --accent: 36 52.6% 14.9%; /* #3A2A12 */
+    --accent-foreground: 34.3 35% 92.2%;
+    --accent-ink: 277.5 45.9% 76.1%;
+    --accent-ink-soft: 36 83.3% 64.7%;
+    --accent-ink-wash: 36 52.6% 14.9%;
 
-    --destructive: 0 72% 55%;
-    --destructive-foreground: 24 10% 8%;
+    --destructive: 5.4 78.9% 72.2%; /* #F08A80 */
+    --destructive-foreground: 266.7 16.4% 10.8%;
 
-    --border: 24 8% 24%;
-    --input: 24 8% 28%;
-    --ring: 37.7 92.1% 55%;
+    --border: 274.3 12.3% 22.4%; /* #3A3240 */
+    --input: 271.4 9.9% 41.8%; /* #6B6075 */
+    --ring: 277.5 45.9% 76.1%;
 
-    --chart-1: 37.7 92.1% 55%;
-    --chart-2: 32.1 94.6% 50%;
-    --chart-3: 48 96% 76%;
-    --chart-4: 40 20% 96%;
-    --chart-5: 35 12% 66%;
+    --chart-1: 277.5 45.9% 76.1%;
+    --chart-2: 36 83.3% 64.7%;
+    --chart-3: 36 83.3% 64.7%;
+    --chart-4: 34.3 35% 92.2%;
+    --chart-5: 273.8 11.9% 73.7%;
 
-    --sidebar-background: 24 10% 8%;
-    --sidebar-foreground: 40 20% 96%;
-    --sidebar-primary: 37.7 92.1% 55%;
-    --sidebar-primary-foreground: 24 10% 8%;
-    --sidebar-accent: 24 8% 16%;
-    --sidebar-accent-foreground: 40 20% 96%;
-    --sidebar-border: 24 8% 24%;
-    --sidebar-ring: 37.7 92.1% 55%;
+    --sidebar-background: 266.7 16.4% 10.8%;
+    --sidebar-foreground: 34.3 35% 92.2%;
+    --sidebar-primary: 277.5 45.9% 76.1%;
+    --sidebar-primary-foreground: 266.7 16.4% 10.8%;
+    --sidebar-accent: 270 14.3% 16.5%;
+    --sidebar-accent-foreground: 34.3 35% 92.2%;
+    --sidebar-border: 274.3 12.3% 22.4%;
+    --sidebar-ring: 277.5 45.9% 76.1%;
   }
 }
 
