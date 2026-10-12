@@ -1,76 +1,110 @@
 {
   "name": "LibraryResource",
-  "type": "object",
   "properties": {
-    "title": {
-      "type": "string"
-    },
-    "kind": {
-      "type": "string",
-      "enum": [
-        "reading",
-        "research_brief",
-        "note"
-      ],
-      "default": "reading",
-      "description": "Reading, supplemental note, or program research brief."
-    },
     "audience": {
-      "type": "string",
+      "default": "participant",
+      "description": "Program-team research is shown in its own labelled shelf, never mixed into the participant readings.",
       "enum": [
         "participant",
         "program_team"
       ],
-      "default": "participant",
-      "description": "Program-team research is shown in its own labelled shelf, never mixed into the participant readings."
-    },
-    "module_order": {
-      "type": "number",
-      "description": "Module this reading belongs to. 0 is Getting Started."
-    },
-    "lesson_code": {
-      "type": "string",
-      "description": "The step this reading came from, when it came from one."
-    },
-    "summary": {
       "type": "string"
     },
     "body": {
-      "type": "string",
-      "description": "The reading itself, kept in the source's own words."
+      "description": "The reading itself, kept in the source's own words.",
+      "type": "string"
+    },
+    "creator": {
+      "description": "Outside sources only: author(s) or speaker, as the source names them.",
+      "type": "string"
+    },
+    "duration_min": {
+      "description": "Talks only: approximate length in minutes.",
+      "type": "number"
     },
     "full_text_uri": {
-      "type": "string",
-      "description": "Private storage reference for a long research brief's full text. Opened through a short-lived signed link when someone chooses to read it, never fetched with the shelf."
+      "description": "Private storage reference for a long research brief's full text. Opened through a short-lived signed link when someone chooses to read it, never fetched with the shelf.",
+      "type": "string"
     },
-    "source_label": {
-      "type": "string",
-      "description": "Where this text came from, kept for auditability."
+    "internal_notes": {
+      "description": "Facilitator-only. Never rendered to participants.",
+      "type": "string"
     },
-    "review_status": {
-      "type": "string",
-      "description": "The status the source document states for itself, kept in its own words. Never an approval claim made by this app."
+    "kind": {
+      "default": "reading",
+      "description": "Reading, supplemental note, or program research brief. Article, study and talk are outside sources that link out and sit on their own shelf.",
+      "enum": [
+        "reading",
+        "research_brief",
+        "note",
+        "article",
+        "study",
+        "talk"
+      ],
+      "type": "string"
+    },
+    "lesson_code": {
+      "description": "The step this reading came from, when it came from one.",
+      "type": "string"
+    },
+    "module_order": {
+      "description": "Module this reading belongs to. 0 is Getting Started.",
+      "type": "number"
     },
     "order": {
       "type": "number"
     },
+    "publisher": {
+      "description": "Outside sources only: outlet, journal or event (e.g. TED).",
+      "type": "string"
+    },
+    "review_status": {
+      "description": "The status the source document states for itself, kept in its own words. Never an approval claim made by this app.",
+      "type": "string"
+    },
+    "source_label": {
+      "description": "Where this text came from, kept for auditability.",
+      "type": "string"
+    },
     "status": {
-      "type": "string",
+      "default": "published",
       "enum": [
         "published",
         "draft"
       ],
-      "default": "published"
+      "type": "string"
     },
-    "internal_notes": {
-      "type": "string",
-      "description": "Facilitator-only. Never rendered to participants."
+    "summary": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "topics": {
+      "description": "Outside sources only: short topic tags for browsing.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "url": {
+      "description": "Outside sources only: the link to the original article, study or talk.",
+      "type": "string"
+    },
+    "why_here": {
+      "description": "Outside sources only: one plain sentence on why it sits in this library. Never a claim that the program is proven.",
+      "type": "string"
+    },
+    "year": {
+      "description": "Outside sources only: year published or recorded.",
+      "type": "number"
     }
   },
   "required": [
     "title",
     "kind"
   ],
+  "type": "object",
   "rls": {
     "read": {},
     "create": {
