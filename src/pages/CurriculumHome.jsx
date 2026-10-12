@@ -25,7 +25,7 @@ export default function CurriculumHome() {
     <div className="space-y-10">
       <section className="max-w-[68ch]">
         <p className="workbook-label">Build Otherwise · Entrepalooza · Pilot 1</p>
-        <h1 className="mt-2">Notice. Try. Reflect. Decide.</h1>
+        <h1 className="mt-2">Want something different? Start with something you can try.</h1>
         <p className="mt-3 text-[18px] leading-relaxed text-muted-foreground">
           Start with a question, an ordinary task, or “I don’t know yet.” Explore what holds your attention, try something
           small if you choose, and decide what comes next. A job, training, a project, a pause, or continued exploration
