@@ -13,6 +13,9 @@ import FeedbackForm from "./FeedbackForm";
 import LessonBeats from "./LessonBeats";
 import WorkedExample from "./WorkedExample";
 import SourceDetails from "./SourceDetails";
+import TryPlanner from "./TryPlanner";
+import TryCheckIn from "./TryCheckIn";
+import { interactionsFor } from "@/lib/interactions";
 import { participationRoutesFor, routeGuidanceFor } from "@/lib/workbook";
 
 export default function LessonView({
@@ -41,6 +44,15 @@ export default function LessonView({
   const guidance = routeGuidanceFor(route);
   const oneLine = guidance ? guidance.field === "line" : false;
   const [showSource, setShowSource] = useState(false);
+
+  // Optional tap-to-answer pieces for this step, set in src/lib/interactions.js.
+  const interactions = interactionsFor(lesson.code);
+  const hasPlanner = interactions.some((item) => item.type === "tryPlanner");
+  const renderInteraction = (item) => {
+    if (item.type === "tryPlanner") return <TryPlanner key="tryPlanner" lesson={lesson} />;
+    if (item.type === "tryCheckIn") return <TryCheckIn key="tryCheckIn" lesson={lesson} planCode={item.planCode} />;
+    return null;
+  };
 
   // A decision is only asked for where there is something to decide about, and only
   // where the step itself calls for one. Saved decisions are never touched.
@@ -135,9 +147,21 @@ export default function LessonView({
           {carrySources && carrySources.length ? (
             <CarryForward sources={carrySources} selected={carried} onChange={onCarriedChange} />
           ) : null}
-          <div className="space-y-6">
-            {tryPrompts.map((prompt, index) => promptField(prompt, index, `try-${index}`))}
-          </div>
+          {interactions.map(renderInteraction)}
+          {hasPlanner ? (
+            <details className="rounded-xl border border-border bg-card p-4 sm:p-5">
+              <summary className="cursor-pointer text-[16px] font-medium text-foreground">
+                Add more detail (optional) · {tryPrompts.length} questions
+              </summary>
+              <div className="mt-4 space-y-6">
+                {tryPrompts.map((prompt, index) => promptField(prompt, index, `try-${index}`))}
+              </div>
+            </details>
+          ) : (
+            <div className="space-y-6">
+              {tryPrompts.map((prompt, index) => promptField(prompt, index, `try-${index}`))}
+            </div>
+          )}
           {pauseNote}
         </div>
       ),
