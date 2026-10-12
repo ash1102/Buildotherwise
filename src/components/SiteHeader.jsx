@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Menu, PenLine, X } from "lucide-react";
 import { useJournalContext } from "@/components/journal/JournalContext";
+import { useAuth } from "@/lib/AuthContext";
 
 const LINKS = [
   { to: "/", label: "Workbook", end: true },
@@ -17,6 +18,14 @@ const LINKS = [
   { to: "/contact", label: "Contact" },
 ];
 
+/** What someone can reach before logging in: the welcome, Getting Started, and the two pages about the program. */
+const PUBLIC_LINKS = [
+  { to: "/", label: "Workbook", end: true },
+  { to: "/getting-started", label: "Getting Started" },
+  { to: "/about", label: "About" },
+  { to: "/contact", label: "Contact" },
+];
+
 const linkClass = ({ isActive }) =>
   `rounded-md px-3 py-2 text-[15px] transition ${
     isActive ? "bg-secondary font-semibold text-foreground" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
@@ -26,7 +35,9 @@ const linkClass = ({ isActive }) =>
 export default function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { openPanel } = useJournalContext();
+  const { isAuthenticated } = useAuth();
   const { pathname } = useLocation();
+  const links = isAuthenticated ? LINKS : PUBLIC_LINKS;
 
   useEffect(() => {
     setMenuOpen(false);
@@ -58,7 +69,7 @@ export default function SiteHeader() {
         </Link>
 
         <nav aria-label="Main" className="hidden min-w-0 flex-wrap items-center gap-x-1 lg:flex">
-          {LINKS.slice(0, 8).map((link) => (
+          {links.slice(0, 8).map((link) => (
             <NavLink key={link.to} to={link.to} end={link.end} className={linkClass}>
               {link.label}
             </NavLink>
@@ -66,16 +77,25 @@ export default function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            id="journal-trigger"
-            onClick={openPanel}
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-[14px] font-medium text-primary-foreground transition hover:bg-primary/90"
-          >
-            <PenLine className="h-4 w-4" aria-hidden="true" />
-            <span className="hidden sm:inline">Add a note</span>
-            <span className="sm:hidden">Note</span>
-          </button>
+          {isAuthenticated ? (
+            <button
+              type="button"
+              id="journal-trigger"
+              onClick={openPanel}
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-[14px] font-medium text-primary-foreground transition hover:bg-primary/90"
+            >
+              <PenLine className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Add a note</span>
+              <span className="sm:hidden">Note</span>
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-[14px] font-medium text-primary-foreground transition hover:bg-primary/90"
+            >
+              Log in
+            </Link>
+          )}
           <button
             type="button"
             onClick={() => setMenuOpen((value) => !value)}
@@ -96,7 +116,7 @@ export default function SiteHeader() {
           className="max-h-[70vh] overflow-y-auto border-t border-border bg-card px-4 py-2 sm:px-6 lg:hidden"
         >
           <ul className="mx-auto grid max-w-6xl gap-0.5 py-1">
-            {LINKS.map((link) => (
+            {links.map((link) => (
               <li key={link.to}>
                 <NavLink to={link.to} end={link.end} className={({ isActive }) => `block ${linkClass({ isActive })}`}>
                   {link.label}

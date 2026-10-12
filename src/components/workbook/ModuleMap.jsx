@@ -64,7 +64,7 @@ export default function ModuleMap({ modules, lessonsByOrder, answers, decisions,
               </p>
               {locked && blocker ? (
                 <p className="mt-3 max-w-2xl text-[13px] leading-relaxed text-muted-faint">
-                  Opens when Module {blocker.order}'s journal is complete.{" "}
+                  Opens when {blocker.label}'s journal is complete.{" "}
                   {blocker.missing.length} {blocker.missing.length === 1 ? "step still needs" : "steps still need"} one
                   line:{" "}
                   {blocker.missing.map((step, index) => (

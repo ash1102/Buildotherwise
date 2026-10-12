@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, BookOpen, Compass, Map } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
 import { useWorkbook } from "@/lib/workbook";
+import { useAuth } from "@/lib/AuthContext";
 import ModuleMap from "@/components/workbook/ModuleMap";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 
@@ -16,6 +17,7 @@ const CYCLE = [
 export default function CurriculumHome() {
   const { modules, lessonsByOrder, loading } = useCurriculum();
   const { answers, decisions, states } = useWorkbook();
+  const { isAuthenticated } = useAuth();
   /** Getting Started is the doorway, not a module, so it sits apart from the numbered list. */
   const gettingStarted = modules.find((module) => module.kind === "orientation");
   const numberedModules = modules.filter((module) => module.kind !== "orientation");
@@ -117,7 +119,8 @@ export default function CurriculumHome() {
           </div>
           <p className="max-w-[46ch] text-[15px] leading-relaxed text-muted-faint">
             Pilot 1 covers Getting Started and Modules 1–5. Modules 6–10 are still being built, and they are listed
-            plainly so you can see where the program is going.
+            plainly so you can see where the program is going. They open one at a time: Getting Started first, then each
+            module once every step before it holds a line.
           </p>
         </div>
         <div className="mt-5">

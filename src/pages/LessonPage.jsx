@@ -19,6 +19,8 @@ import LockedNotice from "@/components/workbook/LockedNotice";
 import ComingLaterNotice from "@/components/workbook/ComingLaterNotice";
 import LessonView from "@/components/workbook/LessonView";
 import { useJournalContext } from "@/components/journal/JournalContext";
+import { useAuth } from "@/lib/AuthContext";
+import LoginRedirect from "@/components/LoginRedirect";
 
 export default function LessonPage() {
   const { code } = useParams();
@@ -28,6 +30,7 @@ export default function LessonPage() {
   const carriedMap = useCarried();
   const decisionsMap = useDecisions();
   const { setLesson } = useJournalContext();
+  const { isAuthenticated } = useAuth();
 
   const lesson = lessonsByCode[code];
   const module = lesson ? modules.find((item) => item.order === lesson.module_order) : null;
@@ -67,6 +70,11 @@ export default function LessonPage() {
         </Link>
       </div>
     );
+  }
+
+  // The numbered modules are for participants. Getting Started's steps stay open to everyone.
+  if (module.kind !== "orientation" && !isAuthenticated) {
+    return <LoginRedirect />;
   }
 
   const moduleTitle = module.kind === "orientation" ? "Getting Started" : `Module ${module.order} — ${module.title}`;

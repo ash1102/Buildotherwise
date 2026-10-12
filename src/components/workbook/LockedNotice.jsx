@@ -10,8 +10,10 @@ import { ArrowRight, PenLine } from "lucide-react";
 export default function LockedNotice({ module, blocking, missing }) {
   const steps = missing || [];
   const blockingName = blocking
-    ? `Module ${blocking.order}${blocking.title ? ` — ${blocking.title}` : ""}`
-    : "the module before this one";
+    ? blocking.kind === "orientation"
+      ? "Getting Started"
+      : `Module ${blocking.order}${blocking.title ? ` — ${blocking.title}` : ""}`
+    : "the section before this one";
 
   return (
     <section className="rounded-xl border border-dashed border-input bg-card p-5 sm:p-6">

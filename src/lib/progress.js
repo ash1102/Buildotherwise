@@ -37,32 +37,34 @@ function isComingLater(module) {
 }
 
 /**
- * Which module can be opened. Numbered modules open in order: a module opens when
- * every step of the module before it holds one saved line. Getting Started keeps
- * its own promise and never gates Module 1. A coming-later module is never drawn
- * as locked, because nothing about it is waiting on the journal.
+ * Which module can be opened. The program opens in order, starting with its own
+ * doorway: Getting Started first, then each numbered module once every step
+ * before it holds one saved line — so Module 1 waits on Getting Started, and
+ * Module 2 waits on Getting Started and Module 1. A coming-later module is never
+ * drawn as locked, because nothing about it is waiting on the journal.
  */
 export function buildProgress({ modules, lessonsByOrder, answers }) {
-  const numbered = (modules || [])
-    .filter((module) => module.kind !== "orientation")
-    .slice()
-    .sort((a, b) => a.order - b.order);
+  const ordered = (modules || []).slice().sort((a, b) => a.order - b.order);
 
-  const before = [];
   const byOrder = {};
+  const rows = [];
+  /** Every container the gate waits on, in order, so the first unfinished one is the blocker. */
+  const gates = [];
 
-  numbered.forEach((module) => {
+  ordered.forEach((module) => {
     const coming = isComingLater(module);
     const lessons = (lessonsByOrder || {})[module.order] || [];
     const incomplete = lessons.filter((lesson) => !stepComplete(lesson, answers));
 
     byOrder[module.order] = {
       order: module.order,
+      kind: module.kind,
       slug: module.slug,
       title: module.title,
+      label: module.kind === "orientation" ? "Getting Started" : `Module ${module.order}`,
       coming,
       complete: lessons.length > 0 && incomplete.length === 0,
-      unlocked: coming ? false : before.every((entry) => entry.complete),
+      unlocked: coming ? false : gates.every((entry) => entry.complete),
       stepCount: lessons.length,
       writtenCount: lessons.length - incomplete.length,
       missing: incomplete.map((lesson) => ({
@@ -72,14 +74,17 @@ export function buildProgress({ modules, lessonsByOrder, answers }) {
       })),
     };
 
-    if (!coming) before.push({ order: module.order, complete: byOrder[module.order].complete });
+    if (module.kind !== "orientation") rows.push(byOrder[module.order]);
+
+    // Nothing waits on a module that was never built, or on a container with no steps to finish.
+    if (!coming && lessons.length > 0) gates.push(byOrder[module.order]);
   });
 
-  /** The first module still missing a line, which is what holds the ones after it shut. */
-  const blocking = before.find((entry) => !entry.complete) || null;
+  /** The first thing still missing a line, which is what holds everything after it shut. */
+  const blocking = gates.find((entry) => !entry.complete) || null;
 
   return {
-    rows: Object.values(byOrder),
+    rows,
     byOrder,
     blockingOrder: blocking ? blocking.order : null,
   };

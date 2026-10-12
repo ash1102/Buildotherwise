@@ -28,6 +28,8 @@ import OAuthConsent from '@/pages/OAuthConsent';
 import About from '@/pages/About';
 import Contact from '@/pages/Contact';
 import Connect from '@/pages/Connect';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import LoginRedirect from '@/components/LoginRedirect';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -59,17 +61,20 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<CurriculumHome />} />
         <Route path="/getting-started" element={<GettingStartedPage />} />
         <Route path="/module/getting-started" element={<Navigate to="/getting-started" replace />} />
-        <Route path="/module/:slug" element={<ModulePage />} />
+        {/* The workbook itself is for participants. Getting Started's own steps stay open, so those are gated on the step page rather than here. */}
+        <Route element={<ProtectedRoute unauthenticatedElement={<LoginRedirect />} />}>
+          <Route path="/module/:slug" element={<ModulePage />} />
+          <Route path="/journal" element={<JournalPage />} />
+          <Route path="/map" element={<LifeMapPage />} />
+          <Route path="/discovery-map" element={<DiscoveryMapPage />} />
+          <Route path="/record" element={<DiscoveryRecordPage />} />
+          <Route path="/program-library" element={<ProgramLibrary />} />
+          <Route path="/tribe-threads" element={<TribeThreads />} />
+          <Route path="/journal-reflection" element={<JournalReflection />} />
+          <Route path="/aspects" element={<AspectIndex />} />
+          <Route path="/aspect/:slug" element={<AspectPage />} />
+        </Route>
         <Route path="/lesson/:code" element={<LessonPage />} />
-        <Route path="/journal" element={<JournalPage />} />
-        <Route path="/map" element={<LifeMapPage />} />
-        <Route path="/discovery-map" element={<DiscoveryMapPage />} />
-        <Route path="/record" element={<DiscoveryRecordPage />} />
-        <Route path="/program-library" element={<ProgramLibrary />} />
-        <Route path="/tribe-threads" element={<TribeThreads />} />
-        <Route path="/journal-reflection" element={<JournalReflection />} />
-        <Route path="/aspects" element={<AspectIndex />} />
-        <Route path="/aspect/:slug" element={<AspectPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/connect" element={<Connect />} />
