@@ -1,0 +1,79 @@
+{
+  "name": "PreviewResponse",
+  "type": "object",
+  "properties": {
+    "section_key": {
+      "type": "string",
+      "description": "Preview section this response came from: before-you-start, module-1, and so on."
+    },
+    "module_label": {
+      "type": "string",
+      "description": "The module label shown at the time: Before you start, Module 1-5 (Pilot 1), or Optional, after Pilot 1."
+    },
+    "step_code": {
+      "type": "string",
+      "description": "Stable code of the step this response belongs to."
+    },
+    "step_title": {
+      "type": "string"
+    },
+    "block_id": {
+      "type": "string",
+      "description": "Stable ID of the block that produced this response."
+    },
+    "block_version": {
+      "type": "string",
+      "description": "Version of that block when the response was saved."
+    },
+    "block_type": {
+      "type": "string",
+      "enum": [
+        "reading",
+        "teaching",
+        "life_map",
+        "scenario_choice",
+        "sort",
+        "pattern_compare",
+        "optional_reflection",
+        "next_decision",
+        "takeaway"
+      ]
+    },
+    "prompt_label": {
+      "type": "string",
+      "description": "The question the person answered, in the lesson's own words."
+    },
+    "response_text": {
+      "type": "string",
+      "description": "What the person chose to write. Nothing is written when a step is skipped: no record means no response."
+    },
+    "response_data": {
+      "type": "string",
+      "description": "Structured choice or map content, held as JSON text. Never a score, type or readiness signal."
+    },
+    "carry_forward": {
+      "type": "boolean",
+      "default": false,
+      "description": "Set only when the person chooses this note for their own take-away. Nothing carries forward on its own."
+    }
+  },
+  "required": [
+    "step_code",
+    "block_id",
+    "block_version"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

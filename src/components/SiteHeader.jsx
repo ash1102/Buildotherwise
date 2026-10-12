@@ -16,6 +16,7 @@ const LINKS = [
   { to: "/aspects", label: "Aspects" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
+  { to: "/preview", label: "Preview" },
 ];
 
 /** What someone can reach before logging in: the welcome, Getting Started, and the two pages about the program. */

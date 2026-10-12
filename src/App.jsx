@@ -30,6 +30,11 @@ import Contact from '@/pages/Contact';
 import Connect from '@/pages/Connect';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import LoginRedirect from '@/components/LoginRedirect';
+import PreviewHome from '@/pages/preview/PreviewHome';
+import PreviewModulePage from '@/pages/preview/PreviewModulePage';
+import PreviewStepPage from '@/pages/preview/PreviewStepPage';
+import PreviewNotes from '@/pages/preview/PreviewNotes';
+import PreviewReview from '@/pages/preview/PreviewReview';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -78,6 +83,12 @@ const AuthenticatedApp = () => {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/connect" element={<Connect />} />
+        {/* The review copy of the updated course. Readable without an account so it can be reviewed; saving needs one. */}
+        <Route path="/preview" element={<PreviewHome />} />
+        <Route path="/preview/module/:slug" element={<PreviewModulePage />} />
+        <Route path="/preview/step/:code" element={<PreviewStepPage />} />
+        <Route path="/preview/notes" element={<PreviewNotes />} />
+        <Route path="/preview/review" element={<PreviewReview />} />
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
