@@ -4,7 +4,21 @@ export const KIND_LABELS = {
   reading: "Reading",
   research_brief: "Research brief",
   note: "Supplemental note",
+  article: "Article",
+  study: "Study",
+  talk: "Talk",
 };
+
+/** Outside sources link out and sit on their own shelf, never mixed into the curriculum readings. */
+export const OUTSIDE_KINDS = ["article", "study", "talk"];
+
+export async function loadOutsideResources() {
+  const page = await base44.entities.LibraryResource.filter(
+    { status: "published", audience: { $ne: "program_team" }, kind: { $in: OUTSIDE_KINDS } },
+    { sort: "order", limit: 200 }
+  );
+  return page.items;
+}
 
 /** Getting Started is not Module 0, so its label never reads as a number. */
 export function moduleTitle(modules, order) {
@@ -18,7 +32,7 @@ export function moduleTitle(modules, order) {
  * narrows a list it has already loaded.
  */
 export async function loadLibraryResources({ search = "", moduleOrder = null, lessonCode = null } = {}) {
-  const query = { status: "published", audience: { $ne: "program_team" } };
+  const query = { status: "published", audience: { $ne: "program_team" }, kind: { $nin: OUTSIDE_KINDS } };
   if (moduleOrder !== null && moduleOrder !== undefined) query.module_order = moduleOrder;
   if (lessonCode) query.lesson_code = lessonCode;
   const term = search.trim();
@@ -39,6 +53,7 @@ export async function loadReadingSteps(moduleOrder) {
     {
       status: "published",
       audience: { $ne: "program_team" },
+      kind: { $nin: OUTSIDE_KINDS },
       module_order: moduleOrder,
       lesson_code: { $exists: true },
     },
