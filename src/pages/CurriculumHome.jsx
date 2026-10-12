@@ -20,7 +20,6 @@ export default function CurriculumHome() {
   const { isAuthenticated } = useAuth();
   /** Getting Started is the doorway, not a module, so it sits apart from the numbered list. */
   const gettingStarted = modules.find((module) => module.kind === "orientation");
-  const numberedModules = modules.filter((module) => module.kind !== "orientation");
   const gettingStartedSteps = gettingStarted ? (lessonsByOrder[gettingStarted.order] || []).length : 0;
 
   return (
@@ -41,25 +40,41 @@ export default function CurriculumHome() {
             Start with Getting Started
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
-          <Link
-            to="/journal"
-            className="inline-flex items-center gap-2 rounded-md border border-input bg-card px-4 py-2.5 text-[15px] font-medium text-foreground transition hover:bg-secondary"
-          >
-            <BookOpen className="h-4 w-4" aria-hidden="true" />
-            Open your Journal
-          </Link>
-          <Link to="/map" className="inline-flex items-center gap-2 text-[15px] font-medium text-accent-ink underline underline-offset-2">
-            <Map className="h-4 w-4" aria-hidden="true" />
-            View your Life Map
-          </Link>
-          <Link
-            to="/aspects"
-            className="inline-flex items-center gap-2 text-[15px] font-medium text-accent-ink underline underline-offset-2"
-          >
-            <Compass className="h-4 w-4" aria-hidden="true" />
-            How the workbook works
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <Link
+                to="/journal"
+                className="inline-flex items-center gap-2 rounded-md border border-input bg-card px-4 py-2.5 text-[15px] font-medium text-foreground transition hover:bg-secondary"
+              >
+                <BookOpen className="h-4 w-4" aria-hidden="true" />
+                Open your Journal
+              </Link>
+              <Link to="/map" className="inline-flex items-center gap-2 text-[15px] font-medium text-accent-ink underline underline-offset-2">
+                <Map className="h-4 w-4" aria-hidden="true" />
+                View your Life Map
+              </Link>
+              <Link
+                to="/aspects"
+                className="inline-flex items-center gap-2 text-[15px] font-medium text-accent-ink underline underline-offset-2"
+              >
+                <Compass className="h-4 w-4" aria-hidden="true" />
+                How the workbook works
+              </Link>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-2 rounded-md border border-input bg-card px-4 py-2.5 text-[15px] font-medium text-foreground transition hover:bg-secondary"
+            >
+              Log in
+            </Link>
+          )}
         </div>
+        {isAuthenticated ? null : (
+          <p className="mt-3 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
+            The journal, the maps and the numbered modules open once you log in. Getting Started is open to everyone.
+          </p>
+        )}
         <div className="mt-5">
           <PrivacyNote />
         </div>
@@ -126,7 +141,7 @@ export default function CurriculumHome() {
         <div className="mt-5">
           <ModuleMap
             loading={loading}
-            modules={numberedModules}
+            modules={modules}
             lessonsByOrder={lessonsByOrder}
             answers={answers}
             decisions={decisions}

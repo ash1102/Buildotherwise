@@ -25,10 +25,13 @@ function SkeletonRow() {
 }
 
 export default function ModuleMap({ modules, lessonsByOrder, answers, decisions, states, loading }) {
+  // The gate is worked out from every container, Getting Started included, so the
+  // numbered modules wait on it. Only the numbered modules are listed below.
   const progress = useMemo(
     () => buildProgress({ modules, lessonsByOrder, answers }),
     [modules, lessonsByOrder, answers]
   );
+  const numbered = modules.filter((module) => module.kind !== "orientation");
 
   if (loading) {
     return (
@@ -42,7 +45,7 @@ export default function ModuleMap({ modules, lessonsByOrder, answers, decisions,
 
   return (
     <ol className="divide-y divide-border border-y border-border">
-      {modules.map((module) => {
+      {numbered.map((module) => {
         const lessons = lessonsByOrder[module.order] || [];
         const coming = isComingLater(module);
         const row = progress.byOrder[module.order];
