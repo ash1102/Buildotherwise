@@ -4,7 +4,7 @@ Status: DRAFT. AI-drafted companion material. Nothing here is approved for parti
 
 ## What is in this folder
 
-- `library_resources_draft.json` (Getting Started, Modules 1-2: 12 readings), `library_resources_draft_part2.json` (Modules 3-6: 13 readings) and `library_resources_draft_part3.json` (Modules 7-10: 11 readings): 36 short readings in total, one per lesson, shaped like LibraryResource records, status "draft". Entering them is a data step, separate from this branch (branches copy code, not data).
+- `library_resources_draft.json` (Getting Started, Modules 1-2: 11 readings), `library_resources_draft_part2.json` (Modules 3-6: 13 readings) and `library_resources_draft_part3.json` (Modules 7-10: 12 readings): 36 short readings in total, one per lesson, shaped like LibraryResource records, status "draft". Entering them is a data step, separate from this branch (branches copy code, not data).
 - `REVIEW.md`: this sheet.
 - The activities, recall prompts and review prompts are in `learning_pack_all_modules.json` (delivered in the chat; not duplicated here to keep this branch small).
 
