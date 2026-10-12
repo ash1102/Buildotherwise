@@ -10,7 +10,7 @@ module.exports = {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
-  		/* Amber palette. Every value lives as a token in src/index.css; map a token here
+  		/* Entrepalooza draft palette (chalk, ink, dusk plum, marigold). Every value lives as a token in src/index.css; map a token here
   		   to get the matching class (bg-primary, text-foreground, border-border, ...). */
   		colors: {
   			background: 'hsl(var(--background))',
