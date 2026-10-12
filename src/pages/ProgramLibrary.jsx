@@ -5,6 +5,7 @@ import useCurriculum from "@/hooks/useCurriculum";
 import {
   KIND_LABELS,
   loadLibraryResources,
+  loadOutsideResources,
   loadReadingSteps,
   loadResearchBriefs,
   moduleTitle,
@@ -13,6 +14,7 @@ import { downloadText } from "@/lib/download";
 import LibraryCard from "@/components/library/LibraryCard";
 import LibraryFilters from "@/components/library/LibraryFilters";
 import ResearchBriefCard from "@/components/library/ResearchBriefCard";
+import OutsideSourceCard from "@/components/library/OutsideSourceCard";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 
 export default function ProgramLibrary() {
@@ -24,6 +26,8 @@ export default function ProgramLibrary() {
   const [steps, setSteps] = useState([]);
   const [resources, setResources] = useState(null);
   const [research, setResearch] = useState([]);
+  const [outside, setOutside] = useState([]);
+  const [outsideKind, setOutsideKind] = useState("all");
   const [loading, setLoading] = useState(true);
 
   /** Typing settles first, so each search is one request rather than one per keystroke. */
@@ -76,6 +80,9 @@ export default function ProgramLibrary() {
     loadResearchBriefs().then((items) => {
       if (active) setResearch(items);
     });
+    loadOutsideResources().then((items) => {
+      if (active) setOutside(items);
+    });
     return () => {
       active = false;
     };
@@ -112,7 +119,16 @@ export default function ProgramLibrary() {
       const status = brief.review_status ? `\n\nReview status: ${brief.review_status}` : "";
       return `${head}${source}${status}\n`;
     });
-    downloadText("entrepalooza-program-library.md", `# Program Library\n\n${[...readingLines, ...briefLines].join("\n\n")}`);
+    const outsideLines = outside.map((item) => {
+      const byline = [item.creator, item.publisher, item.year].filter(Boolean).join(" · ");
+      return `## ${item.title}\n_${KIND_LABELS[item.kind] || "Outside source"}${byline ? ` · ${byline}` : ""}_\n\n${item.summary || ""}${
+        item.url ? `\n\n${item.url}` : ""
+      }\n`;
+    });
+    downloadText(
+      "entrepalooza-program-library.md",
+      `# Program Library\n\n${[...readingLines, ...outsideLines, ...briefLines].join("\n\n")}`
+    );
   };
 
   const busy = curriculumLoading || resources === null;
@@ -179,6 +195,57 @@ export default function ProgramLibrary() {
           </div>
         )}
       </section>
+
+      {outside.length ? (
+        <section className="space-y-5">
+          <div>
+            <h2 className="workbook-label">Outside reading and talks</h2>
+            <h3 className="mt-1.5 text-[20px]">Articles, studies and talks from elsewhere</h3>
+            <p className="mt-2 max-w-[68ch] text-[13.5px] leading-relaxed text-ink-soft">
+              Other people's work, linked to where it lives. All of it is optional. These pieces are here because they
+              connect to something in the program, not because they prove anything about it — take what's useful and
+              question the rest.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Show outside sources by type">
+            {[
+              ["all", "Everything"],
+              ["article", "Articles"],
+              ["study", "Studies"],
+              ["talk", "Talks"],
+            ]
+              .filter(([key]) => key === "all" || outside.some((item) => item.kind === key))
+              .map(([key, label]) => (
+                <Button
+                  key={key}
+                  type="button"
+                  size="sm"
+                  variant={outsideKind === key ? "default" : "outline"}
+                  aria-pressed={outsideKind === key}
+                  onClick={() => setOutsideKind(key)}
+                  className="rounded-md"
+                >
+                  {label}
+                </Button>
+              ))}
+          </div>
+          <div className="space-y-4">
+            {outside
+              .filter((item) => outsideKind === "all" || item.kind === outsideKind)
+              .map((item) => (
+                <OutsideSourceCard
+                  key={item.id}
+                  resource={item}
+                  moduleLabel={
+                    item.module_order === undefined || item.module_order === null
+                      ? null
+                      : moduleTitle(modules, item.module_order)
+                  }
+                />
+              ))}
+          </div>
+        </section>
+      ) : null}
 
       {research.length ? (
         <section className="rounded-lg border border-dashed border-natural-deep bg-white/60 p-6">
