@@ -57,7 +57,7 @@ export default function LifeMapListView({ block, cards, connections, onUpdate, o
                             }`}
                           >
                             <span className="font-semibold">{mark.label}</span>
-                            <span className="ml-1.5 text-muted-foreground">{mark.meaning}</span>
+                            {mark.meaning ? <span className="ml-1.5 text-muted-foreground">{mark.meaning}</span> : null}
                           </button>
                         );
                       })}
