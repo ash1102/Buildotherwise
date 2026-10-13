@@ -113,6 +113,7 @@ export default function LifeMapNodePanel({
         </p>
       </div>
 
+      {onNudge ? (
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <span className="text-[12.5px] text-muted-foreground">Move it without dragging:</span>
         {NUDGES.map(({ key, label: nudgeLabel, dx, dy, Icon }) => (
@@ -127,6 +128,7 @@ export default function LifeMapNodePanel({
           </button>
         ))}
       </div>
+      ) : null}
 
       {node.source_code ? (
         <p className="mt-4 border-l-2 border-primary/30 pl-3 text-[13px] leading-relaxed text-muted-foreground">
