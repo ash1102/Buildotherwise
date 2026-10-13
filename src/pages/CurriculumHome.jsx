@@ -99,6 +99,7 @@ const FRONT_CSS = `
 }
 `;
 
+/** A soft curve where the dark band starts and ends. */
 function TornEdge({ flip = false }) {
   return (
     <svg
@@ -109,7 +110,7 @@ function TornEdge({ flip = false }) {
       style={flip ? { transform: "scaleY(-1)" } : undefined}
     >
       <path
-        d="M0 22 L0 10 L18 14 L34 6 L52 12 L70 4 L92 13 L110 7 L131 15 L150 5 L172 12 L190 6 L212 14 L232 4 L252 11 L274 6 L292 15 L314 7 L333 12 L352 4 L374 13 L400 8 L400 22 Z"
+        d="M0 22 L0 14 C100 2 300 2 400 14 L400 22 Z"
         fill="#18131C"
       />
     </svg>
