@@ -16,7 +16,6 @@ const LINKS = [
   { to: "/aspects", label: "Aspects" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
-  { to: "/preview", label: "Preview" },
 ];
 
 /** What someone can reach before logging in: the welcome, Getting Started, and the two pages about the program. */
@@ -79,16 +78,24 @@ export default function SiteHeader() {
 
         <div className="flex items-center gap-2">
           {isAuthenticated ? (
-            <button
-              type="button"
-              id="journal-trigger"
-              onClick={openPanel}
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-[14px] font-medium text-primary-foreground transition hover:bg-primary/90"
-            >
-              <PenLine className="h-4 w-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Add a note</span>
-              <span className="sm:hidden">Note</span>
-            </button>
+            <>
+              <Link
+                to="/preview"
+                className="rounded-md px-2 py-2 text-[14px] font-medium text-accent-ink transition hover:bg-secondary"
+              >
+                Preview
+              </Link>
+              <button
+                type="button"
+                id="journal-trigger"
+                onClick={openPanel}
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-[14px] font-medium text-primary-foreground transition hover:bg-primary/90"
+              >
+                <PenLine className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Add a note</span>
+                <span className="sm:hidden">Note</span>
+              </button>
+            </>
           ) : (
             <Link
               to="/login"
