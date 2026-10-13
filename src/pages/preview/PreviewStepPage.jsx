@@ -29,6 +29,11 @@ export default function PreviewStepPage() {
 
   useEffect(() => {
     let active = true;
+    /* Nothing from the step before lingers while this one loads, so two lessons are never on screen at once. */
+    setLesson(null);
+    setBodies({});
+    setRecords({});
+    setLoading(true);
     (async () => {
       if (!found) {
         setLoading(false);
@@ -75,7 +80,7 @@ export default function PreviewStepPage() {
     const rest = authored.filter((block) => !block.afterReading);
 
     const liveText = [];
-    if (lesson) {
+    if (lesson && !step.ownWording) {
       if (lesson.teach) {
         liveText.push({
           id: `${step.code}-teach`,
@@ -87,7 +92,7 @@ export default function PreviewStepPage() {
           body: lesson.teach,
         });
       }
-      if (lesson.show) {
+      if (lesson.show && !step.hideLiveExample) {
         liveText.push({
           id: `${step.code}-show`,
           version: "lesson-record",
@@ -239,6 +244,13 @@ export default function PreviewStepPage() {
           />
         ))}
       </div>
+
+      {step.ownWording ? (
+        <p className="rounded-md border border-dashed border-input bg-secondary p-4 text-[16px] leading-relaxed text-muted-foreground">
+          The workbook’s earlier wording for this step is not repeated here: this step proposes replacing it. You can
+          compare the two in the live workbook.
+        </p>
+      ) : null}
 
       {step.closesPilot ? (
         <p className="rounded-md border border-dashed border-input bg-secondary p-4 text-[16px] leading-relaxed text-muted-foreground">
