@@ -67,20 +67,11 @@ export default function ModuleMap({ modules, lessonsByOrder, answers, decisions,
               </p>
               {locked && blocker ? (
                 <p className="mt-3 max-w-2xl text-[13px] leading-relaxed text-muted-faint">
+                  {/* The steps before this one are its own requirement. They are not named here, so no
+                      earlier section reads as part of this module. */}
                   Opens when {blocker.label}'s journal is complete.{" "}
                   {blocker.missing.length} {blocker.missing.length === 1 ? "step still needs" : "steps still need"} one
-                  line:{" "}
-                  {blocker.missing.map((step, index) => (
-                    <React.Fragment key={step.code}>
-                      {index ? " · " : ""}
-                      <Link
-                        to={`/lesson/${step.code}`}
-                        className="text-primary underline decoration-border underline-offset-2 transition hover:text-accent-ink"
-                      >
-                        {step.title}
-                      </Link>
-                    </React.Fragment>
-                  ))}
+                  line.
                 </p>
               ) : null}
             </div>

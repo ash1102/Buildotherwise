@@ -104,15 +104,6 @@ export const module1 = {
       readings: ["M1-R1"],
       blocks: [
         {
-          id: "M1-PREVIEW-L2-b1",
-          version: "1.0",
-          type: "teaching",
-          part: "lesson",
-          title: "Rights reminder",
-          tag: TAG.NEEDS_WORDING,
-          body: "You can use the example, skip any step, or pass without explaining.",
-        },
-        {
           id: "M1-PREVIEW-L2-b2",
           version: "1.0",
           type: "scenario_choice",

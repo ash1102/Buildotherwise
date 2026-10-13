@@ -44,7 +44,7 @@ export const CONTENT_GAPS = [
   {
     item: "Wording still needing your sign-off",
     detail:
-      "The privacy note in Before you start, the rights reminder in the Notice step, the concern-route line, and Module 10's “What exists today” note are all tagged “Needs Ashley’s wording.”",
+      "The privacy note in Before you start, the concern-route line, and Module 10's “What exists today” note are all tagged “Needs Ashley’s wording.” The rights reminder that briefly opened Module 1's Notice step was removed, because the rights live in Before you start.",
   },
   {
     item: "One judgement call to confirm",
