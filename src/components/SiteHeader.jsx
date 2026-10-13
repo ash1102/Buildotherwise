@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Menu, PenLine, X } from "lucide-react";
+import { LogOut, Menu, PenLine, Settings as SettingsIcon, X } from "lucide-react";
 import { useJournalContext } from "@/components/journal/JournalContext";
 import { useAuth } from "@/lib/AuthContext";
 
@@ -34,7 +34,7 @@ const linkClass = ({ isActive }) =>
 export default function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { openPanel } = useJournalContext();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const { pathname } = useLocation();
   const links = isAuthenticated ? LINKS : PUBLIC_LINKS;
 
@@ -111,7 +111,9 @@ export default function SiteHeader() {
             aria-expanded={menuOpen}
             aria-controls="site-menu"
             aria-label={menuOpen ? "Close the menu" : "Open the menu"}
-            className="inline-flex items-center justify-center rounded-md border border-input bg-card p-2 text-foreground transition hover:bg-secondary lg:hidden"
+            className={`inline-flex items-center justify-center rounded-md border border-input bg-card p-2 text-foreground transition hover:bg-secondary ${
+              isAuthenticated ? "" : "lg:hidden"
+            }`}
           >
             {menuOpen ? <X className="h-4 w-4" aria-hidden="true" /> : <Menu className="h-4 w-4" aria-hidden="true" />}
           </button>
@@ -122,7 +124,9 @@ export default function SiteHeader() {
         <nav
           id="site-menu"
           aria-label="Main"
-          className="max-h-[70vh] overflow-y-auto border-t border-border bg-card px-4 py-2 sm:px-6 lg:hidden"
+          className={`max-h-[70vh] overflow-y-auto border-t border-border bg-card px-4 py-2 sm:px-6 ${
+            isAuthenticated ? "" : "lg:hidden"
+          }`}
         >
           <ul className="mx-auto grid max-w-6xl gap-0.5 py-1">
             {links.map((link) => (
@@ -132,6 +136,29 @@ export default function SiteHeader() {
                 </NavLink>
               </li>
             ))}
+            {isAuthenticated ? (
+              <>
+                <li className="mt-1 border-t border-border pt-1">
+                  <NavLink to="/settings" className={({ isActive }) => `flex items-center gap-2 ${linkClass({ isActive })}`}>
+                    <SettingsIcon className="h-4 w-4" aria-hidden="true" />
+                    Settings
+                  </NavLink>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout(false);
+                      window.location.href = "/";
+                    }}
+                    className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-[15px] text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                  >
+                    <LogOut className="h-4 w-4" aria-hidden="true" />
+                    Log out
+                  </button>
+                </li>
+              </>
+            ) : null}
           </ul>
         </nav>
       ) : null}
