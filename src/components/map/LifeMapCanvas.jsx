@@ -192,6 +192,7 @@ export default function LifeMapCanvas({ graph, positions, selectedId, onSelect, 
       ref={boxRef}
       role="group"
       aria-label="Life map. Move a line with the arrow keys, or open it to move it with buttons."
+      style={{ minHeight: `${34 + Math.max(0, graph.nodes.length - 10) * 1.6}rem` }}
       className="relative h-[34rem] w-full overflow-hidden rounded-lg border border-border bg-card/60 sm:h-[38rem]"
     >
       <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
