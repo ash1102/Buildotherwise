@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useLifeMap, useWorkbook } from "@/lib/workbook";
 import { useJournalEntries } from "@/lib/journal";
 import useCurriculum from "@/hooks/useCurriculum";
+import { isOpenerLesson } from "@/lib/curriculum";
 import { downloadText } from "@/lib/download";
 import {
   MAP_SECTIONS,
@@ -22,6 +23,7 @@ import LifeMapCanvas from "@/components/map/LifeMapCanvas";
 import LifeMapNodePanel from "@/components/map/LifeMapNodePanel";
 import LifeMapList from "@/components/map/LifeMapList";
 import BringInSavedAnswer from "@/components/map/BringInSavedAnswer";
+import StepNav from "@/components/workbook/StepNav";
 
 const clamp = (value) => Math.min(0.98, Math.max(0.02, value));
 
@@ -30,13 +32,15 @@ export default function LifeMapPage() {
   const positions = usePositions();
   const entries = useJournalEntries();
   const { answers } = useWorkbook();
-  const { lessons } = useCurriculum();
+  const { lessons, orderedLessons } = useCurriculum();
 
   const [draft, setDraft] = useState("");
   const [draftSection, setDraftSection] = useState(MAP_SECTIONS[0].key);
   const [selectedId, setSelectedId] = useState(null);
   const [asList, setAsList] = useState(false);
 
+  /** The map is the opening move, so the step it hands over to is the first Getting Started step. */
+  const nextStep = useMemo(() => orderedLessons.find((lesson) => !isOpenerLesson(lesson)) || null, [orderedLessons]);
   const graph = useMemo(() => buildGraph(map), [map]);
   const options = useMemo(() => savedAnswerOptions(lessons, answers), [lessons, answers]);
   const nodesById = useMemo(
@@ -252,6 +256,8 @@ export default function LifeMapPage() {
           nothing is sent to Entrepalooza from this page.
         </PrivacyNote>
       </div>
+
+      <StepNav prev={null} next={nextStep} workbookLink="/" />
     </div>
   );
 }
