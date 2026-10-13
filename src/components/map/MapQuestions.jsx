@@ -9,7 +9,7 @@ import {
   MAP_QUESTION_PARTS,
   MAP_SECTIONS,
   addLine,
-  lineFromAnswer,
+  linesFromAnswer,
 } from "@/lib/lifeMap";
 
 const sectionLabel = (key) => (MAP_SECTIONS.find((item) => item.key === key) || {}).label || key;
@@ -28,12 +28,13 @@ export default function MapQuestions({ graph, onAdded }) {
   const countFor = (questionId) => graph.nodes.filter((node) => node.question_id === questionId).length;
 
   const add = (part, question) => {
-    const text = lineFromAnswer(question, drafts[question.id]);
-    if (!text) return;
-    const item = addLine(part.section, { text, question_id: question.id, source_label: question.text });
+    const lines = linesFromAnswer(question, drafts[question.id]);
+    if (!lines.length) return;
+    const items = lines.map((text) => addLine(part.section, { text, question_id: question.id, source_label: question.text }));
     setDrafts((current) => ({ ...current, [question.id]: "" }));
-    setAddedNote((current) => ({ ...current, [question.id]: `Added to ${sectionLabel(part.section)}.` }));
-    if (onAdded) onAdded(item);
+    const added = items.length === 1 ? "1 line" : `${items.length} lines`;
+    setAddedNote((current) => ({ ...current, [question.id]: `Added ${added} to ${sectionLabel(part.section)}.` }));
+    if (onAdded) items.forEach((item) => onAdded(item));
   };
 
   const part = step < PICK_STEP ? MAP_QUESTION_PARTS[step] : null;
@@ -88,6 +89,11 @@ export default function MapQuestions({ graph, onAdded }) {
                   <label htmlFor={`mapq-${question.id}`} className="block text-[15px] font-medium text-foreground">
                     {question.text}
                   </label>
+                  <p className="mt-1 text-[12.5px] text-muted-faint">
+                    {question.list
+                      ? "Separate them with commas or put each on its own line. Each one becomes its own spot on the map."
+                      : "Put each answer on its own line to add more than one."}
+                  </p>
                   <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-start">
                     <Textarea
                       id={`mapq-${question.id}`}
