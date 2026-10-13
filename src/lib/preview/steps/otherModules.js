@@ -1,7 +1,7 @@
 import { TAG } from "../tags";
 
 /**
- * Modules 2, 3, 5, 6, 7, 8, 9 and 10. The lesson text comes from the existing
+ * Modules 3, 5, 6, 7, 8, 9 and 10. Module 2 is built in its own file. The lesson text comes from the existing
  * lesson records; the readings for Modules 2, 3 and 5 are the owner's shortened
  * versions, and the readings for Modules 6 to 10 are not written yet, so they
  * are shown as empty draft slots rather than invented text.
@@ -14,21 +14,6 @@ const draftReading = (id, title) => ({ id, title, tag: TAG.DRAFT, draft: true })
 const shortReading = (id, title) => ({ id, title, tag: TAG.NEEDS_FULL_TEXT });
 
 export const otherModules = [
-  {
-    key: "module-2",
-    slug: "learn-through-one-small-try",
-    order: 2,
-    title: "Learn Through One Small Try",
-    pilot: "pilot_one",
-    kind: "module",
-    purpose: "Try one small, bounded thing and see what it teaches.",
-    readings: [shortReading("M2-R1", "A Try Is Not a Commitment")],
-    steps: [
-      { code: "M2-L1", title: "Choose an interest or try something new", sourceLesson: "M2-L1", readings: ["M2-R1"], blocks: [] },
-      { code: "M2-L2", title: "Reflection, evidence, conditions, and cost", sourceLesson: "M2-L2", readings: [], blocks: [] },
-      { code: "M2-L3", title: "Review, next decision, and handoff", sourceLesson: "M2-L3", readings: [], blocks: [], decision: true },
-    ],
-  },
   {
     key: "module-3",
     slug: "test-how-i-operate",

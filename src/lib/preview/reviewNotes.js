@@ -32,6 +32,11 @@ export const CONTENT_GAPS = [
       "Modules 1, 2, 3 and 5 are showing the shortened versions already stored in the library, each tagged “Needs full text from Ashley.”",
   },
   {
+    item: "Module 2's exposure menu",
+    detail:
+      "The exposure menu is still a labelled placeholder, now shown inside the step as “not written yet”. It waits on the cohort, location and partners, and nothing has been invented to fill it.",
+  },
+  {
     item: "Readings not written yet",
     detail:
       "Module 10's reading is titled “Every exit will still belong” and marked as a draft. Before you start and Modules 6, 7, 8 and 9 have an empty draft slot rather than invented text.",
@@ -73,6 +78,11 @@ export const TESTS = [
   { item: "Module 1 Life Map", detail: "Cards added and edited, marks toggled, connections made and removed, list view used as an equal route, example map loaded, answer saved and deleted again." },
   { item: "Notice step", detail: "Sort sorted and cleared with Look again, explanations announced, both entry routes reaching their own step 3, closing line and take-away in your words." },
   { item: "Patterns step", detail: "A pick on each invented person showing its explanation, mixed and unclear accepted, optional reflection saved." },
+  {
+    item: "Module 2 steps",
+    detail:
+      "The boundary card, the exposure-menu placeholder, the four ways in, the observation-and-interpretation sort and the outcome choice all render with their status tags. A way in was chosen, saved, read back from the account and deleted again. The lesson's own teaching and prompts still print unchanged.",
+  },
   { item: "Saving and notes", detail: "Save, re-open, correct, delete and export checked against your own account only." },
   { item: "Not automatically verified", detail: "Screen reader announcements, keyboard-only completion, real-browser mobile tap, contrast, reduced motion, and shared-device behaviour still need testing by hand before this is called accessible or ready." },
 ];

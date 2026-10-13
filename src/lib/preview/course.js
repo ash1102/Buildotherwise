@@ -2,11 +2,12 @@ import { opener } from "./steps/opener";
 import { beforeYouStart } from "./steps/beforeYouStart";
 import { module1 } from "./steps/module1";
 import { module4 } from "./steps/module4";
+import { module2 } from "./steps/module2";
 import { otherModules } from "./steps/otherModules";
 import { OPTIONAL_AFTER_PILOT_ONE, PILOT_ONE } from "./tags";
 
 /** Numbered modules in curriculum order. */
-export const modules = [module1, ...otherModules, module4].sort((a, b) => a.order - b.order);
+export const modules = [module1, module2, ...otherModules, module4].sort((a, b) => a.order - b.order);
 
 /** The opener stands at the very front, then "Before you start" without a number, then Modules 1 to 10. */
 export const sections = [opener, beforeYouStart, ...modules];
