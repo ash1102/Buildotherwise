@@ -35,13 +35,26 @@ export default function About() {
           but it is not the goal everyone has to reach.
         </p>
         <p>
-          Entrepalooza is built by the team at Build Otherwise and grounded in Scars to Strategy, the Build Otherwise
-          framework: the idea that hard-won experience, unconventional strengths and survival skills can sometimes become
-          real assets. Not because hardship is good, and not because anyone owes a comeback story. Pilot 1 is the current release: Getting Started and
+          Entrepalooza is built by Build Otherwise, using the Scars to Strategy framework. Pilot 1 is the current release: Getting Started and
           Modules 1–5, with Modules 6–10 still in development and named plainly so you can see where the program is
           going. Nothing in the workbook promises a job, an income, recovery or business success. It is an educational
           workbook, not therapy, treatment or diagnosis, and it is not a readiness test.
         </p>
+      </div>
+
+      <div className="workbook-section">
+        <h2 className="text-[18px]">What Pilot 1 is testing</h2>
+        <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
+          Pilot 1 is about whether the program is usable and useful, not proof that it produces recovery, jobs or
+          businesses. We want to learn:
+        </p>
+        <ul className="mt-3 max-w-[68ch] list-disc space-y-1.5 pl-5 text-[16px] leading-relaxed text-muted-foreground">
+          <li>Could participants understand and engage with the activities?</li>
+          <li>Were the experiments accessible, realistic and safe?</li>
+          <li>Did participants learn something useful from what they tried?</li>
+          <li>Were they able to make their own decisions about what to explore next?</li>
+          <li>Which activities helped, which created confusion, and what needs to change?</li>
+        </ul>
       </div>
 
       <div className="workbook-section">
