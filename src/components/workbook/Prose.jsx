@@ -63,7 +63,10 @@ const COMPONENTS = {
   strong: ({ node, ...props }) => <strong className="font-semibold text-foreground" {...props} />,
   em: ({ node, ...props }) => <em className="italic" {...props} />,
   blockquote: ({ node, ...props }) => (
-    <blockquote className="mt-4 border-l-2 border-border pl-4 text-muted-foreground first:mt-0" {...props} />
+    <blockquote
+      className="mt-4 rounded-lg border-l-4 border-primary bg-primary-wash px-4 py-3 text-foreground first:mt-0 [&>p]:mt-0"
+      {...props}
+    />
   ),
   hr: ({ node, ...props }) => <hr className="my-6 border-border" {...props} />,
   a: SafeLink,
