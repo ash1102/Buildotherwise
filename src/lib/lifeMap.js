@@ -243,10 +243,8 @@ const COL = 0.25;
  */
 function slotsFor(hub) {
   const down = hub.y < 0.5;
-  const rows = down ? [1, 2, 3] : [1, 2, -1, -2];
-  const slots = [];
-  [0, -1, 1].forEach((column) => rows.forEach((row) => slots.push([column, row])));
-  return slots;
+  const rows = down ? [1, 2, 3, 4] : [1, -1, 2, -2];
+  return rows.map((row) => [0, row]);
 }
 
 const within = (value) => Math.min(0.94, Math.max(0.06, value));
