@@ -29,7 +29,7 @@ export default function FeedbackForm({ moduleOrder, lessonCode }) {
       });
       setSent(true);
       setMessage("");
-      toast({ title: "Thank you — that has been sent to the program creator." });
+      toast({ title: "Thank you. That has been sent to the program creator." });
     } catch (error) {
       toast({ title: "That didn't send. Please try again." });
     } finally {
@@ -47,18 +47,13 @@ export default function FeedbackForm({ moduleOrder, lessonCode }) {
       >
         <span className="flex items-center gap-2 text-[15px] font-medium text-foreground">
           <Flag className="h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
-          Something confusing, or feedback about this step?
+          Tell us what was confusing
         </span>
-        <span className="shrink-0 text-[14px] text-muted-faint">{open ? "Close" : "Open"}</span>
       </button>
 
       {open ? (
         <div className="mt-4">
-          <p className="max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
-            This form is separate from your journal. Whatever you send here is shared with the program creator; nothing
-            from your journal comes with it.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
             {[
               { value: "confusing_step", label: "This step was confusing" },
               { value: "usability", label: "Usability feedback" },

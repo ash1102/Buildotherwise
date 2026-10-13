@@ -124,7 +124,7 @@ export default function PreviewReview() {
                   <td className="py-2 pr-3 font-mono text-[13px] text-foreground">{row.id}</td>
                   <td className="py-2 pr-3 text-muted-foreground">{row.version}</td>
                   <td className="py-2 pr-3 text-muted-foreground">{row.type}</td>
-                  <td className="py-2 text-muted-foreground">{row.tag ? TAG_LABELS[row.tag].short : "—"}</td>
+                  <td className="py-2 text-muted-foreground">{row.tag ? TAG_LABELS[row.tag].short : "-"}</td>
                 </tr>
               ))}
             </tbody>

@@ -12,7 +12,6 @@ const LINKS = [
   { to: "/record", label: "Discovery Record" },
   { to: "/program-library", label: "Library" },
   { to: "/tribe-threads", label: "Tribe Threads" },
-  { to: "/journal-reflection", label: "Reflection" },
   { to: "/aspects", label: "Aspects" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
@@ -35,7 +34,7 @@ const linkClass = ({ isActive }) =>
 export default function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { openPanel } = useJournalContext();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { pathname } = useLocation();
   const links = isAuthenticated ? LINKS : PUBLIC_LINKS;
 
@@ -79,12 +78,14 @@ export default function SiteHeader() {
         <div className="flex items-center gap-2">
           {isAuthenticated ? (
             <>
-              <Link
-                to="/preview"
-                className="rounded-md px-2 py-2 text-[14px] font-medium text-accent-ink transition hover:bg-secondary"
-              >
-                Preview
-              </Link>
+              {user?.role === "admin" ? (
+                <Link
+                  to="/preview"
+                  className="rounded-md px-2 py-2 text-[14px] font-medium text-accent-ink transition hover:bg-secondary"
+                >
+                  Preview
+                </Link>
+              ) : null}
               <button
                 type="button"
                 id="journal-trigger"

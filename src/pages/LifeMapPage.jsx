@@ -151,7 +151,7 @@ export default function LifeMapPage() {
             <h1 className="mt-2 font-heading text-3xl sm:text-4xl">Map the life you’re actually living</h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
               Each line you save becomes a node under the question it answers, joined to the middle and to anything you
-              link it to. Nothing is guessed from what you wrote — you make the connections yourself.
+              link it to. Nothing is guessed from what you wrote. You make the connections yourself.
             </p>
             <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-muted-faint">
               Come back and change any line, move it, or leave a question empty. Empty is honest too.
@@ -177,7 +177,7 @@ export default function LifeMapPage() {
             {asList ? "Show as a map" : "Show as a list"}
           </Button>
           <PrivacyNote>
-            {total ? `${total} ${total === 1 ? "line" : "lines"} on this map, held in this browser only.` : null}
+            {total ? `${total} ${total === 1 ? "line" : "lines"} on this map, saved on this device only.` : "Saved on this device only."}
           </PrivacyNote>
         </div>
       </header>
@@ -252,8 +252,7 @@ export default function LifeMapPage() {
 
       <div>
         <PrivacyNote>
-          The map is drawn from lines in this browser and the links you choose. Downloading or printing it is yours to do;
-          nothing is sent to Entrepalooza from this page.
+          The map is drawn from lines on this device and the links you choose. Downloading or printing it is yours to do.
         </PrivacyNote>
       </div>
 

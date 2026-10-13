@@ -17,8 +17,7 @@ export default function PrivacyNote({ children }) {
         <Lock className="h-3.5 w-3.5 text-accent-ink" aria-hidden="true" />
       </span>
       <span>
-        {children ||
-          "Saved in this browser only, and joined to your private journal. Nothing is sent to Entrepalooza unless you share it."}
+        {children || "Saved on this device only. Clearing your browser or switching devices loses it."}
       </span>
     </p>
   );

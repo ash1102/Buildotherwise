@@ -20,12 +20,13 @@ export default function Contact() {
     try {
       await base44.entities.Feedback.create({
         kind: "usability",
-        message: email.trim() ? `${message.trim()}\n\nReply to: ${email.trim()}` : message.trim(),
+        message: message.trim(),
+        email: email.trim(),
       });
       setSent(true);
       setMessage("");
       setEmail("");
-      toast({ title: "Thank you — your message has gone to the program team." });
+      toast({ title: "Thank you. Your message has gone to the program team." });
     } catch (error) {
       toast({ title: "That didn't send. Please try again." });
     } finally {

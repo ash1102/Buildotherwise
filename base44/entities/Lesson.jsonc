@@ -77,6 +77,13 @@
       "default": true,
       "description": "Whether the shared Next Decision words are offered here."
     },
+    "decision_options": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Next Decision choices for this step. When empty, all eight are offered."
+    },
     "what_comes_out": {
       "type": "string"
     },

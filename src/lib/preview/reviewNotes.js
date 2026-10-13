@@ -34,7 +34,7 @@ export const CONTENT_GAPS = [
   {
     item: "Module 2's exposure menu",
     detail:
-      "The exposure menu is still a labelled placeholder, now shown inside the step as “not written yet”. It waits on the cohort, location and partners, and nothing has been invented to fill it.",
+      "The exposure menu is still a labelled placeholder, now shown inside the step as “not written yet”. It waits on the group, location and partners, and nothing has been invented to fill it.",
   },
   {
     item: "Readings not written yet",

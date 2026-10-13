@@ -32,7 +32,7 @@ export default function JournalReflection() {
         <h2 className="text-[19px]">Not available yet</h2>
         <p className="mt-2 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
           Reflection is still being built, so there is no conversation to start here at the moment. Your journal entries
-          stay exactly as they are, and any earlier reflection conversations remain stored in the app — nothing has been
+          stay exactly as they are, and any earlier reflection conversations remain stored in the app. Nothing has been
           deleted.
         </p>
         <ul className="mt-4 space-y-2 text-[16px]">
@@ -41,7 +41,7 @@ export default function JournalReflection() {
               Read your journal
             </Link>{" "}
             <span className="text-muted-faint">
-              — {entries.length} {entries.length === 1 ? "entry" : "entries"} saved in this browser.
+              {entries.length} {entries.length === 1 ? "entry" : "entries"} saved on this device.
             </span>
           </li>
           <li>

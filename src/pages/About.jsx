@@ -23,10 +23,8 @@ export default function About() {
         </p>
         <p>
           The program is Getting Started plus ten modules, and each step follows the same shape: a short teaching block,
-          a neutral worked example, a choice of how you want to take part, somewhere to write, and a Next Decision. There
-          are no grades, no scores and no streak to keep. One written line counts as taking part. Writing stays in your
-          own browser and joins your private journal, and it only leaves that browser if you deliberately share a
-          specific entry.
+          a worked example, a choice of how you want to take part, somewhere to write, and a Next Decision. There are
+          no grades, no scores and no streak to keep. Saved on this device only.
         </p>
         <p>
           It is written for adults navigating a transition: a job that has ended or worn thin, training you are weighing

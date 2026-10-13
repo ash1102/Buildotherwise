@@ -39,8 +39,7 @@ export default function GettingStartedPage() {
           <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">{gettingStarted.purpose}</p>
         ) : null}
         <p className="mt-3 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
-          A short sequence before Module 1. Nothing here is scored, and one line in any Try or Reflect box is what a
-          step asks for: Module 1 opens once every step here holds a line.
+          A short sequence before Module 1. Nothing here is scored.
         </p>
       </header>
 

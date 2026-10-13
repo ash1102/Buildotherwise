@@ -12,10 +12,10 @@ import { buildProgress } from "@/lib/progress";
 export default function ModulePage() {
   const { slug } = useParams();
   const { modules, lessonsByOrder, loading } = useCurriculum();
-  const { answers } = useWorkbook();
+  const { answers, states } = useWorkbook();
 
   const module = modules.find((item) => item.slug === slug);
-  const progress = buildProgress({ modules, lessonsByOrder, answers });
+  const progress = buildProgress({ modules, lessonsByOrder, answers, states });
 
   if (loading) {
     return <p className="py-10 text-[16px] text-muted-faint">Opening the module…</p>;

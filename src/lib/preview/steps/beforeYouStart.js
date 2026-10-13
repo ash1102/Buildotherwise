@@ -57,7 +57,7 @@ export const beforeYouStart = {
           title: "Five separate choices",
           tag: TAG.NEEDS_WORDING,
           instruction:
-            "Each of these is its own choice. Answer any of them with yes, no, or not now — or skip the whole thing.",
+            "Each of these is its own choice. Answer any of them with yes, no, or not now, or skip the whole thing.",
           groups: [
             { id: "taking-part", question: "Taking part", options: ["Yes", "No", "Not now"] },
             { id: "evaluation", question: "Evaluation", options: ["Yes", "No", "Not now"] },
@@ -97,7 +97,7 @@ export const beforeYouStart = {
             "• Do not repeat someone’s personal story or record/photograph them without specific permission.\n" +
             "• Offer only support you can actually provide. No fixing, rescuing, policing, or private-life monitoring.\n" +
             "• Use the program’s concern route when a boundary is crossed.\n\n" +
-            "Acknowledgment means the agreements were reviewed—not that someone surrendered rights. Majority preference cannot remove the right to pass or privacy protections.",
+            "Acknowledgment means the agreements were reviewed, not that someone surrendered rights. Majority preference cannot remove the right to pass or privacy protections.",
         },
         {
           id: "BY-L3-b2",
@@ -188,7 +188,7 @@ export const beforeYouStart = {
           version: "1.0",
           type: "example",
           part: "lesson",
-          title: "A neutral demo",
+          title: "Example",
           invented: false,
           tag: TAG.VERBATIM,
           body:

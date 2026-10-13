@@ -12,7 +12,7 @@ export const opener = {
   label: "Start here",
   pilot: null,
   kind: "orientation",
-  purpose: "Put your real week on one page before planning anything — the first thing you do.",
+  purpose: "Put your real week on one page before planning anything: the first thing you do.",
   readings: [{ id: "BY-R6", title: "Map the Life You're Actually Living", tag: TAG.REUSED }],
   steps: [
     {

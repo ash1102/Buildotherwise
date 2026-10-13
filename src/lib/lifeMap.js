@@ -10,7 +10,7 @@ export const MAP_SECTIONS = [
   {
     key: "places",
     label: "Places",
-    prompt: "Where this kind of activity happens — and whether you can get there, feel welcome, and afford it.",
+    prompt: "Where this kind of activity happens, and whether you can get there, feel welcome, and afford it.",
   },
   {
     key: "placeless",
@@ -25,7 +25,7 @@ export const MAP_SECTIONS = [
   {
     key: "barriers",
     label: "Barriers and access",
-    prompt: "Cost, transport, childcare, accessibility, schedule, credentials. Facts about the situation — not failings.",
+    prompt: "Cost, transport, childcare, accessibility, schedule, credentials. Facts about the situation, not failings.",
   },
   {
     key: "threads",

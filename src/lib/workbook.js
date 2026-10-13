@@ -9,68 +9,44 @@ export const NEXT_DECISIONS = [
   "Stop",
   "Another Direction",
   "Continue Looking",
+  "I don't know yet",
 ];
 
-/**
- * Every participation route writes something. There is no pass, and no route
- * that skips the journal: one line is what makes a step yours, so the writing
- * routes are the shared set, and pausing keeps the line before it pauses.
- */
-export const WRITING_ROUTES = [
-  {
-    label: "Write it in my own words",
-    blurb: "Your own words, kept in this browser.",
-    cue: "Say it your way. One line is enough to count.",
-    field: "full",
-  },
-  {
-    label: "Write from the neutral example",
-    blurb: "Start from the example on this step instead of your own material.",
-    cue: "Use the neutral example as your starting point, then swap in what fits you.",
-    field: "full",
-  },
-  {
-    label: "Write one line only",
-    blurb: "One line, written now. That is the whole ask.",
-    cue: "One line only. Short is fine.",
-    field: "line",
-  },
-];
+/** Getting Started. Other lessons use the routes stored on the lesson, including Pass. */
+export const GETTING_STARTED_ROUTES = ["Say it", "Write it", "Watch", "Pass"];
 
-/** Write the line, then leave the step for later. */
+/** Kept so an older saved choice still reads as paused. It is not offered. */
 export const PAUSE_ROUTE = "Write one line, then pause";
 
-/** Available on every step, whichever routes the step itself names. */
-export const UNIVERSAL_ROUTES = [PAUSE_ROUTE];
+/** Watch and Pass count without a writing box. */
+export function routeSkipsWriting(route) {
+  return /^(pass|watch)$/i.test(String(route || "").trim());
+}
 
-export const PARTICIPATION_ROUTES = [...WRITING_ROUTES.map((route) => route.label), ...UNIVERSAL_ROUTES];
+/** Options for this lesson, or all eight when the lesson does not name its own. */
+export function decisionOptionsFor(lesson) {
+  const own = ((lesson && lesson.decision_options) || []).map((option) => String(option).trim()).filter(Boolean);
+  return own.length ? own : NEXT_DECISIONS;
+}
 
-/** Older wording that let a step be taken without writing. It has no place now. */
-const RETIRED_ROUTES = /^(pass|observe|observe only|pause or stop|come back later|observe:)/i;
-
-/** How a chosen route answers the page: field shape, wording, and pause state. */
+/** Say it turns on the one talk control. Anything else is just a label. */
 export function routeGuidanceFor(route) {
-  if (route === PAUSE_ROUTE) {
-    return {
-      label: PAUSE_ROUTE,
-      blurb: "Write a line now and come back to this step later.",
-      cue: "Your line is saved, and this step waits here for you.",
-      field: "line",
-      paused: true,
-    };
-  }
-  return WRITING_ROUTES.find((item) => item.label === route) || null;
+  if (route === PAUSE_ROUTE) return { label: PAUSE_ROUTE, field: "line", paused: true };
+  if (route === "Say it") return { label: "Say it", field: "full", voice: true };
+  if (route === "Write it") return { label: "Write it", field: "full" };
+  if (routeSkipsWriting(route)) return { label: route, field: "none" };
+  return null;
 }
 
 /**
- * A step's own routes come first, then the writing routes that are always
- * available. Anything that once meant "take no part and write nothing" is left
- * out. Falls back to the writing routes when a step names none.
+ * Getting Started always offers Say it, Write it, Watch, and Pass.
+ * Any other lesson shows the routes stored on it, and nothing when it has none.
+ * The opener is a map, not one of those steps.
  */
 export function participationRoutesFor(lesson) {
-  const own = ((lesson && lesson.routes) || []).filter((route) => !RETIRED_ROUTES.test(String(route).trim()));
-  if (!own.length) return PARTICIPATION_ROUTES;
-  return [...own, ...PARTICIPATION_ROUTES].filter((route, index, list) => list.indexOf(route) === index);
+  if (!lesson || lesson.code === "O.6") return [];
+  if (Number(lesson.module_order) === 0) return GETTING_STARTED_ROUTES;
+  return ((lesson.routes) || []).map((route) => String(route).trim()).filter(Boolean);
 }
 
 export const ANSWER_KEY = "answers";
@@ -166,10 +142,13 @@ export function useWorkbook() {
   return { answers, decisions, states };
 }
 
-/** Distinguishes "not answered" from a deliberate pass or pause. */
+/** Distinguishes "not answered" from a decision, a pass, a watch, or a pause. */
 export function describeStep(code, answers, decisions, states) {
   if (decisions && decisions[code]) return "decided";
-  if (states && states[code] === PAUSE_ROUTE) return "paused";
+  const route = states && states[code];
+  if (route && /^pass$/i.test(String(route).trim())) return "passed";
+  if (route && /^watch$/i.test(String(route).trim())) return "watched";
+  if (route === PAUSE_ROUTE) return "paused";
   const saved = Object.keys(answers || {}).some(
     (key) => key.startsWith(`${code}#`) && String(answers[key] || "").trim()
   );
@@ -179,7 +158,9 @@ export function describeStep(code, answers, decisions, states) {
 export function stepStatusLabel(status) {
   return {
     decided: "Next Decision recorded",
-    paused: "One line written, then paused",
+    paused: "Paused",
+    passed: "Passed",
+    watched: "Watched",
     answered: "Answered",
     "not answered": "Not answered yet",
   }[status];
@@ -193,7 +174,7 @@ export function buildCarrySources(codes, lessonsByCode) {
     if (!lesson) return;
     const prompts = [...(lesson.try_prompts || []), ...(lesson.reflect_prompts || [])];
     prompts.forEach((label, index) => {
-      sources.push({ code, index, label: `${lesson.title} — ${label}` });
+      sources.push({ code, index, label: `${lesson.title}: ${label}` });
     });
   });
   return sources;

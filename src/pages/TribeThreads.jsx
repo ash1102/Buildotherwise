@@ -61,13 +61,12 @@ export default function TribeThreads() {
         <h1 className="mt-2">Tribe Threads</h1>
         <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
           A thread is one peer practice from the curriculum, opened up for the group. Each one shows the practice, the
-          prompt, and what others noticed. Answer in your own words, or just read — taking part is optional, and a short
+          prompt, and what others noticed. Answer in your own words, or just read. Taking part is optional, and a short
           reply counts as much as a long one.
         </p>
         <p className="mt-3 max-w-[68ch] text-[16px] leading-relaxed text-muted-faint">
-          Everyone with access to this workbook — the whole pilot cohort — can read replies, and they are posted with your
-          name. Your Conversation Journal is separate and stays private: nothing from it is ever posted here, and a reply
-          only exists if you write one on this page yourself.
+          Everyone in your group can read replies, and they are posted with your name. Your Conversation Journal is
+          separate and stays private. Nothing from it is posted here. A reply only exists if you write one on this page.
         </p>
       </header>
 
@@ -75,7 +74,7 @@ export default function TribeThreads() {
         <p className="py-8 text-[16px] text-muted-faint">Opening the threads…</p>
       ) : threads.length === 0 ? (
         <p className="rounded-xl border border-dashed border-input bg-card p-5 text-[16px] leading-relaxed text-muted-foreground">
-          No threads yet. When the peer practices are published, each one appears here with its prompt and the cohort's
+          No threads yet. When the peer practices are published, each one appears here with its prompt and the group's
           replies.
         </p>
       ) : (
@@ -90,7 +89,7 @@ export default function TribeThreads() {
                     <ThreadCard
                       key={thread.id}
                       thread={thread}
-                      moduleLabel={thread.lesson_code ? `${thread.lesson_code} — peer practice` : "Peer practice"}
+                      moduleLabel={thread.lesson_code ? `${thread.lesson_code}, peer practice` : "Peer practice"}
                       replies={repliesByThread.get(thread.id) || []}
                       user={user}
                       onChanged={refreshReplies}
@@ -104,7 +103,7 @@ export default function TribeThreads() {
             <section>
               <h2 className="text-[20px]">Not open yet</h2>
               <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
-                The part of the program that brings the cohort together is still being written. These threads will open
+                The part of the program that brings the group together is still being written. These threads will open
                 when those steps are published.
               </p>
               <div className="mt-3 space-y-5">

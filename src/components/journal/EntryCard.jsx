@@ -56,7 +56,7 @@ export default function EntryCard({
       {entry.route ? <p className="mt-2 text-[14px] text-muted-faint">Route taken: {entry.route}</p> : null}
 
       {entry.revision_of ? (
-        <p className="mt-2 text-[14px] text-accent-ink">Revised from an earlier entry — both are kept.</p>
+        <p className="mt-2 text-[14px] text-accent-ink">Revised from an earlier entry. Both are kept.</p>
       ) : null}
 
       <EntryActions

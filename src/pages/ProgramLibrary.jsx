@@ -140,7 +140,7 @@ export default function ProgramLibrary() {
         <h1 className="mt-2">Everything you have read, in one place</h1>
         <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
           The readings and notes that sit alongside the steps, kept in the curriculum's own words. Nothing here needs
-          filling in — it is material to come back to.
+          filling in. It is material to come back to.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Button type="button" variant="outline" onClick={download} className="rounded-md border-input bg-card">
@@ -203,7 +203,7 @@ export default function ProgramLibrary() {
             <h3 className="mt-1.5 text-[20px]">Articles, studies and talks from elsewhere</h3>
             <p className="mt-2 max-w-[68ch] text-[13.5px] leading-relaxed text-ink-soft">
               Other people's work, linked to where it lives. All of it is optional. These pieces are here because they
-              connect to something in the program, not because they prove anything about it — take what's useful and
+              connect to something in the program, not because they prove anything about it. Take what's useful and
               question the rest.
             </p>
           </div>
@@ -253,7 +253,7 @@ export default function ProgramLibrary() {
           <h2 className="mt-2 font-heading text-xl">What the curriculum is built on</h2>
           <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-ink-soft">
             The program team's own research documents, listed here so you can see what the curriculum is built on. Each one
-            shows where it came from and the status it states for itself. They are design documents, not lessons — the full
+            shows where it came from and the status it states for itself. They are design documents, not lessons. The full
             text is there if you want it, and it is optional reading.
           </p>
           <ul className="mt-5 space-y-4">

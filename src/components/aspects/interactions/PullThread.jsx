@@ -51,7 +51,7 @@ export default function PullThread() {
       <div>
         <p className="font-heading text-xl text-ink">That is a thread worth keeping.</p>
         <p className="mt-3 text-[14px] leading-relaxed text-ink-soft">
-          Nothing has to come of it yet. In the workbook, threads like this are the raw material for a small try — or
+          Nothing has to come of it yet. In the workbook, threads like this are the raw material for a small try, or
           for a deliberate pause.
         </p>
         <ol className="mt-4 space-y-1.5 text-[13.5px] text-ink-soft">

@@ -86,7 +86,7 @@ export default function DiscoveryRecordPage() {
           Two different things live on this page. <strong className="font-semibold text-foreground">Saved answers</strong> are
           what the steps already hold, kept where you wrote them.{" "}
           <strong className="font-semibold text-foreground">Discoveries you keep</strong> are the few things you choose to
-          carry forward yourself — nothing is added here on your behalf.
+          carry forward yourself. Nothing is added here on your behalf.
         </p>
         <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-faint">
           This is not a score or a finished account of who you are. A few words, uncertainty, or nothing to add yet are all
@@ -117,7 +117,7 @@ export default function DiscoveryRecordPage() {
           </Button>
         </div>
         <div className="mt-3">
-          <PrivacyNote>Kept in this browser on this device. Nothing here is sent to Entrepalooza.</PrivacyNote>
+          <PrivacyNote>Saved on this device only.</PrivacyNote>
         </div>
       </header>
 

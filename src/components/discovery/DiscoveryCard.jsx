@@ -103,7 +103,7 @@ export default function DiscoveryCard({ entry }) {
           {earlier.map((item) => (
             <li key={item.id}>
               Earlier: {item.decision} · {moment(item.date).format("D MMM YYYY")}
-              {item.note ? ` — ${item.note}` : ""}
+              {item.note ? `, ${item.note}` : ""}
             </li>
           ))}
         </ul>
@@ -140,7 +140,7 @@ export default function DiscoveryCard({ entry }) {
         <section className="mt-3 rounded-lg border border-natural bg-ivory/70 p-4">
           <p className="workbook-label text-copper">Where this stands now</p>
           <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-soft">
-            Choosing here adds a dated update. The earlier decision stays on the entry — nothing is erased.
+            Choosing here adds a dated update. The earlier decision stays on the entry. Nothing is erased.
           </p>
           <DecisionChips className="mt-3" value={nextDecision} onChange={setNextDecision} />
           <Textarea

@@ -32,7 +32,7 @@ export const TAG_LABELS = {
     tone: "warn",
   },
   proposed: {
-    short: "New proposal — not approved",
+    short: "New proposal, not approved",
     long: "A new interaction or example proposed for review. Not existing curriculum.",
     tone: "warn",
   },
@@ -51,7 +51,7 @@ export const TAG_LABELS = {
 /** How a skipped or blank answer is described. Never a decision, never a label. */
 export const NO_RESPONSE = "No response";
 
-/** The seven Next Decision words. Exactly these, no eighth option. */
+/** The eight Next Decision words. Pass is a route, not one of these. */
 export const NEXT_DECISION_LABELS = [
   "Keep",
   "Change",
@@ -60,6 +60,7 @@ export const NEXT_DECISION_LABELS = [
   "Stop",
   "Another Direction",
   "Continue Looking",
+  "I don't know yet",
 ];
 
 export const CONTINUE_LOOKING = "Continue Looking";

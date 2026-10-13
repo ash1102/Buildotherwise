@@ -8,6 +8,7 @@ import { getStep, pilotLabel, readingsForStep, stepNeighbours } from "@/lib/prev
 import { loadReadingBodies } from "@/lib/preview/readings";
 import { listResponsesForStep, removeResponse, saveResponse } from "@/lib/preview/responses";
 import { useAuth } from "@/lib/AuthContext";
+import { NEXT_DECISIONS } from "@/lib/workbook";
 
 const EMPTY_READING = {
   draft:
@@ -108,21 +109,27 @@ export default function PreviewStepPage() {
 
     /* Its own wording means its own activities too, so the earlier writing prompts are not printed as well. */
     const liveWriting = [];
+    const decisionLabels = new Set(
+      ((lesson && lesson.decision_options && lesson.decision_options.length) ? lesson.decision_options : NEXT_DECISIONS).map(
+        (option) => String(option).trim().toLowerCase()
+      )
+    );
     if (lesson && !step.ownWording && ((lesson.try_prompts || []).length || (lesson.reflect_prompts || []).length)) {
       const fields = [
         ...(lesson.try_prompts || []).map((prompt, index) => ({ id: `try-${index}`, label: prompt })),
         ...(lesson.reflect_prompts || []).map((prompt, index) => ({ id: `reflect-${index}`, label: prompt })),
-      ];
-      liveWriting.push({
-        id: `${step.code}-writing`,
-        version: "lesson-record",
-        type: "optional_reflection",
-        part: "activity",
-        title: "Write, if you want to",
-        tag: "reused",
-        question: "Every box is optional. One line is enough, and leaving them all empty is a complete answer.",
-        fields,
-      });
+      ].filter((field) => !(step.decision && decisionLabels.has(String(field.label).trim().toLowerCase())));
+      if (fields.length) {
+        liveWriting.push({
+          id: `${step.code}-writing`,
+          version: "lesson-record",
+          type: "optional_reflection",
+          part: "activity",
+          title: "Write, if you want to",
+          tag: "reused",
+          fields,
+        });
+      }
     }
 
     const closing = [];
@@ -139,7 +146,16 @@ export default function PreviewStepPage() {
     }
 
     const decision = step.decision
-      ? [{ id: `${step.code}-decision`, version: "1.0", type: "next_decision", part: "activity", title: "Next Decision" }]
+      ? [
+          {
+            id: `${step.code}-decision`,
+            version: "1.0",
+            type: "next_decision",
+            part: "activity",
+            title: "Next Decision",
+            options: lesson && lesson.decision_options && lesson.decision_options.length ? lesson.decision_options : undefined,
+          },
+        ]
       : [];
 
     return [...readings, ...afterReading, ...liveText, ...rest, ...liveWriting, ...closing, ...decision];
