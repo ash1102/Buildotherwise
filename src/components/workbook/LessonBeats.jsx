@@ -10,11 +10,11 @@ const TONES = {
 };
 
 /**
- * A step opens one section at a time, so the teaching is met in order. Sections
- * already read collapse to a quiet line that can be reopened, and anyone who would
- * rather read straight through can open the whole step. Moving on brings the new
- * section's heading into view below the sticky header and moves focus to that
- * heading — never into a writing box.
+ * A step opens one part at a time, so the teaching is met in order. Parts already
+ * read collapse to a quiet line that can be reopened, and anyone who would rather
+ * read straight through can open the whole step. Moving to another part brings its
+ * heading into view below the sticky header and moves focus to that heading — never
+ * into a writing box, and never while someone is writing.
  */
 export default function LessonBeats({ beats }) {
   const [current, setCurrent] = useState(0);
@@ -25,19 +25,23 @@ export default function LessonBeats({ beats }) {
   const next = beats[current + 1] || null;
   const prev = current > 0 ? beats[current - 1] : null;
   const last = current >= total - 1;
+  const currentKey = beats[current] ? beats[current].key : null;
 
+  // Keyed on the part itself, not on the beats array. A save landing while someone is
+  // typing re-renders this step, and that must not move the page or take the caret.
   useEffect(() => {
     if (firstRun.current) {
       firstRun.current = false;
       return;
     }
-    // Scroll the section itself: it carries the scroll offset that clears the sticky
+    // Scroll the part itself: it carries the scroll offset that clears the sticky
     // header, then focus lands on the heading without scrolling again.
-    const section = document.getElementById(`section-${beats[current].key}`);
+    const section = document.getElementById(`section-${currentKey}`);
     if (section) section.scrollIntoView({ block: "start" });
     const heading = headingRefs.current[current];
     if (heading) heading.focus({ preventScroll: true });
-  }, [current, beats]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentKey]);
 
   const openBeat = (index) => {
     if (index < 0 || index >= total) return;
@@ -63,7 +67,7 @@ export default function LessonBeats({ beats }) {
       <section
         key={beat.key}
         id={`section-${beat.key}`}
-        aria-label={`${beat.label}, section ${index + 1} of ${total}`}
+        aria-label={`${beat.label}, part ${index + 1} of ${total}`}
         className={`rounded-xl border p-4 sm:p-5 ${TONES[beat.tone || "plain"]}`}
       >
         <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -71,7 +75,7 @@ export default function LessonBeats({ beats }) {
             {beat.label}
           </h3>
           <span className="text-[13px] text-muted-faint">
-            Section {index + 1} of {total}
+            Part {index + 1} of {total}
           </span>
         </div>
         {reopenIndex >= 0 ? (
@@ -103,14 +107,14 @@ export default function LessonBeats({ beats }) {
         </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span aria-live="polite" className="text-[13px] text-muted-faint">
-            {openAll ? `All ${total} sections open` : `${beats[current].label.replace(/\.$/, "")} · ${current + 1} of ${total}`}
+            {openAll ? `All ${total} parts open` : `${beats[current].label.replace(/\.$/, "")} · part ${current + 1} of ${total}`}
           </span>
           <button
             type="button"
             onClick={() => setOpenAll((value) => !value)}
             className="text-[13px] font-medium text-accent-ink underline underline-offset-2"
           >
-            {openAll ? "Back to one section at a time" : "Read the whole step"}
+            {openAll ? "Back to one part at a time" : "Read the whole step"}
           </button>
         </div>
       </div>
@@ -148,7 +152,7 @@ export default function LessonBeats({ beats }) {
               className="inline-flex items-center gap-1.5 rounded-md border border-input bg-card px-3.5 py-2 text-[15px] text-foreground transition hover:bg-secondary"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-              Previous section
+              Previous part
             </button>
           ) : null}
           {next ? (
@@ -157,12 +161,12 @@ export default function LessonBeats({ beats }) {
               onClick={() => openBeat(current + 1)}
               className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3.5 py-2 text-[15px] font-medium text-primary-foreground transition hover:bg-primary/90"
             >
-              Next section · {next.label}
+              Next part · {next.label}
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </button>
           ) : (
             <p className="text-[15px] text-muted-foreground">
-              That is the last section of this step. Use the links below to go on.
+              That is the last part of this step. Use the links below to go on.
             </p>
           )}
         </div>
