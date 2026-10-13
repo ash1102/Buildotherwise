@@ -31,10 +31,13 @@ export default function About() {
           up, a project or creative idea you want to test, a pause you need to protect, or a period of not knowing what
           interests you yet. You do not need a business idea, a passion or a personal story to begin. Employment,
           training, further study, a project or venture, a pause and continuing to look are all complete answers here.
-          Entrepreneurship is one possibility, not the goal.
+          Entrepreneurship is a real option, and the business-building skills are useful even if you never start one,
+          but it is not the goal everyone has to reach.
         </p>
         <p>
-          Entrepalooza is built by the team at Build Otherwise. Pilot 1 is the current release: Getting Started and
+          Entrepalooza is built by the team at Build Otherwise and grounded in Scars to Strategy, the Build Otherwise
+          framework: the idea that hard-won experience, unconventional strengths and survival skills can sometimes become
+          real assets. Not because hardship is good, and not because anyone owes a comeback story. Pilot 1 is the current release: Getting Started and
           Modules 1–5, with Modules 6–10 still in development and named plainly so you can see where the program is
           going. Nothing in the workbook promises a job, an income, recovery or business success. It is an educational
           workbook, not therapy, treatment or diagnosis, and it is not a readiness test.
