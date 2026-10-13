@@ -101,14 +101,14 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
       </div>
 
       <p className="mt-4 text-[12px] text-muted-faint">Jump to any part:</p>
-      <ol className="mt-1.5 flex flex-wrap gap-2" aria-label="Parts">
+      <ol className="-mx-1 mt-1.5 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible" aria-label="Parts">
         {STEP_TITLES.map((title, index) => (
           <li key={title}>
             <button
               type="button"
               onClick={() => go(index)}
               aria-current={index === step ? "step" : undefined}
-              className={`rounded-full border px-3 py-1 text-[12.5px] transition ${
+              className={`whitespace-nowrap rounded-full border px-3 py-1 text-[12.5px] transition ${
                 index === step
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border bg-background text-muted-foreground hover:border-primary/50"
