@@ -196,6 +196,7 @@ export function buildGraph(map) {
       links: item.links || [],
       source_code: item.source_code || "",
       source_label: item.source_label || "",
+      question_id: item.question_id || "",
     })),
   }));
 
