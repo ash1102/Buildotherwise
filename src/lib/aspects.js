@@ -90,7 +90,7 @@ export const ASPECTS = [
     number: "07",
     label: "Choices and responsive prompts",
     promise: "Pick a direction and the next prompt changes to match it. Stopping counts too.",
-    body: "Wherever a step asks for a decision, the choices stand as equals: keep it, change it, test it again, pause, stop, take another direction, or keep looking.\n\nChoosing one changes the prompt you get next. Pausing and stopping are recorded as answers, not as unfinished work.",
+    body: "Wherever a step asks for a decision, the choices stand as equals: keep, change, test again, pause, stop, another direction, or continue looking.\n\nChoosing one changes the prompt you get next. Pausing and stopping are recorded as answers, not as unfinished work.",
     interaction: "choices",
     tryLabel: "Try it: pick a direction",
     note: "The choice below saves nothing. In the workbook it is kept with the step, and it can be changed later.",
