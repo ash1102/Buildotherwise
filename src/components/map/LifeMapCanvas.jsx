@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { layoutGraph } from "@/lib/lifeMap";
 
 /** Each question keeps its own colour, so a line is recognisable at a glance. */
@@ -11,6 +11,77 @@ const SECTION_DOT = {
 };
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+/** Rough on-screen size of a pill, in pixels, so lines can be kept from covering each other. */
+const pillSize = (text, maxWidth, height) => ({
+  w: Math.min(maxWidth, String(text || "").length * 6.8 + 12) + 24,
+  h: height,
+});
+
+const GAP = 6;
+const overlaps = (a, b) =>
+  Math.abs(a.x - b.x) * 2 < a.w + b.w + GAP && Math.abs(a.y - b.y) * 2 < a.h + b.h + GAP;
+
+/**
+ * Lines nobody has moved get the nearest clear spot to where they would sit, so
+ * nothing lands on top of another line, a question, or the middle. Lines the
+ * person placed stay exactly where they put them.
+ */
+function settle(graph, layout, saved, box) {
+  if (!box.w || !box.h) return layout.nodes;
+  const taken = [];
+  taken.push({ x: box.w / 2, y: box.h / 2, w: 230, h: 64 });
+  graph.sections.forEach((section) => {
+    const hub = layout.sections[section.key];
+    if (hub) taken.push({ x: hub.x * box.w, y: hub.y * box.h, ...pillSize(section.label, 220, 34) });
+  });
+
+  const result = {};
+  const unplaced = [];
+  graph.nodes.forEach((node) => {
+    const spot = layout.nodes[node.id];
+    if (!spot) return;
+    if ((saved || {})[node.id]) {
+      result[node.id] = spot;
+      taken.push({ x: spot.x * box.w, y: spot.y * box.h, ...pillSize(node.label || node.text, 152, 30) });
+    } else {
+      unplaced.push(node);
+    }
+  });
+
+  unplaced.forEach((node) => {
+    const start = layout.nodes[node.id];
+    const size = pillSize(node.label || node.text, 152, 30);
+    const fits = (x, y) => {
+      const rect = { x, y, ...size };
+      if (x - size.w / 2 < 4 || x + size.w / 2 > box.w - 4 || y - size.h / 2 < 4 || y + size.h / 2 > box.h - 4) return false;
+      return !taken.some((other) => overlaps(rect, other));
+    };
+
+    let best = null;
+    const sx = clamp(start.x * box.w, size.w / 2 + 4, box.w - size.w / 2 - 4);
+    const sy = clamp(start.y * box.h, size.h / 2 + 4, box.h - size.h / 2 - 4);
+    if (fits(sx, sy)) best = { x: sx, y: sy };
+    for (let ring = 1; !best && ring <= 30; ring += 1) {
+      const radius = ring * 14;
+      const steps = 8 + ring * 2;
+      for (let i = 0; i < steps; i += 1) {
+        const angle = (i / steps) * Math.PI * 2 + Math.PI / 2;
+        const x = sx + Math.cos(angle) * radius;
+        const y = sy + Math.sin(angle) * radius * 0.7;
+        if (fits(x, y)) {
+          best = { x, y };
+          break;
+        }
+      }
+    }
+    const placed = best || { x: sx, y: sy };
+    taken.push({ ...placed, ...size });
+    result[node.id] = { x: placed.x / box.w, y: placed.y / box.h };
+  });
+
+  return result;
+}
 
 const NUDGE_KEYS = {
   ArrowLeft: [-0.02, 0],
@@ -30,15 +101,29 @@ export default function LifeMapCanvas({ graph, positions, selectedId, onSelect, 
   const justDragged = useRef(false);
   const [preview, setPreview] = useState(null);
 
+  const [box, setBox] = useState({ w: 0, h: 0 });
+
+  useEffect(() => {
+    const element = boxRef.current;
+    if (!element) return undefined;
+    const measure = () => setBox({ w: element.clientWidth, h: element.clientHeight });
+    measure();
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
   const layout = useMemo(() => layoutGraph(graph, positions), [graph, positions]);
+  const settled = useMemo(() => settle(graph, layout, positions, box), [graph, layout, positions, box]);
 
   const spots = useMemo(() => {
     const resolved = {};
-    Object.entries(layout.nodes).forEach(([id, spot]) => {
+    Object.entries(settled).forEach(([id, spot]) => {
       resolved[id] = preview && preview.id === id ? { x: preview.x, y: preview.y } : spot;
     });
     return resolved;
-  }, [layout.nodes, preview]);
+  }, [settled, preview]);
 
   const nodesById = useMemo(() => {
     const map = {};
