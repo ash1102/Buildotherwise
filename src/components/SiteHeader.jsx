@@ -19,7 +19,7 @@ const LINKS = [
 
 /** What someone can reach before logging in: the welcome, Getting Started, and the two pages about the program. */
 const PUBLIC_LINKS = [
-  { to: "/", label: "Workbook", end: true },
+  { to: "/", label: "Home", end: true },
   { to: "/getting-started", label: "Getting Started" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
