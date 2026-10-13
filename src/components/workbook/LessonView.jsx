@@ -64,9 +64,15 @@ export default function LessonView({
   const rawTry = lesson.try_prompts || [];
   const rawReflect = lesson.reflect_prompts || [];
   const notAnOption = (prompt) => !optionNames.has(String(prompt).trim().toLowerCase());
-  const tryPrompts = rawTry.map((prompt, index) => ({ prompt, index })).filter((item) => notAnOption(item.prompt));
+  // Try and Reflect questions are numbered in one run: the Reflect boxes start after the
+  // Try ones. That way no two questions in a step share a stored answer, so nothing
+  // written in one box can appear in, or overwrite, another. Same order the
+  // carry-forward sources use, so a saved answer still reads back where it was written.
+  const tryPrompts = rawTry
+    .map((prompt, index) => ({ prompt, index, fieldKey: `try-${index}` }))
+    .filter((item) => notAnOption(item.prompt));
   const reflectPrompts = rawReflect
-    .map((prompt, index) => ({ prompt, index }))
+    .map((prompt, index) => ({ prompt, index: rawTry.length + index, fieldKey: `reflect-${index}` }))
     .filter((item) => notAnOption(item.prompt));
   const routes = participationRoutesFor(lesson);
   const guidance = routeGuidanceFor(route);
@@ -198,7 +204,7 @@ export default function LessonView({
             <CarryForward sources={carrySources} selected={carried} onChange={onCarriedChange} />
           ) : null}
           <div className="space-y-6">
-            {tryPrompts.map((item) => promptField(item.prompt, item.index, `try-${item.index}`))}
+            {tryPrompts.map((item) => promptField(item.prompt, item.index, item.fieldKey))}
           </div>
         </div>
       ),
@@ -213,7 +219,7 @@ export default function LessonView({
         <div className="space-y-6">
           {tryPrompts.length ? null : talkControl}
           {tryPrompts.length || hasRoutes ? null : <PrivacyNote />}
-          {reflectPrompts.map((item) => promptField(item.prompt, item.index, `reflect-${item.index}`))}
+          {reflectPrompts.map((item) => promptField(item.prompt, item.index, item.fieldKey))}
         </div>
       ),
     });
