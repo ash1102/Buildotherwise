@@ -34,7 +34,11 @@ export default function Layout() {
               {preview
                 ? "Preview answers are saved to your account when you choose save."
                 : "Your workbook and journal stay on this device."}{" "}
-              Messages, feedback and Tribe Thread posts go out only when you hit submit.
+              Messages and feedback go out only when you hit submit.
+            </p>
+            <p className="mt-2">
+              Tribe Threads are group discussions on the workbook’s practices. Replies there are shared with your group,
+              under your name, and only if you post one.
             </p>
             <p className="mt-2">Pilot 1: Getting Started and Modules 1–5. © Build Otherwise.</p>
           </div>
