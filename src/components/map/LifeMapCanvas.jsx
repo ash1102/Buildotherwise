@@ -235,7 +235,7 @@ export default function LifeMapCanvas({ graph, pick, selectedId, onSelect, onJum
               {pickNothing ? (
                 <p className="text-[13px] text-muted-foreground">Nothing on the map is worth exploring yet. That counts.</p>
               ) : pickHas ? (
-                <div className="max-w-md rounded-xl border border-accent-ink-soft/60 bg-background px-4 py-3 shadow-sm">
+                <div className="max-w-md rounded-xl border border-accent-ink-soft bg-background px-4 py-3 shadow-sm">
                   {MAP_PICK_FIELDS.map((field) => {
                     const value = String((pick || {})[field.id] || "").trim();
                     if (!value) return null;
