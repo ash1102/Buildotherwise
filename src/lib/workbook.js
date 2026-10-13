@@ -1,16 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { readStore, subscribeStore, writeStore } from "./store";
 
 export const NEXT_DECISIONS = [
   "Keep",
   "Change",
-  "Test Again",
-  "Pause/Park",
+  "Test again",
+  "Pause",
   "Stop",
-  "Another Direction",
-  "Continue Looking",
+  "Another direction",
+  "Continue looking",
   "I don't know yet",
 ];
+
+/** Older saved choices still read as the current words. */
+const LEGACY_DECISIONS = {
+  "Test Again": "Test again",
+  "Pause/Park": "Pause",
+  "Another Direction": "Another direction",
+  "Continue Looking": "Continue looking",
+  "Keep looking": "Continue looking",
+};
+
+export function normalizeDecision(label) {
+  return LEGACY_DECISIONS[label] || label;
+}
+
+function normalizeDecisions(map) {
+  const out = {};
+  Object.entries(map || {}).forEach(([code, value]) => {
+    out[code] = normalizeDecision(value);
+  });
+  return out;
+}
 
 /** Getting Started. Other lessons use the routes stored on the lesson, including Pass. */
 export const GETTING_STARTED_ROUTES = ["Say it", "Write it", "Watch", "Pass"];
@@ -93,7 +114,8 @@ export function useStepState() {
 }
 
 export function useDecisions() {
-  return useStoreState(DECISION_KEY, {});
+  const raw = useStoreState(DECISION_KEY, {});
+  return useMemo(() => normalizeDecisions(raw), [raw]);
 }
 
 export function setCarried(code, keys) {
@@ -137,7 +159,8 @@ function useStoreState(key, fallback) {
 /** Answers, decisions and step states together, kept in sync across pages. */
 export function useWorkbook() {
   const answers = useStoreState(ANSWER_KEY, {});
-  const decisions = useStoreState(DECISION_KEY, {});
+  const rawDecisions = useStoreState(DECISION_KEY, {});
+  const decisions = useMemo(() => normalizeDecisions(rawDecisions), [rawDecisions]);
   const states = useStoreState(STATE_KEY, {});
   return { answers, decisions, states };
 }
