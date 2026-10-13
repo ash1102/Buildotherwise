@@ -37,7 +37,7 @@ export default function About() {
         <p>
           Entrepalooza is built by Build Otherwise, using the Scars to Strategy framework. Pilot 1 is the current release: Getting Started and
           Modules 1–5, with Modules 6–10 still in development and named plainly so you can see where the program is
-          going. Nothing in the workbook promises a job, an income, recovery or business success. It is an educational
+          going. Nothing in the workbook promises a job, an income or business success. It is an educational
           workbook, not therapy, treatment or diagnosis, and it is not a readiness test.
         </p>
       </div>
@@ -45,15 +45,15 @@ export default function About() {
       <div className="workbook-section">
         <h2 className="text-[18px]">What Pilot 1 is testing</h2>
         <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
-          Pilot 1 is about whether the program is usable and useful, not proof that it produces recovery, jobs or
-          businesses. We want to learn:
+          The pilot tests the program, not you. We’re checking whether Entrepalooza is clear, doable and worth your
+          time. We’re not promising jobs, income or business results. The questions we’re asking:
         </p>
         <ul className="mt-3 max-w-[68ch] list-disc space-y-1.5 pl-5 text-[16px] leading-relaxed text-muted-foreground">
-          <li>Could participants understand and engage with the activities?</li>
-          <li>Were the experiments accessible, realistic and safe?</li>
-          <li>Did participants learn something useful from what they tried?</li>
-          <li>Were they able to make their own decisions about what to explore next?</li>
-          <li>Which activities helped, which created confusion, and what needs to change?</li>
+          <li>Does it make sense?</li>
+          <li>Are the experiments realistic and safe to try?</li>
+          <li>Do people learn something they can actually use?</li>
+          <li>Do people stay in charge of their own decisions?</li>
+          <li>Which parts help, and which get in the way?</li>
         </ul>
       </div>
 
