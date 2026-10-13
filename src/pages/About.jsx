@@ -58,7 +58,7 @@ export default function About() {
       </div>
 
       <div className="workbook-section">
-        <h2 className="text-[18px]">Reach the program team</h2>
+        <h2 className="text-[18px]">Reach Ashley</h2>
         <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
           Questions about the workbook, the pilot, or how your writing is stored are welcome. There is a contact form on
           the contact page, and every step also carries a separate feedback box.
@@ -68,7 +68,7 @@ export default function About() {
             to="/contact"
             className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-[15px] font-medium text-primary-foreground transition hover:bg-primary/90"
           >
-            Contact the program team
+            Contact Ashley
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
           <Link

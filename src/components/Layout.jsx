@@ -26,7 +26,7 @@ export default function Layout() {
                 About Entrepalooza
               </Link>
               <Link to="/contact" className="font-medium text-accent-ink underline underline-offset-2">
-                Contact the program team
+                Contact Ashley
               </Link>
             </div>
             <p>

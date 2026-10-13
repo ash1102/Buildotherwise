@@ -63,7 +63,7 @@ export default function Connect() {
             to="/contact"
             className="inline-flex items-center gap-2 rounded-md border border-input bg-card px-4 py-2 text-[15px] text-foreground transition hover:bg-secondary"
           >
-            Contact the program team
+            Contact Ashley
           </Link>
         </div>
       </div>

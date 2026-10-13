@@ -252,7 +252,7 @@ export default function ProgramLibrary() {
           <p className="workbook-label">Research behind the program</p>
           <h2 className="mt-2 font-heading text-xl">What the curriculum is built on</h2>
           <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-ink-soft">
-            The program team's own research documents, listed here so you can see what the curriculum is built on. Each one
+            Build Otherwise's own research documents, listed here so you can see what the curriculum is built on. Each one
             shows where it came from and the status it states for itself. They are design documents, not lessons. The full
             text is there if you want it, and it is optional reading.
           </p>

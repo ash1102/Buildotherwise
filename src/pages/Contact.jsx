@@ -26,7 +26,7 @@ export default function Contact() {
       setSent(true);
       setMessage("");
       setEmail("");
-      toast({ title: "Thank you. Your message has gone to the program team." });
+      toast({ title: "Thank you. Your message has gone to Ashley at Build Otherwise." });
     } catch (error) {
       toast({ title: "That didn't send. Please try again." });
     } finally {
@@ -38,10 +38,10 @@ export default function Contact() {
     <article className="space-y-8">
       <header className="border-b border-border pb-5">
         <p className="workbook-label">Contact</p>
-        <h1 className="mt-2">Contact the program team</h1>
+        <h1 className="mt-2">Contact Ashley</h1>
         <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-          Send a question, a concern, or something the workbook should do better. Messages go to the Entrepalooza
-          program team at Build Otherwise.
+          Send a question, a concern, or something the workbook should do better. Messages go to Ashley Zeck, who runs
+          Entrepalooza at Build Otherwise.
         </p>
       </header>
 
