@@ -1,29 +1,25 @@
 import React from "react";
 import { Mic, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { joinWords } from "@/lib/dictation";
 
 const Engine =
   typeof window === "undefined" ? null : window.SpeechRecognition || window.webkitSpeechRecognition;
 
-/** Puts a space between two pieces of text so dictation never runs words together. */
-function join(head, tail) {
-  if (!head) return tail;
-  if (!tail) return head;
-  return /[\s\n]$/.test(head) ? `${head}${tail}` : `${head} ${tail}`;
-}
-
 /**
- * Dictation for one answer field. Words are added to whatever is already written,
- * so nothing typed is lost and nothing is overwritten. Speech goes to the browser's
- * own speech service — this app records nothing, keeps no audio, and costs nothing.
- * The short note is the default so the explanation is not repeated under every box.
+ * Dictation for one answer field. Only the words just heard are handed back, so
+ * words are added to whatever is already written and nothing typed by hand is ever
+ * rewritten — someone can keep typing while they speak and lose neither.
+ * Speech goes to the browser's own speech service: this app records nothing, keeps
+ * no audio, and costs nothing. The short note is the default so the explanation is
+ * not repeated under every box.
  */
-export default function DictateButton({ value, onText, getValue }) {
+export default function DictateButton({ onText }) {
   const [listening, setListening] = useState(false);
   const [note, setNote] = useState("");
   const engine = useRef(null);
-  const base = useRef("");
   const spoken = useRef("");
+  const tail = useRef("");
 
   useEffect(
     () => () => {
@@ -50,11 +46,15 @@ export default function DictateButton({ value, onText, getValue }) {
       let interim = "";
       for (let i = event.resultIndex; i < event.results.length; i += 1) {
         const words = (event.results[i][0].transcript || "").trim();
-        if (event.results[i].isFinal) spoken.current = join(spoken.current, words);
-        else interim = join(interim, words);
+        if (event.results[i].isFinal) spoken.current = joinWords(spoken.current, words);
+        else interim = joinWords(interim, words);
       }
       setNote("");
-      onText(join(base.current, join(spoken.current, interim)));
+      // The words heard so far, and the words dictation put in the box last time.
+      // The box decides where they go, so nothing already written is lost.
+      const heard = joinWords(spoken.current, interim);
+      onText(heard, tail.current);
+      tail.current = heard;
     };
     next.onerror = (event) => {
       const blocked = event.error === "not-allowed" || event.error === "service-not-allowed";
@@ -67,8 +67,8 @@ export default function DictateButton({ value, onText, getValue }) {
     };
     next.onend = () => setListening(false);
     engine.current = next;
-    base.current = (getValue ? getValue() : value) || "";
     spoken.current = "";
+    tail.current = "";
     setNote("");
     setListening(true);
     try {

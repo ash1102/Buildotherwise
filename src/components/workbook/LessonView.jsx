@@ -15,7 +15,7 @@ import WorkedExample from "./WorkedExample";
 import DictateButton from "./DictateButton";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor } from "@/lib/workbook";
 
-function TalkBar({ hasRoutes, talking, onSay, onWrite, getValue, onText }) {
+function TalkBar({ hasRoutes, talking, onSay, onWrite, onText }) {
   if (hasRoutes && !talking) return null;
 
   const chip = (active) =>
@@ -35,7 +35,7 @@ function TalkBar({ hasRoutes, talking, onSay, onWrite, getValue, onText }) {
           </button>
         </>
       )}
-      {talking ? <DictateButton getValue={getValue} onText={onText} value="" /> : null}
+      {talking ? <DictateButton onText={onText} /> : null}
     </div>
   );
 }
@@ -124,13 +124,9 @@ export default function LessonView({
         talking={talking}
         onSay={() => setSayIt(true)}
         onWrite={() => setSayIt(false)}
-        getValue={() => {
+        onText={(heard, previousTail) => {
           const api = currentApi();
-          return api ? api.getValue() : "";
-        }}
-        onText={(text) => {
-          const api = currentApi();
-          if (api) api.setValue(text);
+          if (api) api.insertText(heard, previousTail);
         }}
       />
     ) : null;

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { getAnswer, setAnswer } from "@/lib/workbook";
 import { saveAnswer } from "@/lib/journal";
+import { addSpokenWords } from "@/lib/dictation";
 
 /**
  * One question, with the question itself as the label above the box. The answer is
@@ -41,8 +42,10 @@ export default function PromptField({
     if (!onBind || !fieldKey) return undefined;
     onBind(fieldKey, {
       getValue: () => valueRef.current,
-      setValue: (next) => {
-        if (handleRef.current) handleRef.current(next);
+      // Dictation hands over only the words just heard. They are added to whatever
+      // is in the box at that moment, so typing and speaking never cancel each other.
+      insertText: (heard, previousTail) => {
+        if (handleRef.current) handleRef.current(addSpokenWords(valueRef.current, heard, previousTail));
       },
     });
     return () => onBind(fieldKey, null);
