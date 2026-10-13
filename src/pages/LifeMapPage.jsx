@@ -114,6 +114,19 @@ export default function LifeMapPage() {
     setNodePosition(selected.id, { x: clamp(spot.x + dx), y: clamp(spot.y + dy) });
   };
 
+  /** One line that holds a list becomes one line per item, in the same area. */
+  const splitSelected = (pieces) => {
+    if (!selected || !selectedSection) return;
+    const keep = {
+      question_id: selected.question_id || "",
+      source_label: selected.source_label || "",
+      source_code: selected.source_code || "",
+    };
+    pieces.forEach((text) => addLine(selectedSection.key, { text, ...keep }));
+    removeLine(selectedSection.key, selected.id);
+    setSelectedId(null);
+  };
+
   const removeSelected = () => {
     if (!selected || !selectedSection) return;
     removeLine(selectedSection.key, selected.id);
@@ -220,6 +233,7 @@ export default function LifeMapPage() {
           onDisconnect={disconnect}
           onNudge={nudge}
           onRemove={removeSelected}
+          onSplit={splitSelected}
           onClose={() => setSelectedId(null)}
         />
       ) : (
