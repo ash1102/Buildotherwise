@@ -34,6 +34,107 @@ export const MAP_SECTIONS = [
   },
 ];
 
+/**
+ * The questions that find the lines for the map, in the order of the lesson
+ * "Map the Life You're Actually Living" (Notion, Module 1, Parts 1-6). Wording is
+ * the lesson's own. Each answer becomes a line under the section named here.
+ * `starter: true` means the answer finishes the sentence, so the line keeps it.
+ */
+export const MAP_QUESTION_PARTS = [
+  {
+    key: "part-1",
+    title: "Draw your week",
+    section: "places",
+    intro:
+      "Think about a normal week. You are not trying to make a geographically accurate map. You're making a map of your lived week.",
+    examples:
+      "Work, someone else's house, school, stores, a gym, church, meetings, appointments, parks, restaurants, a garage, a friend's place, treatment or recovery spaces, community organizations, places connected to your kids, anywhere else that is actually part of your life.",
+    questions: [
+      { id: "p1-places", text: "What places do you regularly go?" },
+      { id: "p1-do", text: "What do you usually do there?" },
+      { id: "p1-how", text: "How do you get there?" },
+    ],
+  },
+  {
+    key: "part-2",
+    title: "Add the things that don't have a place",
+    section: "placeless",
+    intro:
+      "Some important parts of life happen without going anywhere. Don't let \"I didn't go anywhere\" turn into \"I didn't do anything.\"",
+    examples:
+      "Research something for hours from your phone, fix things, draw, game, cook, sell things online, talk people through problems, scroll, write, care for somebody, organize things, watch tutorials, work on a car, make music.",
+    questions: [{ id: "p2-placeless", text: "What do you do that doesn't have a place?" }],
+  },
+  {
+    key: "part-3",
+    title: "Mark the energy",
+    section: "energy",
+    intro: "Look over what you have so far. Don't analyze it yet. Just mark it. There is no scoring system.",
+    questions: [
+      { id: "p3-plus", text: "What gives you energy?" },
+      { id: "p3-minus", text: "What drains you?" },
+      { id: "p3-star", text: "What do you care about?" },
+      { id: "p3-question", text: "What are you curious about?" },
+      { id: "p3-dollar", text: "What do you do mostly because you need money or resources?" },
+      { id: "p3-bang", text: "Where do you get unusually focused?" },
+    ],
+  },
+  {
+    key: "part-4",
+    title: "Look at what's missing",
+    section: "barriers",
+    intro:
+      "Sometimes something is missing because you don't care about it. Sometimes it's missing because you can't currently reach it. Those are not the same thing.",
+    questions: [
+      { id: "p4-used-to", text: "What used to be part of my life that isn't anymore?" },
+      { id: "p4-rarely", text: "What do I want to do but rarely get access to?" },
+      {
+        id: "p4-barrier",
+        text: "Where would I go if money, transportation, time, childcare, fear, paperwork, health, or another barrier weren't stopping me?",
+      },
+      { id: "p4-circumstances", text: "Who or what would be on this map if my circumstances were different?" },
+      { id: "p4-in-the-way", text: "What gets in the way?" },
+    ],
+  },
+  {
+    key: "part-5",
+    title: "Find the threads",
+    section: "threads",
+    intro: "Now stop looking at individual places. Look for patterns. Finish any of these that actually fit.",
+    questions: [
+      { id: "p5-ending-up", text: "I keep ending up around…", starter: true },
+      { id: "p5-more-time", text: "I spend more time than I realized doing…", starter: true },
+      { id: "p5-come-to-me", text: "People seem to come to me for…", starter: true },
+      { id: "p5-lose-track", text: "I lose track of time when…", starter: true },
+      { id: "p5-researching", text: "I keep researching…", starter: true },
+      { id: "p5-weird-amount", text: "I seem to know a weird amount about…", starter: true },
+      { id: "p5-improve", text: "I keep trying to improve…", starter: true },
+      { id: "p5-frustrated", text: "I get frustrated when…", starter: true },
+      { id: "p5-miss", text: "Something I miss is…", starter: true },
+      { id: "p5-wish", text: "Something I wish I had access to is…", starter: true },
+      { id: "p5-bigger", text: "One part of this map I would willingly make bigger is…", starter: true },
+    ],
+  },
+];
+
+/** Part 6 of the lesson: one thing worth exploring, or an honest unknown. */
+export const MAP_PICK_FIELDS = [
+  { id: "one-thing", label: "One thing I might want to understand better is:" },
+  { id: "noticed-because", label: "I noticed it because:" },
+  { id: "do-not-know", label: "I do NOT know yet:" },
+  { id: "small-way", label: "One small way I could learn more about it:" },
+];
+
+export const MAP_PICK_KEY = "lifeMapPick";
+
+/** The line an answer becomes. A sentence starter keeps its start so the line reads on its own. */
+export function lineFromAnswer(question, answer) {
+  const value = String(answer || "").trim();
+  if (!value) return "";
+  if (!question.starter) return value;
+  return `${question.text.replace(/…$/, "").trim()} ${value}`;
+}
+
 const POSITIONS_KEY = "lifeMapPositions";
 
 export function readPositions() {
