@@ -266,7 +266,12 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
             Back
           </Button>
           {step < PICK_STEP ? (
-            <Button type="button" size="lg" className="rounded-full" onClick={() => go(step + 1)}>
+            <Button
+              type="button"
+              size="lg"
+              className="h-auto whitespace-normal rounded-full py-3 text-left"
+              onClick={() => go(step + 1)}
+            >
               Next: Part {step + 2} · {STEP_TITLES[step + 1]}
               <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
             </Button>
