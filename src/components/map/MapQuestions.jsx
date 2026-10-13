@@ -46,8 +46,9 @@ export default function MapQuestions({ graph, onAdded }) {
         Questions that build your map
       </p>
       <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-muted-foreground">
-        Answer what fits. Each answer becomes a line on the map. You can add more than one answer to a question, skip any
-        of them, and come back later. You do not have to answer every prompt.
+        Answer what fits. Each answer becomes one line, and everything you add to a question stays together under that
+        question on the map. Lines from different questions do not join up on their own: you connect them yourself, and
+        only if they belong together. Add one answer at a time, skip any question, and come back later.
       </p>
 
       <ol className="mt-4 flex flex-wrap gap-2" aria-label="Parts">
@@ -90,9 +91,8 @@ export default function MapQuestions({ graph, onAdded }) {
                     {question.text}
                   </label>
                   <p className="mt-1 text-[12.5px] text-muted-faint">
-                    {question.list
-                      ? "Separate them with commas or put each on its own line. Each one becomes its own spot on the map."
-                      : "Put each answer on its own line to add more than one."}
+                    One answer per box: press Add, then add the next one. It becomes its own line here, and it stays with
+                    this question unless you link it somewhere else.
                   </p>
                   <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-start">
                     <Textarea
@@ -133,6 +133,9 @@ export default function MapQuestions({ graph, onAdded }) {
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted-foreground">
             You are not choosing a career. You are not committing to a business. You are not announcing your life's
             purpose. Pick one thread that makes you curious enough to look again.
+          </p>
+          <p className="mt-2 max-w-2xl text-[12.5px] leading-relaxed text-muted-faint">
+            These are single answers, not lists. One thing, in your own words, and you can add something else later.
           </p>
           <div className="mt-4 space-y-4">
             {MAP_PICK_FIELDS.map((field) => (

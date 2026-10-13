@@ -173,9 +173,9 @@ export default function LifeMapPage() {
             <p className="workbook-label">Getting Started · the connected map</p>
             <h1 className="mt-2 font-heading text-3xl sm:text-4xl">Map the life you’re actually living</h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-              Start with the questions below. Each answer becomes a line on the map, under the area it belongs to, joined
-              to the middle and to anything you link it to. Nothing is guessed from what you wrote. You make the
-              connections yourself.
+              Start with the questions below. Answer one thing at a time: each answer becomes one line, and every line
+              from a question stays with that question. Lines from different questions only join up when you link them
+              yourself. Nothing is guessed from what you wrote.
             </p>
             <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-muted-faint">
               Come back and change any line, move it, or leave a question empty. Empty is honest too.
