@@ -9,12 +9,12 @@ import { LIFEMAP_KEY, setLifeMap } from "./workbook";
 export const MAP_SECTIONS = [
   {
     key: "places",
-    label: "Places",
+    label: "Your week",
     prompt: "Where this kind of activity happens, and whether you can get there, feel welcome, and afford it.",
   },
   {
     key: "placeless",
-    label: "Activities anywhere",
+    label: "No set place",
     prompt: "Things you do anywhere: reading, walking, talking, making, fixing, helping.",
   },
   {
@@ -24,12 +24,12 @@ export const MAP_SECTIONS = [
   },
   {
     key: "barriers",
-    label: "Barriers and access",
+    label: "What's missing",
     prompt: "Cost, transport, childcare, accessibility, schedule, credentials. Facts about the situation, not failings.",
   },
   {
     key: "threads",
-    label: "Threads and questions",
+    label: "Threads",
     prompt: "What your attention keeps coming back to.",
   },
 ];
@@ -50,9 +50,9 @@ export const MAP_QUESTION_PARTS = [
     examples:
       "Work, someone else's house, school, stores, a gym, church, meetings, appointments, parks, restaurants, a garage, a friend's place, treatment or recovery spaces, community organizations, places connected to your kids, anywhere else that is actually part of your life.",
     questions: [
-      { id: "p1-places", text: "What places do you go in a typical week and weekend?", list: true },
-      { id: "p1-do", text: "What do you usually do when you get there?" },
-      { id: "p1-how", text: "How do you get to and from those places?" },
+      { id: "p1-places", branch: "Places I go", text: "What places do you go in a typical week and weekend?", list: true },
+      { id: "p1-do", branch: "What I do there", text: "What do you usually do when you get there?", aboutPlace: "at" },
+      { id: "p1-how", branch: "Getting there", text: "How do you get to and from those places?", aboutPlace: "to" },
     ],
   },
   {
@@ -63,7 +63,7 @@ export const MAP_QUESTION_PARTS = [
       "Some important parts of life happen without going anywhere. Don't let \"I didn't go anywhere\" turn into \"I didn't do anything.\"",
     examples:
       "Research something for hours from your phone, fix things, draw, game, cook, sell things online, talk people through problems, scroll, write, care for somebody, organize things, watch tutorials, work on a car, make music.",
-    questions: [{ id: "p2-placeless", text: "What do you do that doesn't have a place?", list: true }],
+    questions: [{ id: "p2-placeless", branch: "Things I do anywhere", text: "What do you do that doesn't have a place?", list: true }],
   },
   {
     key: "part-3",
@@ -71,12 +71,12 @@ export const MAP_QUESTION_PARTS = [
     section: "energy",
     intro: "Look over what you have so far. Don't analyze it yet. Just mark it. There is no scoring system.",
     questions: [
-      { id: "p3-plus", text: "What gives you energy?" },
-      { id: "p3-minus", text: "What drains you?" },
-      { id: "p3-star", text: "What do you care about?" },
-      { id: "p3-question", text: "What are you curious about?" },
-      { id: "p3-dollar", text: "What do you do mostly because you need money or resources?" },
-      { id: "p3-bang", text: "Where do you get unusually focused?" },
+      { id: "p3-plus", branch: "Gives me energy", text: "What gives you energy?" },
+      { id: "p3-minus", branch: "Drains me", text: "What drains you?" },
+      { id: "p3-star", branch: "I care about", text: "What do you care about?" },
+      { id: "p3-question", branch: "I'm curious about", text: "What are you curious about?" },
+      { id: "p3-dollar", branch: "Mostly for money or resources", text: "What do you do mostly because you need money or resources?" },
+      { id: "p3-bang", branch: "Where I get focused", text: "Where do you get unusually focused?" },
     ],
   },
   {
@@ -86,14 +86,15 @@ export const MAP_QUESTION_PARTS = [
     intro:
       "Sometimes something is missing because you don't care about it. Sometimes it's missing because you can't currently reach it. Those are not the same thing.",
     questions: [
-      { id: "p4-used-to", text: "What used to be part of my life that isn't anymore?" },
-      { id: "p4-rarely", text: "What do I want to do but rarely get access to?" },
+      { id: "p4-used-to", branch: "Used to be part of my life", text: "What used to be part of my life that isn't anymore?" },
+      { id: "p4-rarely", branch: "Want, but rarely get to", text: "What do I want to do but rarely get access to?" },
       {
         id: "p4-barrier",
+        branch: "If nothing was stopping me",
         text: "Where would I go if money, transportation, time, childcare, fear, paperwork, health, or another barrier weren't stopping me?",
       },
-      { id: "p4-circumstances", text: "Who or what would be on this map if my circumstances were different?" },
-      { id: "p4-in-the-way", text: "What gets in the way?" },
+      { id: "p4-circumstances", branch: "If things were different", text: "Who or what would be on this map if my circumstances were different?" },
+      { id: "p4-in-the-way", branch: "What gets in the way", text: "What gets in the way?" },
     ],
   },
   {
@@ -116,6 +117,21 @@ export const MAP_QUESTION_PARTS = [
     ],
   },
 ];
+
+/** Every Parts 1-5 question by id, with the part and section it belongs to. */
+export const QUESTIONS_BY_ID = Object.fromEntries(
+  MAP_QUESTION_PARTS.flatMap((part, partIndex) =>
+    part.questions.map((question) => [
+      question.id,
+      {
+        ...question,
+        branch: question.branch || question.text.replace(/…$/, "").trim(),
+        partIndex,
+        section: part.section,
+      },
+    ])
+  )
+);
 
 /** Part 6 of the lesson: one thing worth exploring, or an honest unknown. */
 export const MAP_PICK_FIELDS = [
