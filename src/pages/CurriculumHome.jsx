@@ -48,8 +48,8 @@ const FRONT_CSS = `
 .eh .k{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--plum)}
 .eh h1,.eh h2{color:var(--ink);font-weight:700}
 .eh h2{font-size:clamp(1.3rem,4.6vw,1.85rem);line-height:1.15;letter-spacing:-.02em;margin-top:6px}
-.eh .btn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--ink);font-weight:700;font-size:.95rem;padding:.8rem 1.1rem;border-radius:11px;box-shadow:3px 3px 0 var(--ink);transition:transform .15s}
-.eh .btn:hover{transform:translate(-1px,-1px)}
+.eh .btn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--ink);font-weight:700;font-size:.95rem;padding:.8rem 1.1rem;border-radius:11px;box-shadow:3px 3px 0 var(--ink)}
+.eh .btn:hover{filter:brightness(.96)}
 .eh .txt{font-size:.9rem;font-weight:600;color:var(--ink);text-decoration:underline;text-underline-offset:4px}
 .eh .hero{padding:20px 0 40px}
 .eh .shapes{position:relative;height:190px;margin-bottom:6px}
@@ -62,8 +62,8 @@ const FRONT_CSS = `
 .eh .rec{padding:38px 0 42px}
 .eh .pills{list-style:none;padding:0;margin-top:18px;display:flex;flex-wrap:wrap;gap:10px}
 .eh .pills li{background:var(--paper);border:1.5px solid var(--ink);border-radius:999px;padding:.55rem .95rem;font-size:.95rem;font-weight:600}
-.eh .pills li:nth-child(2){transform:rotate(-1.2deg);background:var(--plumsoft)}
-.eh .pills li:nth-child(3){transform:rotate(1deg);background:var(--goldsoft)}
+.eh .pills li:nth-child(2){background:var(--plumsoft)}
+.eh .pills li:nth-child(3){background:var(--goldsoft)}
 .eh .after{margin-top:18px;color:var(--muted);max-width:52ch;font-size:.97rem}
 .eh .after b{color:var(--ink)}
 .eh .dark{background:var(--night);color:#F2ECE4;padding:44px 0 48px;position:relative;overflow:hidden}
@@ -73,8 +73,8 @@ const FRONT_CSS = `
 .eh .flow > div{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:14px 0;border-top:1px solid #2E2633}
 .eh .flow b{font-size:1.05rem;color:#fff}
 .eh .flow .ln{display:block;color:#B3A9BB;font-size:.93rem}
-.eh .flow .num{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--gold);color:var(--ink);font-weight:800;transform:rotate(-4deg)}
-.eh .flow > div:nth-child(even) .num{background:#B48CD0;transform:rotate(3deg)}
+.eh .flow .num{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--gold);color:var(--ink);font-weight:800}
+.eh .flow > div:nth-child(even) .num{background:#B48CD0}
 .eh .dark .ex{margin-top:18px;font-size:.93rem;color:#B3A9BB}
 .eh .dark .ex b{color:#fff}
 .eh .blob{position:absolute;right:-60px;top:-50px;width:200px}
