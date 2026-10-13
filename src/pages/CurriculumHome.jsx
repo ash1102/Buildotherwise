@@ -10,35 +10,57 @@ import { buildProgress, stepComplete } from "@/lib/progress";
 
 const INTEREST_FORM = "https://link.jotform.com/EhQXbmRwbk";
 
-const LOOP = ["Notice", "Try", "Reflect", "Decide"];
-
-const FIT = [
-  "You know you want something different but do not know what yet.",
-  "You have several possible directions and do not know which deserves your attention.",
-  "You keep trying things but struggle to tell what actually fits.",
-  "You have an interest but are not ready to turn it into a career or business.",
-  "You want a practical next step instead of another personality test.",
+const STEPS = [
+  {
+    label: "Notice",
+    does: "Pay attention to what keeps pulling at you.",
+    example: "“I keep watching furniture-restoration videos.”",
+  },
+  {
+    label: "Try",
+    does: "Take one small step you can undo.",
+    example: "Spend one Saturday refinishing a small table.",
+  },
+  {
+    label: "Reflect",
+    does: "Look at what actually happened, including what it cost.",
+    example: "“Loved the hands-on work. Hated the fumes. Lost track of time.”",
+  },
+  {
+    label: "Decide",
+    does: "Choose your next move: keep going, change it, or drop it.",
+    example: "Try it again, this time somewhere with ventilation.",
+  },
 ];
 
-const EXAMPLE = [
-  { label: "Notice", line: "“I keep watching furniture-restoration videos.”" },
-  { label: "Try", line: "Spend one Saturday helping refinish a small piece." },
-  { label: "Reflect", line: "“I liked the hands-on work, hated the fumes, and lost track of time.”" },
-  { label: "Decide", line: "Learn more, but next time test it in a ventilated workshop." },
+const FIT = [
+  "You want something different but can’t name it yet.",
+  "You have too many directions and no way to choose.",
+  "You keep trying things and can’t tell what fits.",
+  "You have an interest you’re not ready to bet on.",
+  "You’re done with personality tests and want an actual next step.",
+];
+
+const INCLUDES = [
+  "Getting Started plus Modules 1–5, at your own pace",
+  "Short lessons, each with a worked example",
+  "Space to write, and one clear next decision at the end of every step",
+  "No grades, scores or streaks",
+  "Your writing stays on your device unless you choose to share it",
 ];
 
 const PILOT_QUESTIONS = [
-  "Could participants understand and engage with the activities?",
-  "Were the experiments accessible, realistic and safe?",
-  "Did participants learn something useful from what they tried?",
-  "Were they able to make their own decisions about what to explore next?",
-  "Which activities helped, which created confusion, and what needs to change?",
+  "Does it make sense?",
+  "Are the experiments realistic and safe to try?",
+  "Do people learn something they can actually use?",
+  "Do people stay in charge of their own decisions?",
+  "Which parts help, and which get in the way?",
 ];
 
 const marigoldButton =
   "inline-flex items-center gap-2 rounded-lg bg-primary-soft px-5 py-3 text-[15px] font-semibold text-foreground transition hover:brightness-95";
 
-function InterestButton({ children = "Express interest in Pilot 1" }) {
+function InterestButton({ children = "Join the Pilot 1 list" }) {
   return (
     <a href={INTEREST_FORM} target="_blank" rel="noopener noreferrer" className={marigoldButton}>
       {children}
