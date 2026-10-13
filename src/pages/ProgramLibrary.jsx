@@ -215,11 +215,11 @@ export default function ProgramLibrary() {
             </ul>
           </div>
           <div className="workbook-card p-5">
-            <h4 className="font-heading text-[17px]">What it can't do yet</h4>
+            <h4 className="font-heading text-[17px]">What it can't do</h4>
             <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[13.5px] leading-relaxed text-ink-soft">
               <li>Show that Entrepalooza works. The first pilot hasn't run, so there are no results to report.</li>
               <li>Predict what happens for any one person. Studies describe groups, often in other countries and with different goals.</li>
-              <li>Make this treatment. Entrepalooza is an educational program, not therapy or a recovery program.</li>
+              <li>Turn this into treatment. Entrepalooza is an educational program, not therapy or a recovery program.</li>
             </ul>
           </div>
         </div>
