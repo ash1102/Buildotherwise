@@ -83,6 +83,38 @@ function settle(graph, layout, saved, box) {
   return result;
 }
 
+/** Stable small number from a string, so each line keeps the same gentle bend. */
+const bendFor = (id) => {
+  let h = 0;
+  for (let i = 0; i < id.length; i += 1) h = (h * 31 + id.charCodeAt(i)) | 0;
+  return ((Math.abs(h) % 100) / 100 - 0.5) * 2; // -1 … 1
+};
+
+/** A slightly curved, hand-drawn path between two points (pixel space). */
+const curve = (a, b, id, strength) => {
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2;
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const offset = bendFor(id) * Math.min(len * strength, 40);
+  const cx = mx + (-dy / len) * offset;
+  const cy = my + (dx / len) * offset;
+  return `M ${a.x.toFixed(1)} ${a.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+};
+
+const MAP_MOTION_CSS = `
+.lm-grow { stroke-dasharray: 1; stroke-dashoffset: 1; animation: lm-grow 900ms cubic-bezier(.3,.7,.2,1) forwards; }
+.lm-fade { opacity: 0; animation: lm-fade 700ms ease-out 350ms forwards; }
+.lm-appear { animation: lm-fade 500ms ease-out both; }
+@keyframes lm-grow { to { stroke-dashoffset: 0; } }
+@keyframes lm-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .lm-grow { animation: none; stroke-dashoffset: 0; }
+  .lm-fade, .lm-appear { animation: none; opacity: 1; }
+}
+`;
+
 const NUDGE_KEYS = {
   ArrowLeft: [-0.02, 0],
   ArrowRight: [0.02, 0],
@@ -138,14 +170,14 @@ export default function LifeMapCanvas({ graph, positions, selectedId, onSelect, 
     graph.sections.forEach((section) => {
       const hub = layout.sections[section.key];
       if (!hub) return;
-      lines.push({ id: `hub-${section.key}`, from: layout.hub, to: hub, chosen: false });
+      lines.push({ id: `hub-${section.key}`, from: layout.hub, to: hub, kind: "root" });
       section.nodes.forEach((node) => {
-        lines.push({ id: `stem-${node.id}`, from: hub, to: spots[node.id] || hub, chosen: false });
+        lines.push({ id: `stem-${node.id}`, from: hub, to: spots[node.id] || hub, kind: "stem" });
       });
     });
     graph.links.forEach(([a, b]) => {
       if (!spots[a] || !spots[b]) return;
-      lines.push({ id: `link-${a}-${b}`, from: spots[a], to: spots[b], chosen: true });
+      lines.push({ id: `link-${a}-${b}`, from: spots[a], to: spots[b], kind: "chosen" });
     });
     return lines;
   }, [graph, layout, spots]);
@@ -195,21 +227,59 @@ export default function LifeMapCanvas({ graph, positions, selectedId, onSelect, 
       style={{ minHeight: `${34 + Math.max(0, graph.nodes.length - 10) * 1.6}rem` }}
       className="relative h-[34rem] w-full overflow-hidden rounded-lg border border-border bg-card/60 sm:h-[38rem]"
     >
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        {edges.map((edge) => (
-          <line
-            key={edge.id}
-            x1={edge.from.x * 100}
-            y1={edge.from.y * 100}
-            x2={edge.to.x * 100}
-            y2={edge.to.y * 100}
-            stroke={edge.chosen ? "hsl(var(--accent-ink))" : "hsl(var(--border))"}
-            strokeWidth={edge.chosen ? 0.5 : 0.35}
-            strokeDasharray={edge.chosen ? "2 1.4" : undefined}
-            vectorEffect="non-scaling-stroke"
-          />
-        ))}
-      </svg>
+      <style>{MAP_MOTION_CSS}</style>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 50%, hsl(var(--primary) / 0.07), transparent 60%), radial-gradient(ellipse at 80% 15%, hsl(var(--accent-ink-soft) / 0.08), transparent 45%)",
+        }}
+      />
+      {box.w > 0 && box.h > 0 && (
+        <svg
+          className="absolute inset-0 h-full w-full"
+          viewBox={`0 0 ${box.w} ${box.h}`}
+          aria-hidden="true"
+        >
+          {edges.map((edge) => {
+            const a = { x: edge.from.x * box.w, y: edge.from.y * box.h };
+            const b = { x: edge.to.x * box.w, y: edge.to.y * box.h };
+            const d = curve(a, b, edge.id, edge.kind === "root" ? 0.12 : 0.22);
+            if (edge.kind === "chosen") {
+              return (
+                <path
+                  key={edge.id}
+                  className="lm-fade"
+                  d={d}
+                  fill="none"
+                  stroke="hsl(var(--accent-ink-soft))"
+                  strokeWidth={1.75}
+                  strokeLinecap="round"
+                  strokeDasharray="5 5"
+                />
+              );
+            }
+            const root = edge.kind === "root";
+            return (
+              <g key={edge.id}>
+                {root && (
+                  <path d={d} fill="none" stroke="hsl(var(--primary) / 0.08)" strokeWidth={9} strokeLinecap="round" />
+                )}
+                <path
+                  className="lm-grow"
+                  pathLength={1}
+                  d={d}
+                  fill="none"
+                  stroke={root ? "hsl(var(--primary) / 0.45)" : "hsl(var(--muted-foreground) / 0.45)"}
+                  strokeWidth={root ? 2 : 1.25}
+                  strokeLinecap="round"
+                />
+              </g>
+            );
+          })}
+        </svg>
+      )}
 
       <div
         className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 rounded-full border border-dashed border-primary/40 bg-background px-4 py-3 text-center"
@@ -225,7 +295,7 @@ export default function LifeMapCanvas({ graph, positions, selectedId, onSelect, 
         return (
           <div
             key={section.key}
-            className="absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-full border border-dashed border-border bg-card px-3 py-1.5"
+            className="lm-appear absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-full border border-dashed border-border bg-card px-3 py-1.5 shadow-sm"
             style={{ left: `${hub.x * 100}%`, top: `${hub.y * 100}%` }}
           >
             <span className={`h-1.5 w-1.5 rounded-full ${SECTION_DOT[section.key] || "bg-primary"}`} aria-hidden="true" />
@@ -259,7 +329,7 @@ export default function LifeMapCanvas({ graph, positions, selectedId, onSelect, 
               onSelect(node.id);
             }}
             style={{ left: `${spot.x * 100}%`, top: `${spot.y * 100}%` }}
-            className={`absolute -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none rounded-full border bg-background px-2.5 py-1 text-left shadow-sm transition ${
+            className={`lm-appear absolute -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none rounded-full border bg-background px-2.5 py-1 text-left shadow-[0_2px_8px_-2px_hsl(var(--primary)/0.25)] transition ${
               selectedId === node.id
                 ? "border-primary ring-2 ring-primary/30"
                 : "border-border hover:border-primary/60"
