@@ -46,7 +46,7 @@ export default function OnboardingSteps() {
           ))}
         </dl>
         <p className="mt-4 text-[13.5px] leading-relaxed text-ink-soft">
-          In the real sequence, these answers decide what you are offered next — including nothing at all, if that is
+          In the real sequence, these answers decide what you are offered next, including nothing at all, if that is
           what you asked for.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-4">

@@ -21,7 +21,7 @@ export default function StepList({ lessons, scopeLabel }) {
         <ol className="mt-3 divide-y divide-border border-y border-border">
           {lessons.map((lesson) => {
             const status = describeStep(lesson.code, answers, decisions, states);
-            const done = stepComplete(lesson, answers);
+            const done = stepComplete(lesson, answers, states);
             return (
               <li key={lesson.id || lesson.code}>
                 <Link
@@ -40,9 +40,7 @@ export default function StepList({ lessons, scopeLabel }) {
                     ) : null}
                     <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px] text-muted-faint">
                       <span>{lesson.duration_min ? `About ${lesson.duration_min} min` : lesson.type}</span>
-                      <span className={done ? "font-medium text-accent-ink" : undefined}>
-                        {done ? stepStatusLabel(status) : "One line still to write — any length"}
-                      </span>
+                      <span className={done ? "font-medium text-accent-ink" : undefined}>{stepStatusLabel(status)}</span>
                     </span>
                   </span>
                   <ArrowRight className="mt-1.5 h-4 w-4 shrink-0 text-muted-faint" aria-hidden="true" />

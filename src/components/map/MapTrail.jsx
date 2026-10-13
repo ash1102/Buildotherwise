@@ -75,7 +75,7 @@ export default function MapTrail({ trail }) {
                         <Link
                           key={step.code}
                           to={`/lesson/${step.code}`}
-                          aria-label={`${step.title} — ${STATE_LABEL[step.status]}`}
+                          aria-label={`${step.title}, ${STATE_LABEL[step.status]}`}
                           className={`inline-flex max-w-full items-center gap-2 rounded-md border px-3 py-1.5 text-[14px] transition hover:bg-secondary ${STATE_STYLE[step.status]}`}
                         >
                           <span className="font-medium">{step.order}</span>

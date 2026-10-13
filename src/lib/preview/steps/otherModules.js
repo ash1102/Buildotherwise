@@ -68,7 +68,7 @@ export const otherModules = [
     pilot: "optional_after",
     kind: "module",
     purpose: "Ask people and reality, not only your own head.",
-    readings: [draftReading("M6-R1", "Draft reading — to be written from this module’s own lesson text")],
+    readings: [draftReading("M6-R1", "Draft reading: to be written from this module’s own lesson text")],
     steps: [
       { code: "M6-L1", title: "Start with a question, not a pitch", sourceLesson: "M6-L1", readings: ["M6-R1"], blocks: [] },
       { code: "M6-L2", title: "Gather and sort outside evidence", sourceLesson: "M6-L2", readings: [], blocks: [] },
@@ -84,7 +84,7 @@ export const otherModules = [
     pilot: "optional_after",
     kind: "module",
     purpose: "Name one bounded try, do it or plan it, and record what it taught.",
-    readings: [draftReading("M7-R1", "Draft reading — to be written from this module’s own lesson text")],
+    readings: [draftReading("M7-R1", "Draft reading: to be written from this module’s own lesson text")],
     steps: [
       { code: "M7-L1", title: "Name the try", sourceLesson: "M7-L1", readings: ["M7-R1"], blocks: [] },
       {
@@ -168,7 +168,7 @@ export const otherModules = [
     pilot: "optional_after",
     kind: "module",
     purpose: "Count the real cost and set an affordability boundary.",
-    readings: [draftReading("M8-R1", "Draft reading — to be written from this module’s own lesson text")],
+    readings: [draftReading("M8-R1", "Draft reading: to be written from this module’s own lesson text")],
     steps: [
       { code: "M8-L1", title: "Map what this try or next step actually cost", sourceLesson: "M8-L1", readings: ["M8-R1"], blocks: [] },
       { code: "M8-L2", title: "Count labour, name real constraints, set an affordability boundary", sourceLesson: "M8-L2", readings: [], blocks: [] },
@@ -202,7 +202,7 @@ export const otherModules = [
     pilot: "optional_after",
     kind: "module",
     purpose: "Choose a direction that fits the capacity you actually have.",
-    readings: [draftReading("M9-R1", "Draft reading — to be written from this module’s own lesson text")],
+    readings: [draftReading("M9-R1", "Draft reading: to be written from this module’s own lesson text")],
     steps: [
       { code: "M9-L1", title: "Review the evidence and redefine success-now", sourceLesson: "M9-L1", readings: ["M9-R1"], blocks: [] },
       { code: "M9-L2", title: "Pick a direction card that fits your capacity", sourceLesson: "M9-L2", readings: [], blocks: [] },

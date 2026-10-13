@@ -152,7 +152,7 @@ export default function JournalPage() {
       entry.body || "(empty)",
     ];
     followUpsFor(entry.id).forEach((item) => {
-      parts.push("", `## Follow-up — ${moment(item.created_date).format("D MMMM YYYY, HH:mm")}`, "", item.body || "(empty)");
+      parts.push("", `## Follow-up, ${moment(item.created_date).format("D MMMM YYYY, HH:mm")}`, "", item.body || "(empty)");
     });
     downloadText(`entrepalooza-journal-${moment(entry.created_date).format("YYYY-MM-DD")}.md`, parts.join("\n"));
     toast({ title: "Entry exported." });
@@ -163,7 +163,7 @@ export default function JournalPage() {
       .slice()
       .reverse()
       .map((entry) => {
-        const where = entry.lesson_title ? ` — ${entry.lesson_code} ${entry.lesson_title}` : "";
+        const where = entry.lesson_title ? `, ${entry.lesson_code} ${entry.lesson_title}` : "";
         return `## ${entry.kind === "free" ? entry.prompt_label || "Personal entry" : entry.prompt_label || "Lesson response"}${where}\n_${moment(
           entry.created_date
         ).format("D MMMM YYYY, HH:mm")}_\n\n${entry.body || "(empty)"}\n`;
@@ -196,7 +196,7 @@ export default function JournalPage() {
           </Button>
         </div>
         <div className="mt-3">
-          <PrivacyNote>Your journal lives in this browser until you share an entry.</PrivacyNote>
+          <PrivacyNote>Saved on this device only.</PrivacyNote>
         </div>
       </header>
 
@@ -227,7 +227,7 @@ export default function JournalPage() {
             onClick={() => {
               const chosen = entries.filter((entry) => selected.includes(entry.id));
               setPending({
-                label: `${chosen.length} selected ${chosen.length === 1 ? "entry" : "entries"} — ${chosen
+                label: `${chosen.length} selected ${chosen.length === 1 ? "entry" : "entries"}: ${chosen
                   .map((entry) => entry.lesson_title || "personal entries")
                   .join("; ")}`,
                 body: chosen
@@ -347,7 +347,7 @@ export default function JournalPage() {
                             onExport={exportEntry}
                             onShare={(item) =>
                               setPending({
-                                label: `One entry — ${item.prompt_label || "personal entry"}${
+                                label: `One entry, ${item.prompt_label || "personal entry"}${
                                   item.lesson_title ? `, from ${item.lesson_title}` : ""
                                 }, written ${moment(item.created_date).format("D MMMM YYYY")}`,
                                 body: item.body,
@@ -375,8 +375,8 @@ export default function JournalPage() {
           Changing your mind
         </h2>
         <p className="mt-2 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-          Deleting an entry here removes it from this browser. Sharing only ever sends what you confirm above — one entry
-          or the entries you ticked — and never your whole journal.
+          Deleting an entry here removes it from this device. Sharing only sends what you confirm above, one entry
+          or the entries you ticked, and never your whole journal.
         </p>
       </section>
     </div>

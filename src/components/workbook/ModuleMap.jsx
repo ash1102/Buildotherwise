@@ -28,8 +28,8 @@ export default function ModuleMap({ modules, lessonsByOrder, answers, decisions,
   // The gate is worked out from every container, Getting Started included, so the
   // numbered modules wait on it. Only the numbered modules are listed below.
   const progress = useMemo(
-    () => buildProgress({ modules, lessonsByOrder, answers }),
-    [modules, lessonsByOrder, answers]
+    () => buildProgress({ modules, lessonsByOrder, answers, states }),
+    [modules, lessonsByOrder, answers, states]
   );
   const numbered = modules.filter((module) => module.kind !== "orientation");
 
@@ -69,9 +69,8 @@ export default function ModuleMap({ modules, lessonsByOrder, answers, decisions,
                 <p className="mt-3 max-w-2xl text-[13px] leading-relaxed text-muted-faint">
                   {/* The steps before this one are its own requirement. They are not named here, so no
                       earlier section reads as part of this module. */}
-                  Opens when {blocker.label}'s journal is complete.{" "}
-                  {blocker.missing.length} {blocker.missing.length === 1 ? "step still needs" : "steps still need"} one
-                  line.
+                  Opens when {blocker.label} is done. {blocker.missing.length}{" "}
+                  {blocker.missing.length === 1 ? "step is" : "steps are"} still open.
                 </p>
               ) : null}
             </div>
@@ -86,7 +85,7 @@ export default function ModuleMap({ modules, lessonsByOrder, answers, decisions,
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-2 text-[14px] text-accent-ink">
-                  {lessons.length} steps{done ? ` · ${done} with a line saved` : ""}
+                  {lessons.length} steps{done ? ` · ${done} done` : ""}
                   <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                 </span>
               )}

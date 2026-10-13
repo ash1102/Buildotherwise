@@ -18,7 +18,7 @@ function join(head, tail) {
  * own speech service — this app records nothing, keeps no audio, and costs nothing.
  * The short note is the default so the explanation is not repeated under every box.
  */
-export default function DictateButton({ value, onText, compact = false }) {
+export default function DictateButton({ value, onText, getValue }) {
   const [listening, setListening] = useState(false);
   const [note, setNote] = useState("");
   const engine = useRef(null);
@@ -39,7 +39,7 @@ export default function DictateButton({ value, onText, compact = false }) {
 
   const start = () => {
     if (!Engine) {
-      setNote("Dictation isn’t available in this browser — you can keep typing.");
+      setNote("Dictation isn’t available in this browser. You can keep typing.");
       return;
     }
     const next = new Engine();
@@ -60,21 +60,21 @@ export default function DictateButton({ value, onText, compact = false }) {
       const blocked = event.error === "not-allowed" || event.error === "service-not-allowed";
       setNote(
         blocked
-          ? "Microphone access is blocked. Your words are untouched — you can keep typing or ask for microphone access."
+          ? "Microphone access is blocked. Your words are untouched. You can keep typing."
           : "Dictation stopped. What you wrote is still here; start it again or keep typing."
       );
       setListening(false);
     };
     next.onend = () => setListening(false);
     engine.current = next;
-    base.current = value || "";
+    base.current = (getValue ? getValue() : value) || "";
     spoken.current = "";
     setNote("");
     setListening(true);
     try {
       next.start();
     } catch (error) {
-      setNote("Dictation couldn’t start. Nothing you wrote was changed — you can keep typing.");
+      setNote("Dictation couldn’t start. Nothing you wrote was changed. You can keep typing.");
       setListening(false);
     }
   };
@@ -96,12 +96,14 @@ export default function DictateButton({ value, onText, compact = false }) {
       {listening ? (
         <span aria-live="polite" className="inline-flex items-center gap-1.5 text-[14px] text-accent-ink">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" aria-hidden="true" />
-          Listening — speak, then stop when you’re done.
+          Listening. Speak, then stop when you’re done.
         </span>
       ) : null}
-      <span aria-live="polite" className={`text-[14px] leading-snug ${note ? "text-destructive" : "text-muted-faint"}`}>
-        {note || (compact ? "Typing stays open either way." : "Typing stays open either way. Speech goes to your browser’s own speech service; no audio is recorded or stored here.")}
-      </span>
+      {note ? (
+        <span aria-live="polite" className="text-[14px] leading-snug text-destructive">
+          {note}
+        </span>
+      ) : null}
     </span>
   );
 }

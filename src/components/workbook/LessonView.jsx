@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import Prose from "./Prose";
@@ -12,8 +12,33 @@ import StepHeader from "./StepHeader";
 import FeedbackForm from "./FeedbackForm";
 import LessonBeats from "./LessonBeats";
 import WorkedExample from "./WorkedExample";
-import SourceDetails from "./SourceDetails";
-import { participationRoutesFor, routeGuidanceFor } from "@/lib/workbook";
+import DictateButton from "./DictateButton";
+import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor } from "@/lib/workbook";
+
+function TalkBar({ hasRoutes, talking, onSay, onWrite, getValue, onText }) {
+  if (hasRoutes && !talking) return null;
+
+  const chip = (active) =>
+    `rounded-md border px-3.5 py-2 text-[15px] transition ${
+      active ? "border-accent-ink bg-accent-ink text-white" : "border-input bg-card text-foreground hover:bg-secondary"
+    }`;
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      {hasRoutes ? null : (
+        <>
+          <button type="button" aria-pressed={talking} onClick={onSay} className={chip(talking)}>
+            Say it
+          </button>
+          <button type="button" aria-pressed={!talking} onClick={onWrite} className={chip(!talking)}>
+            Write it
+          </button>
+        </>
+      )}
+      {talking ? <DictateButton getValue={getValue} onText={onText} value="" /> : null}
+    </div>
+  );
+}
 
 export default function LessonView({
   lesson,
@@ -24,9 +49,7 @@ export default function LessonView({
   next,
   nextIsModule,
   workbookLink,
-  answers,
   decisions,
-  states,
   route,
   onRouteChange,
   onDecisionChange,
@@ -35,16 +58,40 @@ export default function LessonView({
   carrySources,
   status,
 }) {
-  const tryPrompts = lesson.try_prompts || [];
-  const reflectPrompts = lesson.reflect_prompts || [];
+  const decisionOptions = decisionOptionsFor(lesson);
+  const optionNames = new Set(decisionOptions.map((option) => option.trim().toLowerCase()));
+  const decisionStep = lesson.type === "next_decision";
+  const rawTry = lesson.try_prompts || [];
+  const rawReflect = lesson.reflect_prompts || [];
+  const notAnOption = (prompt) => !optionNames.has(String(prompt).trim().toLowerCase());
+  const tryPrompts = rawTry.map((prompt, index) => ({ prompt, index })).filter((item) => notAnOption(item.prompt));
+  const reflectPrompts = rawReflect
+    .map((prompt, index) => ({ prompt, index }))
+    .filter((item) => notAnOption(item.prompt));
   const routes = participationRoutesFor(lesson);
   const guidance = routeGuidanceFor(route);
+  const hasRoutes = routes.length > 0;
   const oneLine = guidance ? guidance.field === "line" : false;
-  const [showSource, setShowSource] = useState(false);
+  const [sayIt, setSayIt] = useState(false);
+  const talking = hasRoutes ? Boolean(guidance && guidance.voice) : sayIt;
+  const fieldApis = useRef({});
+  const activeField = useRef(null);
 
-  // A decision is only asked for where there is something to decide about, and only
-  // where the step itself calls for one. Saved decisions are never touched.
-  const asksForDecision = lesson.has_decision !== false && (tryPrompts.length > 0 || reflectPrompts.length > 0);
+  const bindField = useCallback((key, api) => {
+    if (api) fieldApis.current[key] = api;
+    else delete fieldApis.current[key];
+  }, []);
+
+  const currentApi = () => {
+    const key = activeField.current;
+    if (key && fieldApis.current[key]) return fieldApis.current[key];
+    const first = Object.keys(fieldApis.current)[0];
+    return first ? fieldApis.current[first] : null;
+  };
+
+  const asksForDecision =
+    lesson.has_decision !== false &&
+    (decisionStep || (lesson.decision_options || []).length > 0 || rawTry.length > 0 || rawReflect.length > 0);
 
   const promptField = (prompt, index, key) => (
     <PromptField
@@ -56,16 +103,30 @@ export default function LessonView({
       route={route}
       variant="inline"
       compact={oneLine}
+      fieldKey={key}
+      onBind={bindField}
+      onActivate={(fieldKey) => {
+        activeField.current = fieldKey;
+      }}
     />
   );
 
-  const pauseNote =
-    guidance && guidance.paused ? (
-      <div className="rounded-md border border-dashed border-input bg-secondary p-3">
-        <p className="text-[15px] leading-relaxed text-muted-foreground">
-          Paused after one line. That line is saved, and this step stays here until you want it again.
-        </p>
-      </div>
+  const talkControl =
+    tryPrompts.length || reflectPrompts.length ? (
+      <TalkBar
+        hasRoutes={hasRoutes}
+        talking={talking}
+        onSay={() => setSayIt(true)}
+        onWrite={() => setSayIt(false)}
+        getValue={() => {
+          const api = currentApi();
+          return api ? api.getValue() : "";
+        }}
+        onText={(text) => {
+          const api = currentApi();
+          if (api) api.setValue(text);
+        }}
+      />
     ) : null;
 
   const beats = [];
@@ -73,7 +134,7 @@ export default function LessonView({
   if (lesson.readings_note) {
     beats.push({
       key: "reference",
-      label: "Reference for this step",
+      label: "Look at this",
       tone: "out",
       content: <Prose text={lesson.readings_note} />,
     });
@@ -82,7 +143,7 @@ export default function LessonView({
   if (lesson.teach) {
     beats.push({
       key: "teach",
-      label: "Teaching",
+      label: "Try this",
       content: <Prose text={lesson.teach} />,
     });
   }
@@ -90,7 +151,7 @@ export default function LessonView({
   if (lesson.show) {
     beats.push({
       key: "show",
-      label: "See an example.",
+      label: "See the example",
       tone: "show",
       content: <WorkedExample text={lesson.show} />,
     });
@@ -112,33 +173,33 @@ export default function LessonView({
     });
   }
 
-  beats.push({
-    key: "route",
-    label: "How you'll write",
-    content: (
-      <div className="space-y-3">
-        <RouteChips routes={routes} value={route} onChange={onRouteChange} />
-        <PrivacyNote />
-      </div>
-    ),
-  });
-
-  const exampleAgain = lesson.show ? { key: "show", label: "See the example again" } : null;
+  if (hasRoutes) {
+    beats.push({
+      key: "route",
+      label: "How you'll write",
+      content: (
+        <div className="space-y-3">
+          <RouteChips routes={routes} value={route} onChange={onRouteChange} />
+          <PrivacyNote />
+        </div>
+      ),
+    });
+  }
 
   if (tryPrompts.length) {
     beats.push({
       key: "try",
       label: "Try",
-      reopen: exampleAgain,
       content: (
         <div className="space-y-6">
+          {talkControl}
+          {hasRoutes ? null : <PrivacyNote />}
           {carrySources && carrySources.length ? (
             <CarryForward sources={carrySources} selected={carried} onChange={onCarriedChange} />
           ) : null}
           <div className="space-y-6">
-            {tryPrompts.map((prompt, index) => promptField(prompt, index, `try-${index}`))}
+            {tryPrompts.map((item) => promptField(item.prompt, item.index, `try-${item.index}`))}
           </div>
-          {pauseNote}
         </div>
       ),
     });
@@ -148,20 +209,13 @@ export default function LessonView({
     beats.push({
       key: "reflect",
       label: "Reflect",
-      reopen: exampleAgain,
       content: (
         <div className="space-y-6">
-          {reflectPrompts.map((prompt, index) => promptField(prompt, index, `reflect-${index}`))}
+          {tryPrompts.length ? null : talkControl}
+          {tryPrompts.length || hasRoutes ? null : <PrivacyNote />}
+          {reflectPrompts.map((item) => promptField(item.prompt, item.index, `reflect-${item.index}`))}
         </div>
       ),
-    });
-  }
-
-  if (!tryPrompts.length && !reflectPrompts.length && pauseNote) {
-    beats.push({
-      key: "pause",
-      label: "Writing",
-      content: pauseNote,
     });
   }
 
@@ -169,36 +223,24 @@ export default function LessonView({
     beats.push({
       key: "decision",
       label: "Next decision",
-      content: <DecisionPicker value={decisions[lesson.code] || ""} onChange={onDecisionChange} />,
+      content: (
+        <DecisionPicker
+          value={decisions[lesson.code] || ""}
+          onChange={onDecisionChange}
+          options={decisionOptions}
+        />
+      ),
     });
   }
 
-  // The step ends in one compact section rather than another round of screens.
-  beats.push({
-    key: "ending",
-    label: "Wrapping up",
-    tone: "out",
-    content: (
-      <div className="space-y-4">
-        {lesson.what_comes_out ? (
-          <p className="max-w-[68ch] text-[17px] leading-relaxed text-foreground">{lesson.what_comes_out}</p>
-        ) : null}
-        <p className="text-[15px] leading-relaxed text-muted-foreground">
-          What makes this step count: one line in any Try or Reflect box. Short counts the same as long, and “I don’t know
-          yet” is a complete answer.
-        </p>
-        <SourceDetails
-          open={showSource}
-          onToggle={() => setShowSource((value) => !value)}
-          approvalState={lesson.approval_state}
-          approvalNote={lesson.approval_note}
-          approvedSource={lesson.approved_source}
-          approvedVersion={lesson.approved_version}
-          boundary={lesson.boundary}
-        />
-      </div>
-    ),
-  });
+  if (lesson.what_comes_out) {
+    beats.push({
+      key: "ending",
+      label: "Wrapping up",
+      tone: "out",
+      content: <p className="max-w-[68ch] text-[17px] leading-relaxed text-foreground">{lesson.what_comes_out}</p>,
+    });
+  }
 
   return (
     <article className="space-y-6">
@@ -212,8 +254,7 @@ export default function LessonView({
         status={status}
       />
 
-      {/* Keyed by step so a new step always starts on its own first section. */}
-      <LessonBeats key={lesson.code} beats={beats} />
+      {beats.length ? <LessonBeats key={lesson.code} beats={beats} /> : null}
 
       <FeedbackForm moduleOrder={lesson.module_order} lessonCode={lesson.code} />
 

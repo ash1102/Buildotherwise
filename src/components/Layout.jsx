@@ -1,10 +1,13 @@
 import React from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { JournalProvider } from "@/components/journal/JournalContext";
 import JournalWidget from "@/components/journal/JournalWidget";
 import SiteHeader from "@/components/SiteHeader";
 
 export default function Layout() {
+  const { pathname } = useLocation();
+  const preview = pathname.startsWith("/preview");
+
   return (
     <JournalProvider>
       <div className="flex min-h-screen flex-col">
@@ -23,19 +26,15 @@ export default function Layout() {
               <Link to="/contact" className="font-medium text-accent-ink underline underline-offset-2">
                 Contact the program team
               </Link>
-              <Link to="/connect" className="font-medium text-accent-ink underline underline-offset-2">
-                Connect an AI assistant
-              </Link>
             </div>
             <p>
-              Pilot 1 covers Getting Started and Modules 1–5. What you write in the workbook and your journal stays in
-              this browser until you choose to share it. Contact messages, feedback and Tribe Thread replies are sent
-              only when you submit them.
+              Pilot 1 covers Getting Started and Modules 1–5.{" "}
+              {preview
+                ? "Preview answers are saved to your account when you choose save."
+                : "What you write in the workbook and your journal is saved on this device only."}{" "}
+              Contact messages, feedback, and Tribe Thread replies are sent only when you submit them.
             </p>
-            <p className="mt-2">
-              This is an educational workbook, not therapy or treatment. Support and concern contacts are still being
-              confirmed.
-            </p>
+            <p className="mt-2">This is an educational workbook, not therapy or treatment.</p>
           </div>
         </footer>
 

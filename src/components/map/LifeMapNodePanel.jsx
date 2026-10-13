@@ -119,7 +119,7 @@ export default function LifeMapNodePanel({
 
       {node.source_code ? (
         <p className="mt-4 border-l-2 border-primary/30 pl-3 text-[13px] leading-relaxed text-muted-foreground">
-          Brought in from {node.source_label || "a step"} —{" "}
+          Brought in from {node.source_label || "a step"}.{" "}
           <Link to={`/lesson/${node.source_code}`} className="text-primary underline decoration-border underline-offset-4">
             open that step
           </Link>
@@ -141,7 +141,7 @@ export default function LifeMapNodePanel({
               <option value="">No link</option>
               {entries.slice(0, 40).map((entry) => (
                 <option key={entry.id} value={entry.id}>
-                  {(entry.lesson_title || "Written freely") + " — " + entry.body.slice(0, 50)}
+                  {(entry.lesson_title || "Written freely") + ": " + entry.body.slice(0, 50)}
                 </option>
               ))}
             </select>
@@ -178,7 +178,7 @@ export default function LifeMapNodePanel({
                 ))}
             </select>
           ) : (
-            <p className="mt-2 text-[13px] text-muted-faint">One line so far — connections appear once there are two.</p>
+            <p className="mt-2 text-[13px] text-muted-faint">One line so far. Connections appear once there are two.</p>
           )}
 
           {linked.length ? (

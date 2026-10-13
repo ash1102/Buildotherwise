@@ -4,7 +4,7 @@ const ITEMS = [
   "No diagnosis, personality types, or guesses at hidden motives.",
   "No scoring of readiness, motivation, purpose, or potential.",
   "No action plan unless you ask for one.",
-  "Only your entries, brought in by you — never anyone else's journal.",
+  "Only your entries, brought in by you. Never anyone else's journal.",
   "A carry-forward note is drafted for your approval, never saved for you.",
 ];
 

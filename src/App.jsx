@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -16,7 +16,6 @@ import LifeMapPage from '@/pages/LifeMapPage';
 import DiscoveryRecordPage from '@/pages/DiscoveryRecordPage';
 import ProgramLibrary from '@/pages/ProgramLibrary';
 import TribeThreads from '@/pages/TribeThreads';
-import JournalReflection from '@/pages/JournalReflection';
 import AspectIndex from '@/pages/AspectIndex';
 import AspectPage from '@/pages/AspectPage';
 import DiscoveryMapPage from '@/pages/DiscoveryMapPage';
@@ -35,6 +34,24 @@ import PreviewModulePage from '@/pages/preview/PreviewModulePage';
 import PreviewStepPage from '@/pages/preview/PreviewStepPage';
 import PreviewNotes from '@/pages/preview/PreviewNotes';
 import PreviewReview from '@/pages/preview/PreviewReview';
+
+function AdminOnly() {
+  const { user, isAuthenticated, isLoadingAuth, isLoadingPublicSettings } = useAuth();
+
+  if (isLoadingAuth || isLoadingPublicSettings) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || user?.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+}
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -75,20 +92,20 @@ const AuthenticatedApp = () => {
           <Route path="/record" element={<DiscoveryRecordPage />} />
           <Route path="/program-library" element={<ProgramLibrary />} />
           <Route path="/tribe-threads" element={<TribeThreads />} />
-          <Route path="/journal-reflection" element={<JournalReflection />} />
-          <Route path="/aspects" element={<AspectIndex />} />
+        <Route path="/aspects" element={<AspectIndex />} />
           <Route path="/aspect/:slug" element={<AspectPage />} />
         </Route>
         <Route path="/lesson/:code" element={<LessonPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/connect" element={<Connect />} />
-        {/* The review copy of the updated course. Readable without an account so it can be reviewed; saving needs one. */}
-        <Route path="/preview" element={<PreviewHome />} />
-        <Route path="/preview/module/:slug" element={<PreviewModulePage />} />
-        <Route path="/preview/step/:code" element={<PreviewStepPage />} />
-        <Route path="/preview/notes" element={<PreviewNotes />} />
-        <Route path="/preview/review" element={<PreviewReview />} />
+        <Route element={<AdminOnly />}>
+          <Route path="/preview" element={<PreviewHome />} />
+          <Route path="/preview/module/:slug" element={<PreviewModulePage />} />
+          <Route path="/preview/step/:code" element={<PreviewStepPage />} />
+          <Route path="/preview/notes" element={<PreviewNotes />} />
+          <Route path="/preview/review" element={<PreviewReview />} />
+        </Route>
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />

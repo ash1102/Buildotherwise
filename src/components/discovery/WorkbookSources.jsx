@@ -108,7 +108,7 @@ export default function WorkbookSources() {
                           to={`/lesson/${item.lesson_code}`}
                           className="font-medium text-accent-ink underline underline-offset-2"
                         >
-                          From {item.lesson_code} — {item.lesson_title}
+                          From {item.lesson_code}, {item.lesson_title}
                         </Link>
                       ) : null}
                       <Button
@@ -131,7 +131,7 @@ export default function WorkbookSources() {
           {nothingEligible ? (
             <p className="text-[16px] leading-relaxed text-muted-foreground">
               {allLines
-                ? `${allLines} ${allLines === 1 ? "line is" : "lines are"} saved in steps. None of them feeds the Discovery Record yet — the record's own questions sit in Modules 1–5, and your answers appear here as you reach them.`
+                ? `${allLines} ${allLines === 1 ? "line is" : "lines are"} saved in steps. None of them feeds the Discovery Record yet. The record's own questions sit in Modules 1–5, and your answers appear here as you reach them.`
                 : "Nothing saved from the steps yet. This stays available whenever there is something to gather."}{" "}
               <Link to="/" className="font-medium text-accent-ink underline underline-offset-2">
                 Open the workbook

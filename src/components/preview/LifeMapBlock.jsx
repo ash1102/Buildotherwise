@@ -95,7 +95,7 @@ export default function LifeMapBlock({ block, record, onSave, saving, canSave })
     const connectionLines = connections.map((pair) => {
       const a = cards.find((card) => card.id === pair[0]);
       const b = cards.find((card) => card.id === pair[1]);
-      return `Connected: ${a ? a.text : "a removed card"} — ${b ? b.text : "a removed card"}`;
+      return `Connected: ${a ? a.text : "a removed card"}, ${b ? b.text : "a removed card"}`;
     });
     const fieldLines = joinSummary(
       (block.fields || []).map((field) => ({ label: field.label, value: (values.fields || {})[field.id] }))

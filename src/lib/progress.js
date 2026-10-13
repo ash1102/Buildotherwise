@@ -1,4 +1,4 @@
-import { answerKey } from "./workbook";
+import { answerKey, routeSkipsWriting } from "./workbook";
 import { isOpenerLesson } from "./curriculum";
 
 /**
@@ -25,8 +25,10 @@ export function missingPrompts(lesson, answers) {
   return requiredPrompts(lesson).filter((prompt) => isBlank((answers || {})[answerKey(lesson.code, prompt.index)]));
 }
 
-/** One nonblank line in any Try or Reflect box is enough. A step with no such box never blocks. */
-export function stepComplete(lesson, answers) {
+/** A line in any Try or Reflect box is enough. Watch and Pass count without one. A step with no box never blocks. */
+export function stepComplete(lesson, answers, states) {
+  const route = states && lesson ? states[lesson.code] : "";
+  if (routeSkipsWriting(route)) return true;
   const prompts = requiredPrompts(lesson);
   if (!prompts.length) return true;
   return prompts.some((prompt) => !isBlank((answers || {})[answerKey(lesson.code, prompt.index)]));
@@ -44,7 +46,7 @@ function isComingLater(module) {
  * Module 2 waits on Getting Started and Module 1. A coming-later module is never
  * drawn as locked, because nothing about it is waiting on the journal.
  */
-export function buildProgress({ modules, lessonsByOrder, answers }) {
+export function buildProgress({ modules, lessonsByOrder, answers, states }) {
   const ordered = (modules || []).slice().sort((a, b) => a.order - b.order);
 
   const byOrder = {};
@@ -59,7 +61,7 @@ export function buildProgress({ modules, lessonsByOrder, answers }) {
      * of Getting Started's steps, so it never counts here and nothing waits on it.
      */
     const lessons = ((lessonsByOrder || {})[module.order] || []).filter((lesson) => !isOpenerLesson(lesson));
-    const incomplete = lessons.filter((lesson) => !stepComplete(lesson, answers));
+    const incomplete = lessons.filter((lesson) => !stepComplete(lesson, answers, states));
 
     byOrder[module.order] = {
       order: module.order,

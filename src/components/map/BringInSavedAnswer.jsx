@@ -27,7 +27,7 @@ export default function BringInSavedAnswer({ options, onAdd }) {
       {options.length ? (
         <>
           <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">
-            Answers you already wrote in a Try or Reflect box — bringing one in creates a node, and does not copy anything
+            Answers you already wrote in a Try or Reflect box. Bringing one in creates a node, and does not copy anything
             back into the step.
           </p>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row">
@@ -43,7 +43,7 @@ export default function BringInSavedAnswer({ options, onAdd }) {
               <option value="">Choose a saved answer…</option>
               {options.map((option) => (
                 <option key={option.key} value={option.key}>
-                  {option.lessonTitle} — {option.stepLabel}: {option.value.slice(0, 50)}
+                  {option.lessonTitle}, {option.stepLabel}: {option.value.slice(0, 50)}
                 </option>
               ))}
             </select>

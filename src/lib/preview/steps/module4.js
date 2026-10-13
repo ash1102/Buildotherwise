@@ -27,7 +27,7 @@ const swappableExample = {
   version: "1.0",
   type: "example",
   part: "lesson",
-  title: "Example block — swappable, not approved yet",
+  title: "Example block: swappable, not approved yet",
   invented: false,
   swappable: true,
   tag: TAG.PROPOSED,

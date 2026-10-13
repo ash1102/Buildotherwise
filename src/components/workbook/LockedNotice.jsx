@@ -12,20 +12,18 @@ export default function LockedNotice({ module, blocking, missing }) {
   const blockingName = blocking
     ? blocking.kind === "orientation"
       ? "Getting Started"
-      : `Module ${blocking.order}${blocking.title ? ` — ${blocking.title}` : ""}`
+      : `Module ${blocking.order}${blocking.title ? `: ${blocking.title}` : ""}`
     : "the section before this one";
 
   return (
     <section className="rounded-xl border border-dashed border-input bg-card p-5 sm:p-6">
       <p className="workbook-label">Not open yet</p>
       <h2 className="mt-2">
-        {module ? `Module ${module.order} — ${module.title}` : "This module"} opens once the journal has your lines
+        {module ? `Module ${module.order}: ${module.title}` : "This module"} opens once the earlier steps are done
       </h2>
       <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-        One line in any Try or Reflect box is all a step needs, and any length counts — “I don’t know yet” is a complete
-        answer.{" "}
         {steps.length
-          ? `${steps.length} ${steps.length === 1 ? "step still needs" : "steps still need"} a line in ${blockingName}.`
+          ? `${steps.length} ${steps.length === 1 ? "step is" : "steps are"} still open in ${blockingName}.`
           : null}
       </p>
 

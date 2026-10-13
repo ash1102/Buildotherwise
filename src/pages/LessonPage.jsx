@@ -60,8 +60,8 @@ export default function LessonPage() {
   );
 
   const progress = useMemo(
-    () => buildProgress({ modules, lessonsByOrder, answers }),
-    [modules, lessonsByOrder, answers]
+    () => buildProgress({ modules, lessonsByOrder, answers, states }),
+    [modules, lessonsByOrder, answers, states]
   );
 
   if (loading) {
@@ -88,7 +88,7 @@ export default function LessonPage() {
     ? "Begin here"
     : module.kind === "orientation"
       ? "Getting Started"
-      : `Module ${module.order} — ${module.title}`;
+      : `Module ${module.order}: ${module.title}`;
   const workbookLink = opener ? "/" : module.kind === "orientation" ? "/getting-started" : `/module/${module.slug}`;
 
   // A module that was never built into the pilot is a different state from one that is waiting on writing.

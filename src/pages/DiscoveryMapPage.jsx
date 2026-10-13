@@ -58,11 +58,11 @@ export default function DiscoveryMapPage() {
         <p className="workbook-label">Discovery Map</p>
         <h1 className="mt-2">What you have saved, and what came of it</h1>
         <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-          This page is drawn from work that already exists — lines you saved in steps, choices you recorded, entries you
+          This page is drawn from work that already exists. Lines you saved in steps, choices you recorded, entries you
           kept. There is nothing extra to fill in, and nothing here is a score.
         </p>
         <div className="mt-3 max-w-[68ch]">
-          <PrivacyNote>Kept in this browser only, on this device.</PrivacyNote>
+          <PrivacyNote />
         </div>
       </header>
 

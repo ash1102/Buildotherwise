@@ -10,7 +10,7 @@ export default function ComingLaterNotice({ module }) {
     <section className="rounded-xl border border-dashed border-input bg-card p-5 sm:p-6">
       <p className="workbook-label">Coming later</p>
       <h2 className="mt-2">
-        {module ? `Module ${module.order} — ${module.title}` : "This module"} is not part of Pilot 1
+        {module ? `Module ${module.order}: ${module.title}` : "This module"} is not part of Pilot 1
       </h2>
       <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
         Pilot 1 covers Getting Started and Modules 1–5. This module is written but not built into the pilot yet, so no

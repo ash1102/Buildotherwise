@@ -21,6 +21,10 @@
       "type": "string",
       "description": "What the person chose to send. Only ever what they explicitly submitted."
     },
+    "email": {
+      "type": "string",
+      "description": "Reply address, only when the person typed one on the contact form."
+    },
     "description": {
       "type": "string",
       "description": "Optional short text about this record (up to 1000 characters), used for search and previews."

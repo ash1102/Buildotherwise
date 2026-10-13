@@ -36,7 +36,7 @@ export const module2 = {
           title: "Boundary",
           tag: TAG.VERBATIM,
           body:
-            "No purchase, public performance, or business idea is required. Transport, money, schedule, childcare, access and energy are facts about the situation, not mindset problems. The exposure menu stays a labelled placeholder until cohort, location and partners are known, and nothing on it is promised as available.",
+            "No purchase, public performance, or business idea is required. Transport, money, schedule, childcare, access and energy are facts about the situation, not mindset problems. The exposure menu stays a labelled placeholder until the group, location and partners are known, and nothing on it is promised as available.",
         },
         {
           id: "M2-L1-b2",

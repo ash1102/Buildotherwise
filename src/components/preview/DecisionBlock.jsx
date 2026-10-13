@@ -36,11 +36,11 @@ export default function DecisionBlock({ block, record, onSave, saving, canSave }
   return (
     <div>
       <p className="max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
-        {block.note || "Every one of these is a complete answer. Nothing is recommended, and skipping records nothing."}
+        {block.note || "Pick one. “I don’t know yet” is fine."}
       </p>
 
       <div className="mt-3 flex flex-wrap gap-2">
-        {NEXT_DECISION_LABELS.map((label) => {
+        {(block.options && block.options.length ? block.options : NEXT_DECISION_LABELS).map((label) => {
           const active = values.decision === label;
           return (
             <button

@@ -14,6 +14,7 @@ export const STATE_STYLE = {
   answered: "border-primary bg-primary-wash text-foreground",
   paused: "border-dashed border-input bg-card text-muted-foreground",
   passed: "border-input bg-card text-muted-foreground",
+  watched: "border-input bg-card text-muted-foreground",
   "not answered": "border-border bg-background text-muted-faint",
 };
 
@@ -22,6 +23,7 @@ export const STATE_DOT = {
   answered: "border-primary bg-primary",
   paused: "border-dashed border-input bg-card",
   passed: "border-input bg-input",
+  watched: "border-input bg-input",
   "not answered": "border-border bg-card",
 };
 
@@ -30,10 +32,11 @@ export const STATE_LABEL = {
   answered: "Something written",
   paused: "Paused",
   passed: "Passed",
+  watched: "Watched",
   "not answered": "Still open",
 };
 
-export const STATE_ORDER = ["decided", "answered", "paused", "passed", "not answered"];
+export const STATE_ORDER = ["decided", "answered", "paused", "passed", "watched", "not answered"];
 
 /** Working privately is how most steps are taken, so it is not repeated as a choice made. */
 const QUIET_ROUTE = "Work privately";

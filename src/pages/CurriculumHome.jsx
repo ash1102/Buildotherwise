@@ -10,7 +10,7 @@ import OpenerCard from "@/components/workbook/OpenerCard";
 import { OPENER_LESSON_CODE, isOpenerLesson } from "@/lib/curriculum";
 
 const CYCLE = [
-  { label: "Notice", line: "What keeps holding your attention — without turning it into identity." },
+  { label: "Notice", line: "What keeps holding your attention, without turning it into identity." },
   { label: "Try", line: "One small, bounded, reversible try with a stop rule written before you start." },
   { label: "Reflect", line: "What actually happened, what it cost, and what is still unknown." },
   { label: "Decide", line: "Keep, change, test again, pause, stop, another direction, or continue looking." },
@@ -35,7 +35,7 @@ export default function CurriculumHome() {
         <p className="mt-3 text-[18px] leading-relaxed text-muted-foreground">
           Start with a question, an ordinary task, or “I don’t know yet.” Explore what holds your attention, try something
           small if you choose, and decide what comes next. A job, training, a project, a pause, or continued exploration
-          are all valid directions — entrepreneurship is one possibility, not a requirement.
+          are all valid directions. Entrepreneurship is one possibility, not a requirement.
         </p>
         <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
           <Link
@@ -166,12 +166,8 @@ export default function CurriculumHome() {
             a journal entry if you want a copy.
           </p>
           <p>
-            <strong className="font-semibold text-foreground">Sharing</strong> is separate, voluntary, and per entry — you
-            choose exactly what the program creator receives, and you can see the scope before you send it.
-          </p>
-          <p>
-            <strong className="font-semibold text-foreground">Writing</strong> is part of every step, and one line is enough.
-            No step is passed over: you write something, even when you pause and come back to it.
+            <strong className="font-semibold text-foreground">Sharing</strong> is separate, voluntary, and per entry. You
+            choose exactly what the program creator receives.
           </p>
         </div>
       </section>

@@ -23,7 +23,7 @@ export async function loadOutsideResources() {
 /** Getting Started is not Module 0, so its label never reads as a number. */
 export function moduleTitle(modules, order) {
   const module = modules.find((item) => item.order === order);
-  if (module) return module.kind === "orientation" ? "Getting Started" : `Module ${module.order} — ${module.title}`;
+  if (module) return module.kind === "orientation" ? "Getting Started" : `Module ${module.order}: ${module.title}`;
   return order === 0 ? "Getting Started" : `Module ${order}`;
 }
 

@@ -63,7 +63,7 @@ export default function JournalComposer() {
         value={draft}
         onChange={(event) => write(event.target.value)}
         rows={4}
-        placeholder="A noticing, a question, something you tried — whatever is worth keeping."
+        placeholder="A noticing, a question, something you tried, whatever is worth keeping."
         className="mt-3 min-h-[7rem] resize-y border-natural bg-ivory/40 text-[14.5px] leading-relaxed"
       />
 
@@ -97,7 +97,7 @@ export default function JournalComposer() {
           Save this entry
         </Button>
         {saved ? <span className="text-[12.5px] text-teal-deep">Saved.</span> : null}
-        <PrivacyNote>Kept in this browser until you share an entry.</PrivacyNote>
+        <PrivacyNote>Saved on this device only.</PrivacyNote>
       </div>
     </section>
   );

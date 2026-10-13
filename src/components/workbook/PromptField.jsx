@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { getAnswer, setAnswer } from "@/lib/workbook";
 import { saveAnswer } from "@/lib/journal";
-import DictateButton from "./DictateButton";
 
 /**
  * One question, with the question itself as the label above the box. The answer is
@@ -18,10 +17,15 @@ export default function PromptField({
   onSaved,
   variant = "card",
   compact = false,
+  fieldKey,
+  onBind,
+  onActivate,
 }) {
   const [value, setValue] = useState(() => getAnswer(lessonCode, index));
   const [state, setState] = useState("idle");
   const timer = useRef(null);
+  const valueRef = useRef(value);
+  const handleRef = useRef(null);
 
   useEffect(() => {
     setValue(getAnswer(lessonCode, index));
@@ -30,6 +34,19 @@ export default function PromptField({
       if (timer.current) clearTimeout(timer.current);
     };
   }, [lessonCode, index]);
+
+  valueRef.current = value;
+
+  useEffect(() => {
+    if (!onBind || !fieldKey) return undefined;
+    onBind(fieldKey, {
+      getValue: () => valueRef.current,
+      setValue: (next) => {
+        if (handleRef.current) handleRef.current(next);
+      },
+    });
+    return () => onBind(fieldKey, null);
+  }, [fieldKey, onBind]);
 
   const handleChange = (next) => {
     setValue(next);
@@ -51,6 +68,8 @@ export default function PromptField({
     }, 650);
   };
 
+  handleRef.current = handleChange;
+
   return (
     <div className={variant === "inline" ? "" : "rounded-xl border border-border bg-card p-4 sm:p-5"}>
       <label htmlFor={`${lessonCode}-${index}`} className="block text-[16px] font-medium leading-snug text-foreground">
@@ -60,16 +79,18 @@ export default function PromptField({
         id={`${lessonCode}-${index}`}
         value={value}
         onChange={(event) => handleChange(event.target.value)}
+        onFocus={() => {
+          if (onActivate) onActivate(fieldKey);
+        }}
         rows={compact ? 1 : 3}
         placeholder={compact ? "One line is enough." : "A few words are enough."}
         className={`mt-2 resize-y border-input bg-card text-[16px] leading-relaxed ${
           compact ? "min-h-[2.75rem]" : "min-h-[5rem]"
         }`}
       />
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-        <DictateButton value={value} onText={handleChange} compact />
+      <div className="mt-2 flex flex-wrap items-center justify-end gap-2">
         <span aria-live="polite" className="text-[14px] text-accent-ink">
-          {state === "saved" ? "Saved" : state === "saving" ? "Saving…" : state === "error" ? "Not saved — try again" : ""}
+          {state === "saved" ? "Saved" : state === "saving" ? "Saving…" : state === "error" ? "Not saved. Try again." : ""}
         </span>
       </div>
     </div>
