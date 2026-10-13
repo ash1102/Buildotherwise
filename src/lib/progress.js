@@ -20,8 +20,16 @@ function isBlank(value) {
   return !String(value === null || value === undefined ? "" : value).trim();
 }
 
+/** The tap-to-answer pieces (try plan, check-in) save a line of their own; it counts like a Try box. */
+const INTERACTION_ANSWERS = ["plan", "checkin"];
+
+function hasInteractionLine(lesson, answers) {
+  return INTERACTION_ANSWERS.some((key) => !isBlank((answers || {})[`${lesson.code}#${key}`]));
+}
+
 /** The Try and Reflect boxes with nothing saved in them yet. */
 export function missingPrompts(lesson, answers) {
+  if (hasInteractionLine(lesson, answers)) return [];
   return requiredPrompts(lesson).filter((prompt) => isBlank((answers || {})[answerKey(lesson.code, prompt.index)]));
 }
 
@@ -31,6 +39,7 @@ export function stepComplete(lesson, answers, states) {
   if (routeSkipsWriting(route)) return true;
   const prompts = requiredPrompts(lesson);
   if (!prompts.length) return true;
+  if (hasInteractionLine(lesson, answers)) return true;
   return prompts.some((prompt) => !isBlank((answers || {})[answerKey(lesson.code, prompt.index)]));
 }
 

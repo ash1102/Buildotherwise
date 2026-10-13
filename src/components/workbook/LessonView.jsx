@@ -13,6 +13,9 @@ import FeedbackForm from "./FeedbackForm";
 import LessonBeats from "./LessonBeats";
 import WorkedExample from "./WorkedExample";
 import DictateButton from "./DictateButton";
+import TryPlanner from "./TryPlanner";
+import TryCheckIn from "./TryCheckIn";
+import { interactionsFor } from "@/lib/interactions";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor } from "@/lib/workbook";
 
 function TalkBar({ hasRoutes, talking, onSay, onWrite, onText }) {
@@ -78,6 +81,16 @@ export default function LessonView({
   const guidance = routeGuidanceFor(route);
   const hasRoutes = routes.length > 0;
   const oneLine = guidance ? guidance.field === "line" : false;
+
+  // Optional tap-to-answer pieces for this step, set in src/lib/interactions.js.
+  const interactions = interactionsFor(lesson.code);
+  const hasPlanner = interactions.some((item) => item.type === "tryPlanner");
+  const renderInteraction = (item) => {
+    if (item.type === "tryPlanner") return <TryPlanner key="tryPlanner" lesson={lesson} />;
+    if (item.type === "tryCheckIn") return <TryCheckIn key="tryCheckIn" lesson={lesson} planCode={item.planCode} />;
+    return null;
+  };
+
   const [sayIt, setSayIt] = useState(false);
   const talking = hasRoutes ? Boolean(guidance && guidance.voice) : sayIt;
   const fieldApis = useRef({});
@@ -199,9 +212,21 @@ export default function LessonView({
           {carrySources && carrySources.length ? (
             <CarryForward sources={carrySources} selected={carried} onChange={onCarriedChange} />
           ) : null}
-          <div className="space-y-6">
-            {tryPrompts.map((item) => promptField(item.prompt, item.index, item.fieldKey))}
-          </div>
+          {interactions.map(renderInteraction)}
+          {hasPlanner ? (
+            <details className="rounded-xl border border-border bg-card p-4 sm:p-5">
+              <summary className="cursor-pointer text-[16px] font-medium text-foreground">
+                Add more detail (optional) · {tryPrompts.length} questions
+              </summary>
+              <div className="mt-4 space-y-6">
+                {tryPrompts.map((item) => promptField(item.prompt, item.index, item.fieldKey))}
+              </div>
+            </details>
+          ) : (
+            <div className="space-y-6">
+              {tryPrompts.map((item) => promptField(item.prompt, item.index, item.fieldKey))}
+            </div>
+          )}
         </div>
       ),
     });
