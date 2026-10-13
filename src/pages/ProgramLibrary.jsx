@@ -114,10 +114,9 @@ export default function ProgramLibrary() {
       }\n${item.source_label ? `\nSource: ${item.source_label}\n` : ""}`;
     });
     const briefLines = research.map((brief) => {
-      const head = `## ${brief.title}\n_Program research · summary_\n\n${brief.summary || ""}`;
-      const source = brief.source_label ? `\n\nSource: ${brief.source_label}` : "";
-      const status = brief.review_status ? `\n\nReview status: ${brief.review_status}` : "";
-      return `${head}${source}${status}\n`;
+      const head = `## ${brief.title}\n_Build Otherwise research note · summary only_\n\n${brief.summary || ""}`;
+      const status = brief.review_status ? `\n\nLimit: ${brief.review_status}` : "";
+      return `${head}${status}\n`;
     });
     const outsideLines = outside.map((item) => {
       const byline = [item.creator, item.publisher, item.year].filter(Boolean).join(" · ");
@@ -196,14 +195,42 @@ export default function ProgramLibrary() {
         )}
       </section>
 
+      <section id="evidence" className="space-y-7 scroll-mt-24 border-t border-border pt-8">
+        <div>
+          <h2 className="workbook-label">Evidence</h2>
+          <h3 className="mt-1.5 text-[22px]">What this program draws on, and what it doesn't prove</h3>
+          <p className="mt-2 max-w-[68ch] text-[14px] leading-relaxed text-ink-soft">
+            Entrepalooza is built on research. That isn't the same as being proven. Here is the difference, so you can
+            judge for yourself.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="workbook-card p-5">
+            <h4 className="font-heading text-[17px]">What the research does here</h4>
+            <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[13.5px] leading-relaxed text-ink-soft">
+              <li>Explains why the program is designed the way it is: trying things early, small tries you can learn from, choosing your own direction, and learning alongside other people.</li>
+              <li>Points to studies and talks from other settings, so you can check the thinking yourself.</li>
+              <li>Includes research that cuts against the design, not only research that agrees with it.</li>
+            </ul>
+          </div>
+          <div className="workbook-card p-5">
+            <h4 className="font-heading text-[17px]">What it can't do yet</h4>
+            <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[13.5px] leading-relaxed text-ink-soft">
+              <li>Show that Entrepalooza works. The first pilot hasn't run, so there are no results to report.</li>
+              <li>Predict what happens for any one person. Studies describe groups, often in other countries and with different goals.</li>
+              <li>Make this treatment. Entrepalooza is an educational program, not therapy or a recovery program.</li>
+            </ul>
+          </div>
+        </div>
+
       {outside.length ? (
         <section className="space-y-5">
           <div>
-            <h2 className="workbook-label">Outside reading and talks</h2>
-            <h3 className="mt-1.5 text-[20px]">Articles, studies and talks from elsewhere</h3>
+            <h3 className="workbook-label">Outside studies and talks</h3>
+            <h4 className="mt-1.5 text-[19px]">Other people's work, linked to where it lives</h4>
             <p className="mt-2 max-w-[68ch] text-[13.5px] leading-relaxed text-ink-soft">
-              Other people's work, linked to where it lives. All of it is optional. These pieces are here because they
-              connect to something in the program, not because they prove anything about it. Take what's useful and
+              All of it is optional. Each piece says why it's here and where it stops applying. Take what's useful and
               question the rest.
             </p>
           </div>
@@ -249,12 +276,11 @@ export default function ProgramLibrary() {
 
       {research.length ? (
         <section className="rounded-lg border border-dashed border-natural-deep bg-white/60 p-6">
-          <p className="workbook-label">Research behind the program</p>
-          <h2 className="mt-2 font-heading text-xl">What the curriculum is built on</h2>
+          <h3 className="workbook-label">Build Otherwise's own research notes</h3>
+          <h4 className="mt-1.5 font-heading text-[19px]">How the curriculum was checked against research</h4>
           <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-ink-soft">
-            Build Otherwise's own research documents, listed here so you can see what the curriculum is built on. Each one
-            shows where it came from and the status it states for itself. They are design documents, not lessons. The full
-            text is there if you want it, and it is optional reading.
+            These are working design documents, not lessons. You'll see a short summary of each and the limit it states
+            for itself. The full documents stay private while they're reviewed.
           </p>
           <ul className="mt-5 space-y-4">
             {research.map((brief) => (
@@ -263,6 +289,7 @@ export default function ProgramLibrary() {
           </ul>
         </section>
       ) : null}
+      </section>
     </div>
   );
 }
