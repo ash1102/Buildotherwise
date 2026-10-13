@@ -3,15 +3,15 @@ import React, { useState } from "react";
 /** The decision menu, and the prompt each choice changes into. */
 const CHOICES = [
   {
-    label: "Keep it",
+    label: "Keep",
     prompt: "What tells you it is worth continuing, and what would make you stop?",
   },
   {
-    label: "Change it",
+    label: "Change",
     prompt: "What is the one thing you would change, and what stays the same?",
   },
   {
-    label: "Test it again",
+    label: "Test again",
     prompt: "What would a fairer second test look like, and when would it end?",
   },
   {
@@ -27,7 +27,7 @@ const CHOICES = [
     prompt: "Which thread are you leaving open on purpose?",
   },
   {
-    label: "Keep looking",
+    label: "Continue looking",
     prompt: "What would make the next thing worth pulling on?",
   },
 ];
