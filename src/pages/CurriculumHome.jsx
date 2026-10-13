@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, BookOpen, Compass, Map } from "lucide-react";
+import { ArrowRight, ArrowUpRight, BookOpen, Compass, Map } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
 import { useWorkbook } from "@/lib/workbook";
 import { useAuth } from "@/lib/AuthContext";
@@ -15,6 +15,25 @@ const CYCLE = [
   { label: "Reflect", line: "What actually happened, what it cost, and what is still unknown." },
   { label: "Decide", line: "Keep, change, test again, pause, stop, another direction, or continue looking." },
 ];
+
+const INTEREST_FORM = "https://link.jotform.com/EhQXbmRwbk";
+
+const FIT = [
+  "You know you want something different but do not know what yet.",
+  "You have several possible directions and do not know which deserves your attention.",
+  "You keep trying things but struggle to tell what actually fits.",
+  "You have an interest but are not ready to turn it into a career or business.",
+  "You want a practical next step instead of another personality test.",
+];
+
+const EXAMPLE = [
+  { label: "Notice", line: "“I keep watching furniture-restoration videos.”" },
+  { label: "Try", line: "Spend one Saturday helping refinish a small piece." },
+  { label: "Reflect", line: "“I liked the hands-on work, hated the fumes, and lost track of time.”" },
+  { label: "Decide", line: "Learn more, but next time test it in a ventilated workshop." },
+];
+
+const PATHS = ["Job", "Training", "Collaboration", "Project", "Entrepreneurship", "Keep Looking", "Pause"];
 
 export default function CurriculumHome() {
   const { modules, lessonsByOrder, loading } = useCurriculum();
@@ -76,6 +95,15 @@ export default function CurriculumHome() {
             </Link>
           )}
         </div>
+        <a
+          href={INTEREST_FORM}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex items-center gap-1.5 text-[15px] font-medium text-accent-ink underline underline-offset-2"
+        >
+          Express interest in Pilot 1
+          <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+        </a>
         {isAuthenticated ? null : (
           <p className="mt-3 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
             The journal, the maps and the numbered modules open once you log in. Getting Started is open to everyone.
@@ -88,6 +116,16 @@ export default function CurriculumHome() {
 
       <OpenerCard lesson={openerLesson} />
 
+      <section className="max-w-[68ch]">
+        <h2 className="workbook-label">Who this may fit</h2>
+        <h2 className="mt-1.5">You do not need a business idea to start.</h2>
+        <ul className="mt-3 list-disc space-y-1.5 pl-5 text-[17px] leading-relaxed text-muted-foreground">
+          {FIT.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      </section>
+
       <section>
         <h2 className="workbook-label">The cycle you will use again and again</h2>
         <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -97,6 +135,34 @@ export default function CurriculumHome() {
               <h3 className="mt-1.5 text-[18px]">{step.label}</h3>
               <p className="mt-1.5 text-[16px] leading-relaxed text-muted-foreground">{step.line}</p>
             </div>
+          ))}
+        </div>
+        <div className="mt-4 rounded-xl border border-border bg-secondary p-4 sm:p-5">
+          <p className="workbook-label">One small example</p>
+          <div className="mt-2 space-y-1.5 text-[16px] leading-relaxed text-foreground">
+            {EXAMPLE.map((step) => (
+              <p key={step.label}>
+                <strong className="font-semibold">{step.label}:</strong> {step.line}
+              </p>
+            ))}
+          </div>
+          <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+            That does not mean “become a furniture restorer.” It means you know more than you did before.
+          </p>
+        </div>
+      </section>
+
+      <section className="max-w-[68ch]">
+        <h2 className="workbook-label">Where this can lead</h2>
+        <h2 className="mt-1.5">There isn’t one acceptable ending.</h2>
+        <p className="mt-2 text-[17px] leading-relaxed text-muted-foreground">
+          The point is to make a more informed next choice.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {PATHS.map((path) => (
+            <span key={path} className="rounded-full border border-input bg-card px-3 py-1 text-[15px] text-foreground">
+              {path}
+            </span>
           ))}
         </div>
       </section>
