@@ -161,7 +161,7 @@ function PublicHome() {
       <section className="rounded-2xl bg-primary px-5 py-9 text-primary-foreground sm:px-10">
         <h2 className="text-primary-foreground">Want in on Pilot 1?</h2>
         <p className="mt-2 max-w-[60ch] text-[17px] leading-relaxed text-primary-foreground/85">
-          Joining the list isn’t enrolling. It takes a couple of minutes, and you’ll hear from us when Pilot 1 opens.
+          Joining the list isn’t enrolling. You’ll hear from us when Pilot 1 opens.
         </p>
         <div className="mt-5">
           <InterestButton />
