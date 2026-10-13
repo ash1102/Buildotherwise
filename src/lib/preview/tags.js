@@ -55,15 +55,15 @@ export const NO_RESPONSE = "No response";
 export const NEXT_DECISION_LABELS = [
   "Keep",
   "Change",
-  "Test Again",
-  "Pause/Park",
+  "Test again",
+  "Pause",
   "Stop",
-  "Another Direction",
-  "Continue Looking",
+  "Another direction",
+  "Continue looking",
   "I don't know yet",
 ];
 
-export const CONTINUE_LOOKING = "Continue Looking";
+export const CONTINUE_LOOKING = "Continue looking";
 
 /** Pilot split from the build brief. */
 export const PILOT_ONE = "Pilot 1";
