@@ -1,4 +1,5 @@
 import { answerKey } from "./workbook";
+import { isOpenerLesson } from "./curriculum";
 
 /**
  * Completion follows the curriculum's own shape: a step counts once one Try or
@@ -53,7 +54,11 @@ export function buildProgress({ modules, lessonsByOrder, answers }) {
 
   ordered.forEach((module) => {
     const coming = isComingLater(module);
-    const lessons = (lessonsByOrder || {})[module.order] || [];
+    /**
+     * The opening map is its own entry point at the start of the program, not one
+     * of Getting Started's steps, so it never counts here and nothing waits on it.
+     */
+    const lessons = ((lessonsByOrder || {})[module.order] || []).filter((lesson) => !isOpenerLesson(lesson));
     const incomplete = lessons.filter((lesson) => !stepComplete(lesson, answers));
 
     byOrder[module.order] = {
