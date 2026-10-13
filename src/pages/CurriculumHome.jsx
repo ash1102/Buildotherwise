@@ -35,7 +35,8 @@ export default function CurriculumHome() {
         <p className="mt-3 text-[18px] leading-relaxed text-muted-foreground">
           Start with a question, an ordinary task, or “I don’t know yet.” Explore what holds your attention, try something
           small if you choose, and decide what comes next. A job, training, a project, a pause, or continued exploration
-          are all valid directions. Entrepreneurship is one possibility, not a requirement.
+          are all valid directions. Entrepreneurship is a real option, and the business-building skills are useful even if you
+          never start one, but it is not a requirement.
         </p>
         <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
           <Link
