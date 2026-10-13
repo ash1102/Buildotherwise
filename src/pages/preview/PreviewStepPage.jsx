@@ -65,7 +65,8 @@ export default function PreviewStepPage() {
   const blocks = useMemo(() => {
     if (!found) return [];
     const { section, step } = found;
-    const readings = readingsForStep(section, step).map((reading) => ({
+    // A step that carries its own wording does not also print the reading holding the same words.
+    const readings = (step.hideReading ? [] : readingsForStep(section, step)).map((reading) => ({
       id: reading.id,
       version: "library-record",
       type: "reading",
@@ -105,8 +106,9 @@ export default function PreviewStepPage() {
       }
     }
 
+    /* Its own wording means its own activities too, so the earlier writing prompts are not printed as well. */
     const liveWriting = [];
-    if (lesson && ((lesson.try_prompts || []).length || (lesson.reflect_prompts || []).length)) {
+    if (lesson && !step.ownWording && ((lesson.try_prompts || []).length || (lesson.reflect_prompts || []).length)) {
       const fields = [
         ...(lesson.try_prompts || []).map((prompt, index) => ({ id: `try-${index}`, label: prompt })),
         ...(lesson.reflect_prompts || []).map((prompt, index) => ({ id: `reflect-${index}`, label: prompt })),

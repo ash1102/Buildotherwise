@@ -75,8 +75,12 @@ export const beforeYouStart = {
       title: "Group Code and permission-based feedback",
       sourceLesson: "O.3",
       readings: ["BY-R3"],
-      /** This step carries its own wording, so the lesson record's earlier text is not printed under it. */
+      /**
+       * This step carries its own wording, so neither the lesson record's earlier text nor the
+       * reading holding the same words is printed under it. The reading stays in the library.
+       */
       ownWording: true,
+      hideReading: true,
       blocks: [
         {
           id: "BY-L3-b1",
@@ -154,8 +158,12 @@ export const beforeYouStart = {
       title: "Participation and Support Plan",
       sourceLesson: "O.4",
       readings: ["BY-R4"],
-      /** This step carries its own wording, so the lesson record's earlier text is not printed under it. */
+      /**
+       * This step carries its own wording, so neither the lesson record's earlier text nor the
+       * reading holding the same words is printed under it. The reading stays in the library.
+       */
       ownWording: true,
+      hideReading: true,
       blocks: [
         {
           id: "BY-L4-b1",
