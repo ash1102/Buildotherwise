@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { Download, Plus, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { useJournalEntries } from "@/lib/journal";
 import useCurriculum from "@/hooks/useCurriculum";
 import { isOpenerLesson } from "@/lib/curriculum";
 import { downloadText } from "@/lib/download";
-import { readStore } from "@/lib/store";
+import { readStore, useStore } from "@/lib/store";
 import {
   MAP_PICK_FIELDS,
   MAP_PICK_KEY,
@@ -16,9 +16,7 @@ import {
   buildGraph,
   removeLine,
   savedAnswerOptions,
-  setNodePosition,
   updateLine,
-  usePositions,
 } from "@/lib/lifeMap";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import DashedMotif from "@/components/workbook/DashedMotif";
@@ -29,11 +27,11 @@ import BringInSavedAnswer from "@/components/map/BringInSavedAnswer";
 import MapQuestions from "@/components/map/MapQuestions";
 import StepNav from "@/components/workbook/StepNav";
 
-const clamp = (value) => Math.min(0.98, Math.max(0.02, value));
-
 export default function LifeMapPage() {
   const map = useLifeMap();
-  const positions = usePositions();
+  const [pick] = useStore(MAP_PICK_KEY, {});
+  const [step, setStep] = useState(0);
+  const mapRef = useRef(null);
   const entries = useJournalEntries();
   const { answers } = useWorkbook();
   const { lessons, orderedLessons } = useCurriculum();
@@ -108,10 +106,9 @@ export default function LifeMapPage() {
     });
   };
 
-  const nudge = (dx, dy) => {
-    if (!selected) return;
-    const spot = positions[selected.id] || { x: 0.5, y: 0.5 };
-    setNodePosition(selected.id, { x: clamp(spot.x + dx), y: clamp(spot.y + dy) });
+  const showMap = () => {
+    setAsList(false);
+    requestAnimationFrame(() => mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
 
   /** One line that holds a list becomes one line per item, in the same area. */
@@ -206,19 +203,21 @@ export default function LifeMapPage() {
         </div>
       </header>
 
-      <MapQuestions graph={graph} />
+      <MapQuestions graph={graph} step={step} onStep={setStep} onShowMap={showMap} />
 
-      {asList ? (
-        <LifeMapList graph={graph} selectedId={selectedId} onSelect={setSelectedId} />
-      ) : (
-        <LifeMapCanvas
-          graph={graph}
-          positions={positions}
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-          onMove={(id, spot) => setNodePosition(id, spot)}
-        />
-      )}
+      <div ref={mapRef} className="scroll-mt-4">
+        {asList ? (
+          <LifeMapList graph={graph} selectedId={selectedId} onSelect={setSelectedId} />
+        ) : (
+          <LifeMapCanvas
+            graph={graph}
+            pick={pick}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onJumpToPart={(index) => setStep(index)}
+          />
+        )}
+      </div>
 
       {selected && selectedSection ? (
         <LifeMapNodePanel
@@ -231,15 +230,14 @@ export default function LifeMapPage() {
           onLinkEntry={(entryId) => saveSelected({ entry_id: entryId })}
           onConnect={connect}
           onDisconnect={disconnect}
-          onNudge={nudge}
           onRemove={removeSelected}
           onSplit={splitSelected}
           onClose={() => setSelectedId(null)}
         />
       ) : (
         <p className="text-[13px] leading-relaxed text-muted-faint">
-          Open a node to read the whole line, rename it, link it to a journal entry, or connect it to another line. Drag a
-          node to move it, use the arrow keys while it is focused, or use the move buttons once it is open.
+          Tap any line on the map to read it in full, rename it, link it to a journal entry, or connect it to another
+          line. Connections you make show as dashed gold curves.
         </p>
       )}
 
