@@ -206,7 +206,7 @@ function MemberHome() {
             <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">
               You can go back to any step, add to your journal, or look over your maps.
             </p>
-            <Link to="/discovery" className={`mt-5 ${marigoldButton}`}>
+            <Link to="/discovery-map" className={`mt-5 ${marigoldButton}`}>
               See what you gathered
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
@@ -289,6 +289,8 @@ function MemberHome() {
 }
 
 export default function CurriculumHome() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoadingAuth } = useAuth();
+  /** Wait for the login check so a signed-in person never sees the front door flash first. */
+  if (isLoadingAuth) return <div aria-busy="true" className="min-h-[60vh]" />;
   return isAuthenticated ? <MemberHome /> : <PublicHome />;
 }
