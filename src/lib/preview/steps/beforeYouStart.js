@@ -36,6 +36,8 @@ export const beforeYouStart = {
       title: "Your rights and privacy",
       sourceLesson: "O.2",
       readings: ["BY-R2"],
+      /** This step carries its own wording, so the lesson record's earlier text is not printed under it. */
+      ownWording: true,
       blocks: [
         {
           id: "BY-L2-b1",
@@ -73,6 +75,8 @@ export const beforeYouStart = {
       title: "Group Code and permission-based feedback",
       sourceLesson: "O.3",
       readings: ["BY-R3"],
+      /** This step carries its own wording, so the lesson record's earlier text is not printed under it. */
+      ownWording: true,
       blocks: [
         {
           id: "BY-L3-b1",
@@ -150,6 +154,8 @@ export const beforeYouStart = {
       title: "Participation and Support Plan",
       sourceLesson: "O.4",
       readings: ["BY-R4"],
+      /** This step carries its own wording, so the lesson record's earlier text is not printed under it. */
+      ownWording: true,
       blocks: [
         {
           id: "BY-L4-b1",

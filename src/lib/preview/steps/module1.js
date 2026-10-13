@@ -288,6 +288,8 @@ export const module1 = {
       code: "M1-PREVIEW-L3",
       title: "Obsessive and harmonious patterns (not labels)",
       sourceLesson: "M1-L2",
+      /** This step carries its own invented pair, so the lesson record's earlier example is not printed too. */
+      hideLiveExample: true,
       readings: ["M1-R2"],
       blocks: [
         {

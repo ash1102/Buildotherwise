@@ -60,6 +60,8 @@ export const module4 = {
       code: "M4-L1",
       title: "Separate what happened from what it means",
       sourceLesson: "M4-L1",
+      /** The dropped example lives in this lesson record, so it is not printed; the swappable block stands in its place. */
+      hideLiveExample: true,
       readings: ["M4-R1"],
       blocks: [swappableExample],
     },
