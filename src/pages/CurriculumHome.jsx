@@ -33,7 +33,7 @@ const EXAMPLE = [
   { label: "Decide", line: "Learn more, but next time test it in a ventilated workshop." },
 ];
 
-const PATHS = ["Job", "Training", "Collaboration", "Project", "Entrepreneurship", "Keep Looking", "Pause"];
+const PATHS = ["Job", "Training", "Collaboration", "Project", "Entrepreneurship", "Continue looking", "Pause"];
 
 export default function CurriculumHome() {
   const { modules, lessonsByOrder, loading } = useCurriculum();
