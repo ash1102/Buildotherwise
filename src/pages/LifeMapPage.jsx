@@ -7,7 +7,10 @@ import { useJournalEntries } from "@/lib/journal";
 import useCurriculum from "@/hooks/useCurriculum";
 import { isOpenerLesson } from "@/lib/curriculum";
 import { downloadText } from "@/lib/download";
+import { readStore } from "@/lib/store";
 import {
+  MAP_PICK_FIELDS,
+  MAP_PICK_KEY,
   MAP_SECTIONS,
   addLine,
   buildGraph,
@@ -23,6 +26,7 @@ import LifeMapCanvas from "@/components/map/LifeMapCanvas";
 import LifeMapNodePanel from "@/components/map/LifeMapNodePanel";
 import LifeMapList from "@/components/map/LifeMapList";
 import BringInSavedAnswer from "@/components/map/BringInSavedAnswer";
+import MapQuestions from "@/components/map/MapQuestions";
 import StepNav from "@/components/workbook/StepNav";
 
 const clamp = (value) => Math.min(0.98, Math.max(0.02, value));
@@ -138,7 +142,13 @@ export default function LifeMapPage() {
         return `## ${section.label}\n${lines.length ? lines.join("\n") : "- (nothing yet)"}\n`;
       })
       .join("\n");
-    downloadText("entrepalooza-life-map.md", `# Map the Life You're Actually Living\n\n${body}`);
+    const pick = readStore(MAP_PICK_KEY, {}) || {};
+    const pickLines = pick.nothing_yet
+      ? "Nothing on the map is worth exploring yet."
+      : MAP_PICK_FIELDS.map((field) => `${field.label} ${(pick[field.id] || "").trim()}`).join("\n");
+    const hasPick = pick.nothing_yet || MAP_PICK_FIELDS.some((field) => (pick[field.id] || "").trim());
+    const pickBlock = hasPick ? `\n## One thing worth exploring\n${pickLines}\n` : "";
+    downloadText("entrepalooza-life-map.md", `# Map the Life You're Actually Living\n\n${body}${pickBlock}`);
   };
 
   return (
@@ -150,8 +160,9 @@ export default function LifeMapPage() {
             <p className="workbook-label">Getting Started · the connected map</p>
             <h1 className="mt-2 font-heading text-3xl sm:text-4xl">Map the life you’re actually living</h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-              Each line you save becomes a node under the question it answers, joined to the middle and to anything you
-              link it to. Nothing is guessed from what you wrote. You make the connections yourself.
+              Start with the questions below. Each answer becomes a line on the map, under the area it belongs to, joined
+              to the middle and to anything you link it to. Nothing is guessed from what you wrote. You make the
+              connections yourself.
             </p>
             <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-muted-faint">
               Come back and change any line, move it, or leave a question empty. Empty is honest too.
@@ -181,6 +192,8 @@ export default function LifeMapPage() {
           </PrivacyNote>
         </div>
       </header>
+
+      <MapQuestions graph={graph} />
 
       {asList ? (
         <LifeMapList graph={graph} selectedId={selectedId} onSelect={setSelectedId} />
@@ -217,7 +230,7 @@ export default function LifeMapPage() {
       )}
 
       <section className="rounded-lg border border-border bg-card p-5">
-        <p className="workbook-label">Add a line to the map</p>
+        <p className="workbook-label">Add your own line</p>
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
           <select
             aria-label="Which question this line answers"
