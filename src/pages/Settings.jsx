@@ -243,7 +243,10 @@ export default function Settings() {
         </form>
 
         <div className="border-t border-border pt-4">
-          <button type="button" onClick={() => logout(false) || (window.location.href = "/")} className={secondaryButton}>
+          <button type="button" onClick={() => {
+              logout(false);
+              window.location.href = "/";
+            }} className={secondaryButton}>
             <LogOut className="h-4 w-4" aria-hidden="true" />
             Log out
           </button>
@@ -320,8 +323,7 @@ export default function Settings() {
         ) : (
           <>
             <p className="text-[16px] leading-relaxed text-muted-foreground">
-              This sends a request to delete your account. You don’t need to give a reason. Anything you shared or sent as
-              feedback is removed along with it.
+              This sends a request to delete your account. You don’t need to give a reason.
             </p>
             {confirmDelete ? (
               <div className="space-y-3">
