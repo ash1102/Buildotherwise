@@ -18,6 +18,17 @@ import TryCheckIn from "./TryCheckIn";
 import { interactionsFor } from "@/lib/interactions";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor } from "@/lib/workbook";
 
+/** The full journal-minimum paragraph is shown on the first steps; after that, a one-line reminder. */
+const JOURNAL_MINIMUM_FULL_ON = ["O.1", "O.6"];
+const JOURNAL_MINIMUM_SHORT =
+  "**Journal minimum:** Save at least one short note for this step. “I don’t know yet” counts. Saving is not sharing.";
+
+function teachTextFor(lesson) {
+  const text = String(lesson.teach || "");
+  if (JOURNAL_MINIMUM_FULL_ON.includes(lesson.code)) return text;
+  return text.replace(/\*\*Journal minimum:\*\*[^\n]*/, JOURNAL_MINIMUM_SHORT);
+}
+
 function TalkBar({ hasRoutes, talking, onSay, onWrite, onText }) {
   if (hasRoutes && !talking) return null;
 
@@ -159,7 +170,7 @@ export default function LessonView({
     beats.push({
       key: "teach",
       label: "Try this",
-      content: <Prose text={lesson.teach} />,
+      content: <Prose text={teachTextFor(lesson)} />,
     });
   }
 
