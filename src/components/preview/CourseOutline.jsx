@@ -15,7 +15,9 @@ export default function CourseOutline({ sections, activeKey }) {
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="workbook-label">{section.order ? `Module ${section.order}` : "Before you start"}</p>
+                <p className="workbook-label">
+                  {section.order ? `Module ${section.order}` : section.label || "Before you start"}
+                </p>
                 <h2 className="mt-1 text-[20px]">{section.title}</h2>
               </div>
               {pilot ? (

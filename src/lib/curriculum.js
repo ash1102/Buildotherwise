@@ -1,5 +1,15 @@
 import { base44 } from "@/api/base44Client";
 
+/**
+ * The opening step: mapping the life you are actually living stands before
+ * Getting Started's own sequence, so it is never listed among those steps.
+ */
+export const OPENER_LESSON_CODE = "O.6";
+
+export function isOpenerLesson(lesson) {
+  return Boolean(lesson) && lesson.code === OPENER_LESSON_CODE;
+}
+
 /** Modules and lessons are content records, so later modules can be added as data only. */
 export async function loadModules() {
   const modules = await base44.entities.Module.list("order", 20);

@@ -17,8 +17,8 @@ export default function PreviewHome() {
         <p className="workbook-label">Course review copy</p>
         <h1 className="mt-3">The updated course, for your review</h1>
         <p className="workbook-prose mt-3">
-          Before you start, then Modules 1 to 10. Every step is open, in any order. Nothing is required, no step is
-          scored, and skipping anything records nothing. Each block says whether its words are yours, a shortened
+          Start here, then Before you start, then Modules 1 to 10. Every step is open, in any order. Nothing is
+          required, no step is scored, and skipping anything records nothing. Each block says whether its words are yours, a shortened
           version, a draft, or a new proposal.
         </p>
       </header>

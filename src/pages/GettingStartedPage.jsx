@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Map } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
+import { isOpenerLesson } from "@/lib/curriculum";
 import StepList from "@/components/workbook/StepList";
 
 /**
@@ -27,7 +27,8 @@ export default function GettingStartedPage() {
     );
   }
 
-  const lessons = lessonsByOrder[gettingStarted.order] || [];
+  /** The opening move stands before this sequence, so it is not one of its steps. */
+  const lessons = (lessonsByOrder[gettingStarted.order] || []).filter((lesson) => !isOpenerLesson(lesson));
 
   return (
     <div className="space-y-8">
@@ -42,20 +43,6 @@ export default function GettingStartedPage() {
           step asks for: Module 1 opens once every step here holds a line.
         </p>
       </header>
-
-      <Link
-        to="/map"
-        className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-border bg-card p-4 transition hover:bg-secondary sm:p-5"
-      >
-        <Map className="h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
-        <span className="min-w-0 flex-1">
-          <span className="block text-[16px] font-medium text-foreground">Life Map</span>
-          <span className="mt-0.5 block text-[15px] leading-relaxed text-muted-foreground">
-            Map the life you are actually living — places, activity, energy, barriers, threads.
-          </span>
-        </span>
-        <ArrowRight className="h-4 w-4 shrink-0 text-muted-faint" aria-hidden="true" />
-      </Link>
 
       <StepList lessons={lessons} scopeLabel="before the modules" />
 

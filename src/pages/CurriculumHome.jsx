@@ -6,6 +6,8 @@ import { useWorkbook } from "@/lib/workbook";
 import { useAuth } from "@/lib/AuthContext";
 import ModuleMap from "@/components/workbook/ModuleMap";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
+import OpenerCard from "@/components/workbook/OpenerCard";
+import { OPENER_LESSON_CODE, isOpenerLesson } from "@/lib/curriculum";
 
 const CYCLE = [
   { label: "Notice", line: "What keeps holding your attention — without turning it into identity." },
@@ -20,7 +22,10 @@ export default function CurriculumHome() {
   const { isAuthenticated } = useAuth();
   /** Getting Started is the doorway, not a module, so it sits apart from the numbered list. */
   const gettingStarted = modules.find((module) => module.kind === "orientation");
-  const gettingStartedSteps = gettingStarted ? (lessonsByOrder[gettingStarted.order] || []).length : 0;
+  /** The opener stands before Getting Started, so it is not counted as one of those steps. */
+  const orientationLessons = gettingStarted ? lessonsByOrder[gettingStarted.order] || [] : [];
+  const openerLesson = orientationLessons.find(isOpenerLesson) || null;
+  const gettingStartedSteps = orientationLessons.filter((lesson) => !isOpenerLesson(lesson)).length;
 
   return (
     <div className="space-y-10">
@@ -34,10 +39,10 @@ export default function CurriculumHome() {
         </p>
         <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
           <Link
-            to="/getting-started"
+            to={`/lesson/${OPENER_LESSON_CODE}`}
             className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-[15px] font-medium text-primary-foreground transition hover:bg-primary/90"
           >
-            Start with Getting Started
+            Start here: map your life
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
           {isAuthenticated ? (
@@ -79,6 +84,8 @@ export default function CurriculumHome() {
           <PrivacyNote />
         </div>
       </section>
+
+      <OpenerCard lesson={openerLesson} />
 
       <section>
         <h2 className="workbook-label">The cycle you will use again and again</h2>

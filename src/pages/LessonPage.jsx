@@ -13,7 +13,7 @@ import {
   useWorkbook,
 } from "@/lib/workbook";
 import { saveAnswer } from "@/lib/journal";
-import { isComingLater } from "@/lib/curriculum";
+import { isComingLater, isOpenerLesson } from "@/lib/curriculum";
 import { buildProgress } from "@/lib/progress";
 import LockedNotice from "@/components/workbook/LockedNotice";
 import ComingLaterNotice from "@/components/workbook/ComingLaterNotice";
@@ -34,6 +34,9 @@ export default function LessonPage() {
 
   const lesson = lessonsByCode[code];
   const module = lesson ? modules.find((item) => item.order === lesson.module_order) : null;
+  /** The opener stands first, so it opens the sequence rather than ending it. */
+  const opener = isOpenerLesson(lesson);
+  const firstStep = orderedLessons.find((item) => !isOpenerLesson(item)) || null;
 
   useEffect(() => {
     if (lesson) setLesson({ code: lesson.code, title: lesson.title });
@@ -41,8 +44,12 @@ export default function LessonPage() {
   }, [lesson, setLesson]);
 
   const position = orderedLessons.findIndex((item) => item.code === code);
-  const prev = position > 0 ? orderedLessons[position - 1] : null;
-  const next = position >= 0 && position < orderedLessons.length - 1 ? orderedLessons[position + 1] : null;
+  const prev = opener ? null : position > 0 ? orderedLessons[position - 1] : null;
+  const next = opener
+    ? firstStep
+    : position >= 0 && position < orderedLessons.length - 1
+      ? orderedLessons[position + 1]
+      : null;
 
   const siblings = lesson ? lessonsByOrder[lesson.module_order] || [] : [];
   const stepIndex = siblings.findIndex((item) => item.code === code) + 1;
@@ -77,8 +84,12 @@ export default function LessonPage() {
     return <LoginRedirect />;
   }
 
-  const moduleTitle = module.kind === "orientation" ? "Getting Started" : `Module ${module.order} — ${module.title}`;
-  const workbookLink = module.kind === "orientation" ? "/getting-started" : `/module/${module.slug}`;
+  const moduleTitle = opener
+    ? "Begin here"
+    : module.kind === "orientation"
+      ? "Getting Started"
+      : `Module ${module.order} — ${module.title}`;
+  const workbookLink = opener ? "/" : module.kind === "orientation" ? "/getting-started" : `/module/${module.slug}`;
 
   // A module that was never built into the pilot is a different state from one that is waiting on writing.
   if (isComingLater(module)) {
@@ -113,8 +124,8 @@ export default function LessonPage() {
     <LessonView
       lesson={lesson}
       moduleTitle={moduleTitle}
-      stepNumber={stepIndex}
-      stepCount={siblings.length}
+      stepNumber={opener ? 0 : stepIndex}
+      stepCount={opener ? 0 : siblings.length}
       prev={prev}
       next={next}
       nextIsModule={Boolean(next && module && next.module_order !== lesson.module_order)}

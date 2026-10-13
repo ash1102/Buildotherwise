@@ -1,10 +1,11 @@
 import { TAG } from "../tags";
 
 /**
- * "Before you start" — what used to be Module 0. It keeps every lesson it had,
- * shown as its own section at the front, unnumbered. The reading and lesson text
- * are rendered from the existing records; the two verbatim lessons carry the
- * owner's own wording.
+ * "Before you start" — what used to be Module 0. It keeps its ground rules,
+ * rights and setup lessons, shown as its own section, unnumbered. The
+ * life-mapping step now stands ahead of this sequence as the opener, so it is
+ * not one of these steps. The reading and lesson text are rendered from the
+ * existing records; the two verbatim lessons carry the owner's own wording.
  */
 export const beforeYouStart = {
   key: "before-you-start",
@@ -21,7 +22,6 @@ export const beforeYouStart = {
     { id: "BY-R3", title: "Group Code (Builder's Code) and permission-based feedback", tag: TAG.REUSED },
     { id: "BY-R4", title: "Participation and Support Plan", tag: TAG.REUSED },
     { id: "BY-R5", title: "Your participation decision and handoff", tag: TAG.REUSED },
-    { id: "BY-R6", title: "Map the Life You're Actually Living", tag: TAG.REUSED },
   ],
   steps: [
     {
@@ -229,13 +229,6 @@ export const beforeYouStart = {
       title: "Your choice to join",
       sourceLesson: "O.5",
       readings: ["BY-R5"],
-      blocks: [],
-    },
-    {
-      code: "BY-L6",
-      title: "Map your life right now",
-      sourceLesson: "O.6",
-      readings: ["BY-R6"],
       blocks: [],
     },
   ],

@@ -7,7 +7,9 @@ export default function SectionHeader({ section }) {
   return (
     <header className="border-b border-border pb-5">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="workbook-label">{section.order ? `Module ${section.order}` : "Before you start"}</span>
+        <span className="workbook-label">
+          {section.order ? `Module ${section.order}` : section.label || "Before you start"}
+        </span>
         {pilot ? (
           <span className="rounded-full border border-border bg-secondary px-2.5 py-1 text-[12px] font-medium text-muted-foreground">
             {pilot}
