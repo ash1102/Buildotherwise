@@ -18,6 +18,7 @@ import ProgramLibrary from '@/pages/ProgramLibrary';
 import TribeThreads from '@/pages/TribeThreads';
 import AspectIndex from '@/pages/AspectIndex';
 import AspectPage from '@/pages/AspectPage';
+import Settings from '@/pages/Settings';
 import DiscoveryMapPage from '@/pages/DiscoveryMapPage';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
@@ -94,6 +95,7 @@ const AuthenticatedApp = () => {
           <Route path="/tribe-threads" element={<TribeThreads />} />
         <Route path="/aspects" element={<AspectIndex />} />
           <Route path="/aspect/:slug" element={<AspectPage />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
         <Route path="/lesson/:code" element={<LessonPage />} />
         <Route path="/about" element={<About />} />
