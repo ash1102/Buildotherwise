@@ -10,12 +10,15 @@ import { MAP_SECTIONS } from "@/lib/lifeMap";
 export default function BringInSavedAnswer({ options, onAdd }) {
   const [answerKey, setAnswerKey] = useState("");
   const [section, setSection] = useState(MAP_SECTIONS[0].key);
+  /** Named so the answer to "did that do anything?" sits right where the click happened. */
+  const [addedTo, setAddedTo] = useState("");
 
   const add = () => {
     const option = options.find((item) => item.key === answerKey);
     if (!option) return;
     onAdd(option, section);
     setAnswerKey("");
+    setAddedTo((MAP_SECTIONS.find((item) => item.key === section) || {}).label || section);
   };
 
   return (
@@ -32,7 +35,10 @@ export default function BringInSavedAnswer({ options, onAdd }) {
               aria-label="Saved answer to bring in"
               className="w-full rounded-md border border-border bg-background px-3 py-2 text-[13.5px] sm:flex-1"
               value={answerKey}
-              onChange={(event) => setAnswerKey(event.target.value)}
+              onChange={(event) => {
+                setAnswerKey(event.target.value);
+                setAddedTo("");
+              }}
             >
               <option value="">Choose a saved answer…</option>
               {options.map((option) => (
@@ -58,6 +64,17 @@ export default function BringInSavedAnswer({ options, onAdd }) {
               Bring it in
             </Button>
           </div>
+          {addedTo ? (
+            <p className="mt-2 text-[13px] leading-relaxed text-accent-ink">
+              Added to {addedTo}. It is on the map above, opened for you so you can rename or move it.
+            </p>
+          ) : (
+            <p className="mt-2 text-[13px] leading-relaxed text-muted-faint">
+              {answerKey
+                ? "Bring it in adds it to the map above as its own line."
+                : "Pick a saved answer from the list first. Bring it in adds the one you choose."}
+            </p>
+          )}
         </>
       ) : (
         <p className="mt-2 text-[13px] leading-relaxed text-muted-faint">
