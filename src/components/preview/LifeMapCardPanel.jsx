@@ -46,7 +46,7 @@ export default function LifeMapCardPanel({
       </div>
 
       <fieldset>
-        <legend className="text-[15px] font-medium text-foreground">Marks</legend>
+        <legend className="text-[15px] font-medium text-foreground">Tags</legend>
         <div className="mt-2 flex flex-wrap gap-2">
           {(block.marks || []).map((mark) => {
             const active = (card.marks || []).includes(mark.id);
@@ -62,7 +62,7 @@ export default function LifeMapCardPanel({
                 }`}
               >
                 <span className="font-semibold">{mark.label}</span>
-                <span className="ml-1.5 text-muted-foreground">{mark.meaning}</span>
+                {mark.meaning ? <span className="ml-1.5 text-muted-foreground">{mark.meaning}</span> : null}
               </button>
             );
           })}
