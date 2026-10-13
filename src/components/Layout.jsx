@@ -3,10 +3,12 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { JournalProvider } from "@/components/journal/JournalContext";
 import JournalWidget from "@/components/journal/JournalWidget";
 import SiteHeader from "@/components/SiteHeader";
+import { useApplyDisplay } from "@/lib/display";
 
 export default function Layout() {
   const { pathname } = useLocation();
   const preview = pathname.startsWith("/preview");
+  useApplyDisplay();
 
   return (
     <JournalProvider>
