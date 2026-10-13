@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { ArrowDown, ArrowLeft, ArrowRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/lib/store";
@@ -7,56 +7,106 @@ import {
   MAP_PICK_FIELDS,
   MAP_PICK_KEY,
   MAP_QUESTION_PARTS,
-  MAP_SECTIONS,
+  QUESTIONS_BY_ID,
   addLine,
   linesFromAnswer,
 } from "@/lib/lifeMap";
 
-const sectionLabel = (key) => (MAP_SECTIONS.find((item) => item.key === key) || {}).label || key;
 const PICK_STEP = MAP_QUESTION_PARTS.length;
+const TOTAL = PICK_STEP + 1;
+const STEP_TITLES = [...MAP_QUESTION_PARTS.map((item) => item.title), "Pick one thing worth exploring"];
 
 /**
- * The questions that find the lines for the map, one part at a time. Each answer is
- * added as its own line under the part's section. Nothing has to be answered.
+ * The questions that build the map, one Part at a time. Each answer becomes a line on
+ * the branch of the question it answers. Moving on never loses what was typed: any
+ * answer still in a box is added to the map first. Nothing has to be answered.
  */
-export default function MapQuestions({ graph, onAdded }) {
-  const [step, setStep] = useState(0);
+export default function MapQuestions({ graph, step, onStep, onShowMap }) {
+  const cardRef = useRef(null);
+  const firstRender = useRef(true);
   const [drafts, setDrafts] = useState({});
+  const [placeFor, setPlaceFor] = useState({});
   const [addedNote, setAddedNote] = useState({});
   const [pick, setPick] = useStore(MAP_PICK_KEY, {});
 
+  const places = graph.nodes.filter((node) => node.question_id === "p1-places");
   const countFor = (questionId) => graph.nodes.filter((node) => node.question_id === questionId).length;
+
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [step]);
 
   const add = (part, question) => {
     const lines = linesFromAnswer(question, drafts[question.id]);
-    if (!lines.length) return;
-    const items = lines.map((text) => addLine(part.section, { text, question_id: question.id, source_label: question.text }));
+    if (!lines.length) return 0;
+    const placeId = question.aboutPlace ? placeFor[question.id] : "";
+    lines.forEach((text) =>
+      addLine(part.section, {
+        text,
+        question_id: question.id,
+        source_label: question.text,
+        links: placeId ? [placeId] : [],
+      })
+    );
     setDrafts((current) => ({ ...current, [question.id]: "" }));
-    const added = items.length === 1 ? "1 line" : `${items.length} lines`;
-    setAddedNote((current) => ({ ...current, [question.id]: `Added ${added} to ${sectionLabel(part.section)}.` }));
-    if (onAdded) items.forEach((item) => onAdded(item));
+    const added = lines.length === 1 ? "1 line" : `${lines.length} lines`;
+    setAddedNote((current) => ({
+      ...current,
+      [question.id]: `Added ${added} to “${QUESTIONS_BY_ID[question.id].branch}”.`,
+    }));
+    return lines.length;
+  };
+
+  /** Anything still typed in this Part goes onto the map before moving on. */
+  const flush = () => {
+    const part = step < PICK_STEP ? MAP_QUESTION_PARTS[step] : null;
+    if (!part) return;
+    part.questions.forEach((question) => add(part, question));
+  };
+
+  const go = (next) => {
+    flush();
+    onStep(Math.max(0, Math.min(PICK_STEP, next)));
   };
 
   const part = step < PICK_STEP ? MAP_QUESTION_PARTS[step] : null;
-  const steps = [...MAP_QUESTION_PARTS.map((item) => item.title), "Pick one thing worth exploring"];
+  const pending = part ? part.questions.some((question) => String(drafts[question.id] || "").trim()) : false;
 
   return (
-    <section className="rounded-lg border border-border bg-card p-5" aria-labelledby="map-questions-title">
-      <p className="workbook-label" id="map-questions-title">
-        Questions that build your map
-      </p>
-      <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-muted-foreground">
-        Answer what fits. Each answer becomes one line, and everything you add to a question stays together under that
-        question on the map. Lines from different questions do not join up on their own: you connect them yourself, and
-        only if they belong together. Add one answer at a time, skip any question, and come back later.
-      </p>
+    <section
+      ref={cardRef}
+      className="scroll-mt-4 rounded-lg border border-border bg-card p-5"
+      aria-labelledby="map-questions-title"
+    >
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className="workbook-label" id="map-questions-title">
+          Questions that build your map
+        </p>
+        <p className="text-[12.5px] font-medium text-accent-ink">
+          Part {step + 1} of {TOTAL}
+        </p>
+      </div>
 
-      <ol className="mt-4 flex flex-wrap gap-2" aria-label="Parts">
-        {steps.map((title, index) => (
+      <div className="mt-3 flex gap-1" aria-hidden="true">
+        {STEP_TITLES.map((title, index) => (
+          <span
+            key={title}
+            className={`h-1.5 flex-1 rounded-full ${index <= step ? "bg-primary" : "bg-border"}`}
+          />
+        ))}
+      </div>
+
+      <p className="mt-4 text-[12px] text-muted-faint">Jump to any part:</p>
+      <ol className="mt-1.5 flex flex-wrap gap-2" aria-label="Parts">
+        {STEP_TITLES.map((title, index) => (
           <li key={title}>
             <button
               type="button"
-              onClick={() => setStep(index)}
+              onClick={() => go(index)}
               aria-current={index === step ? "step" : undefined}
               className={`rounded-full border px-3 py-1 text-[12.5px] transition ${
                 index === step
@@ -71,29 +121,51 @@ export default function MapQuestions({ graph, onAdded }) {
       </ol>
 
       {part ? (
-        <div className="mt-5">
+        <div className="mt-6">
           <h3 className="font-heading text-xl">
             Part {step + 1}: {part.title}
           </h3>
-          <p className="mt-1 text-[12.5px] text-muted-faint">Answers go under {sectionLabel(part.section)}.</p>
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted-foreground">{part.intro}</p>
           {part.examples ? (
             <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-muted-faint">Could include: {part.examples}</p>
           ) : null}
 
-          <div className="mt-4 space-y-5">
+          <div className="mt-5 space-y-6">
             {part.questions.map((question) => {
               const count = countFor(question.id);
               const value = drafts[question.id] || "";
+              const branch = QUESTIONS_BY_ID[question.id].branch;
               return (
                 <div key={question.id}>
                   <label htmlFor={`mapq-${question.id}`} className="block text-[15px] font-medium text-foreground">
                     {question.text}
                   </label>
                   <p className="mt-1 text-[12.5px] text-muted-faint">
-                    One answer per box: press Add, then add the next one. It becomes its own line here, and it stays with
-                    this question unless you link it somewhere else.
+                    {question.list
+                      ? "List as many as fit, separated by commas or new lines. Each one becomes its own line on the map."
+                      : "One answer at a time. It shows up on the map under this question."}{" "}
+                    On the map: <span className="text-accent-ink">{branch}</span>.
                   </p>
+
+                  {question.aboutPlace && places.length ? (
+                    <select
+                      aria-label="Which place this answer is about (optional)"
+                      value={placeFor[question.id] || ""}
+                      onChange={(event) => {
+                        const next = event.target.value;
+                        setPlaceFor((current) => ({ ...current, [question.id]: next }));
+                      }}
+                      className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-[13.5px] sm:w-72"
+                    >
+                      <option value="">Which place? (optional)</option>
+                      {places.map((place) => (
+                        <option key={place.id} value={place.id}>
+                          {place.label || place.text}
+                        </option>
+                      ))}
+                    </select>
+                  ) : null}
+
                   <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-start">
                     <Textarea
                       id={`mapq-${question.id}`}
@@ -128,14 +200,14 @@ export default function MapQuestions({ graph, onAdded }) {
           </div>
         </div>
       ) : (
-        <div className="mt-5">
-          <h3 className="font-heading text-xl">Part {PICK_STEP + 1}: Pick one thing worth exploring</h3>
+        <div className="mt-6">
+          <h3 className="font-heading text-xl">Part {TOTAL}: Pick one thing worth exploring</h3>
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted-foreground">
             You are not choosing a career. You are not committing to a business. You are not announcing your life's
             purpose. Pick one thread that makes you curious enough to look again.
           </p>
           <p className="mt-2 max-w-2xl text-[12.5px] leading-relaxed text-muted-faint">
-            These are single answers, not lists. One thing, in your own words, and you can add something else later.
+            These are single answers, not lists. They show up at the end of your map as “Worth exploring.”
           </p>
           <div className="mt-4 space-y-4">
             {MAP_PICK_FIELDS.map((field) => (
@@ -176,28 +248,35 @@ export default function MapQuestions({ graph, onAdded }) {
         </div>
       )}
 
-      <div className="mt-6 flex items-center justify-between gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          className="rounded-full"
-          disabled={step === 0}
-          onClick={() => setStep((value) => Math.max(0, value - 1))}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
-          Back
-        </Button>
-        {step < PICK_STEP ? (
+      <div className="mt-8 border-t border-border pt-5">
+        {pending ? (
+          <p className="mb-3 text-[12.5px] text-muted-faint">
+            Anything still typed above will be added to your map when you move on.
+          </p>
+        ) : null}
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Button
             type="button"
             variant="outline"
             className="rounded-full"
-            onClick={() => setStep((value) => Math.min(PICK_STEP, value + 1))}
+            disabled={step === 0}
+            onClick={() => go(step - 1)}
           >
-            Next part
-            <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+            <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
+            Back
           </Button>
-        ) : null}
+          {step < PICK_STEP ? (
+            <Button type="button" size="lg" className="rounded-full" onClick={() => go(step + 1)}>
+              Next: Part {step + 2} · {STEP_TITLES[step + 1]}
+              <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+            </Button>
+          ) : (
+            <Button type="button" size="lg" className="rounded-full" onClick={onShowMap}>
+              See it on your map
+              <ArrowDown className="ml-2 h-4 w-4" aria-hidden="true" />
+            </Button>
+          )}
+        </div>
       </div>
     </section>
   );
