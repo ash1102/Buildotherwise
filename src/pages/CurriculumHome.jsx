@@ -144,7 +144,7 @@ function PublicHome() {
         <h2 className="mt-1.5">The pilot tests the program, not you.</h2>
         <p className="mt-2 text-[17px] leading-relaxed text-muted-foreground">
           We’re checking whether Entrepalooza is clear, doable and worth your time. We’re not promising jobs, income or
-          business results. What participants tell us decides what changes. The questions we’re asking:
+          business results. What participants tell us shapes what changes. The questions we’re asking:
         </p>
         <ol className="mt-4 space-y-2.5">
           {PILOT_QUESTIONS.map((question, index) => (
@@ -161,7 +161,7 @@ function PublicHome() {
       <section className="rounded-2xl bg-primary px-5 py-9 text-primary-foreground sm:px-10">
         <h2 className="text-primary-foreground">Want in on Pilot 1?</h2>
         <p className="mt-2 max-w-[60ch] text-[17px] leading-relaxed text-primary-foreground/85">
-          Joining the list isn’t enrolling. It just means we’ll reach out when there’s a spot.
+          Joining the list isn’t enrolling. It just tells us you’re interested.
         </p>
         <div className="mt-5">
           <InterestButton />
