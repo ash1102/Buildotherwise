@@ -64,11 +64,11 @@ export async function loadReadingSteps(moduleOrder) {
     .sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }));
 }
 
-/** The research shelf loads summaries only; a brief's full text is read when it is opened. */
+/** The research shelf loads summaries only. Full documents stay private while they are reviewed. */
 export async function loadResearchBriefs() {
   const page = await base44.entities.LibraryResource.filter(
     { status: "published", audience: "program_team" },
-    { sort: "order", limit: 20, fields: ["title", "summary", "source_label", "review_status", "full_text_uri", "order"] }
+    { sort: "order", limit: 20, fields: ["title", "summary", "review_status", "order"] }
   );
   return page.items;
 }
