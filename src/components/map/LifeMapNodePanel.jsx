@@ -26,6 +26,7 @@ export default function LifeMapNodePanel({
   onNudge,
   onRemove,
   onClose,
+  onSplit,
 }) {
   const [label, setLabel] = useState(node.label || "");
   const [text, setText] = useState(node.text || "");
@@ -43,6 +44,11 @@ export default function LifeMapNodePanel({
 
   const journalEntry = node.entry_id ? entries.find((entry) => entry.id === node.entry_id) : null;
   const changed = label.trim() !== (node.label || "") || text.trim() !== (node.text || "");
+  const pieces = String(node.text || "")
+    .split(/[\n,;]+/)
+    .map((piece) => piece.trim())
+    .filter(Boolean);
+  const canSplit = Boolean(onSplit) && pieces.length > 1;
 
   return (
     <section className="rounded-lg border border-primary/30 bg-card p-5" aria-label="The line you opened">
@@ -97,6 +103,11 @@ export default function LifeMapNodePanel({
         >
           Save this line
         </Button>
+        {canSplit ? (
+          <Button type="button" variant="outline" onClick={() => onSplit(pieces)} className="rounded-full">
+            Split into {pieces.length} separate lines
+          </Button>
+        ) : null}
         <p className="text-[12.5px] text-muted-faint">
           {node.source_code ? "Corrections here change the map line, not the step answer." : "Saved in this browser."}
         </p>
