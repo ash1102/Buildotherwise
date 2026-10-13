@@ -104,6 +104,10 @@ export default function CurriculumHome() {
           Express interest in Pilot 1
           <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
         </a>
+        <p className="mt-1.5 max-w-[68ch] text-[15px] leading-relaxed text-muted-faint">
+          Expressing interest is not enrollment. Researchers, educators, facilitators, workforce organizations and
+          community partners can use the same form and pick the partner option.
+        </p>
         {isAuthenticated ? null : (
           <p className="mt-3 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
             The journal, the maps and the numbered modules open once you log in. Getting Started is open to everyone.
