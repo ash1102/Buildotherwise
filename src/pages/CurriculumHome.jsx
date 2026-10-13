@@ -74,42 +74,44 @@ function PublicHome() {
   return (
     <div className="space-y-12">
       <section className="rounded-2xl bg-primary px-5 py-10 text-primary-foreground sm:px-10 sm:py-14">
-        <p className="text-[13px] font-semibold text-primary-soft">Build Otherwise presents · Pilot 1</p>
+        <p className="text-[13px] font-semibold text-primary-soft">Entrepalooza · Pilot 1 · from Build Otherwise</p>
         <h1 className="mt-3 max-w-[18ch] text-[clamp(2.2rem,1.4rem+3.6vw,3.6rem)] leading-[1.05] tracking-tight text-primary-foreground">
           You don’t need your whole life figured out.
         </h1>
         <p className="mt-4 max-w-[58ch] text-[18px] leading-relaxed text-primary-foreground/85">
-          You need something worth testing. Start with a question, an ordinary task, or “I don’t know yet.” Try something
-          small if you choose, and decide what comes next.
+          You need one thing worth testing. Entrepalooza helps you try it small, see what actually happened, and choose
+          your next move.
         </p>
-        <div className="mt-6 flex flex-wrap items-center gap-3">
+        <div className="mt-6">
           <InterestButton />
-          <Link
-            to="/login"
-            className="inline-flex items-center rounded-lg border border-primary-foreground/50 px-5 py-3 text-[15px] font-semibold text-primary-foreground transition hover:bg-primary-foreground/10"
-          >
-            Log in
-          </Link>
         </div>
-        <ol className="mt-7 flex flex-wrap gap-2" aria-label="The learning loop">
-          {LOOP.map((step, index) => (
-            <li
-              key={step}
-              className={`rounded-full border px-3 py-1 text-[14px] ${
-                index === LOOP.length - 1
-                  ? "border-primary-soft bg-primary-soft text-foreground"
-                  : "border-primary-foreground/40 text-primary-foreground"
-              }`}
-            >
-              {step}
+      </section>
+
+      <section>
+        <p className="workbook-label">How it works</p>
+        <h2 className="mt-1.5">Four moves. That’s the whole method.</h2>
+        <ol className="mt-5 grid gap-3 sm:grid-cols-2">
+          {STEPS.map((step, index) => (
+            <li key={step.label} className="rounded-xl border border-border bg-card p-5">
+              <p className="text-[13px] font-semibold text-accent-ink">
+                {index + 1} · {step.label}
+              </p>
+              <p className="mt-1.5 text-[17px] font-semibold leading-snug text-foreground">{step.does}</p>
+              <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
+                <span className="font-medium text-foreground/70">Example: </span>
+                {step.example}
+              </p>
             </li>
           ))}
         </ol>
+        <p className="mt-4 max-w-[60ch] text-[16px] leading-relaxed text-muted-foreground">
+          That isn’t “become a furniture restorer.” It’s knowing more than you did before you tried.
+        </p>
       </section>
 
       <section className="max-w-[68ch]">
-        <p className="workbook-label">Who this may fit</p>
-        <h2 className="mt-1.5">You do not need a business idea to start.</h2>
+        <p className="workbook-label">Who it’s for</p>
+        <h2 className="mt-1.5">Start where you actually are.</h2>
         <ul className="mt-4 grid gap-2">
           {FIT.map((line) => (
             <li key={line} className="rounded-xl border border-border bg-card px-4 py-3 text-[17px] leading-relaxed">
@@ -117,33 +119,32 @@ function PublicHome() {
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-[16px] leading-relaxed text-muted-foreground">
-          Entrepreneurship is a real option, and the business-building skills are useful even if you never start one, but
-          it is not a requirement.
+        <p className="mt-4 text-[17px] leading-relaxed text-foreground">
+          No business idea required. Building one is on the table, though. Entrepalooza teaches the skills behind it:
+          testing ideas cheaply, reading what’s working, and making calls without all the answers. Those skills come with
+          you whether you start something or not. A job, training, a project or a pause are real answers here too.
         </p>
       </section>
 
       <section className="rounded-2xl bg-accent px-5 py-8 sm:px-8">
-        <p className="workbook-label">One small example</p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          {EXAMPLE.map((step) => (
-            <div key={step.label} className="rounded-xl border border-border bg-card p-4">
-              <h3 className="text-[18px] text-accent-ink">{step.label}</h3>
-              <p className="mt-1 text-[16px] leading-relaxed text-muted-foreground">{step.line}</p>
-            </div>
+        <p className="workbook-label">What you get</p>
+        <h2 className="mt-1.5">A workbook, not a lecture.</h2>
+        <ul className="mt-4 space-y-2.5">
+          {INCLUDES.map((line) => (
+            <li key={line} className="flex gap-3 text-[17px] leading-relaxed">
+              <span aria-hidden="true" className="mt-[0.6em] h-2 w-2 shrink-0 rounded-full bg-primary" />
+              <span>{line}</span>
+            </li>
           ))}
-        </div>
-        <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-          That does not mean “become a furniture restorer.” It means you know more than you did before.
-        </p>
+        </ul>
       </section>
 
       <section className="max-w-[68ch]">
-        <p className="workbook-label">What Pilot 1 is testing</p>
-        <h2 className="mt-1.5">Usable and useful, not proof of outcomes.</h2>
+        <p className="workbook-label">About Pilot 1</p>
+        <h2 className="mt-1.5">The pilot tests the program, not you.</h2>
         <p className="mt-2 text-[17px] leading-relaxed text-muted-foreground">
-          Pilot 1 is about whether the program is usable and useful, not proof that it produces recovery, jobs or
-          businesses. We want to learn:
+          We’re checking whether Entrepalooza is clear, doable and worth your time. We’re not promising jobs, income or
+          business results. What participants tell us decides what changes. The questions we’re asking:
         </p>
         <ol className="mt-4 space-y-2.5">
           {PILOT_QUESTIONS.map((question, index) => (
@@ -158,13 +159,16 @@ function PublicHome() {
       </section>
 
       <section className="rounded-2xl bg-primary px-5 py-9 text-primary-foreground sm:px-10">
-        <h2 className="text-primary-foreground">Help shape the first pilot.</h2>
+        <h2 className="text-primary-foreground">Want in on Pilot 1?</h2>
+        <p className="mt-2 max-w-[60ch] text-[17px] leading-relaxed text-primary-foreground/85">
+          Joining the list isn’t enrolling. It just means we’ll reach out when there’s a spot.
+        </p>
         <div className="mt-5">
-          <InterestButton>Express interest</InterestButton>
+          <InterestButton />
         </div>
-        <p className="mt-4 max-w-[60ch] text-[15px] leading-relaxed text-primary-foreground/80">
-          Expressing interest is not enrollment. Researchers, educators, facilitators, workforce organizations and
-          community partners can use the same form and pick the partner option.
+        <p className="mt-5 max-w-[60ch] text-[15px] leading-relaxed text-primary-foreground/80">
+          Researcher, educator, facilitator, or with a workforce or community organization? Use the same form and choose
+          the partner option.
         </p>
       </section>
     </div>
