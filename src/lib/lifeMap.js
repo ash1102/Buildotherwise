@@ -50,7 +50,7 @@ export const MAP_QUESTION_PARTS = [
     examples:
       "Work, someone else's house, school, stores, a gym, church, meetings, appointments, parks, restaurants, a garage, a friend's place, treatment or recovery spaces, community organizations, places connected to your kids, anywhere else that is actually part of your life.",
     questions: [
-      { id: "p1-places", text: "What places do you go in a typical week and weekend?" },
+      { id: "p1-places", text: "What places do you go in a typical week and weekend?", list: true },
       { id: "p1-do", text: "What do you usually do when you get there?" },
       { id: "p1-how", text: "How do you get to and from those places?" },
     ],
@@ -63,7 +63,7 @@ export const MAP_QUESTION_PARTS = [
       "Some important parts of life happen without going anywhere. Don't let \"I didn't go anywhere\" turn into \"I didn't do anything.\"",
     examples:
       "Research something for hours from your phone, fix things, draw, game, cook, sell things online, talk people through problems, scroll, write, care for somebody, organize things, watch tutorials, work on a car, make music.",
-    questions: [{ id: "p2-placeless", text: "What do you do that doesn't have a place?" }],
+    questions: [{ id: "p2-placeless", text: "What do you do that doesn't have a place?", list: true }],
   },
   {
     key: "part-3",
@@ -133,6 +133,22 @@ export function lineFromAnswer(question, answer) {
   if (!value) return "";
   if (!question.starter) return value;
   return `${question.text.replace(/…$/, "").trim()} ${value}`;
+}
+
+/** Pieces of one answer: each new line is its own piece, and list questions also split at commas. */
+export function splitText(value, atCommas) {
+  const pattern = atCommas ? /[\n,;]+/ : /\n+/;
+  return String(value || "")
+    .split(pattern)
+    .map((piece) => piece.trim())
+    .filter(Boolean);
+}
+
+/** Every line one answer becomes. */
+export function linesFromAnswer(question, answer) {
+  return splitText(answer, Boolean(question.list))
+    .map((piece) => lineFromAnswer(question, piece))
+    .filter(Boolean);
 }
 
 const POSITIONS_KEY = "lifeMapPositions";
@@ -216,26 +232,42 @@ export function buildGraph(map) {
 }
 
 const SECTION_RX = 0.30;
-const SECTION_RY = 0.34;
-const NODE_RX = 0.135;
-const NODE_RY = 0.18;
+const SECTION_RY = 0.36;
+const ROW = 0.072;
+const COL = 0.25;
 
-/** Where each node sits before anyone moves it: around its own question, away from the middle. */
+/**
+ * Open spots around a question, nearest first, as [column, row] steps. Rows run
+ * away from the middle where there is room, so lines stack under their question
+ * instead of piling on top of each other.
+ */
+function slotsFor(hub) {
+  const down = hub.y < 0.5;
+  const rows = down ? [1, 2, 3] : [1, 2, -1, -2];
+  const slots = [];
+  [0, -1, 1].forEach((column) => rows.forEach((row) => slots.push([column, row])));
+  return slots;
+}
+
+const within = (value) => Math.min(0.94, Math.max(0.06, value));
+
+/** Where each node sits before anyone moves it: stacked by its own question, away from the middle. */
 export function defaultPositions(sections) {
   const count = sections.length || 1;
   const spots = { sections: {}, nodes: {} };
 
   sections.forEach((section, index) => {
     const angle = -Math.PI / 2 + (index * 2 * Math.PI) / count;
-    spots.sections[section.key] = { x: 0.5 + Math.cos(angle) * SECTION_RX, y: 0.5 + Math.sin(angle) * SECTION_RY };
+    const hub = { x: 0.5 + Math.cos(angle) * SECTION_RX, y: 0.5 + Math.sin(angle) * SECTION_RY };
+    spots.sections[section.key] = hub;
 
-    const lines = section.nodes;
-    lines.forEach((node, position) => {
-      const spread = lines.length > 1 ? (position / (lines.length - 1) - 0.5) * 1.2 : 0;
-      const aimed = angle + spread;
+    const slots = slotsFor(hub);
+    section.nodes.forEach((node, position) => {
+      const [column, row] = slots[position % slots.length];
+      const lap = Math.floor(position / slots.length) * 0.02;
       spots.nodes[node.id] = {
-        x: 0.5 + Math.cos(aimed) * NODE_RX,
-        y: 0.5 + Math.sin(aimed) * NODE_RY,
+        x: within(hub.x + column * COL + lap),
+        y: within(hub.y + row * ROW + lap),
       };
     });
   });
