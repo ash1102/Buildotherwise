@@ -50,9 +50,9 @@ export const MAP_QUESTION_PARTS = [
     examples:
       "Work, someone else's house, school, stores, a gym, church, meetings, appointments, parks, restaurants, a garage, a friend's place, treatment or recovery spaces, community organizations, places connected to your kids, anywhere else that is actually part of your life.",
     questions: [
-      { id: "p1-places", text: "What places do you regularly go?" },
-      { id: "p1-do", text: "What do you usually do there?" },
-      { id: "p1-how", text: "How do you get there?" },
+      { id: "p1-places", text: "What places do you go in a typical week and weekend?" },
+      { id: "p1-do", text: "What do you usually do when you get there?" },
+      { id: "p1-how", text: "How do you get to and from those places?" },
     ],
   },
   {
