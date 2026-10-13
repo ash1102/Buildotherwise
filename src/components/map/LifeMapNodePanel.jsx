@@ -124,6 +124,10 @@ export default function LifeMapNodePanel({
             open that step
           </Link>
         </p>
+      ) : node.source_label ? (
+        <p className="mt-4 border-l-2 border-primary/30 pl-3 text-[13px] leading-relaxed text-muted-foreground">
+          Your answer to: {node.source_label}
+        </p>
       ) : null}
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
