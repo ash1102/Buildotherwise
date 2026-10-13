@@ -102,13 +102,22 @@ export default function LifeMapCanvas({ graph, pick, selectedId, onSelect, onJum
       return { left: rect.left - origin.left, right: rect.right - origin.left, y: rect.top - origin.top + rect.height / 2 };
     };
     const next = [];
+    /** A Part 1 answer tied to a place already says "at Gym" on the leaf, so no curve for it. */
+    const isPlaceTie = (x, y) => {
+      const nx = nodesById[x];
+      const ny = nodesById[y];
+      if (!nx || !ny) return false;
+      const about = (n) => (QUESTIONS_BY_ID[n.question_id] || {}).aboutPlace;
+      return (about(nx) && ny.question_id === "p1-places") || (about(ny) && nx.question_id === "p1-places");
+    };
     graph.links.forEach(([a, b]) => {
+      if (isPlaceTie(a, b)) return;
       const pa = spot(a);
       const pb = spot(b);
       if (!pa || !pb) return;
       const x1 = pa.right + 2;
       const x2 = pb.right + 2;
-      const bulge = Math.min(origin.width - 6, Math.max(x1, x2) + 28 + Math.abs(pa.y - pb.y) * 0.12);
+      const bulge = origin.width - 12;
       next.push({
         id: `${a}-${b}`,
         d: `M ${x1} ${pa.y} C ${bulge} ${pa.y}, ${bulge} ${pb.y}, ${x2} ${pb.y}`,
@@ -117,7 +126,7 @@ export default function LifeMapCanvas({ graph, pick, selectedId, onSelect, onJum
       });
     });
     setCurves(next);
-  }, [graph.links]);
+  }, [graph.links, nodesById]);
 
   useLayoutEffect(() => {
     measure();
@@ -226,7 +235,10 @@ export default function LifeMapCanvas({ graph, pick, selectedId, onSelect, onJum
 
           <li className="lm-branch">
             <div className="lm-in" style={delay()}>
-              <span className="inline-flex items-center gap-2 rounded-full bg-accent-ink-soft px-3 py-1 text-[13px] font-medium text-foreground shadow-sm">
+              <span
+                className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[13px] font-medium shadow-sm"
+                style={{ background: "hsl(var(--accent-ink-soft))", color: "hsl(277 34.3% 18%)" }}
+              >
                 <span className="text-[11px] opacity-75">Part 6</span>
                 Worth exploring
               </span>
@@ -235,7 +247,10 @@ export default function LifeMapCanvas({ graph, pick, selectedId, onSelect, onJum
               {pickNothing ? (
                 <p className="text-[13px] text-muted-foreground">Nothing on the map is worth exploring yet. That counts.</p>
               ) : pickHas ? (
-                <div className="max-w-md rounded-xl border border-accent-ink-soft bg-background px-4 py-3 shadow-sm">
+                <div
+                  className="max-w-md rounded-xl border bg-background px-4 py-3 shadow-sm"
+                  style={{ borderColor: "hsl(var(--accent-ink-soft))" }}
+                >
                   {MAP_PICK_FIELDS.map((field) => {
                     const value = String((pick || {})[field.id] || "").trim();
                     if (!value) return null;
