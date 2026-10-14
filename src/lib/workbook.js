@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { progressStorageKey } from "./progressScope";
 import { readStore, subscribeStore, writeStore } from "./store";
 
 export const NEXT_DECISIONS = [
@@ -77,20 +78,32 @@ export const CARRIED_KEY = "carried";
 export const LIFEMAP_KEY = "lifeMap";
 export const DISCOVERY_KEY = "discoveryNotes";
 
+/** These four are the workbook progress the gate reads. Life Map and the journal stay on the browser key. */
+const SCOPED_KEYS = new Set([ANSWER_KEY, DECISION_KEY, STATE_KEY, CARRIED_KEY]);
+
+function storageKey(baseKey) {
+  return SCOPED_KEYS.has(baseKey) ? progressStorageKey(baseKey) : baseKey;
+}
+
+export function readWorkbookValue(baseKey, fallback) {
+  return readStore(storageKey(baseKey), fallback);
+}
+
 /** field key used to store one answer */
 export function answerKey(code, index) {
   return `${code}#${index}`;
 }
 
 export function getAnswer(code, index) {
-  const answers = readStore(ANSWER_KEY, {});
+  const answers = readStore(storageKey(ANSWER_KEY), {});
   return answers[answerKey(code, index)] || "";
 }
 
 export function setAnswer(code, index, value) {
-  const answers = readStore(ANSWER_KEY, {});
+  const key = storageKey(ANSWER_KEY);
+  const answers = readStore(key, {});
   answers[answerKey(code, index)] = value;
-  writeStore(ANSWER_KEY, answers);
+  writeStore(key, answers);
 }
 
 export function useAnswers() {
@@ -98,15 +111,17 @@ export function useAnswers() {
 }
 
 export function setDecision(code, label) {
-  const decisions = readStore(DECISION_KEY, {});
+  const key = storageKey(DECISION_KEY);
+  const decisions = readStore(key, {});
   decisions[code] = label;
-  writeStore(DECISION_KEY, decisions);
+  writeStore(key, decisions);
 }
 
 export function setStepState(code, state) {
-  const states = readStore(STATE_KEY, {});
+  const key = storageKey(STATE_KEY);
+  const states = readStore(key, {});
   states[code] = state;
-  writeStore(STATE_KEY, states);
+  writeStore(key, states);
 }
 
 export function useStepState() {
@@ -119,9 +134,10 @@ export function useDecisions() {
 }
 
 export function setCarried(code, keys) {
-  const carried = readStore(CARRIED_KEY, {});
+  const key = storageKey(CARRIED_KEY);
+  const carried = readStore(key, {});
   carried[code] = keys;
-  writeStore(CARRIED_KEY, carried);
+  writeStore(key, carried);
 }
 
 export function useCarried() {
@@ -146,14 +162,19 @@ export function setDiscoveryNote(section, value) {
   writeStore(DISCOVERY_KEY, notes);
 }
 
-function useStoreState(key, fallback) {
-  const [value, setValue] = useState(() => readStore(key, fallback));
+function useStoreState(baseKey, fallback) {
+  const key = storageKey(baseKey);
+  const read = () => readStore(key, fallback);
+  const [slot, setSlot] = useState(() => ({ key, value: read() }));
+  if (slot.key !== key) {
+    setSlot({ key, value: read() });
+  }
   useEffect(() => {
-    setValue(readStore(key, fallback));
-    return subscribeStore(key, () => setValue(readStore(key, fallback)));
+    setSlot({ key, value: readStore(key, fallback) });
+    return subscribeStore(key, () => setSlot({ key, value: readStore(key, fallback) }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
-  return value;
+  return slot.key === key ? slot.value : read();
 }
 
 /** Answers, decisions and step states together, kept in sync across pages. */

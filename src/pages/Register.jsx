@@ -10,6 +10,7 @@ import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
 import { toast } from "@/components/ui/use-toast";
 import { safeReturnTo } from "@/lib/authReturnTo";
+import { destinationAfterAuth } from "@/lib/destinationAfterAuth";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -46,7 +47,7 @@ export default function Register() {
       if (result?.access_token) {
         base44.auth.setToken(result.access_token);
       }
-      window.location.href = safeReturnTo();
+      window.location.href = await destinationAfterAuth(result?.user, safeReturnTo());
     } catch (err) {
       setError(err.message || "Invalid verification code");
     } finally {

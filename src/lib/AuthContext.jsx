@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
+import { setProgressUserId } from '@/lib/progressScope';
 
 const AuthContext = createContext();
 
@@ -103,6 +104,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = (shouldRedirect = true) => {
+    setProgressUserId(null);
     setUser(null);
     setIsAuthenticated(false);
     
@@ -119,6 +121,9 @@ export const AuthProvider = ({ children }) => {
     // Use the SDK's redirectToLogin method
     base44.auth.redirectToLogin(window.location.href);
   };
+
+  // Same render as the pages below, so the gate reads this account's progress.
+  setProgressUserId(isAuthenticated && user?.id ? user.id : null);
 
   return (
     <AuthContext.Provider value={{ 
