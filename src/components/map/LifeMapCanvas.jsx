@@ -1,280 +1,380 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { MAP_PICK_FIELDS, MAP_QUESTION_PARTS, QUESTIONS_BY_ID } from "@/lib/lifeMap";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { MAP_QUESTION_PARTS, QUESTIONS_BY_ID, SECTION_AREA_RADIUS, exploreLines, layoutGraph } from "@/lib/lifeMap";
+
+/** Each question keeps its own colour, so a line is recognisable at a glance. */
+const SECTION_DOT = {
+  places: "bg-primary",
+  placeless: "bg-accent-ink",
+  energy: "bg-accent-soft",
+  barriers: "bg-muted-foreground",
+  threads: "bg-primary-soft",
+};
+
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+/** Rough on-screen size of a pill, in pixels, so lines can be kept from covering each other. */
+const pillSize = (text, maxWidth, height) => ({
+  w: Math.min(maxWidth, String(text || "").length * 6.8 + 12) + 24,
+  h: height,
+});
+
+const GAP = 6;
+const overlaps = (a, b) =>
+  Math.abs(a.x - b.x) * 2 < a.w + b.w + GAP && Math.abs(a.y - b.y) * 2 < a.h + b.h + GAP;
 
 /**
- * The Life Map as a growing tree. The middle is the life you're living; each Part of
- * the questions is a branch; each question is a smaller branch; each answer is a leaf
- * on the question it answers. Part 6 sits at the end as the one thing worth exploring.
- * Links the person chose themselves are drawn as dashed marigold curves. Nothing is
- * guessed: every leaf is exactly what was written, where it was written.
+ * Lines nobody has moved get the nearest clear spot to where they would sit, so
+ * nothing lands on top of another line or the middle. The search stays inside
+ * the line's own area: a crowded area may overlap, and it does not spill into
+ * the next one. Lines the person placed stay exactly where they put them.
  */
+function settle(graph, layout, saved, box) {
+  if (!box.w || !box.h) return layout.nodes;
+  const taken = [];
+  taken.push({ x: box.w / 2, y: box.h / 2, w: 230, h: 64 });
+  graph.sections.forEach((section) => {
+    const hub = layout.sections[section.key];
+    if (hub) taken.push({ x: hub.x * box.w, y: hub.y * box.h, ...pillSize(section.label, 220, 34) });
+  });
 
-const TREE_CSS = `
-.lm-tree { --lm-line: hsl(var(--primary) / 0.35); --lm-line-soft: hsl(var(--primary) / 0.2); }
-.lm-tree ul, .lm-tree ol { list-style: none; margin: 0; padding: 0; }
-.lm-branch { position: relative; padding-left: 26px; }
-.lm-branch::before {
-  content: ""; position: absolute; left: 0; top: 0; width: 20px; height: 1.15rem;
-  border-left: 2px solid var(--lm-line); border-bottom: 2px solid var(--lm-line);
-  border-bottom-left-radius: 14px;
+  const result = {};
+  const unplaced = [];
+  graph.nodes.forEach((node) => {
+    const spot = layout.nodes[node.id];
+    if (!spot) return;
+    if ((saved || {})[node.id]) {
+      result[node.id] = spot;
+      taken.push({ x: spot.x * box.w, y: spot.y * box.h, ...pillSize(node.label || node.text, 152, 30) });
+    } else {
+      unplaced.push(node);
+    }
+  });
+
+  unplaced.forEach((node) => {
+    const start = layout.nodes[node.id];
+    const size = pillSize(node.label || node.text, 152, 30);
+    const fits = (x, y) => {
+      const rect = { x, y, ...size };
+      if (x - size.w / 2 < 4 || x + size.w / 2 > box.w - 4 || y - size.h / 2 < 4 || y + size.h / 2 > box.h - 4) return false;
+      return !taken.some((other) => overlaps(rect, other));
+    };
+
+    let best = null;
+    const sx = start.x * box.w;
+    const sy = start.y * box.h;
+    const hub = layout.sections[node.section];
+    const inArea = (x, y) => {
+      if (!hub) return true;
+      return Math.hypot(x / box.w - hub.x, y / box.h - hub.y) <= SECTION_AREA_RADIUS;
+    };
+    const fitsHere = (x, y) => inArea(x, y) && fits(x, y);
+    if (fitsHere(sx, sy)) best = { x: sx, y: sy };
+    const maxRadius = Math.min(box.w, box.h) * 0.12;
+    for (let ring = 1; !best && ring * 14 <= maxRadius; ring += 1) {
+      const radius = ring * 14;
+      const steps = 8 + ring * 2;
+      for (let i = 0; i < steps; i += 1) {
+        const angle = (i / steps) * Math.PI * 2 + Math.PI / 2;
+        const x = sx + Math.cos(angle) * radius;
+        const y = sy + Math.sin(angle) * radius * 0.7;
+        if (fitsHere(x, y)) {
+          best = { x, y };
+          break;
+        }
+      }
+    }
+    const placed = best || { x: sx, y: sy };
+    taken.push({ ...placed, ...size });
+    result[node.id] = { x: placed.x / box.w, y: placed.y / box.h };
+  });
+
+  return result;
 }
-.lm-branch::after {
-  content: ""; position: absolute; left: 0; top: 1.15rem; bottom: -0.25rem;
-  border-left: 2px solid var(--lm-line);
-}
-.lm-branch:last-child::after { display: none; }
-.lm-twig { position: relative; padding-left: 22px; }
-.lm-twig::before {
-  content: ""; position: absolute; left: 0; top: 0; width: 16px; height: 0.95rem;
-  border-left: 1.5px solid var(--lm-line-soft); border-bottom: 1.5px solid var(--lm-line-soft);
-  border-bottom-left-radius: 12px;
-}
-.lm-twig::after {
-  content: ""; position: absolute; left: 0; top: 0.95rem; bottom: -0.25rem;
-  border-left: 1.5px solid var(--lm-line-soft);
-}
-.lm-twig:last-child::after { display: none; }
-.lm-in { animation: lm-in 520ms cubic-bezier(.3,.7,.2,1) both; }
-@keyframes lm-in { from { opacity: 0; transform: translateY(6px) scale(.96); } to { opacity: 1; transform: none; } }
-.lm-link { stroke-dasharray: 6 6; animation: lm-fade 600ms ease-out both; }
+
+/** Stable small number from a string, so each line keeps the same gentle bend. */
+const bendFor = (id) => {
+  let h = 0;
+  for (let i = 0; i < id.length; i += 1) h = (h * 31 + id.charCodeAt(i)) | 0;
+  return ((Math.abs(h) % 100) / 100 - 0.5) * 2; // -1 … 1
+};
+
+/** A slightly curved, hand-drawn path between two points (pixel space). */
+const curve = (a, b, id, strength) => {
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2;
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const offset = bendFor(id) * Math.min(len * strength, 40);
+  const cx = mx + (-dy / len) * offset;
+  const cy = my + (dx / len) * offset;
+  return `M ${a.x.toFixed(1)} ${a.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+};
+
+const MAP_MOTION_CSS = `
+.lm-grow { stroke-dasharray: 1; stroke-dashoffset: 1; animation: lm-grow 900ms cubic-bezier(.3,.7,.2,1) forwards; }
+.lm-fade { opacity: 0; animation: lm-fade 700ms ease-out 350ms forwards; }
+.lm-appear { animation: lm-fade 500ms ease-out both; }
+@keyframes lm-grow { to { stroke-dashoffset: 0; } }
 @keyframes lm-fade { from { opacity: 0; } to { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .lm-in, .lm-link { animation: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .lm-grow { animation: none; stroke-dashoffset: 0; }
+  .lm-fade, .lm-appear { animation: none; opacity: 1; }
+}
 `;
 
-/** A sentence-starter answer reads on its own as a line; under its own question, show only the answer. */
-function leafText(node, question) {
-  const text = node.label || node.text || "";
-  if (node.label || !question || !question.starter) return text;
-  const start = question.text.replace(/…$/, "").trim();
-  return text.startsWith(start) ? text.slice(start.length).trim() || text : text;
-}
+const NUDGE_KEYS = {
+  ArrowLeft: [-0.02, 0],
+  ArrowRight: [0.02, 0],
+  ArrowUp: [0, -0.02],
+  ArrowDown: [0, 0.02],
+};
 
-export default function LifeMapCanvas({ graph, pick, selectedId, onSelect, onJumpToPart }) {
+/**
+ * The Life Map as a connected map: a middle, one area for each group of questions,
+ * and a node for every line. A line sits in the area its question belongs to.
+ * Nodes can be dragged, nudged with the arrow keys, or moved with the buttons
+ * in the panel — dragging is never the only way.
+ */
+export default function LifeMapCanvas({ graph, positions, pick, selectedId, onSelect, onMove, onJumpToPart }) {
   const boxRef = useRef(null);
-  const [curves, setCurves] = useState([]);
+  const drag = useRef(null);
+  const justDragged = useRef(false);
+  const [preview, setPreview] = useState(null);
 
-  const nodesById = useMemo(() => Object.fromEntries(graph.nodes.map((node) => [node.id, node])), [graph.nodes]);
+  const [box, setBox] = useState({ w: 0, h: 0 });
 
-  /** Branches per section, in the order of the questions; lines added by hand go last. */
-  const sections = useMemo(
-    () =>
-      graph.sections.map((section) => {
-        const partIndex = MAP_QUESTION_PARTS.findIndex((part) => part.section === section.key);
-        const part = MAP_QUESTION_PARTS[partIndex];
-        const branches = (part ? part.questions : [])
-          .map((question) => ({
-            key: question.id,
-            question: QUESTIONS_BY_ID[question.id],
-            label: QUESTIONS_BY_ID[question.id].branch,
-            nodes: section.nodes.filter((node) => node.question_id === question.id),
-          }))
-          .filter((branch) => branch.nodes.length);
-        const own = section.nodes.filter((node) => !QUESTIONS_BY_ID[node.question_id]);
-        if (own.length) branches.push({ key: `${section.key}-own`, question: null, label: "Added by you", nodes: own });
-        return { ...section, partIndex, branches, count: section.nodes.length };
-      }),
-    [graph.sections]
-  );
+  useEffect(() => {
+    const element = boxRef.current;
+    if (!element) return undefined;
+    const measure = () => setBox({ w: element.clientWidth, h: element.clientHeight });
+    measure();
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
-  /** "at Gym" / "to Mom's house": a Part 1 answer tied to a place the person named. */
-  const placeNote = (node) => {
-    const question = QUESTIONS_BY_ID[node.question_id];
-    if (!question || !question.aboutPlace) return "";
-    const places = (node.links || [])
-      .map((id) => nodesById[id])
-      .filter((other) => other && other.question_id === "p1-places")
-      .map((other) => other.label || other.text);
-    return places.length ? `${question.aboutPlace} ${places.join(", ")}` : "";
-  };
+  const layout = useMemo(() => layoutGraph(graph, positions), [graph, positions]);
+  const explore = useMemo(() => exploreLines(pick), [pick]);
+  const sectionLabel = (key) => (graph.sections.find((section) => section.key === key) || {}).label || key;
+  const settled = useMemo(() => settle(graph, layout, positions, box), [graph, layout, positions, box]);
 
-  const pickHas = MAP_PICK_FIELDS.some((field) => String((pick || {})[field.id] || "").trim());
-  const pickNothing = Boolean((pick || {}).nothing_yet);
+  const spots = useMemo(() => {
+    const resolved = {};
+    Object.entries(settled).forEach(([id, spot]) => {
+      resolved[id] = preview && preview.id === id ? { x: preview.x, y: preview.y } : spot;
+    });
+    return resolved;
+  }, [settled, preview]);
 
-  /** Dashed curves for links the person chose, measured from where the leaves actually sit. */
-  const measure = useCallback(() => {
-    const box = boxRef.current;
-    if (!box) return;
-    const origin = box.getBoundingClientRect();
-    const spot = (id) => {
-      const el = box.querySelector(`[data-node-id="${id}"]`);
-      if (!el) return null;
-      const rect = el.getBoundingClientRect();
-      return { left: rect.left - origin.left, right: rect.right - origin.left, y: rect.top - origin.top + rect.height / 2 };
-    };
-    const next = [];
-    /** A Part 1 answer tied to a place already says "at Gym" on the leaf, so no curve for it. */
-    const isPlaceTie = (x, y) => {
-      const nx = nodesById[x];
-      const ny = nodesById[y];
-      if (!nx || !ny) return false;
-      const about = (n) => (QUESTIONS_BY_ID[n.question_id] || {}).aboutPlace;
-      return (about(nx) && ny.question_id === "p1-places") || (about(ny) && nx.question_id === "p1-places");
-    };
-    graph.links.forEach(([a, b]) => {
-      if (isPlaceTie(a, b)) return;
-      const pa = spot(a);
-      const pb = spot(b);
-      if (!pa || !pb) return;
-      const x1 = pa.right + 2;
-      const x2 = pb.right + 2;
-      const bulge = origin.width - 12;
-      next.push({
-        id: `${a}-${b}`,
-        d: `M ${x1} ${pa.y} C ${bulge} ${pa.y}, ${bulge} ${pb.y}, ${x2} ${pb.y}`,
-        a: [x1, pa.y],
-        b: [x2, pb.y],
+  const nodesById = useMemo(() => {
+    const map = {};
+    graph.nodes.forEach((node) => {
+      map[node.id] = node;
+    });
+    return map;
+  }, [graph.nodes]);
+
+  const edges = useMemo(() => {
+    const lines = [];
+    graph.sections.forEach((section) => {
+      const hub = layout.sections[section.key];
+      if (!hub) return;
+      lines.push({ id: `hub-${section.key}`, from: layout.hub, to: hub, kind: "root" });
+      section.nodes.forEach((node) => {
+        lines.push({ id: `stem-${node.id}`, from: hub, to: spots[node.id] || hub, kind: "stem" });
       });
     });
-    setCurves(next);
-  }, [graph.links, nodesById]);
+    graph.links.forEach(([a, b]) => {
+      if (!spots[a] || !spots[b]) return;
+      lines.push({ id: `link-${a}-${b}`, from: spots[a], to: spots[b], kind: "chosen" });
+    });
+    return lines;
+  }, [graph, layout, spots]);
 
-  useLayoutEffect(() => {
-    measure();
-    const box = boxRef.current;
-    if (!box || typeof ResizeObserver === "undefined") return undefined;
-    const observer = new ResizeObserver(() => measure());
-    observer.observe(box);
-    return () => observer.disconnect();
-  }, [measure, graph, selectedId]);
+  const startDrag = (event, id) => {
+    if (event.button !== undefined && event.button !== 0) return;
+    drag.current = { id, moved: false };
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
 
-  let order = 0;
-  const delay = () => ({ animationDelay: `${Math.min(order++ * 35, 900)}ms` });
+  const moveDrag = (event, id) => {
+    if (!drag.current || drag.current.id !== id) return;
+    const box = boxRef.current?.getBoundingClientRect();
+    if (!box) return;
+    drag.current.moved = true;
+    setPreview({
+      id,
+      x: clamp((event.clientX - box.left) / box.width, 0.02, 0.98),
+      y: clamp((event.clientY - box.top) / box.height, 0.02, 0.98),
+    });
+  };
+
+  const endDrag = (id) => {
+    const current = drag.current;
+    drag.current = null;
+    if (!current) return;
+    if (current.moved && preview && preview.id === id) {
+      onMove(id, { x: preview.x, y: preview.y });
+      justDragged.current = true;
+    }
+    setPreview(null);
+  };
+
+  const nudge = (event, id) => {
+    const delta = NUDGE_KEYS[event.key];
+    if (!delta) return;
+    event.preventDefault();
+    const spot = spots[id] || { x: 0.5, y: 0.5 };
+    onMove(id, { x: clamp(spot.x + delta[0], 0.02, 0.98), y: clamp(spot.y + delta[1], 0.02, 0.98) });
+  };
 
   return (
+    <div className="overflow-hidden rounded-lg border border-border bg-card/60">
     <div
       ref={boxRef}
-      className="lm-tree relative overflow-hidden rounded-lg border border-border bg-card/60 px-4 pb-6 pt-5 sm:px-6"
-      aria-label="Your Life Map. Each Part is a branch, each question a smaller branch, and each answer a line on it."
+      role="group"
+      aria-label="Life map. Move a line with the arrow keys, or open it to move it with buttons."
+      style={{ minHeight: `${34 + Math.max(0, graph.nodes.length - 10) * 1.6}rem` }}
+      className="relative h-[34rem] w-full overflow-hidden sm:h-[38rem]"
     >
-      <style>{TREE_CSS}</style>
+      <style>{MAP_MOTION_CSS}</style>
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at 15% 0%, hsl(var(--primary) / 0.08), transparent 55%), radial-gradient(ellipse at 100% 100%, hsl(var(--accent-ink-soft) / 0.10), transparent 50%)",
+            "radial-gradient(ellipse at 50% 50%, hsl(var(--primary) / 0.07), transparent 60%), radial-gradient(ellipse at 80% 15%, hsl(var(--accent-ink-soft) / 0.08), transparent 45%)",
         }}
       />
-
-      <svg className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
-        {curves.map((curve) => (
-          <g key={curve.id}>
-            <path className="lm-link" d={curve.d} fill="none" stroke="hsl(var(--accent-ink-soft))" strokeWidth={1.75} strokeLinecap="round" />
-            <circle cx={curve.a[0]} cy={curve.a[1]} r={2.5} fill="hsl(var(--accent-ink-soft))" />
-            <circle cx={curve.b[0]} cy={curve.b[1]} r={2.5} fill="hsl(var(--accent-ink-soft))" />
-          </g>
-        ))}
-      </svg>
-
-      <div className="relative">
-        <div className="lm-in inline-flex flex-col rounded-2xl border border-dashed border-primary/45 bg-background px-4 py-2.5 shadow-sm" style={delay()}>
-          <span className="font-heading text-[15px] leading-tight text-foreground">The life you’re actually living</span>
-          <span className="text-[11.5px] text-muted-faint">your answers, where you put them</span>
-        </div>
-
-        <ol className="mt-3 ml-5 space-y-4" aria-label="Parts of your map">
-          {sections.map((section) => (
-            <li key={section.key} className="lm-branch">
-              <div className="lm-in flex flex-wrap items-center gap-2" style={delay()}>
-                <span className="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-1 text-[13px] font-medium text-primary-foreground shadow-sm">
-                  <span className="text-[11px] opacity-75">Part {section.partIndex + 1}</span>
-                  {section.label}
-                </span>
-                {section.count ? (
-                  <span className="text-[11.5px] text-muted-faint">
-                    {section.count} {section.count === 1 ? "line" : "lines"}
-                  </span>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => onJumpToPart && onJumpToPart(section.partIndex)}
-                    className="text-[12px] text-muted-faint underline decoration-border underline-offset-2 hover:text-primary"
-                  >
-                    Nothing yet. Answer Part {section.partIndex + 1}
-                  </button>
+      {box.w > 0 && box.h > 0 && (
+        <svg
+          className="absolute inset-0 h-full w-full"
+          viewBox={`0 0 ${box.w} ${box.h}`}
+          aria-hidden="true"
+        >
+          {edges.map((edge) => {
+            const a = { x: edge.from.x * box.w, y: edge.from.y * box.h };
+            const b = { x: edge.to.x * box.w, y: edge.to.y * box.h };
+            const d = curve(a, b, edge.id, edge.kind === "root" ? 0.12 : 0.22);
+            if (edge.kind === "chosen") {
+              return (
+                <path
+                  key={edge.id}
+                  className="lm-fade"
+                  d={d}
+                  fill="none"
+                  stroke="hsl(var(--accent-ink-soft))"
+                  strokeWidth={1.75}
+                  strokeLinecap="round"
+                  strokeDasharray="5 5"
+                />
+              );
+            }
+            const root = edge.kind === "root";
+            return (
+              <g key={edge.id}>
+                {root && (
+                  <path d={d} fill="none" stroke="hsl(var(--primary) / 0.08)" strokeWidth={9} strokeLinecap="round" />
                 )}
-              </div>
+                <path
+                  className="lm-grow"
+                  pathLength={1}
+                  d={d}
+                  fill="none"
+                  stroke={root ? "hsl(var(--primary) / 0.45)" : "hsl(var(--muted-foreground) / 0.45)"}
+                  strokeWidth={root ? 2 : 1.25}
+                  strokeLinecap="round"
+                />
+              </g>
+            );
+          })}
+        </svg>
+      )}
 
-              {section.branches.length ? (
-                <ul className="mt-2 ml-3 space-y-2.5">
-                  {section.branches.map((branch) => (
-                    <li key={branch.key} className="lm-twig">
-                      <p className="lm-in text-[12px] font-medium text-accent-ink" style={delay()}>
-                        {branch.label}
-                      </p>
-                      <ul className="mt-1.5 flex flex-wrap gap-1.5">
-                        {branch.nodes.map((node) => {
-                          const note = placeNote(node);
-                          const selected = selectedId === node.id;
-                          return (
-                            <li key={node.id}>
-                              <button
-                                type="button"
-                                data-node-id={node.id}
-                                aria-pressed={selected}
-                                title={node.text}
-                                onClick={() => onSelect(node.id)}
-                                style={delay()}
-                                className={`lm-in max-w-[16rem] rounded-full border bg-background px-3 py-1 text-left text-[13px] leading-snug text-foreground shadow-[0_2px_8px_-3px_hsl(var(--primary)/0.3)] transition hover:border-primary/60 ${
-                                  selected ? "border-primary ring-2 ring-primary/30" : "border-border"
-                                }`}
-                              >
-                                <span className="line-clamp-2">{leafText(node, branch.question) || "Not written yet"}</span>
-                                {note ? <span className="block text-[11px] text-muted-faint">{note}</span> : null}
-                              </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
+      <div
+        className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 rounded-full border border-dashed border-primary/40 bg-background px-4 py-3 text-center"
+        style={{ left: "50%", top: "50%" }}
+      >
+        <span className="font-heading text-[13px] leading-tight text-foreground">The life you’re actually living</span>
+        <span className="text-[11px] text-muted-faint">questions and your lines</span>
+      </div>
+
+      {graph.sections.map((section) => {
+        const hub = layout.sections[section.key];
+        if (!hub) return null;
+        return (
+          <div
+            key={section.key}
+            className="lm-appear absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-full border border-dashed border-border bg-card px-3 py-1.5 shadow-sm"
+            style={{ left: `${hub.x * 100}%`, top: `${hub.y * 100}%` }}
+          >
+            <span className={`h-1.5 w-1.5 rounded-full ${SECTION_DOT[section.key] || "bg-primary"}`} aria-hidden="true" />
+            <span className="font-heading text-[12.5px] text-foreground">{section.label}</span>
+            <span className="text-[11px] text-muted-faint">{section.nodes.length}</span>
+          </div>
+        );
+      })}
+
+      {graph.nodes.map((node) => {
+        const spot = spots[node.id];
+        if (!spot) return null;
+        const label = node.label || node.text;
+        const question = QUESTIONS_BY_ID[node.question_id];
+        const area = sectionLabel(node.section);
+        return (
+          <button
+            key={node.id}
+            type="button"
+            aria-pressed={selectedId === node.id}
+            aria-label={`${area}${question ? `, ${question.branch}` : ""}: ${node.text || "not written yet"}. Open it, or use the arrow keys to move it.`}
+            title={node.text}
+            onPointerDown={(event) => startDrag(event, node.id)}
+            onPointerMove={(event) => moveDrag(event, node.id)}
+            onPointerUp={() => endDrag(node.id)}
+            onPointerCancel={() => endDrag(node.id)}
+            onKeyDown={(event) => nudge(event, node.id)}
+            onClick={() => {
+              if (justDragged.current) {
+                justDragged.current = false;
+                return;
+              }
+              onSelect(node.id);
+            }}
+            style={{ left: `${spot.x * 100}%`, top: `${spot.y * 100}%` }}
+            className={`lm-appear absolute -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none rounded-full border bg-background px-2.5 py-1 text-left shadow-[0_2px_8px_-2px_hsl(var(--primary)/0.25)] transition ${
+              selectedId === node.id
+                ? "border-primary ring-2 ring-primary/30"
+                : "border-border hover:border-primary/60"
+            }`}
+          >
+            <span className="block max-w-[9.5rem] truncate text-[12px] text-foreground">
+              {label || "Not written yet"}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+    {explore.length ? (
+      <div className="border-t border-border px-4 py-3 sm:px-5">
+        <p className="workbook-label">Worth exploring</p>
+        <ul className="mt-2 space-y-1.5">
+          {explore.map((line) => (
+            <li key={line.id}>
+              <button
+                type="button"
+                onClick={() => onJumpToPart && onJumpToPart(MAP_QUESTION_PARTS.length)}
+                className="text-left text-[13px] leading-relaxed text-foreground hover:text-primary"
+              >
+                {line.label ? <span className="text-muted-faint">{line.label} </span> : null}
+                {line.text}
+              </button>
             </li>
           ))}
-
-          <li className="lm-branch">
-            <div className="lm-in" style={delay()}>
-              <span
-                className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[13px] font-medium shadow-sm"
-                style={{ background: "hsl(var(--accent-ink-soft))", color: "hsl(277 34.3% 18%)" }}
-              >
-                <span className="text-[11px] opacity-75">Part 6</span>
-                Worth exploring
-              </span>
-            </div>
-            <div className="lm-in mt-2 ml-3" style={delay()}>
-              {pickNothing ? (
-                <p className="text-[13px] text-muted-foreground">Nothing on the map is worth exploring yet. That counts.</p>
-              ) : pickHas ? (
-                <div
-                  className="max-w-md rounded-xl border bg-background px-4 py-3 shadow-sm"
-                  style={{ borderColor: "hsl(var(--accent-ink-soft))" }}
-                >
-                  {MAP_PICK_FIELDS.map((field) => {
-                    const value = String((pick || {})[field.id] || "").trim();
-                    if (!value) return null;
-                    return (
-                      <p key={field.id} className="text-[13px] leading-relaxed">
-                        <span className="text-muted-faint">{field.label} </span>
-                        <span className="text-foreground">{value}</span>
-                      </p>
-                    );
-                  })}
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => onJumpToPart && onJumpToPart(MAP_QUESTION_PARTS.length)}
-                  className="text-[12px] text-muted-faint underline decoration-border underline-offset-2 hover:text-primary"
-                >
-                  Nothing yet. Answer Part 6
-                </button>
-              )}
-            </div>
-          </li>
-        </ol>
+        </ul>
       </div>
+    ) : null}
     </div>
   );
 }

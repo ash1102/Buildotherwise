@@ -14,9 +14,13 @@ import {
   MAP_SECTIONS,
   addLine,
   buildGraph,
+  exploreLines,
+  layoutGraph,
   removeLine,
   savedAnswerOptions,
+  setNodePosition,
   updateLine,
+  usePositions,
 } from "@/lib/lifeMap";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import DashedMotif from "@/components/workbook/DashedMotif";
@@ -27,8 +31,11 @@ import BringInSavedAnswer from "@/components/map/BringInSavedAnswer";
 import MapQuestions from "@/components/map/MapQuestions";
 import StepNav from "@/components/workbook/StepNav";
 
+const clamp = (value) => Math.min(0.98, Math.max(0.02, value));
+
 export default function LifeMapPage() {
   const map = useLifeMap();
+  const positions = usePositions();
   const [pick] = useStore(MAP_PICK_KEY, {});
   const [step, setStep] = useState(0);
   const mapRef = useRef(null);
@@ -44,6 +51,8 @@ export default function LifeMapPage() {
   /** The map is the opening move, so the step it hands over to is the first Getting Started step. */
   const nextStep = useMemo(() => orderedLessons.find((lesson) => !isOpenerLesson(lesson)) || null, [orderedLessons]);
   const graph = useMemo(() => buildGraph(map), [map]);
+  const layout = useMemo(() => layoutGraph(graph, positions), [graph, positions]);
+  const explore = useMemo(() => exploreLines(pick), [pick]);
   const options = useMemo(() => savedAnswerOptions(lessons, answers), [lessons, answers]);
   const nodesById = useMemo(
     () => Object.fromEntries(graph.nodes.map((node) => [node.id, node])),
@@ -109,6 +118,12 @@ export default function LifeMapPage() {
   const showMap = () => {
     setAsList(false);
     requestAnimationFrame(() => mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
+
+  const nudge = (dx, dy) => {
+    if (!selected) return;
+    const spot = positions[selected.id] || layout.nodes[selected.id] || { x: 0.5, y: 0.5 };
+    setNodePosition(selected.id, { x: clamp(spot.x + dx), y: clamp(spot.y + dy) });
   };
 
   /** One line that holds a list becomes one line per item, in the same area. */
@@ -207,13 +222,15 @@ export default function LifeMapPage() {
 
       <div ref={mapRef} className="scroll-mt-4">
         {asList ? (
-          <LifeMapList graph={graph} selectedId={selectedId} onSelect={setSelectedId} />
+          <LifeMapList graph={graph} explore={explore} selectedId={selectedId} onSelect={setSelectedId} />
         ) : (
           <LifeMapCanvas
             graph={graph}
+            positions={positions}
             pick={pick}
             selectedId={selectedId}
             onSelect={setSelectedId}
+            onMove={(id, spot) => setNodePosition(id, spot)}
             onJumpToPart={(index) => setStep(index)}
           />
         )}
@@ -230,14 +247,16 @@ export default function LifeMapPage() {
           onLinkEntry={(entryId) => saveSelected({ entry_id: entryId })}
           onConnect={connect}
           onDisconnect={disconnect}
+          onNudge={nudge}
           onRemove={removeSelected}
           onSplit={splitSelected}
           onClose={() => setSelectedId(null)}
         />
       ) : (
         <p className="text-[13px] leading-relaxed text-muted-faint">
-          Tap any line on the map to read it in full, rename it, link it to a journal entry, or connect it to another
-          line. Connections you make show as dashed gold curves.
+          Open a line to read it in full, rename it, link it to a journal entry, or connect it to another line. Drag a
+          line to move it, use the arrow keys while it is focused, or use the move buttons once it is open. Connections
+          you make show as dashed gold curves.
         </p>
       )}
 

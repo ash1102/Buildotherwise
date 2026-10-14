@@ -143,6 +143,31 @@ export const MAP_PICK_FIELDS = [
 
 export const MAP_PICK_KEY = "lifeMapPick";
 
+/**
+ * Part 6 is not a line in the lifeMap store. It lives under lifeMapPick, one field
+ * per prompt. Only filled answers are drawn, so a blank box does not become an
+ * empty spot. "Nothing yet" replaces the four fields while it is ticked.
+ */
+export function exploreLines(pick) {
+  const value = pick || {};
+  if (value.nothing_yet) {
+    return [
+      {
+        id: "pick:nothing",
+        fieldId: "nothing_yet",
+        label: "",
+        text: "Nothing on the map is worth exploring yet.",
+      },
+    ];
+  }
+  return MAP_PICK_FIELDS.map((field) => ({
+    id: `pick:${field.id}`,
+    fieldId: field.id,
+    label: field.label,
+    text: String(value[field.id] || "").trim(),
+  })).filter((line) => line.text);
+}
+
 /** The line an answer becomes. A sentence starter keeps its start so the line reads on its own. */
 export function lineFromAnswer(question, answer) {
   const value = String(answer || "").trim();
@@ -249,23 +274,59 @@ export function buildGraph(map) {
 
 const SECTION_RX = 0.30;
 const SECTION_RY = 0.36;
-const ROW = 0.072;
-const COL = 0.25;
+/** Half the gap between neighbouring areas, so a line cannot land in the next one. */
+export const SECTION_AREA_RADIUS = 0.16;
+const AREA_RADIUS = SECTION_AREA_RADIUS - 0.015;
+const AREA_MARGIN = 0.08;
 
-/**
- * Open spots around a question, nearest first, as [column, row] steps. Rows run
- * away from the middle where there is room, so lines stack under their question
- * instead of piling on top of each other.
- */
-function slotsFor(hub) {
-  const down = hub.y < 0.5;
-  const rows = down ? [1, 2, 3, 4] : [1, -1, 2, -2];
-  return rows.map((row) => [0, row]);
+function questionRank(sectionKey, questionId) {
+  const part = MAP_QUESTION_PARTS.find((item) => item.section === sectionKey);
+  if (!part) return 1000;
+  const index = part.questions.findIndex((question) => question.id === questionId);
+  return index === -1 ? 1000 : index;
 }
 
-const within = (value) => Math.min(0.94, Math.max(0.06, value));
+/**
+ * Spots inside one section's area, nearest the hub first and starting on the side
+ * that faces away from the middle. Answers to the same question are placed in order,
+ * so they sit together in the area that question belongs to.
+ */
+function slotsNearHub(hub, angle, count) {
+  const chosen = [];
+  const minGap = 0.048;
+  const taken = (point) => chosen.some((other) => Math.hypot(point.x - other.x, point.y - other.y) < minGap);
 
-/** Where each node sits before anyone moves it: stacked by its own question, away from the middle. */
+  for (let ring = 0; ring < 8 && chosen.length < count; ring += 1) {
+    const radius = 0.052 + ring * 0.028;
+    if (radius > AREA_RADIUS) break;
+    const steps = Math.max(6, 4 + ring * 4);
+    for (let step = 0; step < steps && chosen.length < count; step += 1) {
+      const turn = (step / steps) * Math.PI * 2;
+      const point = {
+        x: hub.x + Math.cos(angle + turn) * radius,
+        y: hub.y + Math.sin(angle + turn) * radius,
+      };
+      if (Math.hypot(point.x - hub.x, point.y - hub.y) > AREA_RADIUS) continue;
+      if (point.x < AREA_MARGIN || point.x > 1 - AREA_MARGIN || point.y < AREA_MARGIN || point.y > 1 - AREA_MARGIN) {
+        continue;
+      }
+      if (taken(point)) continue;
+      chosen.push(point);
+    }
+  }
+
+  let extra = 0;
+  while (chosen.length < count) {
+    extra += 1;
+    chosen.push({
+      x: Math.min(1 - AREA_MARGIN, Math.max(AREA_MARGIN, hub.x + ((extra % 3) - 1) * 0.03)),
+      y: Math.min(1 - AREA_MARGIN, Math.max(AREA_MARGIN, hub.y)),
+    });
+  }
+  return chosen;
+}
+
+/** Where each node sits before anyone moves it: in the area of the question it answers. */
 export function defaultPositions(sections) {
   const count = sections.length || 1;
   const spots = { sections: {}, nodes: {} };
@@ -275,14 +336,13 @@ export function defaultPositions(sections) {
     const hub = { x: 0.5 + Math.cos(angle) * SECTION_RX, y: 0.5 + Math.sin(angle) * SECTION_RY };
     spots.sections[section.key] = hub;
 
-    const slots = slotsFor(hub);
-    section.nodes.forEach((node, position) => {
-      const [column, row] = slots[position % slots.length];
-      const lap = Math.floor(position / slots.length) * 0.02;
-      spots.nodes[node.id] = {
-        x: within(hub.x + column * COL + lap),
-        y: within(hub.y + row * ROW + lap),
-      };
+    const ordered = section.nodes
+      .map((node, order) => ({ node, order, rank: questionRank(section.key, node.question_id) }))
+      .sort((a, b) => a.rank - b.rank || a.order - b.order)
+      .map((item) => item.node);
+    const slots = slotsNearHub(hub, angle, ordered.length);
+    ordered.forEach((node, position) => {
+      spots.nodes[node.id] = slots[position];
     });
   });
 
