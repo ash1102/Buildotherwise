@@ -68,11 +68,14 @@ export default function SiteHeader() {
         </Link>
 
         <nav aria-label="Main" className="hidden min-w-0 flex-wrap items-center gap-x-1 lg:flex">
-          {links.slice(0, 8).map((link) => (
-            <NavLink key={link.to} to={link.to} end={link.end} className={linkClass}>
-              {link.label}
-            </NavLink>
-          ))}
+          {links
+            .filter((link) => link.to !== "/journal")
+            .slice(0, 7)
+            .map((link) => (
+              <NavLink key={link.to} to={link.to} end={link.end} className={linkClass}>
+                {link.label}
+              </NavLink>
+            ))}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -86,6 +89,12 @@ export default function SiteHeader() {
                   Preview
                 </Link>
               ) : null}
+              <Link
+                to="/journal"
+                className="inline-flex items-center rounded-md px-2.5 py-2 text-[14px] font-medium text-foreground transition hover:bg-secondary"
+              >
+                Journal
+              </Link>
               <button
                 type="button"
                 id="journal-trigger"

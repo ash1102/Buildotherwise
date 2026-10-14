@@ -17,6 +17,7 @@ import DictateButton from "./DictateButton";
 import TryPlanner from "./TryPlanner";
 import TryCheckIn from "./TryCheckIn";
 import { interactionsFor } from "@/lib/interactions";
+import { journalStepHref } from "@/lib/journal";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor } from "@/lib/workbook";
 
 /** The full journal-minimum paragraph is shown on the first steps; after that, a one-line reminder. */
@@ -331,12 +332,24 @@ export default function LessonView({
     });
   }
 
+  const journalHref = journalStepHref(lesson.code);
+  const savesToJournal =
+    tryPrompts.length > 0 || reflectPrompts.length > 0 || asksForDecision || interactions.length > 0;
+  const closingJournalHref = lesson.what_comes_out || !savesToJournal ? "" : journalHref;
+
   if (lesson.what_comes_out) {
     beats.push({
       key: "ending",
       label: "Wrapping up",
       tone: "out",
-      content: <p className="max-w-[68ch] text-[17px] leading-relaxed text-foreground">{lesson.what_comes_out}</p>,
+      content: (
+        <div className="space-y-3">
+          <p className="max-w-[68ch] text-[17px] leading-relaxed text-foreground">{lesson.what_comes_out}</p>
+          <Link to={journalHref} className="inline-block text-[15px] font-medium text-accent-ink underline underline-offset-2">
+            See it in your journal
+          </Link>
+        </div>
+      ),
     });
   }
 
@@ -375,7 +388,9 @@ export default function LessonView({
         status={status}
       />
 
-      {beats.length ? <LessonBeats key={lesson.code} beats={beats} /> : null}
+      {beats.length ? (
+        <LessonBeats key={lesson.code} beats={beats} journalHref={closingJournalHref} />
+      ) : null}
 
       <FeedbackForm moduleOrder={lesson.module_order} lessonCode={lesson.code} />
 
@@ -387,6 +402,7 @@ export default function LessonView({
         backLabel={backLabel}
         forward={forward}
         endNote={endNote}
+        nextLabel="Next"
       />
     </article>
   );

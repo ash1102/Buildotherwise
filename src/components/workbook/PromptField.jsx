@@ -32,10 +32,26 @@ export default function PromptField({
   useEffect(() => {
     setValue(getAnswer(lessonCode, index));
     setState("idle");
-    return () => {
-      if (timer.current) clearTimeout(timer.current);
-    };
   }, [lessonCode, index]);
+
+  // Leaving the step before the pause ends still writes the note, so the journal has it.
+  useEffect(() => {
+    return () => {
+      if (!timer.current) return;
+      clearTimeout(timer.current);
+      timer.current = null;
+      const pending = valueRef.current;
+      setAnswer(lessonCode, index, pending);
+      saveAnswer({
+        lessonCode,
+        lessonTitle,
+        promptKey: `${lessonCode}#${index}`,
+        promptLabel: label,
+        body: pending,
+        route,
+      });
+    };
+  }, [lessonCode, lessonTitle, index, label, route]);
 
   valueRef.current = value;
 
@@ -60,6 +76,7 @@ export default function PromptField({
     setState("saving");
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
+      timer.current = null;
       setAnswer(lessonCode, index, next);
       saveAnswer({
         lessonCode,

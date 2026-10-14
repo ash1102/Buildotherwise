@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 /** Surfaces a section can use. Written as literal strings so Tailwind keeps them. */
@@ -16,7 +17,7 @@ const TONES = {
  * heading into view below the sticky header and moves focus to that heading — never
  * into a writing box, and never while someone is writing.
  */
-export default function LessonBeats({ beats }) {
+export default function LessonBeats({ beats, journalHref = "" }) {
   const [current, setCurrent] = useState(0);
   const [openAll, setOpenAll] = useState(false);
   const headingRefs = useRef([]);
@@ -143,7 +144,7 @@ export default function LessonBeats({ beats }) {
             );
           })}
 
-      {!openAll ? (
+      {!openAll && !last ? (
         <div className="flex flex-wrap items-center gap-3 pt-1">
           {prev ? (
             <button
@@ -164,18 +165,19 @@ export default function LessonBeats({ beats }) {
               Next part · {next.label}
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </button>
-          ) : (
-            <p className="text-[15px] text-muted-foreground">
-              That is the last part of this step. Use the links below to go on.
-            </p>
-          )}
+          ) : null}
         </div>
       ) : null}
 
-      {!openAll && last ? (
-        <p className="text-[14px] text-muted-faint">
-          Anything above can be reopened to change your writing. Your writing saves as you type.
-        </p>
+      {openAll || last ? (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
+          <p className="text-[14px] text-muted-faint">Saved as you type.</p>
+          {journalHref ? (
+            <Link to={journalHref} className="text-[15px] font-medium text-accent-ink underline underline-offset-2">
+              See it in your journal
+            </Link>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );
