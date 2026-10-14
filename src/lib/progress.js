@@ -1,5 +1,6 @@
 import { answerKey, routeSkipsWriting } from "./workbook";
 import { isOpenerLesson } from "./curriculum";
+import { readSubmitted } from "./gettingStarted";
 
 /**
  * Completion follows the curriculum's own shape: a step counts once one Try or
@@ -70,7 +71,9 @@ export function buildProgress({ modules, lessonsByOrder, answers, states }) {
      * of Getting Started's steps, so it never counts here and nothing waits on it.
      */
     const lessons = ((lessonsByOrder || {})[module.order] || []).filter((lesson) => !isOpenerLesson(lesson));
-    const incomplete = lessons.filter((lesson) => !stepComplete(lesson, answers, states));
+    /** Once Getting Started is submitted it is finished, whatever was skipped inside it. */
+    const submittedOrientation = module.kind === "orientation" && Boolean(readSubmitted());
+    const incomplete = submittedOrientation ? [] : lessons.filter((lesson) => !stepComplete(lesson, answers, states));
 
     byOrder[module.order] = {
       order: module.order,
