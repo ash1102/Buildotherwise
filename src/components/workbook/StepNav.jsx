@@ -6,7 +6,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
  * The end of a step. This is where the whole lesson/module moves on, which is a
  * different action from the section-by-section controls inside the step.
  */
-export default function StepNav({ prev, next, nextIsModule = false, workbookLink = "/" }) {
+export default function StepNav({ prev, next, nextIsModule = false, workbookLink = "/", nextLabel = "" }) {
   return (
     <nav className="no-print flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
@@ -27,14 +27,19 @@ export default function StepNav({ prev, next, nextIsModule = false, workbookLink
       {next ? (
         <Link
           to={`/lesson/${next.code}`}
+          aria-label={nextLabel ? `${nextLabel}: ${next.title}` : undefined}
           className="inline-flex max-w-full items-center gap-2 self-start rounded-md bg-primary px-4 py-2.5 text-[15px] font-medium text-primary-foreground transition hover:bg-primary/90 sm:ml-auto sm:self-auto"
         >
-          <span className="min-w-0">
-            <span className="block text-[13px] text-primary-foreground/80">
-              {nextIsModule ? "Next module" : "Next lesson"}
+          {nextLabel ? (
+            <span>{nextLabel}</span>
+          ) : (
+            <span className="min-w-0">
+              <span className="block text-[13px] text-primary-foreground/80">
+                {nextIsModule ? "Next module" : "Next lesson"}
+              </span>
+              <span className="block truncate">{next.title}</span>
             </span>
-            <span className="block truncate">{next.title}</span>
-          </span>
+          )}
           <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
         </Link>
       ) : (

@@ -3,6 +3,18 @@ import { makeId, readStore, subscribeStore, writeStore } from "./store";
 
 const KEY = "journal";
 
+/** The Journal page, opened on one step's notes when a step is known. */
+export function journalStepHref(lessonCode) {
+  const code = String(lessonCode || "").trim();
+  if (!code) return "/journal";
+  return `/journal?step=${encodeURIComponent(code)}`;
+}
+
+/** DOM id for the group of notes from one step. */
+export function journalStepDomId(lessonCode) {
+  return `journal-step-${String(lessonCode || "").replace(/[^A-Za-z0-9._-]/g, "")}`;
+}
+
 export function listEntries() {
   const entries = readStore(KEY, []);
   return [...entries].sort((a, b) => (a.created_date < b.created_date ? 1 : -1));

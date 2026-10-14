@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import moment from "moment";
 import { Download, PenLine, Printer, Send, Share2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
 import { base44 } from "@/api/base44Client";
-import { addFollowUp, removeEntry, reviseEntry, updateEntry, useJournalEntries } from "@/lib/journal";
+import { addFollowUp, journalStepDomId, removeEntry, reviseEntry, updateEntry, useJournalEntries } from "@/lib/journal";
 import { createDiscovery, listDiscoveries } from "@/lib/discoveries";
 import { downloadText } from "@/lib/download";
 import EntryCard from "@/components/journal/EntryCard";
@@ -23,6 +24,8 @@ const TABS = [
 
 export default function JournalPage() {
   const entries = useJournalEntries();
+  const [params] = useSearchParams();
+  const stepCode = params.get("step") || "";
   const [tab, setTab] = useState("all");
   const [selected, setSelected] = useState([]);
   const [pending, setPending] = useState(null);
@@ -77,6 +80,17 @@ export default function JournalPage() {
     });
     return groups;
   }, [topLevel]);
+
+  const stepNotes = useMemo(
+    () => (stepCode ? entries.filter((entry) => entry.lesson_code === stepCode) : []),
+    [entries, stepCode]
+  );
+
+  useEffect(() => {
+    if (!stepCode || stepNotes.length === 0) return;
+    const node = document.getElementById(journalStepDomId(stepCode));
+    if (node) node.scrollIntoView({ block: "start" });
+  }, [stepCode, stepNotes.length]);
 
   const focusComposer = () => {
     const box = document.getElementById("journal-entry-box");
@@ -287,7 +301,9 @@ export default function JournalPage() {
         <section className="rounded-xl border border-dashed border-input bg-card p-5">
           <h2 className="text-[19px]">Start wherever you are.</h2>
           <p className="mt-2 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-            Write a thought, question, or observation. Responses you save from lessons will appear here too.
+            {stepCode
+              ? "Nothing from this step is here yet. A note you save on the step shows up here."
+              : "Write a thought, question, or observation. Responses you save from lessons will appear here too."}
           </p>
           <Button
             type="button"
@@ -306,9 +322,24 @@ export default function JournalPage() {
             </p>
           ) : null}
 
-          {grouped.map((group) => (
-            <section key={group.key}>
-              <p className="workbook-label">{group.title}</p>
+          {stepCode && stepNotes.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-input bg-card p-5 text-[17px] leading-relaxed text-muted-foreground">
+              Nothing from this step is here yet. A note you save on the step shows up here.
+            </p>
+          ) : null}
+
+          {grouped.map((group, index) => {
+            const fromThisStep =
+              Boolean(stepCode) &&
+              group.key === stepCode &&
+              grouped.findIndex((item) => item.key === stepCode) === index;
+            return (
+              <section
+                key={`${group.key}-${index}`}
+                id={fromThisStep ? journalStepDomId(stepCode) : undefined}
+                className={fromThisStep ? "rounded-xl bg-secondary p-4" : undefined}
+              >
+                <p className="workbook-label">{group.title}</p>
               <div className="mt-3 space-y-3">
                 {group.items.map((entry) => {
                   const earlier = entry.revision_of
@@ -365,7 +396,8 @@ export default function JournalPage() {
                 })}
               </div>
             </section>
-          ))}
+            );
+          })}
         </div>
       )}
 
