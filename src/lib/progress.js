@@ -20,8 +20,8 @@ function isBlank(value) {
   return !String(value === null || value === undefined ? "" : value).trim();
 }
 
-/** The tap-to-answer pieces (try plan, check-in) save a line of their own; it counts like a Try box. */
-const INTERACTION_ANSWERS = ["plan", "checkin"];
+/** The tap-to-answer pieces (try plan, check-in, sort) save a line of their own; it counts like a Try box. */
+const INTERACTION_ANSWERS = ["plan", "checkin", "sort"];
 
 function hasInteractionLine(lesson, answers) {
   return INTERACTION_ANSWERS.some((key) => !isBlank((answers || {})[`${lesson.code}#${key}`]));
