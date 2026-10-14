@@ -14,7 +14,7 @@ const Engine =
  * no audio, and costs nothing. The short note is the default so the explanation is
  * not repeated under every box.
  */
-export default function DictateButton({ onText }) {
+export default function DictateButton({ onText, buttonRef }) {
   const [listening, setListening] = useState(false);
   const [note, setNote] = useState("");
   const engine = useRef(null);
@@ -82,6 +82,7 @@ export default function DictateButton({ onText }) {
   return (
     <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1">
       <button
+        ref={buttonRef}
         type="button"
         onClick={listening ? stop : start}
         aria-pressed={listening}

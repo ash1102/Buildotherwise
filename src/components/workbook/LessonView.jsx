@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import Prose from "./Prose";
@@ -29,7 +29,7 @@ function teachTextFor(lesson) {
   return text.replace(/\*\*Journal minimum:\*\*[^\n]*/, JOURNAL_MINIMUM_SHORT);
 }
 
-function TalkBar({ hasRoutes, talking, onSay, onWrite, onText }) {
+function TalkBar({ hasRoutes, talking, onSay, onWrite, onText, buttonRef }) {
   if (hasRoutes && !talking) return null;
 
   const chip = (active) =>
@@ -49,7 +49,7 @@ function TalkBar({ hasRoutes, talking, onSay, onWrite, onText }) {
           </button>
         </>
       )}
-      {talking ? <DictateButton onText={onText} /> : null}
+      {talking ? <DictateButton onText={onText} buttonRef={buttonRef} /> : null}
     </div>
   );
 }
@@ -106,6 +106,13 @@ export default function LessonView({
   const talking = hasRoutes ? Boolean(guidance && guidance.voice) : sayIt;
   const fieldApis = useRef({});
   const activeField = useRef(null);
+  const talkButtonRef = useRef(null);
+  const exampleRef = useRef(null);
+  const detailRef = useRef(null);
+  const routeIntent = useRef("");
+  const writeTarget = useRef(null);
+  const watching = /^watch$/i.test(String(route || "").trim());
+  writeTarget.current = tryPrompts[0] || reflectPrompts[0] || null;
 
   const bindField = useCallback((key, api) => {
     if (api) fieldApis.current[key] = api;
@@ -141,6 +148,35 @@ export default function LessonView({
     />
   );
 
+  const chooseRoute = (next) => {
+    routeIntent.current = next;
+    onRouteChange(next);
+  };
+
+  useEffect(() => {
+    const intent = routeIntent.current;
+    if (!intent || String(route || "") !== intent) return undefined;
+    routeIntent.current = "";
+    const action = intent.trim().toLowerCase();
+    const frame = requestAnimationFrame(() => {
+      if (action === "write it") {
+        if (detailRef.current) detailRef.current.open = true;
+        const target = writeTarget.current;
+        const api = target ? fieldApis.current[target.fieldKey] : null;
+        if (api && api.focus) api.focus();
+        else if (target) {
+          const node = document.getElementById(`${lesson.code}-${target.index}`);
+          if (node) node.focus();
+        }
+      } else if (action === "say it" && talkButtonRef.current) {
+        talkButtonRef.current.focus();
+      } else if (action === "watch" && exampleRef.current) {
+        exampleRef.current.scrollIntoView({ block: "nearest" });
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [route, lesson.code]);
+
   const talkControl =
     tryPrompts.length || reflectPrompts.length ? (
       <TalkBar
@@ -152,8 +188,32 @@ export default function LessonView({
           const api = currentApi();
           if (api) api.insertText(heard, previousTail);
         }}
+        buttonRef={talkButtonRef}
       />
     ) : null;
+
+  // Route choices sit at the top of the writing section and act on this step.
+  // Part numbers follow the sections that remain.
+  const answerChoices = hasRoutes ? (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <p id={`answer-route-${lesson.code}`} className="text-[15px] font-medium text-foreground">
+          How do you want to answer?
+        </p>
+        <RouteChips
+          routes={routes}
+          value={route}
+          onChange={chooseRoute}
+          labelledBy={`answer-route-${lesson.code}`}
+        />
+      </div>
+      {watching && lesson.show ? (
+        <div ref={exampleRef} className="rounded-lg border border-border bg-secondary p-3 sm:p-4">
+          <WorkedExample text={lesson.show} />
+        </div>
+      ) : null}
+    </div>
+  ) : null;
 
   const beats = [];
 
@@ -199,33 +259,21 @@ export default function LessonView({
     });
   }
 
-  if (hasRoutes) {
-    beats.push({
-      key: "route",
-      label: "How you'll write",
-      content: (
-        <div className="space-y-3">
-          <RouteChips routes={routes} value={route} onChange={onRouteChange} />
-          <PrivacyNote />
-        </div>
-      ),
-    });
-  }
-
   if (tryPrompts.length) {
     beats.push({
       key: "try",
       label: "Try",
       content: (
         <div className="space-y-6">
+          {answerChoices}
           {talkControl}
-          {hasRoutes ? null : <PrivacyNote />}
+          <PrivacyNote />
           {carrySources && carrySources.length ? (
             <CarryForward sources={carrySources} selected={carried} onChange={onCarriedChange} />
           ) : null}
           {interactions.map(renderInteraction)}
           {hasPlanner ? (
-            <details className="rounded-xl border border-border bg-card p-4 sm:p-5">
+            <details ref={detailRef} className="rounded-xl border border-border bg-card p-4 sm:p-5">
               <summary className="cursor-pointer text-[16px] font-medium text-foreground">
                 Add more detail (optional) · {tryPrompts.length} questions
               </summary>
@@ -241,6 +289,12 @@ export default function LessonView({
         </div>
       ),
     });
+  } else if (hasRoutes && !reflectPrompts.length) {
+    beats.push({
+      key: "try",
+      label: "Try",
+      content: <div className="space-y-6">{answerChoices}</div>,
+    });
   }
 
   if (reflectPrompts.length) {
@@ -249,8 +303,9 @@ export default function LessonView({
       label: "Reflect",
       content: (
         <div className="space-y-6">
+          {tryPrompts.length ? null : answerChoices}
           {tryPrompts.length ? null : talkControl}
-          {tryPrompts.length || hasRoutes ? null : <PrivacyNote />}
+          {tryPrompts.length ? null : <PrivacyNote />}
           {reflectPrompts.map((item) => promptField(item.prompt, item.index, item.fieldKey))}
         </div>
       ),

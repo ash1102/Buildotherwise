@@ -50,7 +50,7 @@ export function decisionOptionsFor(lesson) {
   return own.length ? own : NEXT_DECISIONS;
 }
 
-/** Say it turns on the one talk control. Anything else is just a label. */
+/** Say it shows the talk control. Watch and Pass need no writing. Anything else is a label. */
 export function routeGuidanceFor(route) {
   if (route === PAUSE_ROUTE) return { label: PAUSE_ROUTE, field: "line", paused: true };
   if (route === "Say it") return { label: "Say it", field: "full", voice: true };
