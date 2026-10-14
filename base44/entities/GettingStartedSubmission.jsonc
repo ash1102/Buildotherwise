@@ -1,0 +1,56 @@
+{
+  "name": "GettingStartedSubmission",
+  "properties": {
+    "change_help": {
+      "description": "Optional: what would help if they want to change their choice later.",
+      "type": "string"
+    },
+    "choice_note": {
+      "description": "Optional note the person added to their choice.",
+      "type": "string"
+    },
+    "description": {
+      "description": "Short preview text.",
+      "type": "string"
+    },
+    "join_choice": {
+      "description": "Join, Join with adjustments, Not yet, No thanks, or blank if they passed.",
+      "type": "string"
+    },
+    "support_plan": {
+      "description": "What makes it work for you (O.4), only the boxes the person filled in.",
+      "items": {
+        "properties": {
+          "answer": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [],
+  "rls": {
+    "create": {},
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
+}
