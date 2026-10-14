@@ -2,12 +2,21 @@ import { useEffect } from "react";
 import { readStore, useStore, writeStore } from "./store";
 
 /**
- * Getting Started as a one-time pop-up. It opens on someone's first visit, can be
- * closed with "Not now" and reopened from the home page, and once submitted it is
- * finished: it stops appearing, and the answers stay readable in Settings.
+ * Getting Started is the gate before the workbook: steps O.1 to O.5.
+ * Whether those steps are done is decided from the answers saved in the browser.
+ * The popup below is an older way to fill the same boxes. Submitting it does not
+ * open the workbook. The five steps do.
  */
 
-export const GS_CODES = ["O.1", "O.2", "O.3", "O.4", "O.5"];
+export {
+  GS_CODES,
+  isGettingStartedLesson,
+  gettingStartedSteps,
+  gettingStartedStepDone,
+  gettingStartedFinished,
+  gettingStartedResumePath,
+} from "./gettingStartedProgress";
+
 export const GS_SUBMITTED_KEY = "gettingStartedSubmitted";
 export const GS_SEEN_KEY = "gettingStartedPopupSeen";
 const OPEN_EVENT = "entrepalooza:open-getting-started";
@@ -29,10 +38,6 @@ export function joinChoiceText(choice, note) {
   const cleanNote = String(note || "").trim();
   if (!choice) return cleanNote;
   return cleanNote ? `${choice} — ${cleanNote}` : choice;
-}
-
-export function isGettingStartedLesson(lesson) {
-  return Boolean(lesson) && GS_CODES.includes(lesson.code);
 }
 
 export function readSubmitted() {

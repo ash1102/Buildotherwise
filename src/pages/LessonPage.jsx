@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import useCurriculum from "@/hooks/useCurriculum";
 import {
   buildCarrySources,
@@ -13,11 +13,13 @@ import {
   useWorkbook,
 } from "@/lib/workbook";
 import { saveAnswer } from "@/lib/journal";
-import { isComingLater, isOpenerLesson } from "@/lib/curriculum";
+import { isComingLater, isOpenerLesson, isWorkbookLesson } from "@/lib/curriculum";
+import { gettingStartedFinished, gettingStartedSteps, isGettingStartedLesson } from "@/lib/gettingStarted";
 import { buildProgress } from "@/lib/progress";
 import LockedNotice from "@/components/workbook/LockedNotice";
 import ComingLaterNotice from "@/components/workbook/ComingLaterNotice";
 import LessonView from "@/components/workbook/LessonView";
+import { useWorkbookGate } from "@/components/WorkbookGate";
 import { useJournalContext } from "@/components/journal/JournalContext";
 import { useAuth } from "@/lib/AuthContext";
 import LoginRedirect from "@/components/LoginRedirect";
@@ -25,20 +27,23 @@ import { loadStepReadings } from "@/lib/library";
 
 export default function LessonPage() {
   const { code } = useParams();
-  const { modules, lessonsByOrder, lessonsByCode, orderedLessons, loading } = useCurriculum();
-  const { answers, decisions } = useWorkbook();
+  const { modules, lessons, lessonsByOrder, lessonsByCode, orderedLessons, loading } = useCurriculum();
+  const { answers } = useWorkbook();
   const states = useStepState();
   const carriedMap = useCarried();
   const decisionsMap = useDecisions();
   const { setLesson } = useJournalContext();
   const { isAuthenticated } = useAuth();
   const [readingState, setReadingState] = useState({ code: "", items: [], ready: false });
+  const gate = useWorkbookGate();
 
   const lesson = lessonsByCode[code];
   const module = lesson ? modules.find((item) => item.order === lesson.module_order) : null;
-  /** The opener stands first, so it opens the sequence rather than ending it. */
+  /** Getting Started is the five-step gate. Begin here is the opener, and it is not Module 1. */
+  const gsLesson = isGettingStartedLesson(lesson);
   const opener = isOpenerLesson(lesson);
-  const firstStep = orderedLessons.find((item) => !isOpenerLesson(item)) || null;
+  const gsSteps = gettingStartedSteps(lessons);
+  const bookLessons = orderedLessons.filter(isWorkbookLesson);
 
   useEffect(() => {
     if (lesson) setLesson({ code: lesson.code, title: lesson.title });
@@ -61,16 +66,26 @@ export default function LessonPage() {
     };
   }, [code]);
 
-  const position = orderedLessons.findIndex((item) => item.code === code);
-  const prev = opener ? null : position > 0 ? orderedLessons[position - 1] : null;
-  const next = opener
-    ? firstStep
-    : position >= 0 && position < orderedLessons.length - 1
-      ? orderedLessons[position + 1]
-      : null;
+  let prev = null;
+  let next = null;
+  let nextIsModule = false;
+  if (gsLesson) {
+    const index = gsSteps.findIndex((item) => item.code === lesson.code);
+    prev = index > 0 ? gsSteps[index - 1] : null;
+    next = index >= 0 && index < gsSteps.length - 1 ? gsSteps[index + 1] : null;
+  } else if (opener) {
+    next = bookLessons[0] || null;
+    nextIsModule = Boolean(next);
+  } else if (lesson) {
+    const position = bookLessons.findIndex((item) => item.code === code);
+    prev = position > 0 ? bookLessons[position - 1] : null;
+    next = position >= 0 && position < bookLessons.length - 1 ? bookLessons[position + 1] : null;
+    nextIsModule = Boolean(next && next.module_order !== lesson.module_order);
+  }
 
-  const siblings = lesson ? lessonsByOrder[lesson.module_order] || [] : [];
+  const siblings = lesson ? (lessonsByOrder[lesson.module_order] || []).filter(isWorkbookLesson) : [];
   const stepIndex = siblings.findIndex((item) => item.code === code) + 1;
+  const gsIndex = gsSteps.findIndex((item) => item.code === code);
 
   const carrySources = useMemo(
     () => buildCarrySources(lesson ? lesson.carry_forward : [], lessonsByCode),
@@ -82,11 +97,11 @@ export default function LessonPage() {
     [modules, lessonsByOrder, answers, states]
   );
 
-  if (loading) {
+  if (loading || gate.pending) {
     return <p className="py-10 text-[16px] text-muted-faint">Opening the step…</p>;
   }
 
-  if (!lesson || !module) {
+  if (!lesson || (!module && !gsLesson)) {
     return (
       <div className="py-10">
         <h1>That step isn’t part of Pilot 1.</h1>
@@ -97,20 +112,37 @@ export default function LessonPage() {
     );
   }
 
-  // The numbered modules are for participants. Getting Started's steps stay open to everyone.
-  if (module.kind !== "orientation" && !isAuthenticated) {
+  // Workbook steps wait until Getting Started is done. The five steps themselves stay open.
+  if (!gsLesson && !gate.finished) {
+    return <Navigate to={gate.resumePath} replace />;
+  }
+
+  if (!gsLesson && (!module || module.kind !== "orientation") && !isAuthenticated) {
     return <LoginRedirect />;
   }
 
-  const moduleTitle = opener
-    ? "Begin here"
-    : module.kind === "orientation"
-      ? "Getting Started"
-      : `Module ${module.order}: ${module.title}`;
-  const workbookLink = opener ? "/" : module.kind === "orientation" ? "/getting-started" : `/module/${module.slug}`;
+  const moduleTitle = gsLesson
+    ? "Getting Started"
+    : opener
+      ? "Begin here"
+      : module.kind === "orientation"
+        ? "Getting Started"
+        : `Module ${module.order}: ${module.title}`;
+  const workbookLink = gsLesson || (module && module.kind === "orientation") ? "/getting-started" : opener ? "/" : `/module/${module.slug}`;
+  const backLabel = gsLesson ? "Back to Getting Started" : "Back to the workbook";
+  const stepsDone = gettingStartedFinished(lessons, answers, states);
+  const forward =
+    gsLesson && !next && stepsDone
+      ? {
+          to: isAuthenticated ? "/" : "/login?returnTo=%2F",
+          kicker: "Next",
+          title: "Open the workbook",
+        }
+      : null;
+  const endNote = gsLesson && !next && !stepsDone ? "Finish this step to open the workbook." : undefined;
 
   // A module that was never built into the pilot is a different state from one that is waiting on writing.
-  if (isComingLater(module)) {
+  if (!gsLesson && module && isComingLater(module)) {
     return (
       <div className="space-y-6">
         <header className="border-b border-border pb-5">
@@ -122,8 +154,8 @@ export default function LessonPage() {
     );
   }
 
-  const row = progress.byOrder[module.order];
-  if (row && !row.unlocked) {
+  const row = module ? progress.byOrder[module.order] : null;
+  if (!gsLesson && row && !row.unlocked) {
     const blocker = progress.blockingOrder === null ? null : progress.byOrder[progress.blockingOrder];
     return (
       <div className="space-y-6">
@@ -148,12 +180,15 @@ export default function LessonPage() {
     <LessonView
       lesson={lesson}
       moduleTitle={moduleTitle}
-      stepNumber={opener ? 0 : stepIndex}
-      stepCount={opener ? 0 : siblings.length}
+      stepNumber={gsLesson ? gsIndex + 1 : opener ? 0 : stepIndex}
+      stepCount={gsLesson ? gsSteps.length : opener ? 0 : siblings.length}
       prev={prev}
       next={next}
-      nextIsModule={Boolean(next && module && next.module_order !== lesson.module_order)}
+      nextIsModule={nextIsModule}
       workbookLink={workbookLink}
+      backLabel={backLabel}
+      forward={forward}
+      endNote={endNote}
       answers={answers}
       decisions={decisionsMap}
       states={states}
