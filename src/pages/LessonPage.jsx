@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import useCurriculum from "@/hooks/useCurriculum";
 import {
@@ -23,6 +23,7 @@ import { useWorkbookGate } from "@/components/WorkbookGate";
 import { useJournalContext } from "@/components/journal/JournalContext";
 import { useAuth } from "@/lib/AuthContext";
 import LoginRedirect from "@/components/LoginRedirect";
+import { loadStepReadings } from "@/lib/library";
 
 export default function LessonPage() {
   const { code } = useParams();
@@ -33,6 +34,7 @@ export default function LessonPage() {
   const decisionsMap = useDecisions();
   const { setLesson } = useJournalContext();
   const { isAuthenticated } = useAuth();
+  const [readingState, setReadingState] = useState({ code: "", items: [], ready: false });
   const gate = useWorkbookGate();
 
   const lesson = lessonsByCode[code];
@@ -47,6 +49,22 @@ export default function LessonPage() {
     if (lesson) setLesson({ code: lesson.code, title: lesson.title });
     return () => setLesson(null);
   }, [lesson, setLesson]);
+
+  useEffect(() => {
+    if (!code) return undefined;
+    let active = true;
+    setReadingState({ code, items: [], ready: false });
+    loadStepReadings(code)
+      .then((items) => {
+        if (active) setReadingState({ code, items, ready: true });
+      })
+      .catch(() => {
+        if (active) setReadingState({ code, items: [], ready: true });
+      });
+    return () => {
+      active = false;
+    };
+  }, [code]);
 
   let prev = null;
   let next = null;
@@ -151,6 +169,12 @@ export default function LessonPage() {
   }
 
   const status = describeStep(lesson.code, answers, decisionsMap, states);
+  const readingsReady = readingState.code === code && readingState.ready;
+  const readings = readingsReady ? readingState.items : [];
+
+  if (!readingsReady) {
+    return <p className="py-10 text-[16px] text-muted-faint">Opening the step…</p>;
+  }
 
   return (
     <LessonView
@@ -174,6 +198,7 @@ export default function LessonPage() {
       carried={carriedMap[lesson.code] || []}
       onCarriedChange={(keys) => setCarried(lesson.code, keys)}
       carrySources={carrySources}
+      readings={readings}
       onDecisionChange={(value) => {
         setDecision(lesson.code, value);
         saveAnswer({
