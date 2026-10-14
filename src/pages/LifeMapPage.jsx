@@ -24,7 +24,8 @@ import {
 } from "@/lib/lifeMap";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import DashedMotif from "@/components/workbook/DashedMotif";
-import LifeMapCanvas from "@/components/map/LifeMapCanvas";
+import LifeMapBoard from "@/components/map/LifeMapBoard";
+import MapPickCard from "@/components/map/MapPickCard";
 import LifeMapNodePanel from "@/components/map/LifeMapNodePanel";
 import LifeMapList from "@/components/map/LifeMapList";
 import BringInSavedAnswer from "@/components/map/BringInSavedAnswer";
@@ -120,6 +121,7 @@ export default function LifeMapPage() {
     requestAnimationFrame(() => mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
 
+  /** The move buttons in the panel: the same small steps as the arrow keys. */
   const nudge = (dx, dy) => {
     if (!selected) return;
     const spot = positions[selected.id] || layout.nodes[selected.id] || { x: 0.5, y: 0.5 };
@@ -224,16 +226,15 @@ export default function LifeMapPage() {
         {asList ? (
           <LifeMapList graph={graph} explore={explore} selectedId={selectedId} onSelect={setSelectedId} />
         ) : (
-          <LifeMapCanvas
+          <LifeMapBoard
             graph={graph}
             positions={positions}
-            pick={pick}
             selectedId={selectedId}
             onSelect={setSelectedId}
             onMove={(id, spot) => setNodePosition(id, spot)}
-            onJumpToPart={(index) => setStep(index)}
           />
         )}
+        <MapPickCard pick={pick} onJumpToPart={(index) => setStep(index)} />
       </div>
 
       {selected && selectedSection ? (
@@ -254,7 +255,7 @@ export default function LifeMapPage() {
         />
       ) : (
         <p className="text-[13px] leading-relaxed text-muted-faint">
-          Open a line to read it in full, rename it, link it to a journal entry, or connect it to another line. Drag a
+          Tap a line to read it in full, rename it, link it to a journal entry, or connect it to another line. Drag a
           line to move it, use the arrow keys while it is focused, or use the move buttons once it is open. Connections
           you make show as dashed gold curves.
         </p>

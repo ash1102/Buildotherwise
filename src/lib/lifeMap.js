@@ -192,7 +192,7 @@ export function linesFromAnswer(question, answer) {
     .filter(Boolean);
 }
 
-const POSITIONS_KEY = "lifeMapPositions";
+export const POSITIONS_KEY = "lifeMapPositions";
 
 export function readPositions() {
   return readStore(POSITIONS_KEY, {});
@@ -359,6 +359,93 @@ export function layoutGraph(graph, saved) {
     })
   );
   return { hub: { x: 0.5, y: 0.5 }, sections: base.sections, nodes };
+}
+
+const PILL_LINE_H = 44;
+const PILL_GAP = 6;
+
+function pillSize(text, maxWidth, height) {
+  return {
+    w: Math.min(maxWidth, String(text || "").length * 6.8 + 12) + 24,
+    h: height,
+  };
+}
+
+function pillsOverlap(a, b) {
+  return Math.abs(a.x - b.x) * 2 < a.w + b.w + PILL_GAP && Math.abs(a.y - b.y) * 2 < a.h + b.h + PILL_GAP;
+}
+
+/**
+ * Nudge lines nobody has moved so they do not sit on each other, the area label,
+ * or the middle. The search stays inside that line's area. If nothing clear fits
+ * there, the line stays on its layout spot rather than walking into the next area.
+ * A line the person already placed is returned exactly as saved.
+ */
+export function settleLines(graph, layout, saved, box) {
+  if (!box || !box.w || !box.h) return { ...(layout.nodes || {}) };
+  const taken = [{ x: box.w / 2, y: box.h / 2, w: 230, h: 64 }];
+
+  graph.sections.forEach((section) => {
+    const hub = layout.sections[section.key];
+    if (hub) taken.push({ x: hub.x * box.w, y: hub.y * box.h, ...pillSize(section.label, 220, 34) });
+  });
+
+  const result = {};
+  const unplaced = [];
+  graph.nodes.forEach((node) => {
+    const spot = (layout.nodes || {})[node.id];
+    if (!spot) return;
+    const text = (QUESTIONS_BY_ID[node.question_id] || {}).branch || node.label || node.text;
+    if ((saved || {})[node.id]) {
+      result[node.id] = spot;
+      taken.push({ x: spot.x * box.w, y: spot.y * box.h, ...pillSize(text, 152, PILL_LINE_H) });
+    } else {
+      unplaced.push(node);
+    }
+  });
+
+  unplaced.forEach((node) => {
+    const start = layout.nodes[node.id];
+    const hub = (layout.sections || {})[node.section];
+    const text = (QUESTIONS_BY_ID[node.question_id] || {}).branch || node.label || node.text;
+    const size = pillSize(text, 152, PILL_LINE_H);
+    const inArea = (x, y) => {
+      if (!hub) return true;
+      return Math.hypot(x / box.w - hub.x, y / box.h - hub.y) <= SECTION_AREA_RADIUS;
+    };
+    const fits = (x, y) => {
+      if (!inArea(x, y)) return false;
+      const rect = { x, y, ...size };
+      if (x - size.w / 2 < 4 || x + size.w / 2 > box.w - 4 || y - size.h / 2 < 4 || y + size.h / 2 > box.h - 4) {
+        return false;
+      }
+      return !taken.some((other) => pillsOverlap(rect, other));
+    };
+
+    const sx = start.x * box.w;
+    const sy = start.y * box.h;
+    let best = fits(sx, sy) ? { x: sx, y: sy } : null;
+    const maxRadius = Math.min(box.w, box.h) * SECTION_AREA_RADIUS;
+    for (let ring = 1; !best && ring * 14 <= maxRadius; ring += 1) {
+      const radius = ring * 14;
+      const steps = 8 + ring * 2;
+      for (let i = 0; i < steps; i += 1) {
+        const angle = (i / steps) * Math.PI * 2 + Math.PI / 2;
+        const x = sx + Math.cos(angle) * radius;
+        const y = sy + Math.sin(angle) * radius * 0.7;
+        if (fits(x, y)) {
+          best = { x, y };
+          break;
+        }
+      }
+    }
+
+    const placed = best || { x: sx, y: sy };
+    taken.push({ ...placed, ...size });
+    result[node.id] = { x: placed.x / box.w, y: placed.y / box.h };
+  });
+
+  return result;
 }
 
 /** Saved answers to the workbook's own questions, offered so nothing is typed twice. */
