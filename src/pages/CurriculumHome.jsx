@@ -6,6 +6,7 @@ import { useWorkbook } from "@/lib/workbook";
 import { useAuth } from "@/lib/AuthContext";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import { isOpenerLesson } from "@/lib/curriculum";
+import { isGettingStartedLesson, openGettingStarted, useGettingStartedSubmitted } from "@/lib/gettingStarted";
 import { buildProgress, stepComplete } from "@/lib/progress";
 
 const INTEREST_FORM = "https://link.jotform.com/EhQXbmRwbk";
