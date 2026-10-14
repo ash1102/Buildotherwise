@@ -2,9 +2,9 @@ import React from "react";
 import { routeGuidanceFor } from "@/lib/workbook";
 
 /** The ways to take this step. Shown only when the step has routes. */
-export default function RouteChips({ routes = [], value, onChange }) {
+export default function RouteChips({ routes = [], value, onChange, labelledBy }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div role="group" aria-labelledby={labelledBy || undefined} className="flex flex-wrap gap-2">
       {routes.map((route) => {
         const active = value === route;
         const detail = routeGuidanceFor(route);
