@@ -1,88 +1,93 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
-import { isOpenerLesson } from "@/lib/curriculum";
 import StepList from "@/components/workbook/StepList";
 import { useAuth } from "@/lib/AuthContext";
-import { openGettingStarted, useGettingStartedSubmitted } from "@/lib/gettingStarted";
+import LoginRedirect from "@/components/LoginRedirect";
+import {
+  GS_CODES,
+  gettingStartedFinished,
+  gettingStartedStepDone,
+  gettingStartedSteps,
+} from "@/lib/gettingStarted";
+import { useWorkbook } from "@/lib/workbook";
 
 /**
- * Getting Started keeps its own container rather than living inside the module
- * machinery: its own page, its own heading, and no module number anywhere.
+ * Getting Started stands on its own, before the workbook.
+ * It is not a section of Module 1, and it does not use the Begin here label.
  */
 export default function GettingStartedPage() {
-  const { modules, lessonsByOrder, loading } = useCurriculum();
-  const gettingStarted = modules.find((module) => module.kind === "orientation");
-  const { isAuthenticated } = useAuth();
-  const submitted = useGettingStartedSubmitted();
+  const { lessons, loading, error } = useCurriculum();
+  const { answers, states } = useWorkbook();
+  const { user, isAuthenticated, isLoadingAuth } = useAuth();
+  const admin = Boolean(isAuthenticated && user?.role === "admin");
+  const steps = gettingStartedSteps(lessons);
+  const stepsDone = gettingStartedFinished(lessons, answers, states);
+  const open = steps.find((lesson) => !gettingStartedStepDone(lesson, answers, states)) || null;
+  const openIndex = open ? steps.findIndex((lesson) => lesson.code === open.code) : -1;
+  const anyDone = steps.some((lesson) => gettingStartedStepDone(lesson, answers, states));
+  const missing = GS_CODES.filter((code) => !steps.some((lesson) => lesson.code === code));
 
-  if (isAuthenticated && submitted) {
-    return (
-      <div className="space-y-4 py-6">
-        <p className="workbook-label">Getting Started</p>
-        <h1>You’ve finished Getting Started.</h1>
-        <p className="max-w-[60ch] text-[16px] leading-relaxed text-muted-foreground">
-          Your answers are in Settings, under “My Getting Started.” To change your choice to join, email
-          Start@buildotherwise.org.
-        </p>
-        <div className="flex flex-wrap gap-4">
-          <Link to="/settings" className="text-[16px] font-medium text-accent-ink underline underline-offset-2">
-            See my answers
-          </Link>
-          <Link to="/map" className="text-[16px] font-medium text-accent-ink underline underline-offset-2">
-            Go to my Life Map
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  if (loading) {
+  if (isLoadingAuth || loading) {
     return <p className="py-10 text-[16px] text-muted-faint">Opening Getting Started…</p>;
   }
 
-  if (!gettingStarted) {
-    return (
-      <div className="py-10">
-        <h1>Getting Started isn’t part of this build.</h1>
-        <Link to="/" className="mt-4 inline-block text-[16px] font-medium text-accent-ink underline underline-offset-2">
-          Back to the program list
-        </Link>
-      </div>
-    );
+  if (!admin && stepsDone) {
+    if (!isAuthenticated) return <LoginRedirect />;
+    return <Navigate to="/" replace />;
   }
-
-  /** The opening move stands before this sequence, so it is not one of its steps. */
-  const lessons = (lessonsByOrder[gettingStarted.order] || []).filter((lesson) => !isOpenerLesson(lesson));
 
   return (
     <div className="space-y-8">
       <header className="border-b border-border pb-5">
         <p className="workbook-label">Getting Started</p>
-        <h1 className="mt-2">{gettingStarted.title}</h1>
-        {gettingStarted.purpose ? (
-          <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">{gettingStarted.purpose}</p>
-        ) : null}
-        <p className="mt-3 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
-          A short sequence before Module 1. Nothing here is scored.
+        <h1 className="mt-2">Five steps, then the workbook</h1>
+        <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
+          The workbook starts at Module 1. These steps come first. Pass counts. A saved answer counts too.
         </p>
       </header>
 
-      {isAuthenticated ? (
-        <button
-          type="button"
-          onClick={openGettingStarted}
-          className="rounded-full bg-primary px-5 py-3 text-[16px] font-medium text-primary-foreground"
-        >
-          Open Getting Started
-        </button>
+      {error && !steps.length ? (
+        <p className="text-[16px] text-muted-foreground">Getting Started didn’t load. Refresh the page.</p>
       ) : null}
 
-      <StepList lessons={lessons} scopeLabel="before the modules" />
+      {missing.length ? (
+        <p className="text-[16px] text-muted-foreground">
+          These steps are not in this build yet: {missing.join(", ")}.
+        </p>
+      ) : null}
 
-      <Link to="/" className="inline-block text-[16px] font-medium text-accent-ink underline underline-offset-2">
-        Back to the program list
-      </Link>
+      {admin && stepsDone ? (
+        <p className="text-[16px] text-muted-foreground">Getting Started is done. The workbook is open.</p>
+      ) : null}
+
+      {open ? (
+        <Link
+          to={`/lesson/${open.code}`}
+          className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[16px] font-medium text-primary-foreground"
+        >
+          {anyDone ? `Continue step ${openIndex + 1}` : "Start step 1"}
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </Link>
+      ) : null}
+
+      {admin ? (
+        <p className="text-[15px] text-muted-foreground">
+          Admins can open the workbook before these steps are done.{" "}
+          <Link to="/" className="font-medium text-accent-ink underline underline-offset-2">
+            Open the workbook
+          </Link>
+        </p>
+      ) : null}
+
+      <StepList lessons={steps} scopeLabel="in Getting Started" numberByIndex />
+
+      {!isAuthenticated ? (
+        <Link to="/" className="inline-block text-[16px] font-medium text-accent-ink underline underline-offset-2">
+          Back to the main site
+        </Link>
+      ) : null}
     </div>
   );
 }

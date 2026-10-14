@@ -4,8 +4,8 @@ import { ArrowRight, Map } from "lucide-react";
 import { OPENER_LESSON_CODE } from "@/lib/curriculum";
 
 /**
- * The first thing anyone does: map the life they are actually living now. It
- * stands ahead of Getting Started, on its own, with no step number.
+ * The life-mapping step, on its own. Begin here is this step's label.
+ * It is not a section of Module 1, and Getting Started does not sit inside it.
  */
 export default function OpenerCard({ lesson }) {
   if (!lesson) return null;

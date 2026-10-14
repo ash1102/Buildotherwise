@@ -84,9 +84,9 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<CurriculumHome />} />
         <Route path="/getting-started" element={<GettingStartedPage />} />
         <Route path="/module/getting-started" element={<Navigate to="/getting-started" replace />} />
-        {/* The workbook itself is for participants. Getting Started's own steps stay open, so those are gated on the step page rather than here. */}
+        {/* Modules check Getting Started first, then the account. The five steps stay on their own page. */}
+        <Route path="/module/:slug" element={<ModulePage />} />
         <Route element={<ProtectedRoute unauthenticatedElement={<LoginRedirect />} />}>
-          <Route path="/module/:slug" element={<ModulePage />} />
           <Route path="/journal" element={<JournalPage />} />
           <Route path="/map" element={<LifeMapPage />} />
           <Route path="/discovery-map" element={<DiscoveryMapPage />} />

@@ -63,6 +63,9 @@ export default function LessonView({
   next,
   nextIsModule,
   workbookLink,
+  backLabel,
+  forward,
+  endNote,
   decisions,
   route,
   onRouteChange,
@@ -296,7 +299,15 @@ export default function LessonView({
 
       <FeedbackForm moduleOrder={lesson.module_order} lessonCode={lesson.code} />
 
-      <StepNav prev={prev} next={next} nextIsModule={nextIsModule} workbookLink={workbookLink} />
+      <StepNav
+        prev={prev}
+        next={next}
+        nextIsModule={nextIsModule}
+        workbookLink={workbookLink}
+        backLabel={backLabel}
+        forward={forward}
+        endNote={endNote}
+      />
     </article>
   );
 }

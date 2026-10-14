@@ -1,18 +1,30 @@
 import React from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { BookOpen } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
-import { isComingLater } from "@/lib/curriculum";
+import { isComingLater, isWorkbookLesson } from "@/lib/curriculum";
 import LockedNotice from "@/components/workbook/LockedNotice";
 import ComingLaterNotice from "@/components/workbook/ComingLaterNotice";
 import StepList from "@/components/workbook/StepList";
+import WorkbookGate from "@/components/WorkbookGate";
+import LoginRedirect from "@/components/LoginRedirect";
+import { useAuth } from "@/lib/AuthContext";
 import { useWorkbook } from "@/lib/workbook";
 import { buildProgress } from "@/lib/progress";
 
 export default function ModulePage() {
+  return (
+    <WorkbookGate>
+      <ModuleBody />
+    </WorkbookGate>
+  );
+}
+
+function ModuleBody() {
   const { slug } = useParams();
   const { modules, lessonsByOrder, loading } = useCurriculum();
   const { answers, states } = useWorkbook();
+  const { isAuthenticated } = useAuth();
 
   const module = modules.find((item) => item.slug === slug);
   const progress = buildProgress({ modules, lessonsByOrder, answers, states });
@@ -21,18 +33,26 @@ export default function ModulePage() {
     return <p className="py-10 text-[16px] text-muted-faint">Opening the module…</p>;
   }
 
+  if (!isAuthenticated) {
+    return <LoginRedirect />;
+  }
+
   if (!module) {
     return (
       <div className="py-10">
         <h1>That module isn’t part of Pilot 1.</h1>
         <Link to="/" className="mt-4 inline-block text-[16px] font-medium text-accent-ink underline underline-offset-2">
-          Back to the program list
+          Back to the workbook
         </Link>
       </div>
     );
   }
 
-  const lessons = lessonsByOrder[module.order] || [];
+  if (module.kind === "orientation") {
+    return <Navigate to="/" replace />;
+  }
+
+  const lessons = (lessonsByOrder[module.order] || []).filter(isWorkbookLesson);
   const coming = isComingLater(module);
   const row = progress.byOrder[module.order];
   const locked = Boolean(row && !row.unlocked && !coming);
