@@ -16,19 +16,25 @@ import {
   buildGraph,
   removeLine,
   savedAnswerOptions,
+  setNodePosition,
   updateLine,
+  usePositions,
 } from "@/lib/lifeMap";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import DashedMotif from "@/components/workbook/DashedMotif";
-import LifeMapCanvas from "@/components/map/LifeMapCanvas";
+import LifeMapBoard from "@/components/map/LifeMapBoard";
+import MapPickCard from "@/components/map/MapPickCard";
 import LifeMapNodePanel from "@/components/map/LifeMapNodePanel";
 import LifeMapList from "@/components/map/LifeMapList";
 import BringInSavedAnswer from "@/components/map/BringInSavedAnswer";
 import MapQuestions from "@/components/map/MapQuestions";
 import StepNav from "@/components/workbook/StepNav";
 
+const clamp = (value) => Math.min(0.98, Math.max(0.02, value));
+
 export default function LifeMapPage() {
   const map = useLifeMap();
+  const positions = usePositions();
   const [pick] = useStore(MAP_PICK_KEY, {});
   const [step, setStep] = useState(0);
   const mapRef = useRef(null);
@@ -109,6 +115,13 @@ export default function LifeMapPage() {
   const showMap = () => {
     setAsList(false);
     requestAnimationFrame(() => mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
+
+  /** The move buttons in the panel: the same small steps as the arrow keys. */
+  const nudge = (dx, dy) => {
+    if (!selected) return;
+    const spot = positions[selected.id] || { x: 0.5, y: 0.5 };
+    setNodePosition(selected.id, { x: clamp(spot.x + dx), y: clamp(spot.y + dy) });
   };
 
   /** One line that holds a list becomes one line per item, in the same area. */
@@ -209,14 +222,15 @@ export default function LifeMapPage() {
         {asList ? (
           <LifeMapList graph={graph} selectedId={selectedId} onSelect={setSelectedId} />
         ) : (
-          <LifeMapCanvas
+          <LifeMapBoard
             graph={graph}
-            pick={pick}
+            positions={positions}
             selectedId={selectedId}
             onSelect={setSelectedId}
-            onJumpToPart={(index) => setStep(index)}
+            onMove={(id, spot) => setNodePosition(id, spot)}
           />
         )}
+        <MapPickCard pick={pick} onJumpToPart={(index) => setStep(index)} />
       </div>
 
       {selected && selectedSection ? (
@@ -230,14 +244,16 @@ export default function LifeMapPage() {
           onLinkEntry={(entryId) => saveSelected({ entry_id: entryId })}
           onConnect={connect}
           onDisconnect={disconnect}
+          onNudge={nudge}
           onRemove={removeSelected}
           onSplit={splitSelected}
           onClose={() => setSelectedId(null)}
         />
       ) : (
         <p className="text-[13px] leading-relaxed text-muted-faint">
-          Tap any line on the map to read it in full, rename it, link it to a journal entry, or connect it to another
-          line. Connections you make show as dashed gold curves.
+          Tap a line to read it in full, rename it, link it to a journal entry, or connect it to another line. Drag a
+          line to move it, use the arrow keys while it is focused, or use the move buttons once it is open. Connections
+          you make show as dashed gold curves.
         </p>
       )}
 
