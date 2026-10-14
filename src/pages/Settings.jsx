@@ -8,6 +8,7 @@ import { downloadText } from "@/lib/download";
 import { MAP_SECTIONS } from "@/lib/lifeMap";
 import { TEXT_SIZES, THEMES, useDisplay } from "@/lib/display";
 import { useToast } from "@/components/ui/use-toast";
+import MyGettingStarted from "@/components/gettingStarted/MyGettingStarted";
 
 const STORE_PREFIX = "entrepalooza.v1.";
 const CONTACT = "Start@buildotherwise.org";
@@ -204,6 +205,8 @@ export default function Settings() {
         <p className="workbook-label">Settings</p>
         <h1 className="mt-2">Your account and this device</h1>
       </header>
+
+      <MyGettingStarted />
 
       <Section title="Account">
         <dl className="grid gap-2 text-[16px] sm:grid-cols-[8rem_1fr]">
