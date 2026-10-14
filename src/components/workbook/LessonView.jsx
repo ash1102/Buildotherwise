@@ -12,6 +12,7 @@ import StepHeader from "./StepHeader";
 import FeedbackForm from "./FeedbackForm";
 import LessonBeats from "./LessonBeats";
 import WorkedExample from "./WorkedExample";
+import StepReading from "./StepReading";
 import DictateButton from "./DictateButton";
 import TryPlanner from "./TryPlanner";
 import TryCheckIn from "./TryCheckIn";
@@ -71,6 +72,7 @@ export default function LessonView({
   onCarriedChange,
   carrySources,
   status,
+  readings = [],
 }) {
   const decisionOptions = decisionOptionsFor(lesson);
   const optionNames = new Set(decisionOptions.map((option) => option.trim().toLowerCase()));
@@ -278,6 +280,29 @@ export default function LessonView({
       tone: "out",
       content: <p className="max-w-[68ch] text-[17px] leading-relaxed text-foreground">{lesson.what_comes_out}</p>,
     });
+  }
+
+  if (readings.length) {
+    const readingBeat = {
+      key: "reading",
+      label: readings.length > 1 ? "Readings" : "Reading",
+      content: (
+        <div className="divide-y divide-border">
+          {readings.map((reading) => (
+            <div key={reading.id} className="py-5 first:pt-0 last:pb-0">
+              <StepReading title={reading.title} body={reading.body} />
+            </div>
+          ))}
+        </div>
+      ),
+    };
+    const tryAt = beats.findIndex((beat) => beat.key === "try");
+    const reflectAt = beats.findIndex((beat) => beat.key === "reflect");
+    const decisionAt = beats.findIndex((beat) => beat.key === "decision");
+    const endingAt = beats.findIndex((beat) => beat.key === "ending");
+    const at = [tryAt, reflectAt, decisionAt, endingAt].find((index) => index >= 0);
+    if (at >= 0) beats.splice(at, 0, readingBeat);
+    else beats.push(readingBeat);
   }
 
   return (
