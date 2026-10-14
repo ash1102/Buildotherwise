@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { describeStep, stepStatusLabel, useWorkbook } from "@/lib/workbook";
 import { stepComplete } from "@/lib/progress";
+import { gettingStartedStepDone, isGettingStartedLesson } from "@/lib/gettingStarted";
 
-/** The steps of one container — a module, or Getting Started when it is standing on its own. */
-export default function StepList({ lessons, scopeLabel }) {
+/** The steps of one container: a module, or Getting Started on its own page. */
+export default function StepList({ lessons, scopeLabel, numberByIndex = false }) {
   const { answers, decisions, states } = useWorkbook();
 
   return (
@@ -19,9 +20,11 @@ export default function StepList({ lessons, scopeLabel }) {
 
       {lessons.length ? (
         <ol className="mt-3 divide-y divide-border border-y border-border">
-          {lessons.map((lesson) => {
+          {lessons.map((lesson, index) => {
             const status = describeStep(lesson.code, answers, decisions, states);
-            const done = stepComplete(lesson, answers, states);
+            const done = isGettingStartedLesson(lesson)
+              ? gettingStartedStepDone(lesson, answers, states)
+              : stepComplete(lesson, answers, states);
             return (
               <li key={lesson.id || lesson.code}>
                 <Link
@@ -29,7 +32,7 @@ export default function StepList({ lessons, scopeLabel }) {
                   className="flex items-start gap-4 py-4 transition hover:bg-secondary"
                 >
                   <span className="mt-0.5 shrink-0 text-[15px] font-semibold text-accent-ink">
-                    {String(lesson.order).padStart(2, "0")}
+                    {numberByIndex ? index + 1 : String(lesson.order).padStart(2, "0")}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-[17px] font-semibold leading-snug text-foreground">{lesson.title}</span>

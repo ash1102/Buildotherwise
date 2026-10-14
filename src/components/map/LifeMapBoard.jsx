@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { QUESTIONS_BY_ID, layoutGraph } from "@/lib/lifeMap";
+import { QUESTIONS_BY_ID, layoutGraph, settleLines } from "@/lib/lifeMap";
 
 /** Each part keeps its own dot colour, so a line is recognisable at a glance. */
 const SECTION_DOT = {
@@ -12,87 +12,8 @@ const SECTION_DOT = {
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
-/** Rough on-screen size of a pill, in pixels, so lines can be kept from covering each other. */
-const pillSize = (text, maxWidth, height) => ({
-  w: Math.min(maxWidth, String(text || "").length * 6.8 + 12) + 24,
-  h: height,
-});
-
-const LINE_H = 44;
-const GAP = 6;
-
-const overlaps = (a, b) =>
-  Math.abs(a.x - b.x) * 2 < a.w + b.w + GAP && Math.abs(a.y - b.y) * 2 < a.h + b.h + GAP;
-
 /** The question a line answers, in the lesson's own words. */
 const branchFor = (node) => (QUESTIONS_BY_ID[node.question_id] || {}).branch || "";
-
-/**
- * Lines nobody has moved get the nearest clear spot to where they would sit, so
- * nothing lands on top of another line, a question, or the middle. Lines the
- * person placed stay exactly where they put them.
- */
-function settle(graph, layout, saved, box) {
-  if (!box.w || !box.h) return layout.nodes;
-  const taken = [{ x: box.w / 2, y: box.h / 2, w: 230, h: 64 }];
-
-  graph.sections.forEach((section) => {
-    const hub = layout.sections[section.key];
-    if (hub) taken.push({ x: hub.x * box.w, y: hub.y * box.h, ...pillSize(section.label, 220, 34) });
-  });
-
-  const result = {};
-  const unplaced = [];
-
-  graph.nodes.forEach((node) => {
-    const spot = layout.nodes[node.id];
-    if (!spot) return;
-    const text = branchFor(node) || node.label || node.text;
-    if ((saved || {})[node.id]) {
-      result[node.id] = spot;
-      taken.push({ x: spot.x * box.w, y: spot.y * box.h, ...pillSize(text, 152, LINE_H) });
-    } else {
-      unplaced.push(node);
-    }
-  });
-
-  unplaced.forEach((node) => {
-    const start = layout.nodes[node.id];
-    const size = pillSize(branchFor(node) || node.label || node.text, 152, LINE_H);
-    const fits = (x, y) => {
-      const rect = { x, y, ...size };
-      if (x - size.w / 2 < 4 || x + size.w / 2 > box.w - 4 || y - size.h / 2 < 4 || y + size.h / 2 > box.h - 4) {
-        return false;
-      }
-      return !taken.some((other) => overlaps(rect, other));
-    };
-
-    let best = null;
-    const sx = clamp(start.x * box.w, size.w / 2 + 4, box.w - size.w / 2 - 4);
-    const sy = clamp(start.y * box.h, size.h / 2 + 4, box.h - size.h / 2 - 4);
-    if (fits(sx, sy)) best = { x: sx, y: sy };
-
-    for (let ring = 1; !best && ring <= 30; ring += 1) {
-      const radius = ring * 14;
-      const steps = 8 + ring * 2;
-      for (let i = 0; i < steps; i += 1) {
-        const angle = (i / steps) * Math.PI * 2 + Math.PI / 2;
-        const x = sx + Math.cos(angle) * radius;
-        const y = sy + Math.sin(angle) * radius * 0.7;
-        if (fits(x, y)) {
-          best = { x, y };
-          break;
-        }
-      }
-    }
-
-    const placed = best || { x: sx, y: sy };
-    taken.push({ ...placed, ...size });
-    result[node.id] = { x: placed.x / box.w, y: placed.y / box.h };
-  });
-
-  return result;
-}
 
 /** Stable small number from a string, so each line keeps the same gentle bend. */
 const bendFor = (id) => {
@@ -159,7 +80,7 @@ export default function LifeMapBoard({ graph, positions, selectedId, onSelect, o
   }, []);
 
   const layout = useMemo(() => layoutGraph(graph, positions), [graph, positions]);
-  const settled = useMemo(() => settle(graph, layout, positions, box), [graph, layout, positions, box]);
+  const settled = useMemo(() => settleLines(graph, layout, positions, box), [graph, layout, positions, box]);
 
   const spots = useMemo(() => {
     const resolved = {};

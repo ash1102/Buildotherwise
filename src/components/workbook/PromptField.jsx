@@ -27,6 +27,7 @@ export default function PromptField({
   const timer = useRef(null);
   const valueRef = useRef(value);
   const handleRef = useRef(null);
+  const areaRef = useRef(null);
 
   useEffect(() => {
     setValue(getAnswer(lessonCode, index));
@@ -63,6 +64,9 @@ export default function PromptField({
       insertText: (heard, previousTail) => {
         if (handleRef.current) handleRef.current(addSpokenWords(valueRef.current, heard, previousTail));
       },
+      focus: () => {
+        if (areaRef.current) areaRef.current.focus();
+      },
     });
     return () => onBind(fieldKey, null);
   }, [fieldKey, onBind]);
@@ -96,6 +100,7 @@ export default function PromptField({
         {label}
       </label>
       <Textarea
+        ref={areaRef}
         id={`${lessonCode}-${index}`}
         value={value}
         onChange={(event) => handleChange(event.target.value)}

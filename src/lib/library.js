@@ -1,4 +1,5 @@
 import { base44 } from "@/api/base44Client";
+import { visibleStepReadings } from "@/lib/stepReadings";
 
 export const KIND_LABELS = {
   reading: "Reading",
@@ -45,6 +46,18 @@ export async function loadLibraryResources({ search = "", moduleOrder = null, le
   }
   const page = await base44.entities.LibraryResource.filter(query, { sort: "order", limit: 200 });
   return page.items;
+}
+
+/**
+ * Readings for one lesson step. Same published participant library as the
+ * Program Library, narrowed to this step's code. An empty list means the
+ * step shows no reading.
+ */
+export async function loadStepReadings(lessonCode) {
+  const code = String(lessonCode || "").trim();
+  if (!code) return [];
+  const items = await loadLibraryResources({ lessonCode: code });
+  return visibleStepReadings(Array.isArray(items) ? items : [], code);
 }
 
 /** Only the steps a module actually holds a reading for, so the step filter is never empty. */

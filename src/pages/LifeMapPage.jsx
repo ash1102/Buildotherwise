@@ -14,6 +14,8 @@ import {
   MAP_SECTIONS,
   addLine,
   buildGraph,
+  exploreLines,
+  layoutGraph,
   removeLine,
   savedAnswerOptions,
   setNodePosition,
@@ -50,6 +52,8 @@ export default function LifeMapPage() {
   /** The map is the opening move, so the step it hands over to is the first Getting Started step. */
   const nextStep = useMemo(() => orderedLessons.find((lesson) => !isOpenerLesson(lesson)) || null, [orderedLessons]);
   const graph = useMemo(() => buildGraph(map), [map]);
+  const layout = useMemo(() => layoutGraph(graph, positions), [graph, positions]);
+  const explore = useMemo(() => exploreLines(pick), [pick]);
   const options = useMemo(() => savedAnswerOptions(lessons, answers), [lessons, answers]);
   const nodesById = useMemo(
     () => Object.fromEntries(graph.nodes.map((node) => [node.id, node])),
@@ -120,7 +124,7 @@ export default function LifeMapPage() {
   /** The move buttons in the panel: the same small steps as the arrow keys. */
   const nudge = (dx, dy) => {
     if (!selected) return;
-    const spot = positions[selected.id] || { x: 0.5, y: 0.5 };
+    const spot = positions[selected.id] || layout.nodes[selected.id] || { x: 0.5, y: 0.5 };
     setNodePosition(selected.id, { x: clamp(spot.x + dx), y: clamp(spot.y + dy) });
   };
 
@@ -220,7 +224,7 @@ export default function LifeMapPage() {
 
       <div ref={mapRef} className="scroll-mt-4">
         {asList ? (
-          <LifeMapList graph={graph} selectedId={selectedId} onSelect={setSelectedId} />
+          <LifeMapList graph={graph} explore={explore} selectedId={selectedId} onSelect={setSelectedId} />
         ) : (
           <LifeMapBoard
             graph={graph}

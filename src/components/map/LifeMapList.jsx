@@ -4,7 +4,7 @@ import React from "react";
  * The same map as a list — an accessibility option, not the main view. Every node
  * keeps its full answer, its question, and the links it holds.
  */
-export default function LifeMapList({ graph, selectedId, onSelect }) {
+export default function LifeMapList({ graph, explore = [], selectedId, onSelect }) {
   const byId = (id) => graph.nodes.find((node) => node.id === id);
 
   return (
@@ -52,6 +52,19 @@ export default function LifeMapList({ graph, selectedId, onSelect }) {
           )}
         </section>
       ))}
+      {explore.length ? (
+        <section className="rounded-lg border border-border bg-card p-5">
+          <p className="workbook-label">Worth exploring</p>
+          <ul className="mt-4 space-y-3">
+            {explore.map((line) => (
+              <li key={line.id} className="border-l-2 border-primary/30 pl-3">
+                {line.label ? <p className="text-[12px] text-muted-faint">{line.label}</p> : null}
+                <p className="text-[14px] leading-relaxed text-foreground">{line.text}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </div>
   );
 }
