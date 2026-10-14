@@ -35,11 +35,8 @@
   },
   "required": [],
   "rls": {
-    "create": {},
-    "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
+    "create": {
+      "created_by_id": "{{user.id}}"
     },
     "read": {
       "user_condition": {
@@ -47,6 +44,11 @@
       }
     },
     "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
       "user_condition": {
         "role": "admin"
       }
