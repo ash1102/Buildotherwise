@@ -269,6 +269,7 @@ export default function LessonView({
     beats.push({
       key: "try",
       label: "Try",
+      hasInput: true,
       content: (
         <div className="space-y-6">
           {answerChoices}
@@ -307,6 +308,7 @@ export default function LessonView({
     beats.push({
       key: "reflect",
       label: "Reflect",
+      hasInput: true,
       content: (
         <div className="space-y-6">
           {tryPrompts.length ? null : answerChoices}

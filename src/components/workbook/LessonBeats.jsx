@@ -27,6 +27,8 @@ export default function LessonBeats({ beats, journalHref = "" }) {
   const prev = current > 0 ? beats[current - 1] : null;
   const last = current >= total - 1;
   const currentKey = beats[current] ? beats[current].key : null;
+  /** The save line belongs with a writing box. A wrap-up that only talks has none. */
+  const showSavedLine = Boolean(beats[total - 1] && beats[total - 1].hasInput);
 
   // Keyed on the part itself, not on the beats array. A save landing while someone is
   // typing re-renders this step, and that must not move the page or take the caret.
@@ -170,14 +172,16 @@ export default function LessonBeats({ beats, journalHref = "" }) {
       ) : null}
 
       {openAll || last ? (
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
-          <p className="text-[14px] text-muted-faint">Saved as you type.</p>
-          {journalHref ? (
-            <Link to={journalHref} className="text-[15px] font-medium text-accent-ink underline underline-offset-2">
-              See it in your journal
-            </Link>
-          ) : null}
-        </div>
+        showSavedLine || journalHref ? (
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
+            {showSavedLine ? <p className="text-[14px] text-muted-faint">Saved as you type.</p> : null}
+            {journalHref ? (
+              <Link to={journalHref} className="text-[15px] font-medium text-accent-ink underline underline-offset-2">
+                See it in your journal
+              </Link>
+            ) : null}
+          </div>
+        ) : null
       ) : null}
     </div>
   );
