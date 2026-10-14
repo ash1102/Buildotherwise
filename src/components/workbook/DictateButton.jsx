@@ -14,7 +14,7 @@ const Engine =
  * no audio, and costs nothing. The short note is the default so the explanation is
  * not repeated under every box.
  */
-export default function DictateButton({ onText, buttonRef }) {
+export default function DictateButton({ onText, buttonRef = null }) {
   const [listening, setListening] = useState(false);
   const [note, setNote] = useState("");
   const engine = useRef(null);
