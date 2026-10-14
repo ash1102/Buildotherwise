@@ -5,8 +5,8 @@ import useCurriculum from "@/hooks/useCurriculum";
 import { useWorkbook } from "@/lib/workbook";
 import { useAuth } from "@/lib/AuthContext";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
-import { isOpenerLesson } from "@/lib/curriculum";
-import { isGettingStartedLesson, openGettingStarted, useGettingStartedSubmitted } from "@/lib/gettingStarted";
+import { isWorkbookLesson } from "@/lib/curriculum";
+import WorkbookGate from "@/components/WorkbookGate";
 import { buildProgress, stepComplete } from "@/lib/progress";
 
 const INTEREST_FORM = "https://link.jotform.com/EhQXbmRwbk";
@@ -243,39 +243,25 @@ function PublicHome() {
   );
 }
 
-/** After login: pick up where you left off, then the tools, then progress. No marketing. */
+/** After login, and after Getting Started: pick up where you left off, then the tools, then progress. */
 function MemberHome() {
   const { modules, lessonsByOrder, orderedLessons, loading } = useCurriculum();
   const { answers, states } = useWorkbook();
-  const gsSubmitted = useGettingStartedSubmitted();
 
   const progress = useMemo(
     () => buildProgress({ modules, lessonsByOrder, answers, states }),
-    [modules, lessonsByOrder, answers, states, gsSubmitted]
+    [modules, lessonsByOrder, answers, states]
   );
 
-  /** The opener comes first, then every live step in order. The next step is the first one without a saved line. */
+  /** The workbook starts at Module 1. Getting Started is already finished by the time this shows. */
   const next = useMemo(() => {
-    const opener = orderedLessons.find(isOpenerLesson);
-    const rest = orderedLessons.filter(
-      (lesson) => !isOpenerLesson(lesson) && !(gsSubmitted && isGettingStartedLesson(lesson))
-    );
-    /** Getting Started comes first, as its pop-up; the Life Map follows it. */
-    const gsSteps = gsSubmitted ? [] : rest.filter(isGettingStartedLesson);
-    const others = rest.filter((lesson) => !isGettingStartedLesson(lesson));
-    const sequence = [...gsSteps, ...(opener ? [opener] : []), ...others];
-    return sequence.find((lesson) => !stepComplete(lesson, answers, states)) || null;
-  }, [orderedLessons, answers, states, gsSubmitted]);
-  const nextIsGettingStarted = Boolean(next) && isGettingStartedLesson(next) && !gsSubmitted;
+    return orderedLessons.find((lesson) => isWorkbookLesson(lesson) && !stepComplete(lesson, answers, states)) || null;
+  }, [orderedLessons, answers, states]);
 
-  const started = Object.values(answers || {}).some((value) => String(value || "").trim());
-  const liveModules = modules.filter((module) => module.status === "live");
+  const started = orderedLessons.some((lesson) => isWorkbookLesson(lesson) && stepComplete(lesson, answers, states));
+  const liveModules = modules.filter((module) => module.status === "live" && module.kind !== "orientation");
   const nextModule = next ? modules.find((module) => module.order === next.module_order) : null;
-  const nextLabel = nextModule
-    ? nextModule.kind === "orientation"
-      ? "Getting Started"
-      : `Module ${nextModule.order}`
-    : "";
+  const nextLabel = nextModule ? `Module ${nextModule.order}` : "";
 
   return (
     <div className="space-y-10">
@@ -286,33 +272,18 @@ function MemberHome() {
         ) : next ? (
           <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
             <p className="text-[13px] font-semibold text-primary-soft">
-              {started ? "Pick up where you left off" : "Start here"}
+              {started ? "Pick up where you left off" : "Next step"}
             </p>
             <h1 className="mt-1.5 text-[clamp(1.5rem,1.1rem+1.6vw,2.1rem)] text-primary-foreground">
-              {nextIsGettingStarted
-                ? "Getting Started"
-                : isOpenerLesson(next)
-                  ? next.title
-                  : `${nextLabel} · ${next.title}`}
+              {nextLabel ? `${nextLabel} · ${next.title}` : next.title}
             </h1>
-            {nextIsGettingStarted ? (
-              <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">
-                Five short steps before Module 1, ending with your choice to join.
-              </p>
-            ) : next.purpose ? (
+            {next.purpose ? (
               <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">{next.purpose}</p>
             ) : null}
-            {nextIsGettingStarted ? (
-              <button type="button" onClick={openGettingStarted} className={`mt-5 ${marigoldButton}`}>
-                {started ? "Continue Getting Started" : "Open Getting Started"}
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </button>
-            ) : (
-              <Link to={`/lesson/${next.code}`} className={`mt-5 ${marigoldButton}`}>
-                {started ? "Continue" : "Begin"}
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            )}
+            <Link to={`/lesson/${next.code}`} className={`mt-5 ${marigoldButton}`}>
+              {started ? "Continue" : "Start"}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
           </div>
         ) : (
           <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
@@ -354,7 +325,6 @@ function MemberHome() {
           {liveModules.map((module) => {
             const row = progress.byOrder[module.order];
             if (!row) return null;
-            if (module.kind === "orientation" && gsSubmitted) return null;
             const pct = row.stepCount ? Math.round((row.writtenCount / row.stepCount) * 100) : 0;
             const open = row.unlocked;
             const content = (
@@ -379,15 +349,7 @@ function MemberHome() {
             );
             return (
               <li key={module.id || module.slug}>
-                {open && module.kind === "orientation" ? (
-                  <button
-                    type="button"
-                    onClick={openGettingStarted}
-                    className="block w-full rounded-xl border border-border bg-card px-4 py-3 text-left transition hover:bg-secondary"
-                  >
-                    {content}
-                  </button>
-                ) : open ? (
+                {open ? (
                   <Link
                     to={`/module/${module.slug}`}
                     className="block rounded-xl border border-border bg-card px-4 py-3 transition hover:bg-secondary"
@@ -417,5 +379,10 @@ export default function CurriculumHome() {
   const { isAuthenticated, isLoadingAuth } = useAuth();
   /** Wait for the login check so a signed-in person never sees the front door flash first. */
   if (isLoadingAuth) return <div aria-busy="true" className="min-h-[60vh]" />;
-  return isAuthenticated ? <MemberHome /> : <PublicHome />;
+  if (!isAuthenticated) return <PublicHome />;
+  return (
+    <WorkbookGate>
+      <MemberHome />
+    </WorkbookGate>
+  );
 }

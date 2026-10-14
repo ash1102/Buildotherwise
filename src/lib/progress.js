@@ -1,6 +1,5 @@
 import { answerKey, routeSkipsWriting } from "./workbook";
-import { isOpenerLesson } from "./curriculum";
-import { readSubmitted } from "./gettingStarted";
+import { isWorkbookLesson } from "./curriculum";
 
 /**
  * Completion follows the curriculum's own shape: a step counts once one Try or
@@ -50,30 +49,27 @@ function isComingLater(module) {
 }
 
 /**
- * Which module can be opened. The program opens in order, starting with its own
- * doorway: Getting Started first, then each numbered module once every step
- * before it holds one saved line — so Module 1 waits on Getting Started, and
- * Module 2 waits on Getting Started and Module 1. A coming-later module is never
- * drawn as locked, because nothing about it is waiting on the journal.
+ * Which module can be opened. The workbook starts at Module 1. Getting Started
+ * is a gate before this list, so nothing here waits on it. Each numbered module
+ * opens once every workbook step before it holds one saved line. A coming-later
+ * module is never drawn as locked, because nothing about it is waiting on the journal.
  */
 export function buildProgress({ modules, lessonsByOrder, answers, states }) {
   const ordered = (modules || []).slice().sort((a, b) => a.order - b.order);
 
   const byOrder = {};
   const rows = [];
-  /** Every container the gate waits on, in order, so the first unfinished one is the blocker. */
+  /** Every workbook module the next one waits on, in order. */
   const gates = [];
 
   ordered.forEach((module) => {
     const coming = isComingLater(module);
     /**
-     * The opening map is its own entry point at the start of the program, not one
-     * of Getting Started's steps, so it never counts here and nothing waits on it.
+     * Getting Started and the opener are not steps of a numbered module, even
+     * when their records use that module's order.
      */
-    const lessons = ((lessonsByOrder || {})[module.order] || []).filter((lesson) => !isOpenerLesson(lesson));
-    /** Once Getting Started is submitted it is finished, whatever was skipped inside it. */
-    const submittedOrientation = module.kind === "orientation" && Boolean(readSubmitted());
-    const incomplete = submittedOrientation ? [] : lessons.filter((lesson) => !stepComplete(lesson, answers, states));
+    const lessons = ((lessonsByOrder || {})[module.order] || []).filter(isWorkbookLesson);
+    const incomplete = lessons.filter((lesson) => !stepComplete(lesson, answers, states));
 
     byOrder[module.order] = {
       order: module.order,
@@ -93,7 +89,10 @@ export function buildProgress({ modules, lessonsByOrder, answers, states }) {
       })),
     };
 
-    if (module.kind !== "orientation") rows.push(byOrder[module.order]);
+    // Getting Started is not a row in the workbook, and Module 1 does not wait on it.
+    if (module.kind === "orientation") return;
+
+    rows.push(byOrder[module.order]);
 
     // Nothing waits on a module that was never built, or on a container with no steps to finish.
     if (!coming && lessons.length > 0) gates.push(byOrder[module.order]);

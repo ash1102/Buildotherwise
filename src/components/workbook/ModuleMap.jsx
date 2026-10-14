@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { isComingLater } from "@/lib/curriculum";
+import { isComingLater, isWorkbookLesson } from "@/lib/curriculum";
 import { describeStep } from "@/lib/workbook";
 import { buildProgress } from "@/lib/progress";
 
@@ -25,8 +25,7 @@ function SkeletonRow() {
 }
 
 export default function ModuleMap({ modules, lessonsByOrder, answers, decisions, states, loading }) {
-  // The gate is worked out from every container, Getting Started included, so the
-  // numbered modules wait on it. Only the numbered modules are listed below.
+  // The workbook list starts at Module 1. Getting Started is not a row here.
   const progress = useMemo(
     () => buildProgress({ modules, lessonsByOrder, answers, states }),
     [modules, lessonsByOrder, answers, states]
@@ -46,7 +45,7 @@ export default function ModuleMap({ modules, lessonsByOrder, answers, decisions,
   return (
     <ol className="divide-y divide-border border-y border-border">
       {numbered.map((module) => {
-        const lessons = lessonsByOrder[module.order] || [];
+        const lessons = (lessonsByOrder[module.order] || []).filter(isWorkbookLesson);
         const coming = isComingLater(module);
         const row = progress.byOrder[module.order];
         const locked = Boolean(row && !row.unlocked && !coming);
