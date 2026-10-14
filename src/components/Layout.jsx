@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { JournalProvider } from "@/components/journal/JournalContext";
 import JournalWidget from "@/components/journal/JournalWidget";
 import SiteHeader from "@/components/SiteHeader";
+import GettingStartedHost from "@/components/gettingStarted/GettingStartedHost";
 import { useApplyDisplay } from "@/lib/display";
 
 export default function Layout() {
@@ -45,6 +46,7 @@ export default function Layout() {
         </footer>
 
         <JournalWidget />
+        <GettingStartedHost />
       </div>
     </JournalProvider>
   );
