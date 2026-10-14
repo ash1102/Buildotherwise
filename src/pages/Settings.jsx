@@ -4,6 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import useCurriculum from "@/hooks/useCurriculum";
 import { readStore } from "@/lib/store";
+import { ANSWER_KEY, DECISION_KEY, readWorkbookValue } from "@/lib/workbook";
 import { downloadText } from "@/lib/download";
 import { MAP_SECTIONS } from "@/lib/lifeMap";
 import { TEXT_SIZES, THEMES, useDisplay } from "@/lib/display";
@@ -77,7 +78,7 @@ function buildExport(lessonsByCode) {
       lines.push(entry.body || "", "");
     });
 
-  const answers = readStore("answers", {});
+  const answers = readWorkbookValue(ANSWER_KEY, {});
   const answerKeys = Object.keys(answers).filter((key) => String(answers[key] || "").trim());
   lines.push(`## Workbook answers`, "");
   const byCode = {};
@@ -99,7 +100,7 @@ function buildExport(lessonsByCode) {
       lines.push("");
     });
 
-  const decisions = readStore("decisions", {});
+  const decisions = readWorkbookValue(DECISION_KEY, {});
   const decided = Object.entries(decisions).filter(([, value]) => value);
   if (decided.length) {
     lines.push(`## Next decisions`, "");
