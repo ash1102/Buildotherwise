@@ -251,7 +251,6 @@ function MemberHome() {
 
   const progress = useMemo(
     () => buildProgress({ modules, lessonsByOrder, answers, states }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [modules, lessonsByOrder, answers, states, gsSubmitted]
   );
 
