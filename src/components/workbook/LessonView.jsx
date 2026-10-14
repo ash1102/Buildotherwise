@@ -16,6 +16,7 @@ import StepReading from "./StepReading";
 import DictateButton from "./DictateButton";
 import TryPlanner from "./TryPlanner";
 import TryCheckIn from "./TryCheckIn";
+import TapToSort from "./TapToSort";
 import { interactionsFor } from "@/lib/interactions";
 import { journalStepHref } from "@/lib/journal";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor } from "@/lib/workbook";
@@ -101,10 +102,13 @@ export default function LessonView({
 
   // Optional tap-to-answer pieces for this step, set in src/lib/interactions.js.
   const interactions = interactionsFor(lesson.code);
+  const tryInteractions = interactions.filter((item) => item.beat !== "reflect");
+  const reflectInteractions = interactions.filter((item) => item.beat === "reflect");
   const hasPlanner = interactions.some((item) => item.type === "tryPlanner");
   const renderInteraction = (item) => {
     if (item.type === "tryPlanner") return <TryPlanner key="tryPlanner" lesson={lesson} />;
     if (item.type === "tryCheckIn") return <TryCheckIn key="tryCheckIn" lesson={lesson} planCode={item.planCode} />;
+    if (item.type === "tapToSort") return <TapToSort key="tapToSort" lesson={lesson} />;
     return null;
   };
 
@@ -277,7 +281,7 @@ export default function LessonView({
           {carrySources && carrySources.length ? (
             <CarryForward sources={carrySources} selected={carried} onChange={onCarriedChange} />
           ) : null}
-          {interactions.map(renderInteraction)}
+          {tryInteractions.map(renderInteraction)}
           {hasPlanner ? (
             <details ref={detailRef} className="rounded-xl border border-border bg-card p-4 sm:p-5">
               <summary className="cursor-pointer text-[16px] font-medium text-foreground">
@@ -312,6 +316,7 @@ export default function LessonView({
           {tryPrompts.length ? null : answerChoices}
           {tryPrompts.length ? null : talkControl}
           {tryPrompts.length ? null : <PrivacyNote />}
+          {reflectInteractions.map(renderInteraction)}
           {reflectPrompts.map((item) => promptField(item.prompt, item.index, item.fieldKey))}
         </div>
       ),
