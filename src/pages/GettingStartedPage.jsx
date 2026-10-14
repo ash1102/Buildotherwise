@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import useCurriculum from "@/hooks/useCurriculum";
 import { isOpenerLesson } from "@/lib/curriculum";
 import StepList from "@/components/workbook/StepList";
+import { useAuth } from "@/lib/AuthContext";
+import { openGettingStarted, useGettingStartedSubmitted } from "@/lib/gettingStarted";
 
 /**
  * Getting Started keeps its own container rather than living inside the module
@@ -11,6 +13,29 @@ import StepList from "@/components/workbook/StepList";
 export default function GettingStartedPage() {
   const { modules, lessonsByOrder, loading } = useCurriculum();
   const gettingStarted = modules.find((module) => module.kind === "orientation");
+  const { isAuthenticated } = useAuth();
+  const submitted = useGettingStartedSubmitted();
+
+  if (isAuthenticated && submitted) {
+    return (
+      <div className="space-y-4 py-6">
+        <p className="workbook-label">Getting Started</p>
+        <h1>You’ve finished Getting Started.</h1>
+        <p className="max-w-[60ch] text-[16px] leading-relaxed text-muted-foreground">
+          Your answers are in Settings, under “My Getting Started.” To change your choice to join, email
+          Start@buildotherwise.org.
+        </p>
+        <div className="flex flex-wrap gap-4">
+          <Link to="/settings" className="text-[16px] font-medium text-accent-ink underline underline-offset-2">
+            See my answers
+          </Link>
+          <Link to="/map" className="text-[16px] font-medium text-accent-ink underline underline-offset-2">
+            Go to my Life Map
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return <p className="py-10 text-[16px] text-muted-faint">Opening Getting Started…</p>;
@@ -42,6 +67,16 @@ export default function GettingStartedPage() {
           A short sequence before Module 1. Nothing here is scored.
         </p>
       </header>
+
+      {isAuthenticated ? (
+        <button
+          type="button"
+          onClick={openGettingStarted}
+          className="rounded-full bg-primary px-5 py-3 text-[16px] font-medium text-primary-foreground"
+        >
+          Open Getting Started
+        </button>
+      ) : null}
 
       <StepList lessons={lessons} scopeLabel="before the modules" />
 
