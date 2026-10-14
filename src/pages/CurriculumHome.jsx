@@ -309,7 +309,7 @@ function MemberHome() {
           <Link to="/map" className="rounded-xl border border-border bg-card p-4 transition hover:bg-secondary">
             <Map className="h-5 w-5 text-accent-ink" aria-hidden="true" />
             <span className="mt-2 block font-semibold">Your Life Map</span>
-            <span className="block text-[15px] text-muted-foreground">Places, activities, energy, barriers, threads.</span>
+            <span className="block text-[15px] text-muted-foreground">Places, activities, energy, barriers, threads, people and groups.</span>
           </Link>
           <Link to="/aspects" className="rounded-xl border border-border bg-card p-4 transition hover:bg-secondary">
             <Compass className="h-5 w-5 text-accent-ink" aria-hidden="true" />
