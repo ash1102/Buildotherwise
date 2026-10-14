@@ -32,6 +32,11 @@ export const MAP_SECTIONS = [
     label: "Threads",
     prompt: "What your attention keeps coming back to.",
   },
+  {
+    key: "groups",
+    label: "People and groups",
+    prompt: "The groups you're part of, used to be part of, or might want to try. Where you belong, not a headcount.",
+  },
 ];
 
 /**
@@ -116,9 +121,53 @@ export const MAP_QUESTION_PARTS = [
       { id: "p5-bigger", text: "One part of this map I would willingly make bigger is…", starter: true },
     ],
   },
+  {
+    key: "part-groups",
+    title: "Add the people and groups",
+    section: "groups",
+    intro:
+      "A lot of life happens with other people. A group doesn't need a name or a meeting. It can be the people you text, the crew at work, the regulars somewhere, or people online. You don't have to explain any of it.",
+    examples:
+      "Family, a circle of friends, coworkers, neighbors, people at church, a team, a crew, a class, other parents, people you game with, an online community, a recovery or support group, people who share your language or where you're from.",
+    note: "Skip any of these. A blank line is a real answer.",
+    questions: [
+      { id: "g-now", branch: "Groups I'm in now", text: "Which groups or circles are part of your life right now?", list: true },
+      {
+        id: "g-close",
+        branch: "How close it feels",
+        text: "For each one, how close does it feel right now?",
+        about: "g-now",
+        aboutLabel: "Which group?",
+        chips: ["Close", "In the middle", "At the edge", "Not sure"],
+      },
+      { id: "g-before", branch: "Groups from before", text: "Are there groups you used to be part of?", list: true },
+      {
+        id: "g-left",
+        branch: "What's left of it",
+        text: "Is any of that worth reconnecting with, or is it better left where it is?",
+        about: "g-before",
+        aboutLabel: "Which group?",
+        chips: ["Worth reconnecting", "Changed, but still part of me", "Leaving it where it is", "Not sure"],
+      },
+      {
+        id: "g-curious",
+        branch: "Groups I'm curious about",
+        text: "Is there a group, place, or kind of people you've wondered about joining, or just seeing?",
+        list: true,
+      },
+      {
+        id: "g-take",
+        branch: "What it would take",
+        text: "What would it take to show up there?",
+        section: "barriers",
+        about: "g-curious",
+        aboutLabel: "Which group?",
+      },
+    ],
+  },
 ];
 
-/** Every Parts 1-5 question by id, with the part and section it belongs to. */
+/** Every map question by id, with the part and section it belongs to. */
 export const QUESTIONS_BY_ID = Object.fromEntries(
   MAP_QUESTION_PARTS.flatMap((part, partIndex) =>
     part.questions.map((question) => [
@@ -127,7 +176,7 @@ export const QUESTIONS_BY_ID = Object.fromEntries(
         ...question,
         branch: question.branch || question.text.replace(/…$/, "").trim(),
         partIndex,
-        section: part.section,
+        section: question.section || part.section,
       },
     ])
   )
