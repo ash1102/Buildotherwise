@@ -77,7 +77,7 @@ export default function GettingStartedPopup({ lessons, onClose }) {
       await base44.entities.GettingStartedSubmission.create(record);
       markSubmitted({ sent: sendingPreview });
       setIndex(doneAt);
-    } catch (caught) {
+    } catch {
       setError("That didn't send. Check your connection and try again. Nothing was lost.");
     } finally {
       setSending(false);
