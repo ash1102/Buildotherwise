@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useLifeMap, useWorkbook } from "@/lib/workbook";
 import { useJournalEntries } from "@/lib/journal";
 import useCurriculum from "@/hooks/useCurriculum";
-import { isOpenerLesson } from "@/lib/curriculum";
+import { nextOpenStep } from "@/lib/progress";
 import { downloadText } from "@/lib/download";
 import { readStore, useStore } from "@/lib/store";
 import {
@@ -41,7 +41,7 @@ export default function LifeMapPage() {
   const [step, setStep] = useState(0);
   const mapRef = useRef(null);
   const entries = useJournalEntries();
-  const { answers } = useWorkbook();
+  const { answers, states } = useWorkbook();
   const { lessons, orderedLessons } = useCurriculum();
 
   const [draft, setDraft] = useState("");
@@ -49,8 +49,11 @@ export default function LifeMapPage() {
   const [selectedId, setSelectedId] = useState(null);
   const [asList, setAsList] = useState(false);
 
-  /** The map is the opening move, so the step it hands over to is the first Getting Started step. */
-  const nextStep = useMemo(() => orderedLessons.find((lesson) => !isOpenerLesson(lesson)) || null, [orderedLessons]);
+  /** First unfinished Getting Started step, then the next unfinished workbook step. */
+  const nextStep = useMemo(
+    () => nextOpenStep({ lessons, workbookLessons: orderedLessons, answers, states }),
+    [lessons, orderedLessons, answers, states]
+  );
   const graph = useMemo(() => buildGraph(map), [map]);
   const layout = useMemo(() => layoutGraph(graph, positions), [graph, positions]);
   const explore = useMemo(() => exploreLines(pick), [pick]);
@@ -184,7 +187,7 @@ export default function LifeMapPage() {
         <div className="flex items-start gap-4">
           <DashedMotif size="lg" />
           <div>
-            <p className="workbook-label">Getting Started · the connected map</p>
+            <p className="workbook-label">Your Life Map</p>
             <h1 className="mt-2 font-heading text-3xl sm:text-4xl">Map the life you’re actually living</h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
               Start with the questions below. Answer one thing at a time: each answer becomes one line, and every line
@@ -301,7 +304,7 @@ export default function LifeMapPage() {
         </PrivacyNote>
       </div>
 
-      <StepNav prev={null} next={nextStep} workbookLink="/" />
+      <StepNav prev={null} next={nextStep} workbookLink="/" endNote="" />
     </div>
   );
 }
