@@ -9,8 +9,8 @@ export default function About() {
         <p className="workbook-label">About</p>
         <h1 className="mt-2">About Entrepalooza</h1>
         <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-          A self-paced workbook for adults who are in the middle of a change and want to test what comes next in real
-          life, rather than plan it in theory.
+          A self-paced online workbook for adults who are in the middle of a change and want to test what comes next in
+          real life, rather than plan it in theory.
         </p>
       </header>
 
@@ -32,8 +32,8 @@ export default function About() {
           up, a project or creative idea you want to test, a pause you need to protect, or a period of not knowing what
           interests you yet. You do not need a business idea, a passion or a personal story to begin. Employment,
           training, further study, a project or venture, a pause and continuing to look are all complete answers here.
-          Entrepreneurship is a real option, and the business-building skills are useful even if you never start one,
-          but it is not the goal everyone has to reach.
+          Building a business is a real path here, and the business-building skills are useful even if you never start
+          one. So are the other paths.
         </p>
         <p>
           Entrepalooza is built by Build Otherwise, using the Scars to Strategy framework. Pilot 1 is the current release: Getting Started and
