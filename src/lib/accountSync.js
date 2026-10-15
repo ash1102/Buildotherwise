@@ -28,6 +28,7 @@ let dirty = new Set();
 let timer = null;
 let status = "idle";
 let pending = Promise.resolve();
+let starting = Promise.resolve();
 const statusListeners = new Set();
 
 function setStatus(next) {
@@ -226,8 +227,14 @@ if (typeof window !== "undefined") {
 }
 
 /** Start keeping this account's workbook in sync. Safe to call more than once. */
-export async function startAccountSync(userId) {
-  if (!userId || currentUser === userId) return;
+export function startAccountSync(userId) {
+  if (!userId) return Promise.resolve();
+  if (currentUser === userId) return starting;
+  starting = begin(userId);
+  return starting;
+}
+
+async function begin(userId) {
   currentUser = userId;
   rowIds = {};
   dirty = new Set();
