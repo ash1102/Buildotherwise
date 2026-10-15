@@ -27,7 +27,7 @@ const CHOICES = [
     prompt: "Which thread are you leaving open on purpose?",
   },
   {
-    label: "Continue looking",
+    label: "Keep looking",
     prompt: "What would make the next thing worth pulling on?",
   },
 ];
