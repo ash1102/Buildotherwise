@@ -157,8 +157,8 @@ export default function SiteHeader() {
                 <li>
                   <button
                     type="button"
-                    onClick={() => {
-                      logout(false);
+                    onClick={async () => {
+                      await logout(false);
                       window.location.href = "/";
                     }}
                     className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-[15px] text-muted-foreground transition hover:bg-secondary hover:text-foreground"

@@ -267,8 +267,8 @@ export default function Settings() {
         </form>
 
         <div className="border-t border-border pt-4">
-          <button type="button" onClick={() => {
-              logout(false);
+          <button type="button" onClick={async () => {
+              await logout(false);
               window.location.href = "/";
             }} className={secondaryButton}>
             <LogOut className="h-4 w-4" aria-hidden="true" />
