@@ -153,6 +153,8 @@ export default function Settings() {
   const [newPassword, setNewPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [confirmRecords, setConfirmRecords] = useState(false);
+  const [deletingRecords, setDeletingRecords] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [alsoClear, setAlsoClear] = useState(true);
   const [deleting, setDeleting] = useState(false);
