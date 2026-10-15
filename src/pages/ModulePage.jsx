@@ -2,7 +2,8 @@ import React from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { BookOpen } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
-import { isComingLater, isWorkbookLesson } from "@/lib/curriculum";
+import { isComingLater, isLiveOnlyModule, isWorkbookLesson } from "@/lib/curriculum";
+import CarryForwardScreen from "@/components/records/CarryForwardScreen";
 import LockedNotice from "@/components/workbook/LockedNotice";
 import ComingLaterNotice from "@/components/workbook/ComingLaterNotice";
 import StepList from "@/components/workbook/StepList";
@@ -68,7 +69,9 @@ function ModuleBody() {
         ) : null}
       </header>
 
-      {coming ? (
+      {isLiveOnlyModule(module) ? (
+        <CarryForwardScreen module={module} />
+      ) : coming ? (
         <ComingLaterNotice module={module} />
       ) : locked ? (
         <LockedNotice module={module} row={row} blocking={blocker} missing={blocker ? blocker.missing : []} />
