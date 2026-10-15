@@ -144,6 +144,8 @@ test("Getting Started progress is stored per account, not per browser", async ()
 
   setProgressUserId(null);
   assert.equal(getAnswer("O.1", 0), "answered on this browser");
-  assert.equal(readStore("lifeMap::user::participant-new", null), null);
-  assert.equal(readStore("journal::user::participant-new", null), null);
+  // Logged out, the account's map and journal are not shown.
+  assert.deepEqual(readStore("lifeMap", {}), {});
+  assert.equal(listEntries().some((entry) => entry.body === "a note from this browser"), false);
+  assert.deepEqual(readStore("lifeMap::user::participant-new", null), { places: ["the gym"] });
 });
