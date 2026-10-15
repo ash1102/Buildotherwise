@@ -16,6 +16,7 @@ import StepReading from "./StepReading";
 import DictateButton from "./DictateButton";
 import TryPlanner from "./TryPlanner";
 import TryCheckIn from "./TryCheckIn";
+import NoticeFlow from "./NoticeFlow";
 import ComeBackAfterTry from "./ComeBackAfterTry";
 import { isAfterTryStep } from "@/lib/afterTry";
 import { interactionsFor } from "@/lib/interactions";
@@ -131,7 +132,9 @@ export default function LessonView({
   const decisionStep = lesson.type === "next_decision";
   const rawTry = lesson.try_prompts || [];
   const rawReflect = lesson.reflect_prompts || [];
-  const notAnOption = (prompt) => !optionNames.has(String(prompt).trim().toLowerCase());
+  // A step whose interaction owns its questions does not also print the generic prompt boxes.
+  const ownsPrompts = interactionsFor(lesson.code).some((item) => item.type === "noticeFlow");
+  const notAnOption = (prompt) => !ownsPrompts && !optionNames.has(String(prompt).trim().toLowerCase());
   // Try and Reflect questions are numbered in one run: the Reflect boxes start after the
   // Try ones. That way no two questions in a step share a stored answer, so nothing
   // written in one box can appear in, or overwrite, another. Same order the
@@ -153,6 +156,7 @@ export default function LessonView({
   const renderInteraction = (item) => {
     if (item.type === "tryPlanner") return <TryPlanner key="tryPlanner" lesson={lesson} />;
     if (item.type === "tryCheckIn") return <TryCheckIn key="tryCheckIn" lesson={lesson} planCode={item.planCode} />;
+    if (item.type === "noticeFlow") return <NoticeFlow key="noticeFlow" lesson={lesson} route={route} />;
     return null;
   };
 
@@ -360,7 +364,13 @@ export default function LessonView({
     beats.push({
       key: "try",
       label: "Try",
-      content: <div className="space-y-6">{answerChoices}</div>,
+      content: (
+        <div className="space-y-6">
+          {answerChoices}
+          {interactions.length ? <PrivacyNote /> : null}
+          {interactions.map(renderInteraction)}
+        </div>
+      ),
     });
   }
 
