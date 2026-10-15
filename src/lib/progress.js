@@ -87,7 +87,10 @@ export function buildProgress({ modules, lessonsByOrder, answers, states, pacing
     let weekOpen = true;
     if (pacing && !pacing.skip && !coming && module.kind !== "orientation" && previous) {
       const alreadyOpened = Boolean(openedAt[module.order]);
-      const started = incomplete.length < lessons.length;
+      // Started means a real saved line, not a step that counts as done because it has no box.
+      const started = lessons.some((lesson) =>
+        Object.keys(answers || {}).some((key) => key.startsWith(`${lesson.code}#`) && !isBlank(answers[key]))
+      );
       const prevOpened = openedAt[previous.order] ? new Date(openedAt[previous.order]).getTime() : NaN;
       const readyAt = Number.isNaN(prevOpened) ? null : prevOpened + PACE_MS;
       opensAt = readyAt ? new Date(readyAt).toISOString() : null;
