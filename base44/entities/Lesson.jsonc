@@ -1,28 +1,136 @@
 {
   "name": "Lesson",
-  "type": "object",
   "properties": {
-    "module_order": {
-      "type": "number",
-      "description": "Order of the parent module (0 = Getting Started)."
+    "alias": {
+      "description": "Previous lesson number, kept for auditability.",
+      "type": "string"
     },
-    "order": {
-      "type": "number",
-      "description": "Position of this step inside its module."
+    "approval_note": {
+      "description": "Shown on the card while its teaching is not yet approved. Never a claim of approval.",
+      "type": "string"
+    },
+    "approval_state": {
+      "default": "pending_approval",
+      "description": "Whether the teaching on this card is approved for participant delivery. A complete workbook structure is not the same as approved lesson content.",
+      "enum": [
+        "approved",
+        "pending_approval"
+      ],
+      "type": "string"
+    },
+    "approved_source": {
+      "description": "The approved curriculum source this card's content comes from, when the content is approved.",
+      "type": "string"
+    },
+    "approved_version": {
+      "description": "The exact approved source version this card's content comes from.",
+      "type": "string"
+    },
+    "boundary": {
+      "type": "string"
+    },
+    "carry_forward": {
+      "description": "Codes of earlier steps whose saved answers may be selected as context here. Nothing moves without an explicit choice.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
     },
     "code": {
-      "type": "string",
-      "description": "Stable step code used in the URL. Old lesson numbers are kept as aliases."
+      "description": "Stable step code used in the URL. Old lesson numbers are kept as aliases.",
+      "type": "string"
     },
-    "alias": {
-      "type": "string",
-      "description": "Previous lesson number, kept for auditability."
+    "decision_options": {
+      "description": "Next Decision choices for this step. When empty, all eight are offered.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "description": {
+      "description": "Optional short text about this step (up to 1000 characters), used for search and previews.",
+      "type": "string"
+    },
+    "duration_min": {
+      "type": "number"
+    },
+    "has_decision": {
+      "default": true,
+      "description": "Whether the shared Next Decision words are offered here.",
+      "type": "boolean"
+    },
+    "internal_notes": {
+      "description": "Facilitator-only. Never rendered to participants.",
+      "rls": {
+        "read": {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        "write": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      },
+      "type": "string"
+    },
+    "module_order": {
+      "description": "Order of the parent module (0 = Getting Started).",
+      "type": "number"
+    },
+    "order": {
+      "description": "Position of this step inside its module.",
+      "type": "number"
+    },
+    "purpose": {
+      "description": "One honest sentence on what the step does.",
+      "type": "string"
+    },
+    "readings_note": {
+      "type": "string"
+    },
+    "reflect_prompts": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "routes": {
+      "description": "Equal ways to take part. All count the same.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "show": {
+      "description": "Neutral demonstration. Never a participant story.",
+      "type": "string"
+    },
+    "status": {
+      "default": "draft",
+      "enum": [
+        "draft",
+        "ready",
+        "published"
+      ],
+      "type": "string"
+    },
+    "teach": {
+      "description": "The teaching block for this step.",
+      "type": "string"
     },
     "title": {
       "type": "string"
     },
+    "try_prompts": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
     "type": {
-      "type": "string",
+      "default": "activity",
       "enum": [
         "orientation",
         "reading",
@@ -32,107 +140,10 @@
         "next_decision",
         "tool"
       ],
-      "default": "activity"
-    },
-    "duration_min": {
-      "type": "number"
-    },
-    "purpose": {
-      "type": "string",
-      "description": "One honest sentence on what the step does."
-    },
-    "description": {
-      "type": "string",
-      "description": "Optional short text about this step (up to 1000 characters), used for search and previews."
-    },
-    "teach": {
-      "type": "string",
-      "description": "The teaching block for this step."
-    },
-    "show": {
-      "type": "string",
-      "description": "Neutral demonstration. Never a participant story."
-    },
-    "routes": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Equal ways to take part. All count the same."
-    },
-    "try_prompts": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "reflect_prompts": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "has_decision": {
-      "type": "boolean",
-      "default": true,
-      "description": "Whether the shared Next Decision words are offered here."
-    },
-    "decision_options": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Next Decision choices for this step. When empty, all eight are offered."
+      "type": "string"
     },
     "what_comes_out": {
       "type": "string"
-    },
-    "boundary": {
-      "type": "string"
-    },
-    "carry_forward": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Codes of earlier steps whose saved answers may be selected as context here. Nothing moves without an explicit choice."
-    },
-    "readings_note": {
-      "type": "string"
-    },
-    "status": {
-      "type": "string",
-      "enum": [
-        "draft",
-        "ready",
-        "published"
-      ],
-      "default": "draft"
-    },
-    "approval_state": {
-      "type": "string",
-      "enum": [
-        "approved",
-        "pending_approval"
-      ],
-      "default": "pending_approval",
-      "description": "Whether the teaching on this card is approved for participant delivery. A complete workbook structure is not the same as approved lesson content."
-    },
-    "approval_note": {
-      "type": "string",
-      "description": "Shown on the card while its teaching is not yet approved. Never a claim of approval."
-    },
-    "approved_source": {
-      "type": "string",
-      "description": "The approved curriculum source this card's content comes from, when the content is approved."
-    },
-    "approved_version": {
-      "type": "string",
-      "description": "The exact approved source version this card's content comes from."
-    },
-    "internal_notes": {
-      "type": "string",
-      "description": "Facilitator-only. Never rendered to participants."
     }
   },
   "required": [
@@ -142,13 +153,7 @@
     "title"
   ],
   "rls": {
-    "read": {},
     "create": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "update": {
       "user_condition": {
         "role": "admin"
       }
@@ -157,6 +162,26 @@
       "user_condition": {
         "role": "admin"
       }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
     }
-  }
+  },
+  "type": "object"
 }
