@@ -15,6 +15,9 @@ import EditEntryPanel from "@/components/journal/EditEntryPanel";
 import FollowUpPanel from "@/components/journal/FollowUpPanel";
 import AddFromJournalDialog from "@/components/discovery/AddFromJournalDialog";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
+import JournalConnections from "@/components/journal/JournalConnections";
+import { Link } from "react-router-dom";
+import { MessageCircle } from "lucide-react";
 
 const TABS = [
   { key: "all", label: "All entries" },
@@ -191,8 +194,8 @@ export default function JournalPage() {
         <p className="workbook-label">Conversation Journal</p>
         <h1 className="mt-2">Your Conversation Journal</h1>
         <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-          Keep your lesson responses, observations, and questions together. Return to an earlier entry when you want to
-          add something or see what has changed.
+          Every answer you save in the workbook lands here, next to your own notes. Below, the journal points out threads
+          you left open and words that keep coming back, so you can see what connects.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Button type="button" variant="outline" onClick={downloadAll} className="rounded-md border-input bg-card">
@@ -215,6 +218,8 @@ export default function JournalPage() {
       </header>
 
       <JournalComposer />
+
+      <JournalConnections entries={entries} />
 
       <div className="no-print flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
@@ -253,6 +258,15 @@ export default function JournalPage() {
             <Share2 className="mr-2 h-4 w-4" aria-hidden="true" />
             Share {selected.length} selected
           </Button>
+        ) : null}
+        {selected.length ? (
+          <Link
+            to={`/journal/reflect?entries=${encodeURIComponent(selected.join(","))}`}
+            className="inline-flex items-center rounded-md border border-input bg-card px-4 py-2 text-[15px] font-medium text-foreground transition hover:bg-secondary"
+          >
+            <MessageCircle className="mr-2 h-4 w-4" aria-hidden="true" />
+            Talk {selected.length} through
+          </Link>
         ) : null}
       </div>
 
