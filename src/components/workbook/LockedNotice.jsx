@@ -81,8 +81,8 @@ function WeekNotice({ module, row }) {
         {module ? `Module ${module.order}: ${module.title}` : "This module"} opens a week after {row.previousLabel || "the last module"} did
       </h2>
       <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-        One new module opens each week. That week is for your try to actually happen, and it keeps the workbook to
-        about 2–3 hours a week. You haven’t missed anything, and nothing is overdue.
+        One new module opens each week. The week gives what you noticed or planned time to happen out in your life, and
+        the aim is to keep the workbook to about 2–3 hours a week. You haven’t missed anything, and nothing is overdue.
       </p>
       <p className="mt-3 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
         Until then, everything already open stays open. You can go back to a step, add to your journal, or work on
