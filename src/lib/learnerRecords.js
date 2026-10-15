@@ -99,7 +99,11 @@ export const RECORD_TYPES = [
     module: 5,
     revisit: 9,
     prompt: "Your current direction, and when you will look at it again. It can change.",
-    sources: [{ code: "M5-L3", match: /^one Next Decision$/i }],
+    sources: [
+      { code: "M5-L3", match: /^one Next Decision$/i },
+      { code: "M5-L3", decision: true },
+      { code: "M2-L3", decision: true },
+    ],
   },
   {
     type: "tribe_continuity_card",
@@ -126,9 +130,19 @@ function promptsOf(lesson) {
 }
 
 /** The first step answer that can seed this record, with where it came from. */
-export function draftFromSteps(def, answers, lessonsByCode) {
+export function draftFromSteps(def, answers, lessonsByCode, decisions = {}) {
   for (const source of def.sources || []) {
     let key = "";
+    if (source.decision) {
+      const picked = String((decisions || {})[source.code] || "").trim();
+      if (!picked) continue;
+      const lesson = lessonsByCode[source.code];
+      return {
+        body: `Next Decision: ${picked}`,
+        code: source.code,
+        stepTitle: (lesson && lesson.title) || source.code,
+      };
+    }
     if (source.slot) {
       key = answerKey(source.code, source.slot);
     } else if (source.match) {
