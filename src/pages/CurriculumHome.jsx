@@ -157,7 +157,7 @@ function PublicHome() {
             <p>Start with one small thing you can try. No plan, passion or business idea needed.</p>
             <div className="acts">
               <Link className="btn" to="/getting-started">
-                Start free now
+                Start Getting Started
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               <a className="txt" href="#how">
@@ -242,7 +242,7 @@ function PublicHome() {
           </p>
           <div className="acts">
             <Link className="btn" to="/getting-started">
-              Start free now
+              Start Getting Started
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <a className="txt" href={INTEREST_FORM} target="_blank" rel="noopener noreferrer">
