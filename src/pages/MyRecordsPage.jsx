@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import useCurriculum from "@/hooks/useCurriculum";
-import { useWorkbook } from "@/lib/workbook";
+import { useDecisions, useWorkbook } from "@/lib/workbook";
 import {
   RECORD_TYPES,
   deleteRecord,
@@ -22,6 +22,7 @@ import RecordsPrivacyNotice from "@/components/records/RecordsPrivacyNotice";
 export default function MyRecordsPage() {
   const { modules, lessonsByCode, loading: curriculumLoading } = useCurriculum();
   const { answers } = useWorkbook();
+  const decisions = useDecisions();
   const { byType, loading, error, setByType } = useLearnerRecords();
   const [skipped, setSkippedState] = useState(() => readSkipped());
 
@@ -62,8 +63,8 @@ export default function MyRecordsPage() {
       <ol className="space-y-4">
         {RECORD_TYPES.map((def, index) => {
           const saved = byType[def.type] || null;
-          const available = liveOrders.has(def.module);
-          const stepDraft = draftFromSteps(def, answers, lessonsByCode);
+          const available = !def.liveOnly && liveOrders.has(def.module);
+          const stepDraft = draftFromSteps(def, answers, lessonsByCode, decisions);
           const draft = !saved && !skipped[def.type] ? stepDraft : null;
           const prevType = previousType(def.type);
           const prevSaved = prevType ? byType[prevType] : null;
@@ -82,6 +83,8 @@ export default function MyRecordsPage() {
               previous={previous}
               available={available}
               moduleLabel={`Module ${def.module}`}
+              revisitLabel={def.revisit ? `Module ${def.revisit}` : ""}
+              liveOnly={Boolean(def.liveOnly)}
               canRefill={Boolean(stepDraft) && Boolean(skipped[def.type])}
               onRefill={() => skip(def.type, false)}
               onDiscardDraft={() => skip(def.type, true)}
