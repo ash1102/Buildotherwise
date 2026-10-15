@@ -26,6 +26,15 @@ export default function Layout() {
               <Link to="/about" className="font-medium text-accent-ink underline underline-offset-2">
                 About Entrepalooza
               </Link>
+              <Link to="/mission" className="font-medium text-accent-ink underline underline-offset-2">
+                Mission
+              </Link>
+              <Link to="/programs" className="font-medium text-accent-ink underline underline-offset-2">
+                Programs
+              </Link>
+              <Link to="/get-involved" className="font-medium text-accent-ink underline underline-offset-2">
+                Get involved
+              </Link>
               <Link to="/contact" className="font-medium text-accent-ink underline underline-offset-2">
                 Contact Ashley
               </Link>
