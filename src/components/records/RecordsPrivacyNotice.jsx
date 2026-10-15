@@ -23,10 +23,7 @@ export default function RecordsPrivacyNotice() {
           app&rsquo;s database, which is hosted by Base44. That is why they follow you when you sign in on another device.
         </li>
         <li>In the app, only your account can open, change or delete them. Other learners can&rsquo;t see them.</li>
-        <li>
-          Build Otherwise runs the app, so it has technical access to that database. A record is not shared with a
-          facilitator or anyone else unless you choose to share it.
-        </li>
+        <li>Build Otherwise runs the app, so it has technical access to that database.</li>
         <li>
           Your step answers and journal are different: they stay <strong className="text-foreground">on this device
           only</strong>. A draft copied from a step is not saved to your account until you press Save.
