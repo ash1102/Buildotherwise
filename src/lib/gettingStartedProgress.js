@@ -1,12 +1,23 @@
 /**
- * Getting Started is five steps, O.1 to O.5, found by code.
+ * Getting Started is four required steps (O.1, O.2, O.4, O.5), found by code. O.3 is optional.
  * They may be stored on module 0 or module 1. The gate does not care which.
  * A step is done when it has a saved answer, or Pass. Watch counts the same way,
  * because the book already treats it as finished without a writing box.
  * Answers and the Pass choice live in the same browser storage as the rest of the book.
  */
 
-export const GS_CODES = ["O.1", "O.2", "O.3", "O.4", "O.5"];
+export const GS_CODES = ["O.1", "O.2", "O.4", "O.5"];
+
+/**
+ * Optional Getting Started steps. They do not hold the workbook shut.
+ * O.3 "How we give feedback" is a group practice, so in the self-paced app it is
+ * offered as a read before replying in Tribe threads instead of a gate.
+ */
+export const OPTIONAL_GS_CODES = ["O.3"];
+
+export function isOptionalGettingStartedLesson(lesson) {
+  return Boolean(lesson) && OPTIONAL_GS_CODES.includes(lesson.code);
+}
 
 export function isGettingStartedLesson(lesson) {
   return Boolean(lesson) && GS_CODES.includes(lesson.code);

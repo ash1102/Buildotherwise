@@ -10,7 +10,7 @@ import WorkbookGate from "@/components/WorkbookGate";
 import LoginRedirect from "@/components/LoginRedirect";
 import { useAuth } from "@/lib/AuthContext";
 import { useWorkbook } from "@/lib/workbook";
-import { buildProgress } from "@/lib/progress";
+import { usePacedProgress } from "@/lib/pacing";
 
 export default function ModulePage() {
   return (
@@ -27,7 +27,7 @@ function ModuleBody() {
   const { isAuthenticated } = useAuth();
 
   const module = modules.find((item) => item.slug === slug);
-  const progress = buildProgress({ modules, lessonsByOrder, answers, states });
+  const progress = usePacedProgress({ modules, lessonsByOrder, answers, states });
 
   if (loading) {
     return <p className="py-10 text-[16px] text-muted-faint">Opening the module…</p>;
@@ -71,7 +71,7 @@ function ModuleBody() {
       {coming ? (
         <ComingLaterNotice module={module} />
       ) : locked ? (
-        <LockedNotice module={module} blocking={blocker} missing={blocker ? blocker.missing : []} />
+        <LockedNotice module={module} row={row} blocking={blocker} missing={blocker ? blocker.missing : []} />
       ) : (
         <>
           <StepList lessons={lessons} scopeLabel="in this module" />

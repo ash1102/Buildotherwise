@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import useCurriculum from "@/hooks/useCurriculum";
 import { groupBy, loadTribeReplies, loadTribeThreads, moduleTitle, subscribeTribeReplies } from "@/lib/library";
@@ -67,6 +68,13 @@ export default function TribeThreads() {
         <p className="mt-3 max-w-[68ch] text-[16px] leading-relaxed text-muted-faint">
           Everyone in your group can read replies, and they are posted with your name. Your Conversation Journal is
           separate and stays private. Nothing from it is posted here. A reply only exists if you write one on this page.
+        </p>
+        <p className="mt-3 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
+          Before replying to someone, you may want to read{" "}
+          <Link to="/lesson/O.3" className="font-medium text-accent-ink underline underline-offset-2">
+            How we give feedback
+          </Link>
+          . It’s optional.
         </p>
       </header>
 
