@@ -13,8 +13,11 @@ import { progressStorageKey } from "./progressScope";
  * Records are saved to the learner's account (the LearnerRecord entity), and only
  * that account can read, change or delete them through the app.
  *
- * `module` is where a record is made. A record whose module is not live yet shows
- * as "opens with Module X" and cannot be filled.
+ * `module` is where a record first opens. A record whose module is not live yet
+ * shows as "opens with Module X" and cannot be filled. `revisit` is a later module
+ * that deepens it. Pilot 1 ends at Module 5, so records with a Pilot 1 source open
+ * early as a first draft rather than waiting for Modules 6–10.
+ * `liveOnly` records are made in a live session, not in the app.
  *
  * `sources` are step answers that can pre-fill a first draft. Each one names a step
  * and either a fixed answer slot ("plan", "checkin") or a pattern matched against
@@ -39,6 +42,7 @@ export const RECORD_TYPES = [
     module: 4,
     prompt: "What did you actually see or check? What does it support, complicate, or leave unknown?",
     sources: [
+      { code: "M5-L3", match: /one piece of evidence you gathered/i },
       { code: "M4-L3", match: /What wording is more accurate now/ },
       { code: "M4-L1", match: /What more accurate statement fits/ },
       { code: "M2-L3", match: /what evidence supports or complicates/i },
@@ -54,16 +58,26 @@ export const RECORD_TYPES = [
   {
     type: "named_try",
     title: "Named try",
-    module: 7,
+    module: 2,
+    revisit: 7,
     prompt: "Name the one manageable try: what you will create, practise or move forward.",
-    sources: [],
+    sources: [
+      { code: "M2-L1", slot: "plan" },
+      { code: "M2-L1", match: /^\*\*Smallest real action:\*\*/ },
+      { code: "M3-L2", match: /What single part of the setup would you change/ },
+    ],
   },
   {
     type: "try_review",
     title: "Try review",
-    module: 7,
+    module: 2,
+    revisit: 7,
     prompt: "What happened, what did it cost, and what did it teach?",
-    sources: [],
+    sources: [
+      { code: "M2-L2", slot: "checkin" },
+      { code: "M2-L3", match: /^what changed from expectation/i },
+      { code: "M3-L3", match: /What changed, and what else was different/ },
+    ],
   },
   {
     type: "financial_reality_note",
@@ -82,14 +96,16 @@ export const RECORD_TYPES = [
   {
     type: "current_direction_record",
     title: "Current Direction Record",
-    module: 9,
+    module: 5,
+    revisit: 9,
     prompt: "Your current direction, and when you will look at it again. It can change.",
-    sources: [],
+    sources: [{ code: "M5-L3", match: /^one Next Decision$/i }],
   },
   {
     type: "tribe_continuity_card",
     title: "Tribe Continuity Card",
     module: 10,
+    liveOnly: true,
     prompt: "If you want to stay connected: how, with whom, and how often. Leaving is a full ending too.",
     sources: [],
   },
