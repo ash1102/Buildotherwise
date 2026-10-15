@@ -296,7 +296,7 @@ export default function LessonView({
   if (lesson.teach) {
     beats.push({
       key: "teach",
-      label: "Try this",
+      label: "What to know",
       content: <Prose text={teachTextFor(lesson)} />,
     });
   }
