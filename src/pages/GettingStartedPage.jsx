@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/AuthContext";
 import LoginRedirect from "@/components/LoginRedirect";
 import {
   GS_CODES,
+  OPTIONAL_GS_CODES,
   gettingStartedFinished,
   gettingStartedStepDone,
   gettingStartedSteps,
@@ -28,6 +29,7 @@ export default function GettingStartedPage() {
   const openIndex = open ? steps.findIndex((lesson) => lesson.code === open.code) : -1;
   const anyDone = steps.some((lesson) => gettingStartedStepDone(lesson, answers, states));
   const missing = GS_CODES.filter((code) => !steps.some((lesson) => lesson.code === code));
+  const optional = OPTIONAL_GS_CODES.map((code) => (lessons || []).find((lesson) => lesson.code === code)).filter(Boolean);
 
   if (isLoadingAuth || loading) {
     return <p className="py-10 text-[16px] text-muted-faint">Opening Getting Started…</p>;
@@ -42,7 +44,7 @@ export default function GettingStartedPage() {
     <div className="space-y-8">
       <header className="border-b border-border pb-5">
         <p className="workbook-label">Getting Started</p>
-        <h1 className="mt-2">Five steps, then the workbook</h1>
+        <h1 className="mt-2">Four steps, then the workbook</h1>
         <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
           The workbook starts at Module 1. These steps come first. Pass counts. A saved answer counts too.
         </p>
@@ -82,6 +84,24 @@ export default function GettingStartedPage() {
       ) : null}
 
       <StepList lessons={steps} scopeLabel="in Getting Started" numberByIndex />
+
+      {optional.length ? (
+        <section className="rounded-xl border border-dashed border-input bg-card p-5 sm:p-6">
+          <p className="workbook-label">Optional, later</p>
+          <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
+            Not needed to open the workbook. Worth a look before you reply to anyone in Tribe threads.
+          </p>
+          <ul className="mt-3 space-y-1">
+            {optional.map((lesson) => (
+              <li key={lesson.code} className="text-[16px] text-foreground">
+                {lesson.title}
+                {lesson.duration_min ? <span className="text-muted-faint"> · About {lesson.duration_min} min</span> : null}
+                <span className="block text-[14px] text-muted-faint">Opens once the four steps above are done.</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {!isAuthenticated ? (
         <Link to="/" className="inline-block text-[16px] font-medium text-accent-ink underline underline-offset-2">
