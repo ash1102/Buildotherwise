@@ -94,6 +94,22 @@ function migrateDeviceCopies(userId, inAccount) {
       meta[base] = { ...(meta[base] || {}), local: Date.now() };
       dirty.add(base);
       moved = true;
+    } else if (base === "journal") {
+      // Journal notes written on this device before logging in are added, never dropped.
+      try {
+        const current = JSON.parse(readRaw(localName(base, userId)) || "[]");
+        const extra = JSON.parse(loose || "[]");
+        const ids = new Set(current.map((entry) => entry.id));
+        const added = extra.filter((entry) => entry && !ids.has(entry.id));
+        if (added.length) {
+          writeRaw(localName(base, userId), JSON.stringify([...current, ...added]));
+          meta[base] = { ...(meta[base] || {}), local: Date.now() };
+          dirty.add(base);
+          moved = true;
+        }
+      } catch {
+        return; // leave the device copy where it is rather than lose it
+      }
     }
     writeRaw(PREFIX + base, null);
   });
