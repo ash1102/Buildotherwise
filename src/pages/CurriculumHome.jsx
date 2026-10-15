@@ -237,8 +237,7 @@ function PublicHome() {
         <div className="w">
           <h2>Want in on Pilot 1?</h2>
           <p>
-            Pilot 1 is online and open now. Start now whenever you like. Join the list too if you want to
-            hear about group sessions and updates.
+            Pilot 1 is online and open now. Begin whenever you like, and join the list if you want updates.
           </p>
           <div className="acts">
             <Link className="btn" to="/getting-started">
