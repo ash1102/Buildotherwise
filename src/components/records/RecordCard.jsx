@@ -18,6 +18,8 @@ export default function RecordCard({
   previous,
   available,
   moduleLabel,
+  revisitLabel = "",
+  liveOnly = false,
   onSave,
   onDelete,
   onDiscardDraft,
@@ -76,7 +78,8 @@ export default function RecordCard({
   return (
     <li className={`rounded-xl border bg-card p-5 sm:p-6 ${available ? "border-border" : "border-dashed border-input"}`}>
       <p className="workbook-label">
-        {number}. {moduleLabel}
+        {number}. {liveOnly ? `${moduleLabel} · live session` : moduleLabel}
+        {revisitLabel ? ` · revisited in ${revisitLabel}` : ""}
       </p>
       <h2 className={`mt-1 text-[20px] ${available ? "" : "text-muted-faint"}`}>{def.title}</h2>
       <p className={`mt-1 max-w-[68ch] text-[15px] leading-relaxed ${available ? "text-muted-foreground" : "text-muted-faint"}`}>
@@ -96,7 +99,11 @@ export default function RecordCard({
       ) : null}
 
       {mode === "later" ? (
-        <p className="mt-4 text-[15px] text-muted-faint">Opens with {moduleLabel}, which is still being built.</p>
+        <p className="mt-4 text-[15px] text-muted-faint">
+          {liveOnly
+            ? `Made together in the ${moduleLabel} live session, not in the app. Until then, your other records carry forward on their own.`
+            : `Opens with ${moduleLabel}, which is still being built.`}
+        </p>
       ) : null}
 
       {mode === "saved" ? (
