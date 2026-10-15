@@ -51,6 +51,11 @@ export default function Login() {
           >
             Create one
           </Link>
+          <span className="mt-3 block text-[13px] leading-relaxed text-muted-foreground">
+            Why an account? It opens your journal, the workbook modules and group threads. What you type in the
+            workbook still stays in this browser. Your account only holds what you choose to save or send, like a
+            record, a thread reply or feedback.
+          </span>
         </>
       }
     >
