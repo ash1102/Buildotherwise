@@ -10,6 +10,8 @@ import { MAP_SECTIONS } from "@/lib/lifeMap";
 import { TEXT_SIZES, THEMES, useDisplay } from "@/lib/display";
 import { useToast } from "@/components/ui/use-toast";
 import MyGettingStarted from "@/components/gettingStarted/MyGettingStarted";
+import { Link } from "react-router-dom";
+import { deleteRecord, listMyRecords } from "@/lib/learnerRecords";
 
 const STORE_PREFIX = "entrepalooza.v1.";
 const CONTACT = "Start@buildotherwise.org";
@@ -151,6 +153,8 @@ export default function Settings() {
   const [newPassword, setNewPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [confirmRecords, setConfirmRecords] = useState(false);
+  const [deletingRecords, setDeletingRecords] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [alsoClear, setAlsoClear] = useState(true);
   const [deleting, setDeleting] = useState(false);
@@ -197,6 +201,22 @@ export default function Settings() {
       toast({ title: `That didn't send. Please email ${CONTACT} instead.` });
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const deleteAllRecords = async () => {
+    setDeletingRecords(true);
+    try {
+      const rows = await listMyRecords();
+      for (const row of rows || []) {
+        await deleteRecord(row.id);
+      }
+      setConfirmRecords(false);
+      toast({ title: rows && rows.length ? "Your records were deleted from your account." : "You have no saved records." });
+    } catch {
+      toast({ title: `Some records didn't delete. Try again, or email ${CONTACT}.` });
+    } finally {
+      setDeletingRecords(false);
     }
   };
 
@@ -265,6 +285,14 @@ export default function Settings() {
           Your journal, answers and maps are saved in this browser only. Download a copy before switching devices or
           clearing your browser.
         </p>
+        <p className="text-[16px] leading-relaxed text-muted-foreground">
+          <Link to="/my-records" className="font-medium text-accent-ink underline underline-offset-2">
+            My Records
+          </Link>{" "}
+          are different: the records you save there go to your Entrepalooza account, in the app’s database (hosted by
+          Base44), so they follow you to other devices. Only your account can open them in the app. Build Otherwise runs
+          the app and has technical access to that database.
+        </p>
         <button type="button" onClick={download} className={primaryButton}>
           <Download className="h-4 w-4" aria-hidden="true" />
           Download everything I’ve written
@@ -274,7 +302,8 @@ export default function Settings() {
           <h3 className="text-[16px]">Clear this device</h3>
           <p className="mt-1 text-[15px] leading-relaxed text-muted-foreground">
             Removes your journal, answers and maps from this browser. Useful on a shared or public computer. This can’t be
-            undone, so download a copy first if you want one.
+            undone, so download a copy first if you want one. It does not delete My Records from your account; use the
+            button below for that.
           </p>
           {confirmClear ? (
             <div className="mt-3 flex flex-wrap gap-2">
@@ -296,6 +325,28 @@ export default function Settings() {
           ) : (
             <button type="button" className={`mt-3 ${secondaryButton}`} onClick={() => setConfirmClear(true)}>
               Clear this device
+            </button>
+          )}
+        </div>
+
+        <div className="border-t border-border pt-4">
+          <h3 className="text-[16px]">Delete all My Records from my account</h3>
+          <p className="mt-1 text-[15px] leading-relaxed text-muted-foreground">
+            Removes every record on your My Records page from the database. Your step answers on this device stay. You
+            can also delete records one at a time on the My Records page.
+          </p>
+          {confirmRecords ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button type="button" className={dangerButton} disabled={deletingRecords} onClick={deleteAllRecords}>
+                {deletingRecords ? "Deleting…" : "Yes, delete all my records"}
+              </button>
+              <button type="button" className={secondaryButton} onClick={() => setConfirmRecords(false)}>
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button type="button" className={`mt-3 ${secondaryButton}`} onClick={() => setConfirmRecords(true)}>
+              Delete all My Records
             </button>
           )}
         </div>

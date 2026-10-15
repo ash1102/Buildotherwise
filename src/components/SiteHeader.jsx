@@ -10,6 +10,7 @@ const LINKS = [
   { to: "/map", label: "Life Map" },
   { to: "/discovery-map", label: "Discovery Map" },
   { to: "/record", label: "Discovery Record" },
+  { to: "/my-records", label: "My Records" },
   { to: "/program-library", label: "Library" },
   { to: "/tribe-threads", label: "Tribe Threads" },
   { to: "/aspects", label: "Aspects" },

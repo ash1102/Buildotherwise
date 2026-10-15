@@ -117,7 +117,13 @@ export default function DiscoveryRecordPage() {
           </Button>
         </div>
         <div className="mt-3">
-          <PrivacyNote>Saved on this device only.</PrivacyNote>
+          <PrivacyNote>
+            Saved on this device only. Your carry-forward records (question to Tribe Continuity Card) live on{" "}
+            <a href="/my-records" className="underline underline-offset-2">
+              My Records
+            </a>
+            , saved to your account.
+          </PrivacyNote>
         </div>
       </header>
 
