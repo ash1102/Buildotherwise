@@ -16,8 +16,8 @@ export default function AspectIndex() {
           Seven aspects, each with its own page.
         </h1>
         <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-ink-soft">
-          This is the workbook described from the inside: what it is made of, and how each part behaves. Every page has
-          something you can actually handle rather than a paragraph about it.
+          This is the workbook described from the inside: what it is made of, and how each part behaves. Each page says
+          plainly what works today and what is still being built.
         </p>
       </section>
 
