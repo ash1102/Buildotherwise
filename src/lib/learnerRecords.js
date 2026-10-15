@@ -15,8 +15,8 @@ import { progressStorageKey } from "./progressScope";
  *
  * `module` is where a record first opens. A record whose module is not live yet
  * shows as "opens with Module X" and cannot be filled. `revisit` is a later module
- * that deepens it. Pilot 1 ends at Module 5, so records with a Pilot 1 source open
- * early as a first draft rather than waiting for Modules 6–10.
+ * that deepens it. Records with a source in Modules 1–5 open early as a first
+ * draft rather than waiting for Modules 6–10.
  * `liveOnly` records are made in a live session, not in the app.
  *
  * `sources` are step answers that can pre-fill a first draft. Each one names a step
@@ -32,8 +32,8 @@ export const RECORD_TYPES = [
     module: 2,
     prompt: "What are you trying to learn right now?",
     sources: [
-      { code: "M2-L1", match: /^\*\*Question:\*\*/ },
-      { code: "M1-L1", match: /What would you need to see again/ },
+      { code: "M2-L1", match: /^(\*\*)?Question:/ },
+      { code: "M1-L1", match: /What caught your attention/ },
     ],
   },
   {
@@ -63,7 +63,7 @@ export const RECORD_TYPES = [
     prompt: "Name the one manageable try: what you will create, practise or move forward.",
     sources: [
       { code: "M2-L1", slot: "plan" },
-      { code: "M2-L1", match: /^\*\*Smallest real action:\*\*/ },
+      { code: "M2-L1", match: /^(\*\*)?Smallest real action:/ },
       { code: "M3-L2", match: /What single part of the setup would you change/ },
     ],
   },
@@ -75,7 +75,7 @@ export const RECORD_TYPES = [
     prompt: "What happened, what did it cost, and what did it teach?",
     sources: [
       { code: "M2-L2", slot: "checkin" },
-      { code: "M2-L3", match: /^what changed from expectation/i },
+      { code: "M2-L3", match: /^what changed from (expectation|what you expected)/i },
       { code: "M3-L3", match: /What changed, and what else was different/ },
     ],
   },
@@ -100,7 +100,6 @@ export const RECORD_TYPES = [
     revisit: 9,
     prompt: "Your current direction, and when you will look at it again. It can change.",
     sources: [
-      { code: "M5-L3", match: /^one Next Decision$/i },
       { code: "M5-L3", decision: true },
       { code: "M2-L3", decision: true },
     ],
