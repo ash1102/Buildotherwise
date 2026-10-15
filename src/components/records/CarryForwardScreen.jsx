@@ -53,7 +53,7 @@ export default function CarryForwardScreen({ module }) {
         )}
 
         <p className="mt-4 max-w-[68ch] text-[15px] leading-relaxed text-muted-foreground">
-          Every next decision counts: Keep · Change · Test again · Pause · Stop · Another direction · Continue looking.
+          Every next decision counts: Keep · Change · Test again · Pause · Stop · Another direction · Keep looking.
         </p>
 
         <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2">
