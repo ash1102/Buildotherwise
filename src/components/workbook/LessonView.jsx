@@ -19,7 +19,8 @@ import TryCheckIn from "./TryCheckIn";
 import ComeBackAfterTry from "./ComeBackAfterTry";
 import { isAfterTryStep } from "@/lib/afterTry";
 import { interactionsFor } from "@/lib/interactions";
-import { journalStepHref } from "@/lib/journal";
+import { journalStepHref, saveAnswer } from "@/lib/journal";
+import DecisionFollowUp from "./DecisionFollowUp";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor, setAnswer, useAnswers, answerKey } from "@/lib/workbook";
 import { JOIN_CHOICES, joinChoiceText, splitChoice } from "@/lib/gettingStarted";
 
@@ -27,8 +28,19 @@ import { JOIN_CHOICES, joinChoiceText, splitChoice } from "@/lib/gettingStarted"
 const JOIN_CHOICE_CODE = "O.5";
 const JOIN_CHOICE_INDEX = 1;
 
-function JoinChoicePicker({ lessonCode, index, label }) {
+function JoinChoicePicker({ lessonCode, lessonTitle, index, label }) {
   const answers = useAnswers();
+  /** The choice is kept on the step and copied into the journal, like a typed answer. */
+  const record = (text) => {
+    setAnswer(lessonCode, index, text);
+    saveAnswer({
+      lessonCode,
+      lessonTitle,
+      promptKey: `${lessonCode}#${index}`,
+      promptLabel: label,
+      body: text,
+    });
+  };
   const { choice, note } = splitChoice((answers || {})[answerKey(lessonCode, index)]);
   const id = `${lessonCode}-${index}`;
   return (
@@ -43,7 +55,7 @@ function JoinChoicePicker({ lessonCode, index, label }) {
               key={option}
               type="button"
               aria-pressed={active}
-              onClick={() => setAnswer(lessonCode, index, joinChoiceText(active ? "" : option, note))}
+              onClick={() => record(joinChoiceText(active ? "" : option, note))}
               className={`rounded-md border px-3.5 py-2 text-[15px] transition ${
                 active ? "border-accent-ink bg-accent-ink text-white" : "border-input bg-card text-foreground hover:bg-secondary"
               }`}
@@ -60,7 +72,7 @@ function JoinChoicePicker({ lessonCode, index, label }) {
         id={id}
         rows={2}
         value={note}
-        onChange={(event) => setAnswer(lessonCode, index, joinChoiceText(choice, event.target.value))}
+        onChange={(event) => record(joinChoiceText(choice, event.target.value))}
         placeholder="Optional."
         className="mt-1 w-full resize-y rounded-md border border-input bg-card px-3 py-2 text-[16px] leading-relaxed"
       />
@@ -186,7 +198,7 @@ export default function LessonView({
 
   const promptField = (prompt, index, key) =>
     lesson.code === JOIN_CHOICE_CODE && index === JOIN_CHOICE_INDEX ? (
-      <JoinChoicePicker key={key} lessonCode={lesson.code} index={index} label={prompt} />
+      <JoinChoicePicker key={key} lessonCode={lesson.code} lessonTitle={lesson.title} index={index} label={prompt} />
     ) : (
     <PromptField
       key={key}
@@ -384,11 +396,21 @@ export default function LessonView({
       key: "decision",
       label: "Next decision",
       content: (
-        <DecisionPicker
-          value={decisions[lesson.code] || ""}
-          onChange={onDecisionChange}
-          options={decisionOptions}
-        />
+        <div>
+          <DecisionPicker
+            value={decisions[lesson.code] || ""}
+            onChange={onDecisionChange}
+            options={decisionOptions}
+          />
+          {decisions[lesson.code] ? (
+            <DecisionFollowUp
+              key={decisions[lesson.code]}
+              lessonCode={lesson.code}
+              lessonTitle={lesson.title}
+              decision={decisions[lesson.code]}
+            />
+          ) : null}
+        </div>
       ),
     });
   }
