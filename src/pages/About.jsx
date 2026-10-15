@@ -37,8 +37,7 @@ export default function About() {
         </p>
         <p>
           Entrepalooza is built by Build Otherwise, using the Scars to Strategy framework. Pilot 1 is the current release: Getting Started and
-          Modules 1–5, with Modules 6–10 still in development and named plainly so you can see where the program is
-          going. Nothing in the workbook promises a job, an income or business success. It is an educational
+          Modules 1–10. Nothing in the workbook promises a job, an income or business success. It is an educational
           workbook, not therapy, treatment or diagnosis, and it is not a readiness test.
         </p>
       </div>
