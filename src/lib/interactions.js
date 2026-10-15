@@ -8,8 +8,10 @@
  * Types:
  *   tryPlanner  plan one small try by tapping, then save it as plain sentences
  *   tryCheckIn  say what happened after the try; planCode names the step that held the plan
+ *   noticeFlow  route pills swap the questions (own thread vs. garden example); replaces the step's generic prompt boxes
  */
 export const INTERACTIONS = {
+  "M1-L1": [{ type: "noticeFlow" }],
   "M2-L1": [{ type: "tryPlanner" }],
   "M2-L2": [{ type: "tryCheckIn", planCode: "M2-L1" }],
 };
