@@ -76,8 +76,12 @@ function writeRaw(name, value) {
   }
 }
 
-/** Move device-only copies of the journal and maps into this account, once. */
-function migrateDeviceCopies(userId) {
+/**
+ * Move device-only copies of the journal and maps into this account, once. Only
+ * into a part the account has nothing saved for, so an older device copy never
+ * replaces what the account already holds.
+ */
+function migrateDeviceCopies(userId, inAccount) {
   const meta = readMeta(userId);
   let moved = false;
   SYNCED_KEYS.forEach((base) => {
@@ -85,7 +89,7 @@ function migrateDeviceCopies(userId) {
     const loose = readRaw(PREFIX + base);
     if (loose === null) return;
     const mine = readRaw(localName(base, userId));
-    if (mine === null) {
+    if (mine === null && !inAccount.has(base)) {
       writeRaw(localName(base, userId), loose);
       meta[base] = { ...(meta[base] || {}), local: Date.now() };
       dirty.add(base);
@@ -128,6 +132,7 @@ async function pull(userId) {
   });
   writeMeta(userId, meta);
   if (changed) announceAllChanged();
+  return seen;
 }
 
 async function pushOne(userId, base) {
@@ -211,11 +216,10 @@ export async function startAccountSync(userId) {
   rowIds = {};
   dirty = new Set();
   setStatus("loading");
-  const moved = migrateDeviceCopies(userId);
-  if (moved) announceAllChanged();
   try {
-    await pull(userId);
+    const inAccount = await pull(userId);
     if (currentUser !== userId) return;
+    if (migrateDeviceCopies(userId, inAccount)) announceAllChanged();
     if (dirty.size) await flushNow();
     else setStatus("saved");
   } catch {
