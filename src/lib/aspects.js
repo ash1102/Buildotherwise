@@ -26,7 +26,7 @@ export const ASPECTS = [
     body: "Most of the reading here is short, and it is placed immediately before the activity that uses it. You are never asked to hold a chapter in your head while you do something else.\n\nIf a reading raises something worth keeping, it can become part of the same step: a saved answer, a journal line, or a choice carried into the next module.\n\nWhat it is today: many steps do not have their reading written yet. Those steps go straight to the activity.",
     interaction: "weave",
     tryLabel: "Try it: weave a reading into an activity",
-    note: "In the workbook the reading and the activity arrive already paired. This shows how they fit.",
+    note: "Where a step has a reading, it arrives already paired with the activity. This shows how they fit.",
     places: [
       { to: "/", label: "The workbook" },
       { to: "/program-library", label: "Library" },
@@ -41,7 +41,10 @@ export const ASPECTS = [
     interaction: "journal",
     tryLabel: "Try it: write one line",
     note: "This one is not a demonstration. A line written here is saved to your journal on this device.",
-    places: [{ to: "/journal", label: "Your Journal" }],
+    places: [
+      { to: "/journal", label: "Your Journal" },
+      { to: "/journal/reflect", label: "Talk it through" },
+    ],
   },
   {
     slug: "private-reflection",
