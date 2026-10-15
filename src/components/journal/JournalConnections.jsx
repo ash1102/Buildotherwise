@@ -65,7 +65,7 @@ function reflectHref(ids) {
 
 /**
  * What the journal notices across entries: threads left open, words that keep
- * coming back, and questions being carried. Worked out in this browser only.
+ * coming back, and questions being carried. Worked out on the device from the journal itself; nothing extra is sent.
  * Every item is a question, never a conclusion.
  */
 export default function JournalConnections({ entries }) {
@@ -82,7 +82,7 @@ export default function JournalConnections({ entries }) {
           Connections across your answers
         </h2>
         <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
-          Pulled from your own words, in this browser. These are things that might be worth a second look, not
+          Pulled from your own words. These are things that might be worth a second look, not
           conclusions about you. Answer, skip, or ignore any of them.
         </p>
       </header>

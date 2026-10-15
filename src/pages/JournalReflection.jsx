@@ -140,8 +140,8 @@ export default function JournalReflection() {
         </p>
         <div className="mt-3 max-w-[68ch]">
           <PrivacyNote>
-            Your journal stays on this device. Only the entries you bring in, and the messages you write here, are sent
-            to the reflection partner. These conversations are kept in your Entrepalooza account.
+            The reflection partner sees only the entries you bring in and the messages you write here. These
+            conversations are kept in your Entrepalooza account, like your journal.
           </PrivacyNote>
         </div>
         {conversations.length ? (

@@ -212,7 +212,7 @@ export default function GettingStartedPopup({ lessons, onClose }) {
                 <li>“Not now” closes this. You can open it again from the home page.</li>
                 <li>
                   At the end you’ll see exactly what gets sent to Ashley before you submit: your choice to join and your
-                  “What makes it work for you” answers. Everything else stays on this device.
+                  “What makes it work for you” answers. Everything else stays private in your workbook.
                 </li>
               </ul>
             </div>
@@ -237,7 +237,7 @@ export default function GettingStartedPopup({ lessons, onClose }) {
               ) : null}
               {prompts.length ? (
                 <div className="mt-6 space-y-5 border-t border-border pt-5">
-                  <p className="text-[13px] text-muted-faint">Answer what fits. Saved on this device as you type.</p>
+                  <p className="text-[13px] text-muted-faint">Answer what fits. Saved as you type.</p>
                   {prompts.map((label, promptIndex) => renderPrompt(label, promptIndex))}
                 </div>
               ) : null}
@@ -250,7 +250,7 @@ export default function GettingStartedPopup({ lessons, onClose }) {
                 Check what gets sent
               </h2>
               <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
-                Only this goes to Ashley. Everything else you wrote stays on this device. Go back to change anything.
+                Only this goes to Ashley. Everything else you wrote stays private in your workbook. Go back to change anything.
               </p>
               <dl className="mt-5 space-y-4 rounded-xl border border-border bg-card px-4 py-4 text-[15px]">
                 <div>

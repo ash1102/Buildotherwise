@@ -98,7 +98,7 @@ export default function JournalComposer() {
           Save this entry
         </Button>
         {saved ? <span className="text-[12.5px] text-teal-deep">Saved.</span> : null}
-        <PrivacyNote>Saved on this device only.</PrivacyNote>
+        <PrivacyNote />
       </div>
     </section>
   );

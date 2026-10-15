@@ -138,7 +138,7 @@ export default function JournalPage() {
       setCopying(null);
       toast({ title: "Added to your Discovery Record." });
     } else {
-      toast({ title: "That did not save in this browser, so nothing was copied." });
+      toast({ title: "That did not save, so nothing was copied." });
     }
   };
 
@@ -213,7 +213,7 @@ export default function JournalPage() {
           </Button>
         </div>
         <div className="mt-3">
-          <PrivacyNote>Saved on this device only.</PrivacyNote>
+          <PrivacyNote />
         </div>
       </header>
 
@@ -421,7 +421,7 @@ export default function JournalPage() {
           Changing your mind
         </h2>
         <p className="mt-2 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-          Deleting an entry here removes it from this device. Sharing only sends what you confirm above, one entry
+          Deleting an entry here removes it from your account. Sharing only sends what you confirm above, one entry
           or the entries you ticked, and never your whole journal.
         </p>
       </section>

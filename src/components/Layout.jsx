@@ -34,7 +34,7 @@ export default function Layout() {
             <p className="mt-2">
               {preview
                 ? "Preview answers are saved to your account when you choose save."
-                : "Your workbook and journal stay on this device."}{" "}
+                : "Your workbook and journal are saved to your account. Only you can open them in the app."}{" "}
               Messages and feedback go out only when you hit submit.
             </p>
             <p className="mt-2">

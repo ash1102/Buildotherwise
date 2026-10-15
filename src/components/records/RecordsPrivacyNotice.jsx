@@ -25,8 +25,8 @@ export default function RecordsPrivacyNotice() {
         <li>In the app, only your account can open, change or delete them. Other learners can&rsquo;t see them.</li>
         <li>Build Otherwise runs the app, so it has technical access to that database.</li>
         <li>
-          Your step answers and journal are different: they stay <strong className="text-foreground">on this device
-          only</strong>. A draft copied from a step is not saved to your account until you press Save.
+          Your step answers and journal are kept the same way, in your account. A draft copied from a step is not
+          saved as a record until you press Save.
         </li>
         <li>
           Delete removes a record from the database. To ask about your records, email{" "}

@@ -15,7 +15,7 @@ const DRAFT_KEY = "journalDraft";
 
 /** One status at a time, so storage and privacy are never claimed in the same breath. */
 const STATUS_TEXT = {
-  draft: "Draft saved in this browser",
+  draft: "Draft saved on this device",
   saving: "Saving…",
   saved: "Entry saved",
   error: "Couldn’t save. Keep this panel open and copy your text.",

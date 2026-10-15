@@ -224,7 +224,7 @@ export default function Settings() {
     <article className="space-y-6">
       <header className="border-b border-border pb-5">
         <p className="workbook-label">Settings</p>
-        <h1 className="mt-2">Your account and this device</h1>
+        <h1 className="mt-2">Your account and your data</h1>
       </header>
 
       <MyGettingStarted />
@@ -275,15 +275,15 @@ export default function Settings() {
             Log out
           </button>
           <p className="mt-2 text-[14px] text-muted-faint">
-            Logging out keeps your answers on this device. To remove them, use “Clear this device” below.
+            Logging out saves your work to your account and takes your copy off this device, so the next person on a shared computer won’t see it.
           </p>
         </div>
       </Section>
 
       <Section title="My data">
         <p className="text-[16px] leading-relaxed text-muted-foreground">
-          Your journal, answers and maps are saved in this browser only. Download a copy before switching devices or
-          clearing your browser.
+          Your journal, answers and maps are saved to your Entrepalooza account, so they follow you to any device you
+          sign in on. <SyncLine />
         </p>
         <p className="text-[16px] leading-relaxed text-muted-foreground">
           <Link to="/my-records" className="font-medium text-accent-ink underline underline-offset-2">
