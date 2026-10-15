@@ -81,10 +81,11 @@ function ModuleBody() {
 
           {module.order === 5 ? (
             <section className="rounded-xl border border-border bg-card p-5 sm:p-6">
-              <p className="workbook-label">Pilot 1 closes at the end of this module</p>
+              <p className="workbook-label">The halfway point</p>
               <p className="mt-2 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-                The last step closes the pilot: one piece of evidence, one thing worth keeping, one support that mattered,
-                one Next Decision, and one optional question for later. No readiness judgement, no next-module pitch.
+                The last step is a chance to take stock: one piece of evidence, one thing worth keeping, one support that
+                mattered, one Next Decision, and one optional question for later. Modules 6–10 turn outward. Moving on is
+                optional, and there is no readiness judgment.
               </p>
               <Link
                 to="/record"
