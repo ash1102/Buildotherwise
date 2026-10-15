@@ -22,7 +22,11 @@ const STEPS = [
 ];
 
 const FACTS = [
-  { title: "Private", dot: "#E9A23B", line: "Your writing stays on your device. You share only what you choose." },
+  {
+    title: "Private",
+    dot: "#E9A23B",
+    line: "What you write stays in your browser. An account only holds what you choose to save or send.",
+  },
   { title: "No pressure", dot: "#B48CD0", line: "No grades, scores or streaks. Stopping or pausing counts as an answer." },
   {
     title: "Honest",
@@ -146,16 +150,16 @@ function PublicHome() {
             </svg>
           </div>
           <div>
-            <p className="k">Pilot 1 · from Build Otherwise</p>
+            <p className="k">Pilot 1 · online · from Build Otherwise</p>
             <h1>
               Want something different but <em>can’t name it yet?</em>
             </h1>
             <p>Start with one small thing you can try. No plan, passion or business idea needed.</p>
             <div className="acts">
-              <a className="btn" href={INTEREST_FORM} target="_blank" rel="noopener noreferrer">
-                Join the Pilot 1 list
-                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-              </a>
+              <Link className="btn" to="/getting-started">
+                Start free now
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
               <a className="txt" href="#how">
                 See how it works
               </a>
@@ -232,12 +236,22 @@ function PublicHome() {
         </svg>
         <div className="w">
           <h2>Want in on Pilot 1?</h2>
-          <p>Joining the list isn’t enrolling. You’ll hear from us when it opens.</p>
-          <a className="btn" href={INTEREST_FORM} target="_blank" rel="noopener noreferrer">
-            Join the Pilot 1 list
-            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-          </a>
-          <small>Researcher, educator or community partner? Use the same form and pick the partner option.</small>
+          <p>
+            Pilot 1 is online and open now. Start Getting Started whenever you like. Join the list too if you want to
+            hear about group sessions and updates.
+          </p>
+          <div className="acts">
+            <Link className="btn" to="/getting-started">
+              Start free now
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+            <a className="txt" href={INTEREST_FORM} target="_blank" rel="noopener noreferrer">
+              Join the list for updates
+            </a>
+          </div>
+          <small>
+            Researcher, educator or community partner? Use the same list form and pick the partner or advisor option.
+          </small>
         </div>
       </section>
     </div>
