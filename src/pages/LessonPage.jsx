@@ -15,7 +15,7 @@ import {
 import { saveAnswer } from "@/lib/journal";
 import { isComingLater, isOpenerLesson, isWorkbookLesson } from "@/lib/curriculum";
 import { gettingStartedFinished, gettingStartedSteps, isGettingStartedLesson } from "@/lib/gettingStarted";
-import { buildProgress } from "@/lib/progress";
+import { usePacedProgress } from "@/lib/pacing";
 import LockedNotice from "@/components/workbook/LockedNotice";
 import ComingLaterNotice from "@/components/workbook/ComingLaterNotice";
 import LessonView from "@/components/workbook/LessonView";
@@ -92,10 +92,7 @@ export default function LessonPage() {
     [lesson, lessonsByCode]
   );
 
-  const progress = useMemo(
-    () => buildProgress({ modules, lessonsByOrder, answers, states }),
-    [modules, lessonsByOrder, answers, states]
-  );
+  const progress = usePacedProgress({ modules, lessonsByOrder, answers, states });
 
   if (loading || gate.pending) {
     return <p className="py-10 text-[16px] text-muted-faint">Opening the step…</p>;
@@ -163,7 +160,7 @@ export default function LessonPage() {
           <p className="workbook-label">{moduleTitle}</p>
           <h1 className="mt-2">{lesson.title}</h1>
         </header>
-        <LockedNotice module={module} blocking={blocker} missing={blocker ? blocker.missing : []} />
+        <LockedNotice module={module} row={row} blocking={blocker} missing={blocker ? blocker.missing : []} />
       </div>
     );
   }
