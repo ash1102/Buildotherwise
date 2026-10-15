@@ -15,14 +15,20 @@ const LINKS = [
   { to: "/tribe-threads", label: "Tribe Threads" },
   { to: "/aspects", label: "Aspects" },
   { to: "/about", label: "About" },
+  { to: "/mission", label: "Mission" },
+  { to: "/programs", label: "Programs" },
+  { to: "/get-involved", label: "Get involved" },
   { to: "/contact", label: "Contact" },
 ];
 
-/** What someone can reach before logging in: the welcome, Getting Started, and the two pages about the program. */
+/** What someone can reach before logging in: the welcome, Getting Started, and the pages about the program and Build Otherwise. */
 const PUBLIC_LINKS = [
   { to: "/", label: "Home", end: true },
   { to: "/getting-started", label: "Getting Started" },
   { to: "/about", label: "About" },
+  { to: "/mission", label: "Mission" },
+  { to: "/programs", label: "Programs" },
+  { to: "/get-involved", label: "Get involved" },
   { to: "/contact", label: "Contact" },
 ];
 
