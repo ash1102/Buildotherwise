@@ -143,6 +143,20 @@ function clearDevice() {
   window.dispatchEvent(new CustomEvent("entrepalooza:change", { detail: null }));
 }
 
+const SYNC_WORDS = {
+  saved: "Everything is saved.",
+  saving: "Saving…",
+  loading: "Bringing your workbook in…",
+  offline: "Can’t reach your account right now. Your work is kept on this device and will save when you’re back online.",
+  error: "Some changes haven’t saved yet. They’re kept on this device and will try again.",
+};
+
+function SyncLine() {
+  const status = useSyncStatus();
+  const words = SYNC_WORDS[status];
+  return words ? <span className="text-foreground">{words}</span> : null;
+}
+
 export default function Settings() {
   const { user, logout } = useAuth();
   const { lessonsByCode } = useCurriculum();
@@ -153,6 +167,7 @@ export default function Settings() {
   const [newPassword, setNewPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [clearing, setClearing] = useState(false);
   const [confirmRecords, setConfirmRecords] = useState(false);
   const [deletingRecords, setDeletingRecords] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -196,7 +211,14 @@ export default function Settings() {
         description: "Account deletion request",
       });
       setDeleteSent(true);
-      if (alsoClear) clearDevice();
+      if (alsoClear) {
+        try {
+          await deleteAccountWorkbook();
+        } catch {
+          /* the account deletion request still covers it */
+        }
+        clearDevice();
+      }
     } catch (error) {
       toast({ title: `That didn't send. Please email ${CONTACT} instead.` });
     } finally {
@@ -289,9 +311,9 @@ export default function Settings() {
           <Link to="/my-records" className="font-medium text-accent-ink underline underline-offset-2">
             My Records
           </Link>{" "}
-          are different: the records you save there go to your Entrepalooza account, in the app’s database (hosted by
-          Base44), so they follow you to other devices. Only your account can open them in the app. Build Otherwise runs
-          the app and has technical access to that database.
+          are saved the same way. Everything is kept in the app’s database, hosted by Base44. In the app, only your
+          account can open, change or delete it. Build Otherwise runs the app and can technically access the stored
+          data, but does not read it unless you choose to share it.
         </p>
         <button type="button" onClick={download} className={primaryButton}>
           <Download className="h-4 w-4" aria-hidden="true" />
@@ -299,24 +321,33 @@ export default function Settings() {
         </button>
 
         <div className="border-t border-border pt-4">
-          <h3 className="text-[16px]">Clear this device</h3>
+          <h3 className="text-[16px]">Delete my workbook from my account</h3>
           <p className="mt-1 text-[15px] leading-relaxed text-muted-foreground">
-            Removes your journal, answers and maps from this browser. Useful on a shared or public computer. This can’t be
-            undone, so download a copy first if you want one. It does not delete My Records from your account; use the
-            button below for that.
+            Removes your journal, step answers, decisions and maps from your account and from this device. This can’t be
+            undone, so download a copy first if you want one. It does not delete My Records; use the button below for
+            that.
           </p>
           {confirmClear ? (
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="button"
                 className={dangerButton}
-                onClick={() => {
-                  clearDevice();
-                  setConfirmClear(false);
-                  toast({ title: "This device has been cleared." });
+                disabled={clearing}
+                onClick={async () => {
+                  setClearing(true);
+                  try {
+                    await deleteAccountWorkbook();
+                    clearDevice();
+                    toast({ title: "Your workbook was deleted from your account." });
+                  } catch {
+                    toast({ title: `Some of it didn't delete. Try again, or email ${CONTACT}.` });
+                  } finally {
+                    setClearing(false);
+                    setConfirmClear(false);
+                  }
                 }}
               >
-                Yes, clear this device
+                {clearing ? "Deleting…" : "Yes, delete my workbook"}
               </button>
               <button type="button" className={secondaryButton} onClick={() => setConfirmClear(false)}>
                 Cancel
@@ -324,7 +355,7 @@ export default function Settings() {
             </div>
           ) : (
             <button type="button" className={`mt-3 ${secondaryButton}`} onClick={() => setConfirmClear(true)}>
-              Clear this device
+              Delete my workbook
             </button>
           )}
         </div>
@@ -332,7 +363,7 @@ export default function Settings() {
         <div className="border-t border-border pt-4">
           <h3 className="text-[16px]">Delete all My Records from my account</h3>
           <p className="mt-1 text-[15px] leading-relaxed text-muted-foreground">
-            Removes every record on your My Records page from the database. Your step answers on this device stay. You
+            Removes every record on your My Records page from the database. Your workbook and journal stay. You
             can also delete records one at a time on the My Records page.
           </p>
           {confirmRecords ? (
@@ -389,7 +420,7 @@ export default function Settings() {
                     onChange={(event) => setAlsoClear(event.target.checked)}
                     className="mt-1"
                   />
-                  Also clear my answers from this device
+                  Also delete my workbook and journal from my account now
                 </label>
                 <div className="flex flex-wrap gap-2">
                   <button type="button" disabled={deleting} className={dangerButton} onClick={requestDeletion}>
