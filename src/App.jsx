@@ -29,6 +29,9 @@ import OAuthConsent from '@/pages/OAuthConsent';
 import About from '@/pages/About';
 import Contact from '@/pages/Contact';
 import Connect from '@/pages/Connect';
+import Mission from '@/pages/Mission';
+import Programs from '@/pages/Programs';
+import GetInvolved from '@/pages/GetInvolved';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import LoginRedirect from '@/components/LoginRedirect';
 import PreviewHome from '@/pages/preview/PreviewHome';
@@ -103,6 +106,9 @@ const AuthenticatedApp = () => {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/connect" element={<Connect />} />
+        <Route path="/mission" element={<Mission />} />
+        <Route path="/programs" element={<Programs />} />
+        <Route path="/get-involved" element={<GetInvolved />} />
         <Route element={<AdminOnly />}>
           <Route path="/preview" element={<PreviewHome />} />
           <Route path="/preview/module/:slug" element={<PreviewModulePage />} />
