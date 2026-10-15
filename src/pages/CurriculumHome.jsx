@@ -7,7 +7,8 @@ import { useAuth } from "@/lib/AuthContext";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import { isWorkbookLesson } from "@/lib/curriculum";
 import WorkbookGate from "@/components/WorkbookGate";
-import { buildProgress, stepComplete } from "@/lib/progress";
+import { stepComplete } from "@/lib/progress";
+import { formatOpenDate, usePacedProgress } from "@/lib/pacing";
 
 const INTEREST_FORM = "https://link.jotform.com/EhQXbmRwbk";
 
@@ -248,10 +249,7 @@ function MemberHome() {
   const { modules, lessonsByOrder, orderedLessons, loading } = useCurriculum();
   const { answers, states } = useWorkbook();
 
-  const progress = useMemo(
-    () => buildProgress({ modules, lessonsByOrder, answers, states }),
-    [modules, lessonsByOrder, answers, states]
-  );
+  const progress = usePacedProgress({ modules, lessonsByOrder, answers, states });
 
   /** The workbook starts at Module 1. Getting Started is already finished by the time this shows. */
   const next = useMemo(() => {
@@ -262,6 +260,10 @@ function MemberHome() {
   const liveModules = modules.filter((module) => module.status === "live" && module.kind !== "orientation");
   const nextModule = next ? modules.find((module) => module.order === next.module_order) : null;
   const nextLabel = nextModule ? `Module ${nextModule.order}` : "";
+  /** The next step sits in a module that opens later this week. */
+  const nextRow = nextModule ? progress.byOrder[nextModule.order] : null;
+  const waitingWeek = Boolean(nextRow && nextRow.lockReason === "week");
+  const waitingDate = waitingWeek ? formatOpenDate(nextRow.opensAt) : "";
 
   return (
     <div className="space-y-10">
@@ -269,6 +271,23 @@ function MemberHome() {
         <p className="workbook-label">{started ? "Welcome back" : "Welcome"}</p>
         {loading ? (
           <div aria-busy="true" className="mt-3 h-[140px] animate-pulse rounded-2xl bg-border/60" />
+        ) : next && waitingWeek ? (
+          <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
+            <p className="text-[13px] font-semibold text-primary-soft">
+              {waitingDate ? `${nextLabel} opens ${waitingDate}` : `${nextLabel} opens next week`}
+            </p>
+            <h1 className="mt-1.5 text-[clamp(1.5rem,1.1rem+1.6vw,2.1rem)] text-primary-foreground">
+              This week is for your try.
+            </h1>
+            <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">
+              One new module opens each week, so there is room for things to happen out there. Nothing is overdue.
+              Everything already open stays open: your journal, your Life Map, and every step you have done.
+            </p>
+            <Link to="/journal" className={`mt-5 ${marigoldButton}`}>
+              Open your journal
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
         ) : next ? (
           <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
             <p className="text-[13px] font-semibold text-primary-soft">
@@ -342,6 +361,10 @@ function MemberHome() {
                       <span className="block h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
                     </span>
                   </span>
+                ) : row.lockReason === "week" ? (
+                  <span className="shrink-0 text-[13px] text-muted-faint">
+                    {row.opensAt ? `Opens ${formatOpenDate(row.opensAt)}` : "Opens next week"}
+                  </span>
                 ) : (
                   <span className="shrink-0 text-[13px] text-muted-faint">Not open yet</span>
                 )}
@@ -366,8 +389,14 @@ function MemberHome() {
           })}
         </ol>
         <p className="mt-3 text-[14px] leading-relaxed text-muted-faint">
-          Modules open one at a time, once every step before them holds a saved line. Modules 6–10 are still being built.
+          One new module opens each week, once every step before it holds a saved line. That works out to about 2–3
+          hours a week. Modules 6–10 are still being built.
         </p>
+        {progress.pacingSkipped ? (
+          <p className="mt-2 text-[13px] leading-relaxed text-muted-faint">
+            Admin view: weekly pacing is skipped for you so every module stays open for review. Participants see it.
+          </p>
+        ) : null}
       </section>
 
       <PrivacyNote />
