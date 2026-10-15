@@ -103,6 +103,14 @@ export default function RecordCard({
           {liveOnly
             ? `Made together in the ${moduleLabel} live session, not in the app. Until then, your other records carry forward on their own.`
             : `Opens with ${moduleLabel}, which is still being built.`}
+          {liveOnly ? (
+            <>
+              {" "}
+              <Link to="/module/build-the-tribe" className="font-medium text-accent-ink underline underline-offset-2">
+                See what to carry forward
+              </Link>
+            </>
+          ) : null}
         </p>
       ) : null}
 
