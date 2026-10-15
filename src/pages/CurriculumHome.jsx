@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowUpRight, BookOpen, Compass, Map } from "lucide-react";
+import { ArrowRight, BookOpen, Compass, Map } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
 import { useWorkbook } from "@/lib/workbook";
 import { useAuth } from "@/lib/AuthContext";
@@ -157,7 +157,7 @@ function PublicHome() {
             <p>Start with one small thing you can try. No plan, passion or business idea needed.</p>
             <div className="acts">
               <Link className="btn" to="/getting-started">
-                Start Getting Started
+                Start now
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               <a className="txt" href="#how">
@@ -237,12 +237,12 @@ function PublicHome() {
         <div className="w">
           <h2>Want in on Pilot 1?</h2>
           <p>
-            Pilot 1 is online and open now. Start Getting Started whenever you like. Join the list too if you want to
+            Pilot 1 is online and open now. Start now whenever you like. Join the list too if you want to
             hear about group sessions and updates.
           </p>
           <div className="acts">
             <Link className="btn" to="/getting-started">
-              Start Getting Started
+              Start now
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <a className="txt" href={INTEREST_FORM} target="_blank" rel="noopener noreferrer">
