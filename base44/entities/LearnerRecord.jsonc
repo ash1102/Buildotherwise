@@ -1,0 +1,50 @@
+{
+  "name": "LearnerRecord",
+  "type": "object",
+  "properties": {
+    "record_type": {
+      "type": "string",
+      "enum": [
+        "question",
+        "evidence_note",
+        "branch",
+        "named_try",
+        "try_review",
+        "financial_reality_note",
+        "success_now_note",
+        "current_direction_record",
+        "tribe_continuity_card"
+      ],
+      "description": "Which record in the carry-forward chain this is. One per learner per type."
+    },
+    "body": {
+      "type": "string",
+      "description": "The learner's own words. Never edited by staff."
+    },
+    "prefilled_from": {
+      "type": "string",
+      "description": "Step code the first draft was copied from, if any (e.g. M2-L1). Empty when written fresh."
+    },
+    "description": {
+      "type": "string",
+      "description": "Short label for search and previews."
+    }
+  },
+  "required": [
+    "record_type"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}
