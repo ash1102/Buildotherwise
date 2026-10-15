@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import Prose from "@/components/workbook/Prose";
 import { base44 } from "@/api/base44Client";
-import { answerKey, setAnswer, useAnswers } from "@/lib/workbook";
+import { answerKey, setAnswer as setWorkbookAnswer, useAnswers } from "@/lib/workbook";
+import { saveAnswer } from "@/lib/journal";
 import { GS_CODES, JOIN_CHOICES, joinChoiceText, markSubmitted, splitChoice } from "@/lib/gettingStarted";
 
 const CHOICE_CODE = "O.5";
@@ -86,6 +87,20 @@ export default function GettingStartedPopup({ lessons, onClose }) {
 
   const step = index >= 0 && index < steps.length ? steps[index] : null;
   const prompts = step ? [...(step.try_prompts || []), ...(step.reflect_prompts || [])] : [];
+
+  /** Getting Started answers are kept on the step and land in the journal, so the journal starts here. */
+  const setAnswer = (code, promptIndex, text) => {
+    setWorkbookAnswer(code, promptIndex, text);
+    const lesson = lessonsByCode[code];
+    const allPrompts = lesson ? [...(lesson.try_prompts || []), ...(lesson.reflect_prompts || [])] : [];
+    saveAnswer({
+      lessonCode: code,
+      lessonTitle: lesson ? lesson.title : "Getting Started",
+      promptKey: `${code}#${promptIndex}`,
+      promptLabel: allPrompts[promptIndex] || "Getting Started",
+      body: text,
+    });
+  };
 
   const renderPrompt = (label, promptIndex) => {
     const key = answerKey(step.code, promptIndex);
