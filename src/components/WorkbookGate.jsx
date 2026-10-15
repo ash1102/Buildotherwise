@@ -14,7 +14,7 @@ export function useWorkbookGate() {
   const sync = useSyncStatus();
   const admin = Boolean(isAuthenticated && user?.role === "admin");
   // On a new device, wait for the account copy before deciding where someone is.
-  const pending = isLoadingAuth || loading || (isAuthenticated && sync === "loading");
+  const pending = isLoadingAuth || loading || (isAuthenticated && (sync === "loading" || sync === "idle"));
   const stepsDone = gettingStartedFinished(lessons, answers, states);
   return {
     admin,
