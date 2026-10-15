@@ -1,0 +1,77 @@
+{
+  "name": "Inquiry",
+  "type": "object",
+  "properties": {
+    "reaching_out_as": {
+      "type": "string",
+      "enum": [
+        "partner",
+        "volunteer",
+        "fiscal_sponsor",
+        "participant",
+        "other"
+      ],
+      "description": "Who the person said they are reaching out as, on the Get Involved form."
+    },
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string",
+      "description": "Reply address the person typed."
+    },
+    "organization": {
+      "type": "string",
+      "description": "Organization or fund, when they gave one."
+    },
+    "interests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Ways a volunteer said they would like to help."
+    },
+    "message": {
+      "type": "string",
+      "description": "What the person chose to send."
+    },
+    "email_notified": {
+      "type": "boolean",
+      "default": false,
+      "description": "True once a notification email went to Start@buildotherwise.org."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "replied",
+        "closed"
+      ],
+      "default": "new"
+    }
+  },
+  "required": [
+    "reaching_out_as",
+    "name",
+    "email",
+    "message"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
