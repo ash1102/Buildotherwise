@@ -16,6 +16,8 @@ import StepReading from "./StepReading";
 import DictateButton from "./DictateButton";
 import TryPlanner from "./TryPlanner";
 import TryCheckIn from "./TryCheckIn";
+import ComeBackAfterTry from "./ComeBackAfterTry";
+import { isAfterTryStep } from "@/lib/afterTry";
 import { interactionsFor } from "@/lib/interactions";
 import { journalStepHref } from "@/lib/journal";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor } from "@/lib/workbook";
@@ -394,16 +396,20 @@ export default function LessonView({
 
       <FeedbackForm moduleOrder={lesson.module_order} lessonCode={lesson.code} />
 
-      <StepNav
-        prev={prev}
-        next={next}
-        nextIsModule={nextIsModule}
-        workbookLink={workbookLink}
-        backLabel={backLabel}
-        forward={forward}
-        endNote={endNote}
-        nextLabel="Next"
-      />
+      {next && isAfterTryStep(lesson.code) ? (
+        <ComeBackAfterTry lesson={lesson} next={next} workbookLink={workbookLink} backLabel={backLabel} />
+      ) : (
+        <StepNav
+          prev={prev}
+          next={next}
+          nextIsModule={nextIsModule}
+          workbookLink={workbookLink}
+          backLabel={backLabel}
+          forward={forward}
+          endNote={endNote}
+          nextLabel="Next"
+        />
+      )}
     </article>
   );
 }
