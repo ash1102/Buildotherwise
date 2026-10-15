@@ -53,14 +53,24 @@ function isComingLater(module) {
  * is a gate before this list, so nothing here waits on it. Each numbered module
  * opens once every workbook step before it holds one saved line. A coming-later
  * module is never drawn as locked, because nothing about it is waiting on the journal.
+ *
+ * Optional weekly pacing (see src/lib/pacing.js): `pacing.openedAt` maps module
+ * order to the date it first opened. A module also waits until a week after the
+ * module before it opened. It never closes again once opened or started.
  */
-export function buildProgress({ modules, lessonsByOrder, answers, states }) {
+const PACE_MS = 7 * 24 * 60 * 60 * 1000;
+
+export function buildProgress({ modules, lessonsByOrder, answers, states, pacing = null }) {
   const ordered = (modules || []).slice().sort((a, b) => a.order - b.order);
 
   const byOrder = {};
   const rows = [];
   /** Every workbook module the next one waits on, in order. */
   const gates = [];
+  /** The numbered module just before this one, for weekly pacing. */
+  let previous = null;
+  const openedAt = (pacing && pacing.openedAt) || {};
+  const now = pacing && pacing.now ? pacing.now : Date.now();
 
   ordered.forEach((module) => {
     const coming = isComingLater(module);
@@ -70,6 +80,19 @@ export function buildProgress({ modules, lessonsByOrder, answers, states }) {
      */
     const lessons = ((lessonsByOrder || {})[module.order] || []).filter(isWorkbookLesson);
     const incomplete = lessons.filter((lesson) => !stepComplete(lesson, answers, states));
+    const stepsOpen = coming ? false : gates.every((entry) => entry.complete);
+
+    // Weekly pacing. The first numbered module has nothing to wait a week on.
+    let opensAt = null;
+    let weekOpen = true;
+    if (pacing && !pacing.skip && !coming && module.kind !== "orientation" && previous) {
+      const alreadyOpened = Boolean(openedAt[module.order]);
+      const started = incomplete.length < lessons.length;
+      const prevOpened = openedAt[previous.order] ? new Date(openedAt[previous.order]).getTime() : NaN;
+      const readyAt = Number.isNaN(prevOpened) ? null : prevOpened + PACE_MS;
+      opensAt = readyAt ? new Date(readyAt).toISOString() : null;
+      weekOpen = alreadyOpened || started || (readyAt !== null && now >= readyAt);
+    }
 
     byOrder[module.order] = {
       order: module.order,
@@ -79,7 +102,11 @@ export function buildProgress({ modules, lessonsByOrder, answers, states }) {
       label: module.kind === "orientation" ? "Getting Started" : `Module ${module.order}`,
       coming,
       complete: lessons.length > 0 && incomplete.length === 0,
-      unlocked: coming ? false : gates.every((entry) => entry.complete),
+      unlocked: stepsOpen && weekOpen,
+      /** Why a built module is shut: "steps" (earlier steps need a line) or "week" (weekly pacing). */
+      lockReason: coming ? null : !stepsOpen ? "steps" : !weekOpen ? "week" : null,
+      opensAt: !weekOpen ? opensAt : null,
+      previousLabel: previous ? `Module ${previous.order}` : "",
       stepCount: lessons.length,
       writtenCount: lessons.length - incomplete.length,
       missing: incomplete.map((lesson) => ({
@@ -93,6 +120,7 @@ export function buildProgress({ modules, lessonsByOrder, answers, states }) {
     if (module.kind === "orientation") return;
 
     rows.push(byOrder[module.order]);
+    if (!coming) previous = byOrder[module.order];
 
     // Nothing waits on a module that was never built, or on a container with no steps to finish.
     if (!coming && lessons.length > 0) gates.push(byOrder[module.order]);
