@@ -277,10 +277,11 @@ function MemberHome() {
               {waitingDate ? `${nextLabel} opens ${waitingDate}` : `${nextLabel} opens next week`}
             </p>
             <h1 className="mt-1.5 text-[clamp(1.5rem,1.1rem+1.6vw,2.1rem)] text-primary-foreground">
-              This week is for your try.
+              You’re caught up for this week.
             </h1>
             <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">
-              One new module opens each week, so there is room for things to happen out there. Nothing is overdue.
+              One new module opens each week, so there is room for what you noticed or planned to happen out in your
+              life. Nothing is overdue.
               Everything already open stays open: your journal, your Life Map, and every step you have done.
             </p>
             <Link to="/journal" className={`mt-5 ${marigoldButton}`}>
@@ -389,8 +390,8 @@ function MemberHome() {
           })}
         </ol>
         <p className="mt-3 text-[14px] leading-relaxed text-muted-faint">
-          One new module opens each week, once every step before it holds a saved line. That works out to about 2–3
-          hours a week. Modules 6–10 are still being built.
+          One new module opens each week, once every step before it holds a saved line. The aim is to keep the
+          workbook to about 2–3 hours a week. Modules 6–10 are still being built.
         </p>
         {progress.pacingSkipped ? (
           <p className="mt-2 text-[13px] leading-relaxed text-muted-faint">
