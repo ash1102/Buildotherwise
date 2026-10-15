@@ -134,10 +134,16 @@ test("Getting Started progress is stored per account, not per browser", async ()
   setProgressUserId("participant-new");
   assert.equal(getAnswer("O.1", 0), "this account only");
 
-  setProgressUserId(null);
-  assert.equal(getAnswer("O.1", 0), "answered on this browser");
+  // The Life Map and journal now belong to the account too, so another account never sees them.
+  setProgressUserId("participant-other");
+  assert.deepEqual(readStore("lifeMap", {}), {});
+  assert.equal(listEntries().some((entry) => entry.body === "a note from this browser"), false);
+  setProgressUserId("participant-new");
   assert.deepEqual(readStore("lifeMap", {}), { places: ["the gym"] });
   assert.equal(listEntries().some((entry) => entry.body === "a note from this browser"), true);
+
+  setProgressUserId(null);
+  assert.equal(getAnswer("O.1", 0), "answered on this browser");
   assert.equal(readStore("lifeMap::user::participant-new", null), null);
   assert.equal(readStore("journal::user::participant-new", null), null);
 });

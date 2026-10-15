@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Download, LogOut } from "lucide-react";
+import { deleteAccountWorkbook, useSyncStatus } from "@/lib/accountSync";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import useCurriculum from "@/hooks/useCurriculum";
