@@ -20,7 +20,53 @@ import ComeBackAfterTry from "./ComeBackAfterTry";
 import { isAfterTryStep } from "@/lib/afterTry";
 import { interactionsFor } from "@/lib/interactions";
 import { journalStepHref } from "@/lib/journal";
-import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor } from "@/lib/workbook";
+import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor, setAnswer, useAnswers, answerKey } from "@/lib/workbook";
+import { JOIN_CHOICES, joinChoiceText, splitChoice } from "@/lib/gettingStarted";
+
+/** O.5's second box holds the join choice. On the step page it is a set of buttons, not a writing box. */
+const JOIN_CHOICE_CODE = "O.5";
+const JOIN_CHOICE_INDEX = 1;
+
+function JoinChoicePicker({ lessonCode, index, label }) {
+  const answers = useAnswers();
+  const { choice, note } = splitChoice((answers || {})[answerKey(lessonCode, index)]);
+  const id = `${lessonCode}-${index}`;
+  return (
+    <fieldset>
+      <legend className="block text-[16px] font-medium leading-snug text-foreground">{label}</legend>
+      <p className="mt-1 text-[14px] text-muted-foreground">Pick one. No explanation needed.</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {JOIN_CHOICES.map((option) => {
+          const active = choice === option;
+          return (
+            <button
+              key={option}
+              type="button"
+              aria-pressed={active}
+              onClick={() => setAnswer(lessonCode, index, joinChoiceText(active ? "" : option, note))}
+              className={`rounded-md border px-3.5 py-2 text-[15px] transition ${
+                active ? "border-accent-ink bg-accent-ink text-white" : "border-input bg-card text-foreground hover:bg-secondary"
+              }`}
+            >
+              {option}
+            </button>
+          );
+        })}
+      </div>
+      <label htmlFor={id} className="mt-3 block text-[14px] text-muted-foreground">
+        Add a note if you want (for example, the adjustments you'd like)
+      </label>
+      <textarea
+        id={id}
+        rows={2}
+        value={note}
+        onChange={(event) => setAnswer(lessonCode, index, joinChoiceText(choice, event.target.value))}
+        placeholder="Optional."
+        className="mt-1 w-full resize-y rounded-md border border-input bg-card px-3 py-2 text-[16px] leading-relaxed"
+      />
+    </fieldset>
+  );
+}
 
 /** The full journal-minimum paragraph is shown on the first steps; after that, a one-line reminder. */
 const JOURNAL_MINIMUM_FULL_ON = ["O.1", "O.6"];
@@ -138,7 +184,10 @@ export default function LessonView({
     lesson.has_decision !== false &&
     (decisionStep || (lesson.decision_options || []).length > 0 || rawTry.length > 0 || rawReflect.length > 0);
 
-  const promptField = (prompt, index, key) => (
+  const promptField = (prompt, index, key) =>
+    lesson.code === JOIN_CHOICE_CODE && index === JOIN_CHOICE_INDEX ? (
+      <JoinChoicePicker key={key} lessonCode={lesson.code} index={index} label={prompt} />
+    ) : (
     <PromptField
       key={key}
       lessonCode={lesson.code}
@@ -215,6 +264,16 @@ export default function LessonView({
           labelledBy={`answer-route-${lesson.code}`}
         />
       </div>
+      {/^pass$/i.test(String(route || "").trim()) ? (
+        <p role="status" className="rounded-lg border border-border bg-secondary px-3 py-2 text-[15px] text-foreground">
+          Passed. That counts as an answer. You can still write something below if you change your mind.
+        </p>
+      ) : null}
+      {watching ? (
+        <p role="status" className="rounded-lg border border-border bg-secondary px-3 py-2 text-[15px] text-foreground">
+          Watching counts as taking part. Writing below is optional.
+        </p>
+      ) : null}
       {watching && lesson.show ? (
         <div ref={exampleRef} className="rounded-lg border border-border bg-secondary p-3 sm:p-4">
           <WorkedExample text={lesson.show} />
