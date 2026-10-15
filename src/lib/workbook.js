@@ -9,7 +9,7 @@ export const NEXT_DECISIONS = [
   "Pause",
   "Stop",
   "Another direction",
-  "Continue looking",
+  "Keep looking",
   "I don't know yet",
 ];
 
@@ -18,8 +18,8 @@ const LEGACY_DECISIONS = {
   "Test Again": "Test again",
   "Pause/Park": "Pause",
   "Another Direction": "Another direction",
-  "Continue Looking": "Continue looking",
-  "Keep looking": "Continue looking",
+  "Continue Looking": "Keep looking",
+  "Continue looking": "Keep looking",
 };
 
 export function normalizeDecision(label) {
