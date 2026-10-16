@@ -45,7 +45,7 @@ export default function AspectIndex() {
       <section className="rounded-lg border border-dashed border-teal-deep/40 bg-white/60 p-6">
         <p className="workbook-label">What stays the same</p>
         <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-ink-soft">
-          Whatever you try on these pages, nothing leaves this browser on its own. Pausing and stopping are complete
+          The demonstrations on these pages save nothing to your account. Pausing and stopping are complete
           answers here too.
         </p>
       </section>

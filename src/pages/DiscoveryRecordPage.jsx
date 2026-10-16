@@ -31,7 +31,7 @@ export default function DiscoveryRecordPage() {
       toast({ title: "Added to your Discovery Record." });
     } else {
       setStatus("This browser did not keep the entry, so it is still open below.");
-      toast({ title: "That did not save in this browser." });
+      toast({ title: "That did not save. Try again." });
     }
   };
 

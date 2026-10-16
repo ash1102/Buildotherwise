@@ -25,7 +25,7 @@ const FACTS = [
   {
     title: "Private",
     dot: "#E9A23B",
-    line: "What you write stays in your browser. An account only holds what you choose to save or send.",
+    line: "What you write is saved to your account. Only you can open it in the app, and sharing is always your choice.",
   },
   { title: "No pressure", dot: "#B48CD0", line: "No grades, scores or streaks. Stopping or pausing counts as an answer." },
   {
