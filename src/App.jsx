@@ -12,6 +12,7 @@ import GettingStartedPage from '@/pages/GettingStartedPage';
 import ModulePage from '@/pages/ModulePage';
 import LessonPage from '@/pages/LessonPage';
 import JournalPage from '@/pages/JournalPage';
+import JournalReflection from '@/pages/JournalReflection';
 import LifeMapPage from '@/pages/LifeMapPage';
 import DiscoveryRecordPage from '@/pages/DiscoveryRecordPage';
 import MyRecordsPage from '@/pages/MyRecordsPage';
@@ -90,6 +91,7 @@ const AuthenticatedApp = () => {
           <Route path="/module/:slug" element={<ModulePage />} />
           <Route path="/lesson/:code" element={<LessonPage />} />
           <Route path="/journal" element={<JournalPage />} />
+          <Route path="/journal/reflect" element={<JournalReflection />} />
           <Route path="/map" element={<LifeMapPage />} />
           <Route path="/discovery-map" element={<DiscoveryMapPage />} />
           <Route path="/record" element={<DiscoveryRecordPage />} />

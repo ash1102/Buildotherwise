@@ -281,7 +281,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                 <span className="block text-[13px] text-muted-faint">That counts as a complete answer. Your answer can change.</span>
               </span>
             </label>
-            <p className="text-[12.5px] text-muted-faint">Saved on this device as you type.</p>
+            <p className="text-[12.5px] text-muted-faint">Saved to your account as you type.</p>
           </div>
         </div>
       )}

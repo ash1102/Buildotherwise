@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { setProgressUserId } from '@/lib/progressScope';
+import { startAccountSync, stopAccountSync } from '@/lib/accountSync';
 
 const AuthContext = createContext();
 
@@ -103,7 +104,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = (shouldRedirect = true) => {
+  /** Saves what is left to the account and takes this account's copy off the device first. */
+  const logout = async (shouldRedirect = true) => {
+    try {
+      await stopAccountSync();
+    } catch {
+      /* unsaved work stays on the device */
+    }
     setProgressUserId(null);
     setUser(null);
     setIsAuthenticated(false);
@@ -124,6 +131,11 @@ export const AuthProvider = ({ children }) => {
 
   // Same render as the pages below, so the gate reads this account's progress.
   setProgressUserId(isAuthenticated && user?.id ? user.id : null);
+
+  // The workbook lives in the account: bring it down on login and keep it saved.
+  useEffect(() => {
+    if (isAuthenticated && user?.id) startAccountSync(user.id);
+  }, [isAuthenticated, user?.id]);
 
   return (
     <AuthContext.Provider value={{ 

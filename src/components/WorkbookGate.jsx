@@ -4,14 +4,17 @@ import useCurriculum from "@/hooks/useCurriculum";
 import { useAuth } from "@/lib/AuthContext";
 import { gettingStartedFinished, gettingStartedResumePath } from "@/lib/gettingStartedProgress";
 import { useWorkbook } from "@/lib/workbook";
+import { useSyncStatus } from "@/lib/accountSync";
 
 /** Admins walk into the workbook. Everyone else finishes Getting Started first. */
 export function useWorkbookGate() {
   const { user, isAuthenticated, isLoadingAuth } = useAuth();
   const { lessons, loading, error } = useCurriculum();
   const { answers, states } = useWorkbook();
+  const sync = useSyncStatus();
   const admin = Boolean(isAuthenticated && user?.role === "admin");
-  const pending = isLoadingAuth || loading;
+  // On a new device, wait for the account copy before deciding where someone is.
+  const pending = isLoadingAuth || loading || (isAuthenticated && (sync === "loading" || sync === "idle"));
   const stepsDone = gettingStartedFinished(lessons, answers, states);
   return {
     admin,

@@ -1,0 +1,39 @@
+{
+  "name": "UserStore",
+  "type": "object",
+  "properties": {
+    "store_key": {
+      "type": "string",
+      "description": "Which part of the workbook this holds: journal, answers, decisions, lifeMap, and so on. One row per key per account."
+    },
+    "value": {
+      "type": "string",
+      "description": "The person's own saved work for that key, held as JSON text. Never edited by staff."
+    },
+    "client_updated_at": {
+      "type": "number",
+      "description": "When the person last changed this on a device (milliseconds). Used to keep the newest copy across devices."
+    },
+    "description": {
+      "type": "string",
+      "description": "Short label for search and previews."
+    }
+  },
+  "required": [
+    "store_key"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}
