@@ -13,6 +13,7 @@ import FeedbackForm from "./FeedbackForm";
 import LessonBeats from "./LessonBeats";
 import WorkedExample from "./WorkedExample";
 import StepReading from "./StepReading";
+import DiscoverySampler from "./DiscoverySampler";
 import DictateButton from "./DictateButton";
 import TryPlanner from "./TryPlanner";
 import TryCheckIn from "./TryCheckIn";
@@ -319,6 +320,14 @@ export default function LessonView({
       key: "teach",
       label: "What to know",
       content: <Prose text={teachTextFor(lesson)} />,
+    });
+  }
+
+  if (lesson.code === "M2-L1") {
+    beats.push({
+      key: "discovery-sampler",
+      label: "Explore real possibilities",
+      content: <DiscoverySampler />,
     });
   }
 
