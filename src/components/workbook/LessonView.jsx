@@ -196,9 +196,12 @@ export default function LessonView({
     return first ? fieldApis.current[first] : null;
   };
 
+  // Reflection or reading questions do not implicitly require a decision.
+  // Preserve explicit next-decision steps and deliberately configured decision choices.
   const asksForDecision =
     lesson.has_decision !== false &&
-    (decisionStep || (lesson.decision_options || []).length > 0 || rawTry.length > 0 || rawReflect.length > 0);
+    (decisionStep || (lesson.decision_options || []).length > 0 ||
+      (lesson.type !== "reading" && (rawTry.length > 0 || rawReflect.length > 0)));
 
   const promptField = (prompt, index, key) =>
     lesson.code === JOIN_CHOICE_CODE && index === JOIN_CHOICE_INDEX ? (
