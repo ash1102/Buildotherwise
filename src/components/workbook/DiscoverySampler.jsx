@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { useAnswers, answerKey, setAnswer } from "@/lib/workbook";
 
-const OPTIONS = [
+export const OPTIONS = [
   {
     id: "repair", title: "Investigate a problem", field: "Automotive service technician",
     source: "https://www.bls.gov/ooh/installation-maintenance-and-repair/automotive-service-technicians-and-mechanics.htm",
@@ -34,12 +35,15 @@ const OPTIONS = [
 ];
 
 export default function DiscoverySampler() {
-  const [selected, setSelected] = useState(null);
+  const answers = useAnswers();
+  const saved = (answers || {})[answerKey("M2-L1", 20)];
+  const [selected, setSelected] = useState(() => saved || null);
   const [guesses, setGuesses] = useState({});
   const [seen, setSeen] = useState([]);
   const current = OPTIONS.find((option) => option.id === selected);
   const choose = (id) => {
     setSelected(id);
+    setAnswer("M2-L1", 20, id);
     setSeen((previous) => previous.includes(id) ? previous : [...previous, id]);
   };
 
