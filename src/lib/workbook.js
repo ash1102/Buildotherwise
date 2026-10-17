@@ -223,8 +223,12 @@ export function buildCarrySources(codes, lessonsByCode) {
           { index: "own-dont-know", label: "What I don't know yet" },
           { index: "possibility", label: "What might help you learn a little more?" },
         ]
-      : [...(lesson.try_prompts || []), ...(lesson.reflect_prompts || [])]
-          .map((label, index) => ({ label, index }));
+      : code === "M2-L1"
+        ? [{ index: "plan", label: "My saved experiment plan" }]
+        : code === "M2-L2"
+          ? [{ index: "checkin", label: "What happened during my try" }]
+          : [...(lesson.try_prompts || []), ...(lesson.reflect_prompts || [])]
+              .map((label, index) => ({ label, index }));
     prompts.forEach(({ label, index }) => {
       sources.push({ code, index, label: `${lesson.title}: ${label}` });
     });
