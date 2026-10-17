@@ -12,8 +12,8 @@
  */
 export const INTERACTIONS = {
   "M1-L1": [{ type: "noticeFlow" }],
-  "M2-L1": [{ type: "tryPlanner" }],
-  "M2-L2": [{ type: "tryCheckIn", planCode: "M2-L1" }],
+  // Module 2 now uses the concise workbook prompts. The former interactive
+  // planner/check-in code remains available, but is not rendered twice.
 };
 
 export function interactionsFor(code) {
