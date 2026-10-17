@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useStore } from "@/lib/store";
-import { setAnswer } from "@/lib/workbook";
+import { setAnswer, useAnswers } from "@/lib/workbook";
 import { saveAnswer } from "@/lib/journal";
 import {
   CONDITION_CHIPS,
@@ -10,6 +10,7 @@ import {
   PLAN_KEY,
   STOP_RULES,
   TRY_CARDS,
+  EXPLORATION_MENU,
   composePlan,
   toggleItem,
 } from "@/lib/tryLoop";
@@ -23,11 +24,16 @@ import { Chip, ChipGroup } from "./TryChips";
 export default function TryPlanner({ lesson }) {
   const [plans, setPlans] = useStore(PLAN_KEY, {});
   const saved = plans[lesson.code] || null;
+  const previous = useAnswers();
+  const priorNotes = ["own-caught", "own-dont-know", "possibility"].map((key) => previous[`M1-L1#${key}`]).filter((value) => value && String(value).trim());
   const [draft, setDraft] = useState(() => (saved ? { ...EMPTY_PLAN, ...saved } : EMPTY_PLAN));
   const [editing, setEditing] = useState(!saved);
 
   const change = (patch) => setDraft((current) => ({ ...current, ...patch }));
   const needsOwn = draft.card === "own" || draft.card === "reject";
+  const route = draft.route || (draft.experiment ? "menu" : draft.card === "own" ? "own" : "");
+  const available = EXPLORATION_MENU.find((group) => group.category === draft.category)?.items || [];
+  const chooseExperiment = (item) => change({ route: "menu", experiment: item.id, card: "", own: "" });
 
   const save = () => {
     const text = composePlan(draft);
@@ -75,6 +81,59 @@ export default function TryPlanner({ lesson }) {
         </p>
       </div>
 
+      <ChipGroup label="Where would you like to start?" hint="You can change your mind. You are exploring, not choosing a career.">
+        {[
+          ["thread", "Something caught my attention"],
+          ["menu", "Show me what's out there"],
+          ["unsure", "I have absolutely no idea"],
+        ].map(([key, label]) => (
+          <Chip key={key} active={route === key} onClick={() => change({ route: key, card: "", experiment: "", category: "" })}>{label}</Chip>
+        ))}
+      </ChipGroup>
+
+      {route === "thread" ? (
+        <div className="space-y-3 rounded-lg bg-secondary p-4">
+          <p className="text-[15px] font-medium">Things you noticed in Module 1</p>
+          {priorNotes.length ? priorNotes.map((note, index) => (
+            <button key={index} type="button" onClick={() => change({card: "own", own: String(note), experiment: ""})}
+              className="block w-full rounded-md border border-input bg-card p-3 text-left text-[15px]">{String(note)}</button>
+          )) : <p className="text-[15px]">Nothing saved here yet. You can name something now or browse the menu instead.</p>}
+          <label className="block text-[15px]">What could you try or find out?
+            <Input className="mt-2" value={draft.own} onChange={(event) => change({card: "own",own:event.target.value})} placeholder="A few words are enough." />
+          </label>
+        </div>
+      ) : null}
+
+      {(route === "menu" || route === "unsure") ? (
+        <div className="space-y-4">
+          <p className="text-[15px] text-muted-foreground">{route === "unsure" ? "Not knowing is a valid starting point. Browse, or let the menu suggest something." : "Pick a category, then one small experience. All are suggestions, not promises of a local opportunity."}</p>
+          <div className="flex flex-wrap gap-2">
+            {EXPLORATION_MENU.map((group) => <Chip key={group.category} active={draft.category === group.category}
+              onClick={() => change({category:group.category,experiment:"",card:""})}>{group.category}</Chip>)}
+          </div>
+          {route === "unsure" ? <button type="button" className="rounded-md border border-input px-3 py-2 text-[15px] font-medium"
+            onClick={() => { const all = EXPLORATION_MENU.flatMap((group)=>group.items); const item=all[Math.floor(Math.random()*all.length)]; const group=EXPLORATION_MENU.find((g)=>g.items.some((i)=>i.id===item.id)); change({category:group.category, experiment:item.id, card:""}); }}>Surprise me</button> : null}
+          <div className="grid gap-2">
+            {available.map((item) => (
+              <button key={item.id} type="button" onClick={() => chooseExperiment(item)}
+                className={`rounded-lg border p-3 text-left ${draft.experiment===item.id ? "border-accent-ink bg-secondary":"border-input bg-card"}`}>
+                <span className="block font-medium">{item.label}</span>
+                <span className="block text-[14px] text-muted-foreground">{item.minutes} · {item.cost}</span>
+                <span className="block text-[14px] text-muted-foreground">{item.alternative}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {route === "menu" || route === "unsure" ? (
+        <label className="block text-[15px]">Something else you'd rather explore?
+          <Input value={draft.own} onChange={(event) => change({card:"own",experiment:"",own:event.target.value})} className="mt-2" placeholder="Add your own possibility" />
+        </label>
+      ) : null}
+
+      <details className="rounded-lg border border-input p-3">
+        <summary className="cursor-pointer text-[15px] font-medium">Other starting options (optional)</summary>
       <ChipGroup label="What will you try?">
         <div className="flex w-full flex-col gap-2">
           {TRY_CARDS.map((card) => (
@@ -85,7 +144,8 @@ export default function TryPlanner({ lesson }) {
         </div>
       </ChipGroup>
 
-      {draft.card ? (
+      </details>
+      {draft.card && route !== "thread" && route !== "menu" && route !== "unsure" ? (
         <div>
           <label htmlFor={`${lesson.code}-plan-own`} className="block text-[16px] font-medium leading-snug text-foreground">
             {draft.card === "own"
@@ -143,12 +203,12 @@ export default function TryPlanner({ lesson }) {
         <button
           type="button"
           onClick={save}
-          disabled={!draft.card}
+          disabled={!(draft.experiment || (draft.card === "own" && draft.own.trim()) || (draft.card && draft.card !== "own"))}
           className="rounded-md bg-primary px-4 py-2 text-[15px] font-medium text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Save my plan
         </button>
-        {!draft.card ? <span className="text-[15px] text-muted-foreground">Pick one try to save a plan.</span> : null}
+        {!(draft.card || draft.experiment) ? <span className="text-[15px] text-muted-foreground">Pick one try to save a plan.</span> : null}
         {saved ? (
           <button
             type="button"
