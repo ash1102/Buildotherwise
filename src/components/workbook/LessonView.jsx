@@ -14,6 +14,7 @@ import LessonBeats from "./LessonBeats";
 import WorkedExample from "./WorkedExample";
 import StepReading from "./StepReading";
 import DiscoverySampler from "./DiscoverySampler";
+import DiscoveryFollowThrough from "./DiscoveryFollowThrough";
 import DictateButton from "./DictateButton";
 import TryPlanner from "./TryPlanner";
 import TryCheckIn from "./TryCheckIn";
@@ -321,6 +322,10 @@ export default function LessonView({
       label: "What to know",
       content: <Prose text={teachTextFor(lesson)} />,
     });
+  }
+
+  if (lesson.code === "M2-L2") {
+    beats.push({ key: "guided-follow-through", label: "Explore what you encountered", content: <DiscoveryFollowThrough /> });
   }
 
   if (lesson.code === "M2-L1") {
