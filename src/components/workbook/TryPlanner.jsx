@@ -33,7 +33,8 @@ export default function TryPlanner({ lesson }) {
   const needsOwn = draft.card === "own" || draft.card === "reject";
   const route = draft.route || (draft.experiment ? "menu" : draft.card === "own" ? "own" : "");
   const available = EXPLORATION_MENU.find((group) => group.category === draft.category)?.items || [];
-  const chooseExperiment = (item) => change({ route: "menu", experiment: item.id, card: "", own: "" });
+  const chooseExperiment = (item) => change({ experiment: item.id, card: "", own: "" });
+  const hasChosenTry = Boolean(draft.experiment || (draft.card === "own" && draft.own.trim()) || (draft.card && draft.card !== "own"));
 
   const save = () => {
     const text = composePlan(draft);
@@ -132,8 +133,8 @@ export default function TryPlanner({ lesson }) {
         </label>
       ) : null}
 
-      <details className="rounded-lg border border-input p-3">
-        <summary className="cursor-pointer text-[15px] font-medium">Other starting options (optional)</summary>
+      {route ? <details className="rounded-lg border border-input p-3">
+        <summary className="cursor-pointer text-[15px] font-medium">Other ways to begin (optional)</summary>
       <ChipGroup label="What will you try?">
         <div className="flex w-full flex-col gap-2">
           {TRY_CARDS.map((card) => (
@@ -144,7 +145,7 @@ export default function TryPlanner({ lesson }) {
         </div>
       </ChipGroup>
 
-      </details>
+      </details> : null}
       {draft.card && route !== "thread" && route !== "menu" && route !== "unsure" ? (
         <div>
           <label htmlFor={`${lesson.code}-plan-own`} className="block text-[16px] font-medium leading-snug text-foreground">
@@ -164,7 +165,9 @@ export default function TryPlanner({ lesson }) {
         </div>
       ) : null}
 
-      <ChipGroup label="When will you stop?" hint="Set the limit before you start.">
+      {hasChosenTry ? <div className="space-y-5 rounded-xl border border-input bg-secondary/50 p-4">
+      <p className="text-[16px] font-medium">You have a starting point. Make it manageable.</p>
+      <ChipGroup label="When will you stop?" hint="A short limit is enough; you can change it.">
         {STOP_RULES.map((rule) => (
           <Chip key={rule.id} active={draft.stop === rule.id} onClick={() => change({ stop: draft.stop === rule.id ? "" : rule.id })}>
             {rule.label}
@@ -180,7 +183,10 @@ export default function TryPlanner({ lesson }) {
         ))}
       </ChipGroup>
 
-      <ChipGroup label="Anything that could get in the way? (optional)" hint="Pick any that apply.">
+      <details className="rounded-lg border border-input bg-card p-3">
+      <summary className="cursor-pointer text-[15px] font-medium">Practical constraints or support (optional)</summary>
+      <div className="mt-3 space-y-3">
+      <ChipGroup label="Anything that could get in the way?" hint="Pick any that apply. This will not block your plan.">
         {CONDITION_CHIPS.map((item) => (
           <Chip
             key={item}
@@ -194,21 +200,23 @@ export default function TryPlanner({ lesson }) {
 
       {draft.conditions.length ? (
         <p className="rounded-md border border-dashed border-input bg-secondary p-3 text-[15px] leading-relaxed text-foreground">
-          These are facts about the situation, not mindset problems. Choose something accessible, shrink the try, or
-          record the barrier instead of forcing an attempt.
+          {draft.conditions.includes("Childcare")
+            ? "Childcare matters. Could you explore this at home, in five minutes, or by watching instead? You can also save the barrier and revisit the try later."
+            : "Your circumstances matter. Shrink the try, change how you explore it, or record the barrier instead of forcing an attempt."}
         </p>
       ) : null}
+      </div></details>
 
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
           onClick={save}
-          disabled={!(draft.experiment || (draft.card === "own" && draft.own.trim()) || (draft.card && draft.card !== "own"))}
+          disabled={!hasChosenTry}
           className="rounded-md bg-primary px-4 py-2 text-[15px] font-medium text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Save my plan
         </button>
-        {!(draft.card || draft.experiment) ? <span className="text-[15px] text-muted-foreground">Pick one try to save a plan.</span> : null}
+        {!hasChosenTry ? <span className="text-[15px] text-muted-foreground">Choose an activity above first.</span> : null}
         {saved ? (
           <button
             type="button"
@@ -222,6 +230,7 @@ export default function TryPlanner({ lesson }) {
           </button>
         ) : null}
       </div>
+      </div> : <p className="text-[15px] text-muted-foreground">Choose one small experiment above to continue. Nothing else is required yet.</p>}
     </section>
   );
 }
