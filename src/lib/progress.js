@@ -27,8 +27,18 @@ function hasInteractionLine(lesson, answers) {
   return INTERACTION_ANSWERS.some((key) => !isBlank((answers || {})[`${lesson.code}#${key}`]));
 }
 
+/** Module 1 uses interactive question keys rather than the old numbered Try inputs. */
+function hasNoticeResponse(answers) {
+  return ["own-caught", "own-dont-know", "possibility", "garden-picks"]
+    .some((key) => !isBlank((answers || {})[`M1-L1#${key}`]));
+}
+
 /** The Try and Reflect boxes with nothing saved in them yet. */
 export function missingPrompts(lesson, answers) {
+  if (lesson?.code === "M1-L1") {
+    if (hasNoticeResponse(answers)) return [];
+    return [{ index: "own-caught", label: "What caught your attention (or what you are unsure about)", kind: "Try" }];
+  }
   if (hasInteractionLine(lesson, answers)) return [];
   return requiredPrompts(lesson).filter((prompt) => isBlank((answers || {})[answerKey(lesson.code, prompt.index)]));
 }
@@ -37,6 +47,7 @@ export function missingPrompts(lesson, answers) {
 export function stepComplete(lesson, answers, states) {
   const route = states && lesson ? states[lesson.code] : "";
   if (routeSkipsWriting(route)) return true;
+  if (lesson?.code === "M1-L1") return hasNoticeResponse(answers);
   const prompts = requiredPrompts(lesson);
   if (!prompts.length) return true;
   if (hasInteractionLine(lesson, answers)) return true;
