@@ -165,6 +165,7 @@ export default function LessonView({
   // Optional tap-to-answer pieces for this step, set in src/lib/interactions.js.
   const interactions = interactionsFor(lesson.code);
   const hasPlanner = interactions.some((item) => item.type === "tryPlanner");
+  const hasCheckIn = interactions.some((item) => item.type === "tryCheckIn");
   const renderInteraction = (item) => {
     if (item.type === "tryPlanner") return <TryPlanner key="tryPlanner" lesson={lesson} />;
     if (item.type === "tryCheckIn") return <TryCheckIn key="tryCheckIn" lesson={lesson} planCode={item.planCode} />;
@@ -358,7 +359,7 @@ export default function LessonView({
             <CarryForward sources={carrySources} selected={carried} onChange={onCarriedChange} />
           ) : null}
           {interactions.map(renderInteraction)}
-          {hasPlanner ? (
+          {hasPlanner || hasCheckIn ? (
             <details ref={detailRef} className="rounded-xl border border-border bg-card p-4 sm:p-5">
               <summary className="cursor-pointer text-[16px] font-medium text-foreground">
                 Add more detail (optional) · {tryPrompts.length} questions
