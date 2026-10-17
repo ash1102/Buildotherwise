@@ -198,13 +198,6 @@ export default function TryPlanner({ lesson }) {
         ))}
       </ChipGroup>
 
-      {draft.conditions.length ? (
-        <p className="rounded-md border border-dashed border-input bg-secondary p-3 text-[15px] leading-relaxed text-foreground">
-          {draft.conditions.includes("Childcare")
-            ? "Childcare matters. Could you explore this at home, in five minutes, or by watching instead? You can also save the barrier and revisit the try later."
-            : "Your circumstances matter. Shrink the try, change how you explore it, or record the barrier instead of forcing an attempt."}
-        </p>
-      ) : null}
       </div></details>
 
       <div className="flex flex-wrap items-center gap-3">
