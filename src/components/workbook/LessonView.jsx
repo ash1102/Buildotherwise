@@ -119,6 +119,37 @@ function TalkBar({ hasRoutes, talking, onSay, onWrite, onText, buttonRef }) {
   );
 }
 
+function Module3ExperienceBridge({ lessonCode }) {
+  const answers = useAnswers();
+  const choice = DISCOVERY_OPTIONS.find((item) => item.id === answers[answerKey("M2-L1", 20)]);
+  const notes = [0, 1, 2, 3, 4].map((i) => answers[answerKey("M2-L2", i)]).filter((v) => String(v || "").trim());
+  const firstNote = String(answers[answerKey("M2-L2", 1)] || "").trim();
+  return (
+    <div className="space-y-3">
+      <p className="text-[16px] leading-relaxed text-foreground">
+        Module 3 examines the <strong>conditions around a task</strong>—instructions, time, noise, help, and choice. You can work with something from Module 2, or use the self-contained task below.
+      </p>
+      {choice ? <div className="rounded-lg bg-secondary p-3">
+        <p className="text-[14px] text-muted-foreground">A possibility you explored in Module 2</p>
+        <p className="mt-1 font-medium text-foreground">{choice.field}</p>
+        <p className="mt-1 text-[15px] text-foreground">{choice.task}</p>
+        <p className="mt-2 text-[14px] text-muted-foreground">This suggests a subject to investigate, not proof you completed the task.</p>
+      </div> : null}
+      {firstNote ? <div className="rounded-lg border border-border p-3">
+        <p className="text-[14px] text-muted-foreground">What you recorded doing or observing</p>
+        <p className="mt-1 whitespace-pre-wrap text-[15px] text-foreground">{firstNote}</p>
+      </div> : notes.length ? <p className="text-[14px] text-muted-foreground">You saved other observations in Module 2, but did not describe a completed activity.</p> : <p className="text-[14px] text-muted-foreground">No Module 2 observations are recorded. You can still complete this lesson without inventing a past experience.</p>}
+      <div className="rounded-lg border border-border p-3">
+        <p className="text-[15px] font-medium text-foreground">A task you can do here, without materials</p>
+        <p className="mt-1 text-[15px] leading-relaxed text-foreground">Find the information in this notice: “Community workshop — Saturday 11 a.m. Free entry. Bring a notebook. Registration closes Friday at 5 p.m.”</p>
+        <p className="mt-2 text-[15px] text-foreground">First, identify the deadline using the paragraph. Then read it as a checklist: <strong>When:</strong> Saturday 11 a.m. · <strong>Cost:</strong> Free · <strong>Bring:</strong> notebook · <strong>Register by:</strong> Friday 5 p.m.</p>
+        <p className="mt-2 text-[14px] text-muted-foreground">Both formats have the same facts. Compare how easily you locate the deadline, not which answer is correct. This is a constructed formatting exercise, not a real workshop listing.</p>
+      </div>
+      {lessonCode === "M3-L2" ? <p className="text-[15px] text-foreground">To compare conditions, use the same notice with different formats—or choose a real task you already know. Keep the task similar, and remember that familiarity from the first attempt could affect the second.</p> : null}
+    </div>
+  );
+}
+
 function DiscoveryReviewNotes() {
   const answers = useAnswers();
   const selected = DISCOVERY_OPTIONS.find((item) => item.id === answers[answerKey("M2-L1", 20)]);
@@ -353,6 +384,14 @@ export default function LessonView({
       key: "teach",
       label: "What to know",
       content: <Prose text={teachTextFor(lesson)} />,
+    });
+  }
+
+  if (lesson.code === "M3-L1" || lesson.code === "M3-L2") {
+    beats.push({
+      key: "module-3-experience",
+      label: "Work with a real observation or a provided task",
+      content: <Module3ExperienceBridge lessonCode={lesson.code} />,
     });
   }
 
