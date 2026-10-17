@@ -150,6 +150,34 @@ function Module3ExperienceBridge({ lessonCode }) {
   );
 }
 
+function Module3ReviewBridge() {
+  const answers = useAnswers();
+  const previous = [
+    { code: "M3-L1", labels: ["Task considered", "Condition identified"], indexes: [0, 1] },
+    { code: "M3-L2", labels: ["Condition to change", "Task kept similar", "Time limit and stop rule", "Balance signal", "What happened or why it was not tried", "Effort or discomfort", "What might be tested again"], indexes: [0, 1, 2, 3, 4, 5, 6] },
+  ];
+  const entries = previous.flatMap((step) => step.indexes.map((index, i) => ({
+    key: step.code + "-" + index,
+    label: step.labels[i],
+    value: String(answers[answerKey(step.code, index)] || "").trim(),
+  }))).filter((item) => item.value);
+  return (
+    <div className="space-y-4">
+      <p className="text-[16px] leading-relaxed text-foreground">Before reviewing your result, look at what you actually recorded. An intended change is not evidence it was tried. An observation does not automatically prove what caused it.</p>
+      {entries.length ? (
+        <div className="space-y-3">
+          {entries.map((entry) => <div key={entry.key} className="border-l-2 border-border pl-3">
+            <p className="text-[13px] text-muted-foreground">{entry.label}</p>
+            <p className="mt-1 whitespace-pre-wrap text-[15px] text-foreground">{entry.value}</p>
+          </div>)}
+          <p className="text-[15px] text-muted-foreground">What does this support? What else could explain the result? What did the task cost in time, effort, or support?</p>
+        </div>
+      ) : <p className="rounded-lg border border-dashed border-input p-3 text-[15px] text-muted-foreground">You haven't recorded a task-condition attempt yet. You may use the provided word-sorting example to check its correct order, or leave the outcome unknown. No made-up result is needed.</p>}
+      <p className="text-[14px] text-muted-foreground">A useful takeaway can be a tentative observation, a condition to test again, or a question you cannot answer yet. The next module will examine how claims compare with available evidence.</p>
+    </div>
+  );
+}
+
 function DiscoveryReviewNotes() {
   const answers = useAnswers();
   const selected = DISCOVERY_OPTIONS.find((item) => item.id === answers[answerKey("M2-L1", 20)]);
@@ -385,6 +413,10 @@ export default function LessonView({
       label: "What to know",
       content: <Prose text={teachTextFor(lesson)} />,
     });
+  }
+
+  if (lesson.code === "M3-L3") {
+    beats.push({ key: "module-3-review", label: "Review what actually happened", content: <Module3ReviewBridge /> });
   }
 
   if (lesson.code === "M3-L1" || lesson.code === "M3-L2") {
