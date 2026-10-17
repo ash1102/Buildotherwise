@@ -441,9 +441,31 @@ export default function LessonView({
       content: (
         <div className="space-y-3">
           <p className="max-w-[68ch] text-[17px] leading-relaxed text-foreground">{lesson.what_comes_out}</p>
-          <Link to={journalHref} className="inline-block text-[15px] font-medium text-accent-ink underline underline-offset-2">
-            See it in your journal
-          </Link>
+          {lesson.module_order === 1 ? (
+            <div className="space-y-2">
+              <p className="text-[15px] leading-relaxed text-muted-foreground">
+                Your response is already saved. You don't need to answer the same question again.
+              </p>
+              <div className="flex flex-wrap gap-x-5 gap-y-2 text-[15px]">
+                <Link
+                  to={`/tribe-threads?lesson=${encodeURIComponent(lesson.code)}#lesson-thread`}
+                  className="font-medium text-accent-ink underline underline-offset-2"
+                >
+                  Explore the related Tribe Thread (optional)
+                </Link>
+                <Link to={journalHref} className="text-accent-ink underline underline-offset-2">
+                  Revisit or expand your private note
+                </Link>
+              </div>
+              <p className="text-[14px] text-muted-faint">
+                Tribe replies are shared with other participants. Your journal stays private unless you choose to share.
+              </p>
+            </div>
+          ) : (
+            <Link to={journalHref} className="inline-block text-[15px] font-medium text-accent-ink underline underline-offset-2">
+              See it in your journal
+            </Link>
+          )}
         </div>
       ),
     });
