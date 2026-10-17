@@ -146,7 +146,8 @@ export default function LessonView({
   const rawReflect = lesson.reflect_prompts || [];
   // A step whose interaction owns its questions does not also print the generic prompt boxes.
   const ownsPrompts = interactionsFor(lesson.code).some((item) => item.type === "noticeFlow");
-  const notAnOption = (prompt) => !ownsPrompts && !optionNames.has(String(prompt).trim().toLowerCase());
+  // Empty slots keep historic answer indices stable when curriculum questions are retired.
+  const notAnOption = (prompt) => !ownsPrompts && Boolean(String(prompt || "").trim()) && !optionNames.has(String(prompt).trim().toLowerCase());
   // Try and Reflect questions are numbered in one run: the Reflect boxes start after the
   // Try ones. That way no two questions in a step share a stored answer, so nothing
   // written in one box can appear in, or overwrite, another. Same order the
