@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 /** Surfaces a section can use. Written as literal strings so Tailwind keeps them. */
 const TONES = {
