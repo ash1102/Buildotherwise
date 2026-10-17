@@ -13,7 +13,7 @@ import FeedbackForm from "./FeedbackForm";
 import LessonBeats from "./LessonBeats";
 import WorkedExample from "./WorkedExample";
 import StepReading from "./StepReading";
-import DiscoverySampler from "./DiscoverySampler";
+import DiscoverySampler, { OPTIONS as DISCOVERY_OPTIONS } from "./DiscoverySampler";
 import DiscoveryFollowThrough from "./DiscoveryFollowThrough";
 import DictateButton from "./DictateButton";
 import TryPlanner from "./TryPlanner";
@@ -115,6 +115,38 @@ function TalkBar({ hasRoutes, talking, onSay, onWrite, onText, buttonRef }) {
         </>
       )}
       {talking ? <DictateButton onText={onText} buttonRef={buttonRef} /> : null}
+    </div>
+  );
+}
+
+function DiscoveryReviewNotes() {
+  const answers = useAnswers();
+  const selected = DISCOVERY_OPTIONS.find((item) => item.id === answers[answerKey("M2-L1", 20)]);
+  const questions = [
+    "What caught your attention?",
+    "What did you actually do or observe?",
+    "What surprised, frustrated, or interested you?",
+    "What helped or made participation difficult?",
+    "What did it take in time, money, energy, or support?",
+  ];
+  const notes = questions.map((label, index) => ({ label, value: answers[answerKey("M2-L2", index)] }))
+    .filter((item) => String(item.value || "").trim());
+  return (
+    <div className="space-y-4">
+      {selected ? <div className="rounded-lg bg-secondary p-4">
+        <p className="text-[14px] text-muted-foreground">Your discovery from Lesson 1</p>
+        <p className="mt-1 font-medium text-foreground">{selected.field}</p>
+        <p className="mt-2 text-[15px] text-foreground">{selected.fact}</p>
+        <a className="mt-2 inline-block text-[14px] text-accent-ink underline" href={selected.source} target="_blank" rel="noopener noreferrer">Revisit the occupation profile</a>
+      </div> : <p className="text-[15px] text-muted-foreground">No sampler selection was saved. You may have explored something else.</p>}
+      {notes.length ? <div className="space-y-3">
+        <p className="text-[15px] font-medium">Your actual Lesson 2 observations</p>
+        {notes.map((note) => <div key={note.label} className="border-l-2 border-border pl-3">
+          <p className="text-[13px] text-muted-foreground">{note.label}</p>
+          <p className="mt-1 whitespace-pre-wrap text-[15px]">{note.value}</p>
+        </div>)}
+        <p className="text-[15px] text-muted-foreground">Compare these notes with the source. What is established, and what still needs checking?</p>
+      </div> : <p className="rounded-lg border border-border p-3 text-[15px] text-muted-foreground">No Lesson 2 observations are saved yet. You can review what the source taught you, return to try something later, or leave the question open.</p>}
     </div>
   );
 }
@@ -321,6 +353,14 @@ export default function LessonView({
       key: "teach",
       label: "What to know",
       content: <Prose text={teachTextFor(lesson)} />,
+    });
+  }
+
+  if (lesson.code === "M2-L3") {
+    beats.push({
+      key: "review-discovery",
+      label: "Review what you explored",
+      content: <DiscoveryReviewNotes />,
     });
   }
 
