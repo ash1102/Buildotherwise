@@ -216,8 +216,16 @@ export function buildCarrySources(codes, lessonsByCode) {
   (codes || []).forEach((code) => {
     const lesson = lessonsByCode[code];
     if (!lesson) return;
-    const prompts = [...(lesson.try_prompts || []), ...(lesson.reflect_prompts || [])];
-    prompts.forEach((label, index) => {
+    // M1-L1 uses interactive named answers, not its obsolete numbered prompt fields.
+    const prompts = code === "M1-L1"
+      ? [
+          { index: "own-caught", label: "What caught your attention" },
+          { index: "own-dont-know", label: "What I don't know yet" },
+          { index: "possibility", label: "What might help you learn a little more?" },
+        ]
+      : [...(lesson.try_prompts || []), ...(lesson.reflect_prompts || [])]
+          .map((label, index) => ({ label, index }));
+    prompts.forEach(({ label, index }) => {
       sources.push({ code, index, label: `${lesson.title}: ${label}` });
     });
   });
