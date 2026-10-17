@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import useCurriculum from "@/hooks/useCurriculum";
 import { groupBy, loadTribeReplies, loadTribeThreads, moduleTitle, subscribeTribeReplies } from "@/lib/library";
 import ThreadCard from "@/components/tribe/ThreadCard";
 
 export default function TribeThreads() {
+  const [searchParams] = useSearchParams();
+  const linkedLesson = searchParams.get("lesson");
   const { modules, loading: curriculumLoading } = useCurriculum();
   const [threads, setThreads] = useState([]);
   const [replies, setReplies] = useState([]);
@@ -55,6 +57,12 @@ export default function TribeThreads() {
   const openOrders = [...new Set(openThreads.map((thread) => thread.module_order))].sort((a, b) => a - b);
   const busy = loading || curriculumLoading;
 
+  useEffect(() => {
+    if (busy || !linkedLesson) return;
+    const target = document.getElementById("lesson-thread");
+    if (target) target.scrollIntoView({ block: "start" });
+  }, [busy, linkedLesson]);
+
   return (
     <div className="space-y-8">
       <header className="border-b border-border pb-5">
@@ -94,14 +102,15 @@ export default function TribeThreads() {
                 {openThreads
                   .filter((thread) => thread.module_order === order)
                   .map((thread) => (
-                    <ThreadCard
-                      key={thread.id}
-                      thread={thread}
-                      moduleLabel={thread.lesson_code ? `${thread.lesson_code}, peer practice` : "Peer practice"}
-                      replies={repliesByThread.get(thread.id) || []}
-                      user={user}
-                      onChanged={refreshReplies}
-                    />
+                    <div key={thread.id} id={thread.lesson_code === linkedLesson ? "lesson-thread" : undefined} className="scroll-mt-28">
+                      <ThreadCard
+                        thread={thread}
+                        moduleLabel={thread.lesson_code ? `${thread.lesson_code}, peer practice` : "Peer practice"}
+                        replies={repliesByThread.get(thread.id) || []}
+                        user={user}
+                        onChanged={refreshReplies}
+                      />
+                    </div>
                   ))}
               </div>
             </section>
