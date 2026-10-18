@@ -4,7 +4,7 @@ import React from "react";
  * The same map as a list — an accessibility option, not the main view. Every node
  * keeps its full answer, its question, and the links it holds.
  */
-export default function LifeMapList({ graph, explore = [], selectedId, onSelect }) {
+export default function LifeMapList({ graph, explore = [], selectedId, onSelect, onRemove }) {
   const byId = (id) => graph.nodes.find((node) => node.id === id);
 
   return (
@@ -36,14 +36,26 @@ export default function LifeMapList({ graph, explore = [], selectedId, onSelect 
                         .join(" · ")}
                     </p>
                   ) : null}
-                  <button
-                    type="button"
-                    onClick={() => onSelect(node.id)}
-                    aria-pressed={selectedId === node.id}
-                    className="mt-2 text-[12.5px] text-primary underline decoration-border underline-offset-2 transition hover:text-accent-ink"
-                  >
-                    {selectedId === node.id ? "Open on the map" : "Show on the map"}
-                  </button>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <button
+                      type="button"
+                      onClick={() => onSelect(node.id)}
+                      aria-pressed={selectedId === node.id}
+                      className="text-[12.5px] text-primary underline decoration-border underline-offset-2 transition hover:text-accent-ink"
+                    >
+                      {selectedId === node.id ? "Open on the map" : "Show on the map"}
+                    </button>
+                    {onRemove ? (
+                      <button
+                        type="button"
+                        onClick={() => onRemove(node)}
+                        aria-label={`Remove ${node.label || node.text || "this line"}`}
+                        className="text-[12.5px] text-muted-faint underline decoration-border underline-offset-2 transition hover:text-destructive"
+                      >
+                        Remove
+                      </button>
+                    ) : null}
+                  </div>
                 </li>
               ))}
             </ul>
