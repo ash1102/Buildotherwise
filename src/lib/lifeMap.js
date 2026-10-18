@@ -43,7 +43,8 @@ export const MAP_SECTIONS = [
  * The questions that find the lines for the map, in the order of the lesson
  * "Map the Life You're Actually Living" (Notion, Module 1, Parts 1-6). Wording is
  * the lesson's own. Each answer becomes a line under the section named here.
- * `starter: true` means the answer finishes the sentence, so the line keeps it.
+ * `starter: true` means the answer finishes the sentence. The sentence stays the
+ * question label on the map. The line itself is only what the participant wrote.
  */
 export const MAP_QUESTION_PARTS = [
   {
@@ -217,12 +218,32 @@ export function exploreLines(pick) {
   })).filter((line) => line.text);
 }
 
-/** The line an answer becomes. A sentence starter keeps its start so the line reads on its own. */
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * The words that belong on the node. A sentence starter stays the question label.
+ * An older line may still have that starter glued on the front. Take it back off
+ * so the node shows only what the participant wrote.
+ */
+export function answerText(question, text) {
+  const value = String(text || "").trim();
+  if (!value || !question || !question.starter) return value;
+  const prefix = String(question.text || "").replace(/…$/, "").trim();
+  if (!prefix) return value;
+  const pattern = new RegExp(`^${escapeRegExp(prefix)}(?:[\\s….:,;\\-–—]+)`, "i");
+  const matched = value.match(pattern);
+  if (!matched) return value;
+  const rest = value.slice(matched[0].length).trim();
+  return rest || value;
+}
+
+/** The line an answer becomes. The starter is not copied onto the line. */
 export function lineFromAnswer(question, answer) {
   const value = String(answer || "").trim();
   if (!value) return "";
-  if (!question.starter) return value;
-  return `${question.text.replace(/…$/, "").trim()} ${value}`;
+  return answerText(question, value);
 }
 
 /** Pieces of one answer: each new line is its own piece, and list questions also split at commas. */
@@ -296,7 +317,7 @@ export function buildGraph(map) {
     nodes: ((map || {})[section.key] || []).map((item) => ({
       id: item.id,
       section: section.key,
-      text: item.text || "",
+      text: answerText(QUESTIONS_BY_ID[item.question_id], item.text || ""),
       label: item.label || "",
       entry_id: item.entry_id || "",
       links: item.links || [],

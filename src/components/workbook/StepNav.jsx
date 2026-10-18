@@ -62,7 +62,7 @@ export default function StepNav({
           </span>
           <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
         </Link>
-      ) : (
+      ) : endNote === "" ? null : (
         <span className="text-[15px] text-muted-faint sm:ml-auto">{endNote || "This is the last step in Pilot 1."}</span>
       )}
     </nav>

@@ -1,5 +1,6 @@
+import { gettingStartedFinished, gettingStartedStepDone, gettingStartedSteps } from "./gettingStartedProgress";
+import { isWorkbookLesson } from "./lessonKind";
 import { answerKey, routeSkipsWriting } from "./workbook";
-import { isWorkbookLesson } from "./curriculum";
 
 /**
  * Completion follows the curriculum's own shape: a step counts once one Try or
@@ -148,4 +149,20 @@ export function buildProgress({ modules, lessonsByOrder, answers, states, pacing
     byOrder,
     blockingOrder: blocking ? blocking.order : null,
   };
+}
+
+/**
+ * The step the Life Map offers next.
+ * Getting Started comes first: the earliest of those five steps that is not done.
+ * Once all five are done, the next unfinished workbook step, in live workbook order.
+ * Nothing left, or Getting Started not fully loaded, means there is no next step.
+ */
+export function nextOpenStep({ lessons, workbookLessons, answers, states }) {
+  const openGettingStarted = gettingStartedSteps(lessons).find(
+    (lesson) => !gettingStartedStepDone(lesson, answers, states)
+  );
+  if (openGettingStarted) return openGettingStarted;
+  if (!gettingStartedFinished(lessons, answers, states)) return null;
+  const book = workbookLessons || lessons || [];
+  return book.find((lesson) => isWorkbookLesson(lesson) && !stepComplete(lesson, answers, states)) || null;
 }

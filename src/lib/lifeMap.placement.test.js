@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { nextOpenStep } from "./progress.js";
 import { LIFEMAP_KEY } from "./workbook.js";
 import {
   MAP_PICK_FIELDS,
@@ -85,10 +86,8 @@ test("every question belongs to a section the map draws, and an answer is read b
   });
 
   assert.deepEqual(linesFromAnswer(QUESTIONS_BY_ID["p3-plus"], "   "), []);
-  assert.equal(
-    linesFromAnswer(QUESTIONS_BY_ID["p5-ending-up"], "libraries")[0],
-    "I keep ending up around libraries"
-  );
+  assert.equal(QUESTIONS_BY_ID["p5-ending-up"].branch, "I keep ending up around");
+  assert.equal(linesFromAnswer(QUESTIONS_BY_ID["p5-ending-up"], "libraries")[0], "libraries");
 
   const { map, expected } = sampleMap();
   const graph = buildGraph(map);
@@ -113,6 +112,67 @@ test("every question belongs to a section the map draws, and an answer is read b
   const own = handAdded.nodes.find((node) => node.id === "own-1");
   assert.equal(own.section, "energy");
   assert.equal(own.text, "walking the long way");
+});
+
+test("a Part 5 line already saved with its starter shows only the answer", () => {
+  const question = QUESTIONS_BY_ID["p5-researching"];
+  assert.equal(question.text, "I keep researching…");
+  assert.equal(question.branch, "I keep researching");
+  assert.equal(linesFromAnswer(question, "test thread")[0], "test thread");
+
+  const graph = buildGraph({
+    threads: [{ id: "old", text: "I keep researching test thread", question_id: "p5-researching", links: [] }],
+  });
+  assert.equal(graph.nodes[0].text, "test thread");
+  assert.equal(graph.nodes[0].question_id, "p5-researching");
+});
+
+function step(code, moduleOrder, extra = {}) {
+  return {
+    code,
+    title: extra.title || code,
+    module_order: moduleOrder,
+    order: extra.order ?? 1,
+    try_prompts: extra.try_prompts || ["note"],
+  };
+}
+
+test("the map offers the next unfinished step, or nothing when the book is done", () => {
+  const gettingStarted = ["O.1", "O.2", "O.3", "O.4", "O.5"].map((code, index) =>
+    step(code, 0, { order: index, title: code === "O.1" ? "What this is (and isn't)" : code })
+  );
+  const opener = step("O.6", 0, { order: 6, title: "Map the life", try_prompts: ["map"] });
+  const first = step("M1-L1", 1, { order: 1, title: "Notice what returns" });
+  const second = step("M1-L2", 1, { order: 2, title: "Look again" });
+  const lessons = [...gettingStarted, opener, first, second];
+
+  assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, answers: {}, states: {} }).code, "O.1");
+
+  const throughFour = {
+    answers: { "O.1#0": "here", "O.2#0": "pace", "O.3#0": "note" },
+    states: { "O.4": "Pass" },
+  };
+  assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, ...throughFour }).code, "O.5");
+
+  const started = { answers: { ...throughFour.answers, "O.5#0": "done" }, states: throughFour.states };
+  assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, ...started }).code, "M1-L1");
+
+  const midBook = { answers: { ...started.answers, "M1-L1#0": "noticed" }, states: started.states };
+  assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, ...midBook }).code, "M1-L2");
+
+  const finished = { answers: { ...midBook.answers, "M1-L2#0": "again" }, states: midBook.states };
+  assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, ...finished }), null);
+
+  const missingLast = gettingStarted.slice(0, 4);
+  assert.equal(
+    nextOpenStep({
+      lessons: missingLast,
+      workbookLessons: [first],
+      answers: throughFour.answers,
+      states: { ...throughFour.states },
+    }),
+    null
+  );
 });
 
 test("each answer sits in the area of the section its question belongs to", () => {
