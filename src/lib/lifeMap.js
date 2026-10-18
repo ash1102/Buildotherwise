@@ -292,15 +292,21 @@ export function updateLine(sectionKey, id, patch) {
   setLifeMap({ ...map, [sectionKey]: items.map((item) => (item.id === id ? { ...item, ...patch } : item)) });
 }
 
+/** Drop one line from its area, and drop every link that pointed at it. */
+export function mapWithoutLine(map, sectionKey, id) {
+  const next = {};
+  Object.entries(map || {}).forEach(([key, items]) => {
+    const list = Array.isArray(items) ? items : [];
+    next[key] = list
+      .filter((item) => !(key === sectionKey && item.id === id))
+      .map((item) => ({ ...item, links: (item.links || []).filter((link) => link !== id) }));
+  });
+  return next;
+}
+
 export function removeLine(sectionKey, id) {
   const map = readStore(LIFEMAP_KEY, {});
-  const items = map[sectionKey] || [];
-  setLifeMap({
-    ...map,
-    [sectionKey]: items
-      .map((item) => ({ ...item, links: (item.links || []).filter((link) => link !== id) }))
-      .filter((item) => item.id !== id),
-  });
+  setLifeMap(mapWithoutLine(map, sectionKey, id));
   const positions = { ...readPositions() };
   delete positions[id];
   writeStore(POSITIONS_KEY, positions);

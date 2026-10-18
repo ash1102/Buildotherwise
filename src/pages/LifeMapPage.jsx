@@ -227,7 +227,16 @@ export default function LifeMapPage() {
 
       <div ref={mapRef} className="scroll-mt-4">
         {asList ? (
-          <LifeMapList graph={graph} explore={explore} selectedId={selectedId} onSelect={setSelectedId} />
+          <LifeMapList
+            graph={graph}
+            explore={explore}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onRemove={(node) => {
+              removeLine(node.section, node.id);
+              if (selectedId === node.id) setSelectedId(null);
+            }}
+          />
         ) : (
           <LifeMapBoard
             graph={graph}
@@ -258,7 +267,7 @@ export default function LifeMapPage() {
         />
       ) : (
         <p className="text-[13px] leading-relaxed text-muted-faint">
-          Tap a line to read it in full, rename it, link it to a journal entry, or connect it to another line. Drag a
+          Tap a line to read it in full, rename it, remove it, link it to a journal entry, or connect it to another line. Drag a
           line to move it, use the arrow keys while it is focused, or use the move buttons once it is open. Connections
           you make show as dashed gold curves.
         </p>

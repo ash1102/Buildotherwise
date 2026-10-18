@@ -16,6 +16,7 @@ import {
   exploreLines,
   layoutGraph,
   linesFromAnswer,
+  mapWithoutLine,
   settleLines,
 } from "./lifeMap.js";
 
@@ -157,7 +158,7 @@ test("the map offers the next unfinished step, or nothing when the book is done"
   const started = { answers: { ...throughFour.answers, "O.5#0": "done" }, states: throughFour.states };
   assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, ...started }).code, "M1-L1");
 
-  const midBook = { answers: { ...started.answers, "M1-L1#0": "noticed" }, states: started.states };
+  const midBook = { answers: { ...started.answers, "M1-L1#own-caught": "noticed" }, states: started.states };
   assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, ...midBook }).code, "M1-L2");
 
   const finished = { answers: { ...midBook.answers, "M1-L2#0": "again" }, states: midBook.states };
@@ -231,6 +232,17 @@ test("part 6 answers are read from the pick store and blank fields stay off the 
     },
   ]);
   assert.deepEqual(exploreLines({}), []);
+});
+
+test("removing a line drops it and the links that pointed at it", () => {
+  const map = {
+    threads: [{ id: "a", text: "test thread", links: ["b"] }],
+    places: [{ id: "b", text: "the gym", links: ["a", "c"] }, { id: "c", text: "work", links: [] }],
+  };
+  const next = mapWithoutLine(map, "threads", "a");
+  assert.deepEqual(next.threads, []);
+  assert.deepEqual(next.places[0].links, ["c"]);
+  assert.equal(next.places[1].id, "c");
 });
 
 test("a line someone already moved stays where they put it", () => {
