@@ -158,7 +158,7 @@ test("the map offers the next unfinished step, or nothing when the book is done"
   const started = { answers: { ...throughFour.answers, "O.5#0": "done" }, states: throughFour.states };
   assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, ...started }).code, "M1-L1");
 
-  const midBook = { answers: { ...started.answers, "M1-L1#0": "noticed" }, states: started.states };
+  const midBook = { answers: { ...started.answers, "M1-L1#own-caught": "noticed" }, states: started.states };
   assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, ...midBook }).code, "M1-L2");
 
   const finished = { answers: { ...midBook.answers, "M1-L2#0": "again" }, states: midBook.states };
