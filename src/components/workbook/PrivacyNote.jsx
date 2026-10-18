@@ -17,7 +17,7 @@ export default function PrivacyNote({ children }) {
         <Lock className="h-3.5 w-3.5 text-accent-ink" aria-hidden="true" />
       </span>
       <span>
-        {children || "Saved on this device only. Clearing your browser or switching devices loses it."}
+        {children || "Saved to your account, so it’s there on any device. Only you can open it in the app."}
       </span>
     </p>
   );

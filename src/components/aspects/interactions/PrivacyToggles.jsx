@@ -12,7 +12,7 @@ export default function PrivacyToggles() {
         <p className="mt-2 font-heading text-[16px] leading-relaxed text-ink">
           “The thing I keep coming back to is not really about the job.”
         </p>
-        <p className="mt-2 text-[12.5px] text-ink-faint">Kept in this browser · Tuesday</p>
+        <p className="mt-2 text-[12.5px] text-ink-faint">Kept in your account · Tuesday</p>
       </div>
 
       <div className="mt-4 flex items-start justify-between gap-4 rounded-md border border-natural p-4">
@@ -39,7 +39,7 @@ export default function PrivacyToggles() {
       ) : (
         <p className="mt-3 inline-flex items-start gap-2 text-[13px] leading-relaxed text-teal-deep/80">
           <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-copper" aria-hidden="true" />
-          Right now it stays in this browser.
+          Right now it stays private in your account.
         </p>
       )}
     </div>

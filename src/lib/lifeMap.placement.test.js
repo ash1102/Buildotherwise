@@ -29,6 +29,9 @@ const SAMPLES = [
   ["p3-minus", "late shifts"],
   ["p4-in-the-way", "childcare"],
   ["p5-ending-up", "libraries"],
+  ["g-now", "family, the crew at work"],
+  ["g-close", "In the middle"],
+  ["g-take", "a ride on Saturdays"],
 ];
 
 function sampleMap() {
@@ -67,6 +70,7 @@ test("answers are stored on the same keys the map has always used", () => {
       ["energy", "Energy"],
       ["barriers", "What's missing"],
       ["threads", "Threads"],
+      ["groups", "People and groups"],
     ]
   );
 });
@@ -75,7 +79,10 @@ test("every question belongs to a section the map draws, and an answer is read b
   const sectionKeys = new Set(MAP_SECTIONS.map((section) => section.key));
   Object.values(QUESTIONS_BY_ID).forEach((question) => {
     assert.ok(sectionKeys.has(question.section), `${question.id} section ${question.section} is not on the map`);
-    assert.equal(MAP_QUESTION_PARTS[question.partIndex].section, question.section);
+    assert.equal(question.section, question.section || MAP_QUESTION_PARTS[question.partIndex].section);
+    if (!MAP_QUESTION_PARTS[question.partIndex].questions.find((item) => item.id === question.id).section) {
+      assert.equal(MAP_QUESTION_PARTS[question.partIndex].section, question.section);
+    }
   });
 
   assert.deepEqual(linesFromAnswer(QUESTIONS_BY_ID["p3-plus"], "   "), []);

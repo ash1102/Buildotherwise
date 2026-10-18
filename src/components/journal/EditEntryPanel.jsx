@@ -20,7 +20,7 @@ export default function EditEntryPanel({ entry, onSave, onCancel }) {
         className="mt-3 border-natural bg-ivory/40 text-[14px] leading-relaxed"
       />
       <p className="mt-3 text-[13px] leading-relaxed text-ink-soft">
-        Keep the earlier wording beside this one, or replace it in place. Either way it stays in this browser.
+        Keep the earlier wording beside this one, or replace it in place. Either way it stays in your journal.
       </p>
       <div className="mt-3">
         <DictateButton value={text} onText={setText} />

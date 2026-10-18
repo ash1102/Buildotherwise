@@ -8,6 +8,7 @@ const SECTION_DOT = {
   energy: "bg-accent-soft",
   barriers: "bg-muted-foreground",
   threads: "bg-primary-soft",
+  groups: "bg-accent-ink/50",
 };
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));

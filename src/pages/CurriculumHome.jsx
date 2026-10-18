@@ -1,13 +1,14 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowUpRight, BookOpen, Compass, Map } from "lucide-react";
+import { ArrowRight, BookOpen, Compass, Map } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
 import { useWorkbook } from "@/lib/workbook";
 import { useAuth } from "@/lib/AuthContext";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import { isWorkbookLesson } from "@/lib/curriculum";
 import WorkbookGate from "@/components/WorkbookGate";
-import { buildProgress, stepComplete } from "@/lib/progress";
+import { stepComplete } from "@/lib/progress";
+import { formatOpenDate, usePacedProgress } from "@/lib/pacing";
 
 const INTEREST_FORM = "https://link.jotform.com/EhQXbmRwbk";
 
@@ -21,7 +22,11 @@ const STEPS = [
 ];
 
 const FACTS = [
-  { title: "Private", dot: "#E9A23B", line: "Your writing stays on your device. You share only what you choose." },
+  {
+    title: "Private",
+    dot: "#E9A23B",
+    line: "What you write is saved to your account. Only you can open it in the app, and sharing is always your choice.",
+  },
   { title: "No pressure", dot: "#B48CD0", line: "No grades, scores or streaks. Stopping or pausing counts as an answer." },
   {
     title: "Honest",
@@ -145,16 +150,16 @@ function PublicHome() {
             </svg>
           </div>
           <div>
-            <p className="k">Pilot 1 · from Build Otherwise</p>
+            <p className="k">Pilot 1 · online · from Build Otherwise</p>
             <h1>
               Want something different but <em>can’t name it yet?</em>
             </h1>
             <p>Start with one small thing you can try. No plan, passion or business idea needed.</p>
             <div className="acts">
-              <a className="btn" href={INTEREST_FORM} target="_blank" rel="noopener noreferrer">
-                Join the Pilot 1 list
-                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-              </a>
+              <Link className="btn" to="/getting-started">
+                Start now
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
               <a className="txt" href="#how">
                 See how it works
               </a>
@@ -231,12 +236,21 @@ function PublicHome() {
         </svg>
         <div className="w">
           <h2>Want in on Pilot 1?</h2>
-          <p>Joining the list isn’t enrolling. You’ll hear from us when it opens.</p>
-          <a className="btn" href={INTEREST_FORM} target="_blank" rel="noopener noreferrer">
-            Join the Pilot 1 list
-            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-          </a>
-          <small>Researcher, educator or community partner? Use the same form and pick the partner option.</small>
+          <p>
+            Pilot 1 is online and open now. Begin whenever you like, and join the list if you want updates.
+          </p>
+          <div className="acts">
+            <Link className="btn" to="/getting-started">
+              Start now
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+            <a className="txt" href={INTEREST_FORM} target="_blank" rel="noopener noreferrer">
+              Join the list for updates
+            </a>
+          </div>
+          <small>
+            Researcher, educator or community partner? Use the same list form and pick the partner or advisor option.
+          </small>
         </div>
       </section>
     </div>
@@ -248,10 +262,7 @@ function MemberHome() {
   const { modules, lessonsByOrder, orderedLessons, loading } = useCurriculum();
   const { answers, states } = useWorkbook();
 
-  const progress = useMemo(
-    () => buildProgress({ modules, lessonsByOrder, answers, states }),
-    [modules, lessonsByOrder, answers, states]
-  );
+  const progress = usePacedProgress({ modules, lessonsByOrder, answers, states });
 
   /** The workbook starts at Module 1. Getting Started is already finished by the time this shows. */
   const next = useMemo(() => {
@@ -262,6 +273,10 @@ function MemberHome() {
   const liveModules = modules.filter((module) => module.status === "live" && module.kind !== "orientation");
   const nextModule = next ? modules.find((module) => module.order === next.module_order) : null;
   const nextLabel = nextModule ? `Module ${nextModule.order}` : "";
+  /** The next step sits in a module that opens later this week. */
+  const nextRow = nextModule ? progress.byOrder[nextModule.order] : null;
+  const waitingWeek = Boolean(nextRow && nextRow.lockReason === "week");
+  const waitingDate = waitingWeek ? formatOpenDate(nextRow.opensAt) : "";
 
   return (
     <div className="space-y-10">
@@ -269,6 +284,24 @@ function MemberHome() {
         <p className="workbook-label">{started ? "Welcome back" : "Welcome"}</p>
         {loading ? (
           <div aria-busy="true" className="mt-3 h-[140px] animate-pulse rounded-2xl bg-border/60" />
+        ) : next && waitingWeek ? (
+          <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
+            <p className="text-[13px] font-semibold text-primary-soft">
+              {waitingDate ? `${nextLabel} opens ${waitingDate}` : `${nextLabel} opens next week`}
+            </p>
+            <h1 className="mt-1.5 text-[clamp(1.5rem,1.1rem+1.6vw,2.1rem)] text-primary-foreground">
+              You’re caught up for this week.
+            </h1>
+            <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">
+              One new module opens each week, so there is room for what you noticed or planned to happen out in your
+              life. Nothing is overdue.
+              Everything already open stays open: your journal, your Life Map, and every step you have done.
+            </p>
+            <Link to="/journal" className={`mt-5 ${marigoldButton}`}>
+              Open your journal
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
         ) : next ? (
           <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
             <p className="text-[13px] font-semibold text-primary-soft">
@@ -309,7 +342,7 @@ function MemberHome() {
           <Link to="/map" className="rounded-xl border border-border bg-card p-4 transition hover:bg-secondary">
             <Map className="h-5 w-5 text-accent-ink" aria-hidden="true" />
             <span className="mt-2 block font-semibold">Your Life Map</span>
-            <span className="block text-[15px] text-muted-foreground">Places, activities, energy, barriers, threads.</span>
+            <span className="block text-[15px] text-muted-foreground">Places, activities, energy, barriers, threads, people and groups.</span>
           </Link>
           <Link to="/aspects" className="rounded-xl border border-border bg-card p-4 transition hover:bg-secondary">
             <Compass className="h-5 w-5 text-accent-ink" aria-hidden="true" />
@@ -342,6 +375,10 @@ function MemberHome() {
                       <span className="block h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
                     </span>
                   </span>
+                ) : row.lockReason === "week" ? (
+                  <span className="shrink-0 text-[13px] text-muted-faint">
+                    {row.opensAt ? `Opens ${formatOpenDate(row.opensAt)}` : "Opens next week"}
+                  </span>
                 ) : (
                   <span className="shrink-0 text-[13px] text-muted-faint">Not open yet</span>
                 )}
@@ -366,8 +403,14 @@ function MemberHome() {
           })}
         </ol>
         <p className="mt-3 text-[14px] leading-relaxed text-muted-faint">
-          Modules open one at a time, once every step before them holds a saved line. Modules 6–10 are still being built.
+          One new module opens each week, once every step before it holds a saved line. The aim is to keep the
+          workbook to about 2–3 hours a week. Modules 6–10 are still being built.
         </p>
+        {progress.pacingSkipped ? (
+          <p className="mt-2 text-[13px] leading-relaxed text-muted-faint">
+            Admin view: weekly pacing is skipped for you so every module stays open for review. Participants see it.
+          </p>
+        ) : null}
       </section>
 
       <PrivacyNote />

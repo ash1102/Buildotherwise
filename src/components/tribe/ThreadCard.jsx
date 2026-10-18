@@ -24,7 +24,7 @@ export default function ThreadCard({ thread, moduleLabel, replies, user, onChang
       {open ? (
         <>
           <ReplyForm thread={thread} user={user} onPosted={onChanged} />
-          <ReplyList replies={replies} user={user} onDeleted={onChanged} />
+          <ReplyList replies={replies} thread={thread} user={user} onDeleted={onChanged} />
         </>
       ) : (
         <p className="mt-4 rounded-lg border border-dashed border-input bg-card p-4 text-[16px] leading-relaxed text-muted-foreground">

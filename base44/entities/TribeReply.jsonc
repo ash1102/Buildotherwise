@@ -20,6 +20,10 @@
     "body": {
       "type": "string",
       "description": "What the person chose to post. Never copied from a private journal entry."
+    },
+    "parent_reply_id": {
+      "type": "string",
+      "description": "Optional ID of another reply in the same thread, allowing direct conversational responses."
     }
   },
   "required": [

@@ -59,11 +59,11 @@ export const NEXT_DECISION_LABELS = [
   "Pause",
   "Stop",
   "Another direction",
-  "Continue looking",
+  "Keep looking",
   "I don't know yet",
 ];
 
-export const CONTINUE_LOOKING = "Continue looking";
+export const CONTINUE_LOOKING = "Keep looking";
 
 /** Pilot split from the build brief. */
 export const PILOT_ONE = "Pilot 1";

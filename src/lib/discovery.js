@@ -4,8 +4,8 @@
  */
 export const DISCOVERY_SOURCES = {
   "M1-L1#0": { section: "curiosity", label: "What my attention returned to" },
-  "M1-L2#2": { section: "curiosity", label: "The sign I said I would watch" },
-  "M1-L2#4": { section: "conditions", label: "Conditions that might shape the pattern" },
+  "M1-L2#0": { section: "curiosity", label: "The sign I said I would watch" },
+  "M1-L2#1": { section: "conditions", label: "Conditions that might shape the pattern" },
   "M2-L1#0": { section: "try_plan", label: "The question this try is for" },
   "M2-L1#1": { section: "try_plan", label: "Smallest real action" },
   "M2-L1#2": { section: "try_plan", label: "Balance condition" },
@@ -13,11 +13,10 @@ export const DISCOVERY_SOURCES = {
   "M2-L1#4": { section: "try_plan", label: "Support" },
   "M2-L1#5": { section: "try_plan", label: "Stop or pause rule" },
   "M2-L2#1": { section: "observed", label: "What I actually did, or did not do" },
-  "M2-L2#4": { section: "observed", label: "The story I could easily add" },
-  "M2-L2#5": { section: "observed", label: "Evidence that complicates that story" },
-  "M2-L2#2": { section: "conditions", label: "A condition or barrier that mattered" },
-  "M2-L2#3": { section: "cost", label: "What it cost" },
-  "M2-L2#6": { section: "unknown", label: "Still unknown" },
+  "M2-L2#2": { section: "observed", label: "What frustrated or bored me" },
+  "M2-L2#3": { section: "conditions", label: "What helped" },
+  "M2-L2#4": { section: "cost", label: "What it cost" },
+  "M2-L2#6": { section: "unknown", label: "Still unknown, or what contradicts my first impression" },
   "M2-L3#0": { section: "observed", label: "What changed from expectation" },
   "M2-L3#1": { section: "observed", label: "Evidence that supports or complicates" },
   "M2-L3#2": { section: "observed", label: "Conditions and after-effects" },
@@ -25,12 +24,12 @@ export const DISCOVERY_SOURCES = {
   "M2-L3#4": { section: "decide_next", label: "Next action and review point" },
   "M3-L2#0": { section: "conditions", label: "Condition changed" },
   "M3-L2#1": { section: "conditions", label: "What stayed similar" },
-  "M3-L3#2": { section: "cost", label: "What it cost" },
+  "M3-L3#3": { section: "cost", label: "What it cost" },
   "M4-L3#4": { section: "revised", label: "More accurate wording now" },
-  "M5-L3#4": { section: "close", label: "One piece of evidence kept" },
-  "M5-L3#5": { section: "close", label: "One thing worth keeping" },
-  "M5-L3#6": { section: "close", label: "One support that mattered" },
-  "M5-L3#7": { section: "close", label: "One question for later" },
+  "M5-L3#5": { section: "close", label: "One piece of evidence kept" },
+  "M5-L3#6": { section: "close", label: "One thing worth keeping" },
+  "M5-L3#7": { section: "close", label: "One support that mattered" },
+  "M5-L3#8": { section: "close", label: "One question for later" },
 };
 
 /**
@@ -46,14 +45,14 @@ export const GROUP_LABELS = {
   cost: "What it cost",
   revised: "Revised statements",
   decide_next: "Next action and review point",
-  close: "What you are keeping from Pilot 1",
+  close: "What you are keeping from Modules 1–5",
 };
 
 /** The named try-log fields the curriculum's own build notes specify. */
 export const TRY_LOG_FIELDS = [
   { key: "disc_try_question", source: "M2-L1#0", label: "What it should teach" },
-  { key: "disc_try_enjoy", source: "M2-L3#5", label: "Enjoyment (1-7 or words)" },
-  { key: "disc_try_progress", source: "M2-L3#6", label: "Goal or accomplishment" },
+  // Enjoyment and goal ratings were pointed at M2-L3 boxes that ask other questions.
+  // No step asks for those ratings right now, so they are left out until one does.
 ];
 
 export function entriesFromAnswers(answers = {}) {

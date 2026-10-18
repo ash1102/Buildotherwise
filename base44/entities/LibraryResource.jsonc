@@ -23,11 +23,35 @@
       "type": "number"
     },
     "full_text_uri": {
-      "description": "Private storage reference for a long research brief's full text. Opened through a short-lived signed link when someone chooses to read it, never fetched with the shelf.",
+      "description": "Private storage reference for a long research brief's full text. Opened through a short-lived signed link when someone chooses to read it, never fetched with the shelf. Admin-only.",
+      "rls": {
+        "read": {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        "write": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      },
       "type": "string"
     },
     "internal_notes": {
       "description": "Facilitator-only. Never rendered to participants.",
+      "rls": {
+        "read": {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        "write": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      },
       "type": "string"
     },
     "kind": {
@@ -104,15 +128,8 @@
     "title",
     "kind"
   ],
-  "type": "object",
   "rls": {
-    "read": {},
     "create": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "update": {
       "user_condition": {
         "role": "admin"
       }
@@ -121,6 +138,26 @@
       "user_condition": {
         "role": "admin"
       }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
     }
-  }
+  },
+  "type": "object"
 }

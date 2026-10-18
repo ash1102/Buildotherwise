@@ -16,8 +16,8 @@ export default function AspectIndex() {
           Seven aspects, each with its own page.
         </h1>
         <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-ink-soft">
-          This is the workbook described from the inside: what it is made of, and how each part behaves. Every page has
-          something you can actually handle rather than a paragraph about it.
+          This is the workbook described from the inside: what it is made of, and how each part behaves. Each page says
+          plainly what works today and what is still being built.
         </p>
       </section>
 
@@ -45,7 +45,7 @@ export default function AspectIndex() {
       <section className="rounded-lg border border-dashed border-teal-deep/40 bg-white/60 p-6">
         <p className="workbook-label">What stays the same</p>
         <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-ink-soft">
-          Whatever you try on these pages, nothing leaves this browser on its own. Pausing and stopping are complete
+          The demonstrations on these pages save nothing to your account. Pausing and stopping are complete
           answers here too.
         </p>
       </section>

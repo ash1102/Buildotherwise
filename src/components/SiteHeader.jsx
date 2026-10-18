@@ -10,18 +10,25 @@ const LINKS = [
   { to: "/map", label: "Life Map" },
   { to: "/discovery-map", label: "Discovery Map" },
   { to: "/record", label: "Discovery Record" },
+  { to: "/my-records", label: "My Records" },
   { to: "/program-library", label: "Library" },
   { to: "/tribe-threads", label: "Tribe Threads" },
   { to: "/aspects", label: "Aspects" },
   { to: "/about", label: "About" },
+  { to: "/mission", label: "Mission" },
+  { to: "/programs", label: "Programs" },
+  { to: "/get-involved", label: "Get involved" },
   { to: "/contact", label: "Contact" },
 ];
 
-/** What someone can reach before logging in: the welcome, Getting Started, and the two pages about the program. */
+/** What someone can reach before logging in: the welcome, Getting Started, and the pages about the program and Build Otherwise. */
 const PUBLIC_LINKS = [
   { to: "/", label: "Home", end: true },
   { to: "/getting-started", label: "Getting Started" },
   { to: "/about", label: "About" },
+  { to: "/mission", label: "Mission" },
+  { to: "/programs", label: "Programs" },
+  { to: "/get-involved", label: "Get involved" },
   { to: "/contact", label: "Contact" },
 ];
 
@@ -156,8 +163,8 @@ export default function SiteHeader() {
                 <li>
                   <button
                     type="button"
-                    onClick={() => {
-                      logout(false);
+                    onClick={async () => {
+                      await logout(false);
                       window.location.href = "/";
                     }}
                     className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-[15px] text-muted-foreground transition hover:bg-secondary hover:text-foreground"

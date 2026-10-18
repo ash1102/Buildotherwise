@@ -12,8 +12,10 @@ import GettingStartedPage from '@/pages/GettingStartedPage';
 import ModulePage from '@/pages/ModulePage';
 import LessonPage from '@/pages/LessonPage';
 import JournalPage from '@/pages/JournalPage';
+import JournalReflection from '@/pages/JournalReflection';
 import LifeMapPage from '@/pages/LifeMapPage';
 import DiscoveryRecordPage from '@/pages/DiscoveryRecordPage';
+import MyRecordsPage from '@/pages/MyRecordsPage';
 import ProgramLibrary from '@/pages/ProgramLibrary';
 import TribeThreads from '@/pages/TribeThreads';
 import AspectIndex from '@/pages/AspectIndex';
@@ -28,6 +30,9 @@ import OAuthConsent from '@/pages/OAuthConsent';
 import About from '@/pages/About';
 import Contact from '@/pages/Contact';
 import Connect from '@/pages/Connect';
+import Mission from '@/pages/Mission';
+import Programs from '@/pages/Programs';
+import GetInvolved from '@/pages/GetInvolved';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import LoginRedirect from '@/components/LoginRedirect';
 import PreviewHome from '@/pages/preview/PreviewHome';
@@ -81,26 +86,31 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<CurriculumHome />} />
-        <Route path="/getting-started" element={<GettingStartedPage />} />
-        <Route path="/module/getting-started" element={<Navigate to="/getting-started" replace />} />
-        {/* Modules check Getting Started first, then the account. The five steps stay on their own page. */}
-        <Route path="/module/:slug" element={<ModulePage />} />
+        {/* Lessons and modules are readable only when signed in, so every workbook page needs an account. */}
         <Route element={<ProtectedRoute unauthenticatedElement={<LoginRedirect />} />}>
+          <Route path="/" element={<CurriculumHome />} />
+          <Route path="/getting-started" element={<GettingStartedPage />} />
+          <Route path="/module/getting-started" element={<Navigate to="/getting-started" replace />} />
+          <Route path="/module/:slug" element={<ModulePage />} />
+          <Route path="/lesson/:code" element={<LessonPage />} />
           <Route path="/journal" element={<JournalPage />} />
+          <Route path="/journal/reflect" element={<JournalReflection />} />
           <Route path="/map" element={<LifeMapPage />} />
           <Route path="/discovery-map" element={<DiscoveryMapPage />} />
           <Route path="/record" element={<DiscoveryRecordPage />} />
+          <Route path="/my-records" element={<MyRecordsPage />} />
           <Route path="/program-library" element={<ProgramLibrary />} />
           <Route path="/tribe-threads" element={<TribeThreads />} />
         <Route path="/aspects" element={<AspectIndex />} />
           <Route path="/aspect/:slug" element={<AspectPage />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
-        <Route path="/lesson/:code" element={<LessonPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/connect" element={<Connect />} />
+        <Route path="/mission" element={<Mission />} />
+        <Route path="/programs" element={<Programs />} />
+        <Route path="/get-involved" element={<GetInvolved />} />
         <Route element={<AdminOnly />}>
           <Route path="/preview" element={<PreviewHome />} />
           <Route path="/preview/module/:slug" element={<PreviewModulePage />} />

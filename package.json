@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "test:life-map": "node --import ./scripts/register-js-extension.mjs --test src/lib/lifeMap.placement.test.js",
+    "test:gate": "node --import ./scripts/register-js-extension.mjs --test src/lib/postAuthPath.test.js",
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
@@ -14,7 +15,7 @@
   },
   "dependencies": {
     "@base44/sdk": "^0.8.54",
-    "@base44/vite-plugin": "^1.0.46",
+    "@base44/vite-plugin": "^1.0.47",
     "@hello-pangea/dnd": "^17.0.0",
     "@hookform/resolvers": "^4.1.2",
     "@radix-ui/react-accordion": "^1.2.3",

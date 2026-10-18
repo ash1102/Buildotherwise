@@ -218,7 +218,7 @@ export default function LifeMapPage() {
             {asList ? "Show as a map" : "Show as a list"}
           </Button>
           <PrivacyNote>
-            {total ? `${total} ${total === 1 ? "line" : "lines"} on this map, saved on this device only.` : "Saved on this device only."}
+            {total ? `${total} ${total === 1 ? "line" : "lines"} on this map, saved to your account.` : "Saved to your account."}
           </PrivacyNote>
         </div>
       </header>
@@ -300,7 +300,7 @@ export default function LifeMapPage() {
 
       <div>
         <PrivacyNote>
-          The map is drawn from lines on this device and the links you choose. Downloading or printing it is yours to do.
+          The map is drawn from your saved lines and the links you choose. Downloading or printing it is yours to do.
         </PrivacyNote>
       </div>
 

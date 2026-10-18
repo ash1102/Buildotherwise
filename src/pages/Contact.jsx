@@ -92,7 +92,7 @@ export default function Contact() {
         <p className="mt-2 text-[16px] leading-relaxed text-muted-foreground">
           Entrepalooza is an educational workbook, not therapy or treatment, and this form is not monitored around the
           clock. If you are in crisis or need clinical support, please contact your local emergency services or a
-          qualified professional rather than this form.
+          qualified professional rather than this form. In the US, you can call or text 988 any time.
         </p>
       </div>
     </article>

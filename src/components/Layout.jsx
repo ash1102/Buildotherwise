@@ -26,6 +26,15 @@ export default function Layout() {
               <Link to="/about" className="font-medium text-accent-ink underline underline-offset-2">
                 About Entrepalooza
               </Link>
+              <Link to="/mission" className="font-medium text-accent-ink underline underline-offset-2">
+                Mission
+              </Link>
+              <Link to="/programs" className="font-medium text-accent-ink underline underline-offset-2">
+                Programs
+              </Link>
+              <Link to="/get-involved" className="font-medium text-accent-ink underline underline-offset-2">
+                Get involved
+              </Link>
               <Link to="/contact" className="font-medium text-accent-ink underline underline-offset-2">
                 Contact Ashley
               </Link>
@@ -34,14 +43,14 @@ export default function Layout() {
             <p className="mt-2">
               {preview
                 ? "Preview answers are saved to your account when you choose save."
-                : "Your workbook and journal stay on this device."}{" "}
+                : "Your workbook and journal are saved to your account. Only you can open them in the app."}{" "}
               Messages and feedback go out only when you hit submit.
             </p>
             <p className="mt-2">
               Tribe Threads are group discussions on the workbook’s practices. Replies there are shared with your group,
               under your name, and only if you post one.
             </p>
-            <p className="mt-2">Pilot 1: Getting Started and Modules 1–5. © Build Otherwise.</p>
+            <p className="mt-2">Pilot 1: Getting Started and Modules 1–10. © Build Otherwise.</p>
           </div>
         </footer>
 

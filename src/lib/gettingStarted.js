@@ -10,6 +10,8 @@ import { readStore, useStore, writeStore } from "./store";
 
 export {
   GS_CODES,
+  OPTIONAL_GS_CODES,
+  isOptionalGettingStartedLesson,
   isGettingStartedLesson,
   gettingStartedSteps,
   gettingStartedStepDone,
