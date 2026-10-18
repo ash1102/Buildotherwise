@@ -16,6 +16,7 @@ import {
   exploreLines,
   layoutGraph,
   linesFromAnswer,
+  mapWithoutLine,
   settleLines,
 } from "./lifeMap.js";
 
@@ -224,6 +225,17 @@ test("part 6 answers are read from the pick store and blank fields stay off the 
     },
   ]);
   assert.deepEqual(exploreLines({}), []);
+});
+
+test("removing a line drops it and the links that pointed at it", () => {
+  const map = {
+    threads: [{ id: "a", text: "test thread", links: ["b"] }],
+    places: [{ id: "b", text: "the gym", links: ["a", "c"] }, { id: "c", text: "work", links: [] }],
+  };
+  const next = mapWithoutLine(map, "threads", "a");
+  assert.deepEqual(next.threads, []);
+  assert.deepEqual(next.places[0].links, ["c"]);
+  assert.equal(next.places[1].id, "c");
 });
 
 test("a line someone already moved stays where they put it", () => {

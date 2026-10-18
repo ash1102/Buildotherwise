@@ -57,14 +57,25 @@ export default function LifeMapNodePanel({
           <p className="workbook-label">{section ? section.label : "On the map"}</p>
           <h3 className="mt-1.5 font-heading text-lg">{label || text || "Not written yet"}</h3>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close this line"
-          className="shrink-0 text-muted-faint transition hover:text-primary"
-        >
-          <X className="h-4 w-4" />
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={onRemove}
+            aria-label="Remove this line from the map"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-[13px] text-foreground transition hover:border-destructive hover:text-destructive"
+          >
+            <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+            Remove
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close this line"
+            className="text-muted-faint transition hover:text-primary"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -219,14 +230,6 @@ export default function LifeMapNodePanel({
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={onRemove}
-        className="mt-5 inline-flex items-center gap-2 text-[12.5px] text-muted-faint transition hover:text-destructive"
-      >
-        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-        Remove this line from the map
-      </button>
     </section>
   );
 }
