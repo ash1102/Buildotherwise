@@ -8,6 +8,7 @@ import { LogIn, Mail, Lock, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
 import { safeReturnTo } from "@/lib/authReturnTo";
+import { destinationAfterAuth } from "@/lib/destinationAfterAuth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -23,8 +24,8 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      await base44.auth.loginViaEmailPassword(email, password);
-      window.location.href = returnTo;
+      const result = await base44.auth.loginViaEmailPassword(email, password);
+      window.location.href = await destinationAfterAuth(result?.user, returnTo);
     } catch (err) {
       setError(err.message || "Invalid email or password");
     } finally {
@@ -50,6 +51,10 @@ export default function Login() {
           >
             Create one
           </Link>
+          <span className="mt-3 block text-[13px] leading-relaxed text-muted-foreground">
+            Why an account? It opens your journal, the workbook modules and group threads, and it keeps what you
+            write, so it is there on any device. Only you can open it in the app. Sharing anything is a separate choice.
+          </span>
         </>
       }
     >

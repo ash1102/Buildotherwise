@@ -1,10 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import useCurriculum from "@/hooks/useCurriculum";
 import { groupBy, loadTribeReplies, loadTribeThreads, moduleTitle, subscribeTribeReplies } from "@/lib/library";
 import ThreadCard from "@/components/tribe/ThreadCard";
 
 export default function TribeThreads() {
+  const [searchParams] = useSearchParams();
+  const linkedLesson = searchParams.get("lesson");
   const { modules, loading: curriculumLoading } = useCurriculum();
   const [threads, setThreads] = useState([]);
   const [replies, setReplies] = useState([]);
@@ -54,6 +57,12 @@ export default function TribeThreads() {
   const openOrders = [...new Set(openThreads.map((thread) => thread.module_order))].sort((a, b) => a - b);
   const busy = loading || curriculumLoading;
 
+  useEffect(() => {
+    if (busy || !linkedLesson) return;
+    const target = document.getElementById("lesson-thread");
+    if (target) target.scrollIntoView({ block: "start" });
+  }, [busy, linkedLesson]);
+
   return (
     <div className="space-y-8">
       <header className="border-b border-border pb-5">
@@ -67,6 +76,13 @@ export default function TribeThreads() {
         <p className="mt-3 max-w-[68ch] text-[16px] leading-relaxed text-muted-faint">
           Everyone in your group can read replies, and they are posted with your name. Your Conversation Journal is
           separate and stays private. Nothing from it is posted here. A reply only exists if you write one on this page.
+        </p>
+        <p className="mt-3 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
+          Before replying to someone, you may want to read{" "}
+          <Link to="/lesson/O.3" className="font-medium text-accent-ink underline underline-offset-2">
+            How we give feedback
+          </Link>
+          . It’s optional.
         </p>
       </header>
 
@@ -86,14 +102,15 @@ export default function TribeThreads() {
                 {openThreads
                   .filter((thread) => thread.module_order === order)
                   .map((thread) => (
-                    <ThreadCard
-                      key={thread.id}
-                      thread={thread}
-                      moduleLabel={thread.lesson_code ? `${thread.lesson_code}, peer practice` : "Peer practice"}
-                      replies={repliesByThread.get(thread.id) || []}
-                      user={user}
-                      onChanged={refreshReplies}
-                    />
+                    <div key={thread.id} id={thread.lesson_code === linkedLesson ? "lesson-thread" : undefined} className="scroll-mt-28">
+                      <ThreadCard
+                        thread={thread}
+                        moduleLabel={thread.lesson_code ? `${thread.lesson_code}, peer practice` : "Peer practice"}
+                        replies={repliesByThread.get(thread.id) || []}
+                        user={user}
+                        onChanged={refreshReplies}
+                      />
+                    </div>
                   ))}
               </div>
             </section>

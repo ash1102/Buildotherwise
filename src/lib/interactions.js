@@ -8,10 +8,12 @@
  * Types:
  *   tryPlanner  plan one small try by tapping, then save it as plain sentences
  *   tryCheckIn  say what happened after the try; planCode names the step that held the plan
+ *   noticeFlow  route pills swap the questions (own thread vs. garden example); replaces the step's generic prompt boxes
  */
 export const INTERACTIONS = {
-  "M2-L1": [{ type: "tryPlanner" }],
-  "M2-L2": [{ type: "tryCheckIn", planCode: "M2-L1" }],
+  "M1-L1": [{ type: "noticeFlow" }],
+  // Module 2 now uses the concise workbook prompts. The former interactive
+  // planner/check-in code remains available, but is not rendered twice.
 };
 
 export function interactionsFor(code) {

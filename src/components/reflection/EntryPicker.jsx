@@ -8,15 +8,15 @@ export default function EntryPicker({ entries, selectedIds, onToggle, onBring, b
 
   return (
     <section className="workbook-card p-5">
-      <p className="workbook-label">Your entries in this browser</p>
+      <p className="workbook-label">Your journal entries</p>
       <p className="mt-2 text-[13px] leading-relaxed text-ink-soft">
-        Choose what you want reflected on. Nothing leaves this browser until you bring it in, and what you bring in becomes
+        Choose what you want reflected on. The reflection partner sees nothing until you bring it in, and what you bring in becomes
         part of this conversation.
       </p>
 
       {entries.length === 0 ? (
         <p className="mt-4 text-[13.5px] leading-relaxed text-ink-faint">
-          You have no saved entries in this browser yet. Write one in the Journal, then come back and choose it here.
+          You have no saved entries yet. Write one in the Journal, then come back and choose it here.
         </p>
       ) : (
         <ul className="mt-4 max-h-72 space-y-2 overflow-y-auto pr-1">

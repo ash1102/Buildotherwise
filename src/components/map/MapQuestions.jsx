@@ -30,6 +30,13 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
   const [pick, setPick] = useStore(MAP_PICK_KEY, {});
 
   const places = graph.nodes.filter((node) => node.question_id === "p1-places");
+  /** The lines a question can be about: places for aboutPlace, or the answers to the question named in `about`. */
+  const targetsFor = (question) =>
+    question.about
+      ? graph.nodes.filter((node) => node.question_id === question.about)
+      : question.aboutPlace
+        ? places
+        : [];
   const countFor = (questionId) => graph.nodes.filter((node) => node.question_id === questionId).length;
 
   useEffect(() => {
@@ -43,9 +50,10 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
   const add = (part, question) => {
     const lines = linesFromAnswer(question, drafts[question.id]);
     if (!lines.length) return 0;
-    const placeId = question.aboutPlace ? placeFor[question.id] : "";
+    const placeId = question.aboutPlace || question.about ? placeFor[question.id] : "";
+    const section = QUESTIONS_BY_ID[question.id].section || part.section;
     lines.forEach((text) =>
-      addLine(part.section, {
+      addLine(section, {
         text,
         question_id: question.id,
         source_label: question.text,
@@ -129,12 +137,16 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
           {part.examples ? (
             <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-muted-faint">Could include: {part.examples}</p>
           ) : null}
+          {part.note ? (
+            <p className="mt-2 max-w-2xl text-[13px] font-medium leading-relaxed text-accent-ink">{part.note}</p>
+          ) : null}
 
           <div className="mt-5 space-y-6">
             {part.questions.map((question) => {
               const count = countFor(question.id);
               const value = drafts[question.id] || "";
               const branch = QUESTIONS_BY_ID[question.id].branch;
+              const targets = targetsFor(question);
               return (
                 <div key={question.id}>
                   <label htmlFor={`mapq-${question.id}`} className="block text-[15px] font-medium text-foreground">
@@ -147,9 +159,9 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                     On the map: <span className="text-accent-ink">{branch}</span>.
                   </p>
 
-                  {question.aboutPlace && places.length ? (
+                  {(question.aboutPlace || question.about) && targets.length ? (
                     <select
-                      aria-label="Which place this answer is about (optional)"
+                      aria-label={`${question.aboutLabel || "Which place?"} (optional)`}
                       value={placeFor[question.id] || ""}
                       onChange={(event) => {
                         const next = event.target.value;
@@ -157,13 +169,39 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                       }}
                       className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-[13.5px] sm:w-72"
                     >
-                      <option value="">Which place? (optional)</option>
-                      {places.map((place) => (
+                      <option value="">{question.aboutLabel || "Which place?"} (optional)</option>
+                      {targets.map((place) => (
                         <option key={place.id} value={place.id}>
                           {place.label || place.text}
                         </option>
                       ))}
                     </select>
+                  ) : null}
+
+                  {question.chips ? (
+                    <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Quick answers">
+                      {question.chips.map((chip) => {
+                        const active = value.trim() === chip;
+                        return (
+                          <button
+                            key={chip}
+                            type="button"
+                            aria-pressed={active}
+                            onClick={() => {
+                              setDrafts((current) => ({ ...current, [question.id]: chip }));
+                              setAddedNote((current) => ({ ...current, [question.id]: "" }));
+                            }}
+                            className={`rounded-full border px-3 py-1 text-[13px] transition ${
+                              active
+                                ? "border-primary bg-primary-wash font-medium text-foreground"
+                                : "border-border bg-background text-muted-foreground hover:border-primary/50"
+                            }`}
+                          >
+                            {chip}
+                          </button>
+                        );
+                      })}
+                    </div>
                   ) : null}
 
                   <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-start">
@@ -243,7 +281,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                 <span className="block text-[13px] text-muted-faint">That counts as a complete answer. Your answer can change.</span>
               </span>
             </label>
-            <p className="text-[12.5px] text-muted-faint">Saved on this device as you type.</p>
+            <p className="text-[12.5px] text-muted-faint">Saved to your account as you type.</p>
           </div>
         </div>
       )}

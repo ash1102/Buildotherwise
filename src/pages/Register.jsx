@@ -10,6 +10,7 @@ import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
 import { toast } from "@/components/ui/use-toast";
 import { safeReturnTo } from "@/lib/authReturnTo";
+import { destinationAfterAuth } from "@/lib/destinationAfterAuth";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -46,7 +47,7 @@ export default function Register() {
       if (result?.access_token) {
         base44.auth.setToken(result.access_token);
       }
-      window.location.href = safeReturnTo();
+      window.location.href = await destinationAfterAuth(result?.user, safeReturnTo());
     } catch (err) {
       setError(err.message || "Invalid verification code");
     } finally {
@@ -129,7 +130,7 @@ export default function Register() {
     <AuthLayout
       icon={UserPlus}
       title="Create your account"
-      subtitle="What you write stays on your device unless you choose to share it."
+      subtitle="Your account keeps what you write, so it’s there on any device. Sharing is always your choice."
       footer={
         <>
           Already have an account?{" "}

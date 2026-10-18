@@ -120,7 +120,7 @@ export default function LifeMapNodePanel({
           </Button>
         ) : null}
         <p className="text-[12.5px] text-muted-faint">
-          {node.source_code ? "Corrections here change the map line, not the step answer." : "Saved in this browser."}
+          {node.source_code ? "Corrections here change the map line, not the step answer." : "Saved to your account."}
         </p>
       </div>
 
