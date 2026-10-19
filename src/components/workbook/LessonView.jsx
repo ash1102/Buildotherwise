@@ -188,7 +188,10 @@ function DiscoveryReviewNotes() {
     "What helped or made participation difficult?",
     "What did it take in time, money, energy, or support?",
   ];
-  const notes = questions.map((label, index) => ({ label, value: answers[answerKey("M2-L2", index)] }))
+  const notes = [
+    ...questions.map((label, index) => ({ label, value: answers[answerKey("M2-L2", index)] })),
+    ...["What kind of encounter did you actually have: reading, watching, a conversation, a visit, doing an activity yourself, or a combination? If you did not have an opportunity, record that.","At what point did your attention change? Was there a particular part you wanted to understand better?","How did the people, setting, instructions, or available support affect the experience? What remains uncertain?"].map((label, index) => ({ label, value: answers[answerKey("M2-L2", 11 + index)] }))
+  ]
     .filter((item) => String(item.value || "").trim());
   return (
     <div className="space-y-4">
