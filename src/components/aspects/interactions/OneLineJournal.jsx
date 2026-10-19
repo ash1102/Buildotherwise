@@ -4,7 +4,6 @@ import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { addEntry } from "@/lib/journal";
-import DictateButton from "@/components/workbook/DictateButton";
 
 export default function OneLineJournal() {
   const [body, setBody] = useState("");
@@ -38,7 +37,6 @@ export default function OneLineJournal() {
       />
 
       <div className="mt-3 flex flex-wrap items-center gap-4">
-        <DictateButton value={body} onText={setBody} />
         <Button onClick={save} disabled={!body.trim()} className="rounded-full">
           Save to your journal
         </Button>
