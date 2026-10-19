@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import moment from "moment";
 import { Trash2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function ReplyItem({ reply, thread, user, canDelete, onDeleted, onPosted, children }) {
   const [replying, setReplying] = useState(false);
@@ -52,7 +53,7 @@ export default function ReplyItem({ reply, thread, user, canDelete, onDeleted, o
       {replying ? (
         <div className="mt-3 space-y-2">
           <label className="block text-[14px] text-muted-foreground" htmlFor={`reply-to-${reply.id}`}>Responding to {reply.display_name || "participant"}. Your reply is visible to other workbook users.</label>
-          <textarea id={`reply-to-${reply.id}`} value={text} onChange={(e) => setText(e.target.value)} rows={3} className="w-full rounded-lg border border-input bg-card p-3 text-[16px] text-foreground" />
+          <Textarea id={`reply-to-${reply.id}`} value={text} onChange={(e) => setText(e.target.value)} rows={3} className="w-full rounded-lg border border-input bg-card p-3 text-[16px] text-foreground" />
           <button type="button" disabled={!text.trim() || saving} onClick={send} className="rounded-md bg-primary px-4 py-2 text-[15px] text-primary-foreground disabled:opacity-50">{saving ? "Posting…" : "Post response"}</button>
         </div>
       ) : null}
