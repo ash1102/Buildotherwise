@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import PromptField from "./PromptField";
 import { Chip, ChipGroup } from "./TryChips";
 import { setAnswer, useAnswers, answerKey } from "@/lib/workbook";
@@ -11,7 +12,7 @@ import { saveAnswer } from "@/lib/journal";
  * Module 1 preview blocks unless marked SUGGESTED.
  */
 
-const OWN_ROUTES = ["Something that caught my attention", "A thread from my Life Map"];
+const OWN_ROUTES = ["Something that caught my attention", "A thread from my Life Map", "Use something I noticed", "Bring a Life Map thread", "Explore something unfamiliar"];
 const EXAMPLE_ROUTES = ["The garden example", "I’m not sure yet", "I'm not sure yet"];
 
 const SORT_CATEGORIES = [
@@ -143,6 +144,10 @@ function ExampleQuestions({ lesson }) {
   );
 }
 
+function LinkToMap() {
+  return <Link to="/map" className="inline-block text-[15px] text-accent-ink underline underline-offset-2">Look back at your Life Map</Link>;
+}
+
 function OwnQuestions({ lesson, route }) {
   return (
     <section className="space-y-5" aria-label="Your own thread">
@@ -150,8 +155,11 @@ function OwnQuestions({ lesson, route }) {
         <p className="text-[17px] font-medium leading-snug text-foreground">
           What caught your attention, and what don’t you know yet?
         </p>
-        <p className="mt-1 text-[15px] text-muted-foreground">Jot down a few words for each part.</p>
+        <p className="mt-1 text-[15px] text-muted-foreground">Write privately, talk it through with someone you choose, or combine both. Take time to explain what you notice. “Nothing draws me in yet” is useful information too.</p>
       </div>
+      <PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index="time-energy" label="Looking at what takes up your time and energy, which things draw you in once you start, and which things do you mostly get through because they need doing?" route={route} variant="inline" />
+      <PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index="activity-parts" label="Within those activities, are there particular parts you pay more attention to?" route={route} variant="inline" />
+      <PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index="missing-experience" label="Is anything missing from your week that you’d like a chance to encounter?" route={route} variant="inline" />
       <PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index="own-caught" label="What caught your attention" route={route} variant="inline" />
       <PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index="own-dont-know" label="What I don’t know yet" route={route} variant="inline" />
     </section>
@@ -191,10 +199,17 @@ export default function NoticeFlow({ lesson, route }) {
 
   return (
     <div className="space-y-8">
+      <section className="space-y-3 rounded-xl border border-border bg-card p-4 sm:p-5" aria-label="From your Life Map to exploration">
+        <h3 className="text-[20px] font-semibold text-foreground">What can you do with your Life Map?</h3>
+        <p className="text-[16px] leading-relaxed text-foreground">Your map shows where your time and energy go right now. Time spent on something may reflect interest, responsibility, necessity, habit, or a mixture. You decide what your answers mean.</p>
+        <p className="text-[16px] leading-relaxed text-foreground">Look for parts that draw you in, things you mostly need to get through, and experiences you have not had access to. Something can matter to you and still take effort.</p>
+        <p className="text-[16px] leading-relaxed text-foreground">If nothing draws you in yet, that is a real finding. Module 2 offers possibilities to encounter. Here, you are reflecting and gathering questions; you do not need to choose or try an activity yet.</p>
+        <LinkToMap />
+      </section>
       {!current ? (
         // SUGGESTED wording (Claude), not from the build spec.
         <p className="text-[15px] leading-relaxed text-muted-foreground">
-          Pick how you want to start above and your questions will show here. You can also skip to the last question.
+          Pick how you want to start above and your questions will show here. You can begin with uncertainty, or skip to the last question.
         </p>
       ) : null}
 
