@@ -6,6 +6,7 @@ import { useStore } from "@/lib/store";
 import EnergyMarks from "./EnergyMarks";
 import {
   MAP_PICK_FIELDS,
+  MAP_CLOSING_QUESTIONS,
   MAP_PICK_KEY,
   MAP_QUESTION_PARTS,
   QUESTIONS_BY_ID,
@@ -15,12 +16,12 @@ import {
 
 const PICK_STEP = MAP_QUESTION_PARTS.length;
 const TOTAL = PICK_STEP + 1;
-const STEP_TITLES = [...MAP_QUESTION_PARTS.map((item) => item.title), "Pick one thing worth exploring"];
+const STEP_TITLES = [...MAP_QUESTION_PARTS.map((item) => item.title), "Look over your map and choose whether to explore"];
 
 /**
  * The questions that build the map, one Part at a time. Each answer becomes a line on
- * the branch of the question it answers. Moving on never loses what was typed: any
- * answer still in a box is added to the map first. Nothing has to be answered.
+ * the branch the participant chooses. Navigation keeps drafts without submitting.
+ * Nothing has to be answered.
  */
 export default function MapQuestions({ graph, step, onStep, onShowMap }) {
   const cardRef = useRef(null);
@@ -28,6 +29,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
   const [drafts, setDrafts] = useState({});
   const [placeFor, setPlaceFor] = useState({});
   const [addedNote, setAddedNote] = useState({});
+  const [connections, setConnections] = useState({});
   const [pick, setPick] = useStore(MAP_PICK_KEY, {});
 
   const places = graph.nodes.filter((node) => node.question_id === "p1-places");
@@ -35,9 +37,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
   const targetsFor = (question) => {
     if (question.about) return graph.nodes.filter((node) => node.question_id === question.about);
     if (question.aboutPlace) return places;
-    if (/^p[345]-/.test(question.id)) return graph.nodes.filter((node) =>
-      ["places", "placeless", "groups"].includes(node.section) && node.question_id !== "p1-how"
-    );
+    if (/^p[345]-/.test(question.id)) return graph.nodes;
     return [];
   };
   const countFor = (questionId) => graph.nodes.filter((node) => node.question_id === questionId).length;
@@ -61,40 +61,28 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
         text,
         question_id: question.id,
         source_label: question.text,
-        links: placeId ? [placeId] : [],
+        links: [...new Set([...(placeId ? [placeId] : []), ...(connections[question.id] || [])])],
         parent_id: placeId || "",
-        parent_choice: selectedParent === "__separate" ? "standalone" : placeId ? "chosen" : "",
+        parent_choice: placeId ? "chosen" : "standalone",
+        branch_group: section === "barriers" && !placeId ? "barriers" : "",
       })
     );
     setDrafts((current) => ({ ...current, [question.id]: "" }));
     const added = lines.length === 1 ? "1 line" : `${lines.length} lines`;
     setAddedNote((current) => ({
       ...current,
-      [question.id]: `Added ${added} to “${QUESTIONS_BY_ID[question.id].branch}”.`,
+      [question.id]: `Added ${added}${placeId ? " beneath “" + (graph.nodes.find(node => node.id === placeId)?.label || graph.nodes.find(node => node.id === placeId)?.text || "your selected entry") + "”" : " as a separate entry"}.`,
     }));
     return lines.length;
   };
 
-  /** Anything still typed in this Part goes onto the map before moving on. */
-  const flush = () => {
-    const part = step < PICK_STEP ? MAP_QUESTION_PARTS[step] : null;
-    if (!part) return;
-    part.questions.forEach((question) => add(part, question));
+  // Navigation never submits tentative answers. Drafts stay in this mounted guide.
+  const go = (next) => onStep(Math.max(0, Math.min(PICK_STEP, next)));
+  const part = step < PICK_STEP ? MAP_QUESTION_PARTS[step] : {
+    title: "Optional closing reflections", intro: "You can leave things as they are, leave a question open, or choose to explore. No decision is required.",
+    section: "threads", questions: MAP_CLOSING_QUESTIONS
   };
-
-  const go = (next) => {
-    const currentPart = step < PICK_STEP ? MAP_QUESTION_PARTS[step] : null;
-    const missing = currentPart?.questions.find((question) => String(drafts[question.id] || "").trim() && needsContext(question) && targetsFor(question).length && !placeFor[question.id]);
-    if (missing) {
-      setAddedNote((current) => ({ ...current, [missing.id]: "Choose which earlier entry this describes, or keep it as a separate answer." }));
-      return;
-    }
-    flush();
-    onStep(Math.max(0, Math.min(PICK_STEP, next)));
-  };
-
-  const part = step < PICK_STEP ? MAP_QUESTION_PARTS[step] : null;
-  const pending = part ? part.questions.some((question) => String(drafts[question.id] || "").trim()) : false;
+  const pending = part.questions.some(question => String(drafts[question.id] || "").trim());
 
   return (
     <section
@@ -140,10 +128,10 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
         ))}
       </ol>
 
-      {part ? (
+      {(
         <div className="mt-6">
           <h3 className="font-heading text-xl">
-            Part {step + 1}: {part.title}
+            {step < PICK_STEP ? `Part ${step + 1}: ` : ""}{part.title}
           </h3>
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted-foreground">{part.intro}</p>
           {part.examples ? (
@@ -168,7 +156,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                     {question.list
                       ? "List as many as fit, separated by commas or new lines. Each one becomes its own line on the map."
                       : "One answer at a time. It shows up on the map under this question."}{" "}
-                    It can unfold beneath an earlier entry, or stay separate.
+                    Choose Add to map when ready. Moving between parts keeps your draft without adding it.
                   </p>
 
                   {needsContext(question) && targets.length ? (
@@ -181,7 +169,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                       }}
                       className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-[13.5px] sm:w-72"
                     >
-                      <option value="">Which earlier entry does this describe?</option>
+                      <option value="">Keep separate, or choose an entry…</option>
                       <option value="__separate">Keep this as a separate answer</option>
                       {targets.map((place) => (
                         <option key={place.id} value={place.id}>
@@ -194,6 +182,22 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                   {placeFor[question.id] && placeFor[question.id] !== "__separate" ? <p className="mt-2 rounded-md bg-secondary p-3 text-[15px]">
                     Answering about: <strong>{targets.find((node) => node.id === placeFor[question.id])?.text || "the entry you selected"}</strong>
                   </p> : null}
+
+                  {/^p5-/.test(question.id) && graph.nodes.length > 0 ? (
+                    <details className="mt-3">
+                      <summary className="cursor-pointer text-[13px]">Connect this observation to more entries (optional)</summary>
+                      <p className="mt-2 text-[13px]">Choose only connections you see. Selecting entries does not establish a pattern or its cause.</p>
+                      <div className="mt-2 max-h-48 space-y-2 overflow-auto">
+                        {graph.nodes.map(node => <label key={node.id} className="flex items-start gap-2 text-[14px]">
+                          <input type="checkbox" checked={(connections[question.id] || []).includes(node.id)}
+                            onChange={event => { const checked = event.target.checked; setConnections(current => ({
+                              ...current, [question.id]: checked ? [...(current[question.id] || []), node.id] : (current[question.id] || []).filter(id => id !== node.id)
+                            })); }} />
+                          {node.label || node.text}
+                        </label>)}
+                      </div>
+                    </details>
+                  ) : null}
 
                   {question.chips ? (
                     <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Quick answers">
@@ -236,7 +240,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                     <Button
                       type="button"
                       onClick={() => add(part, question)}
-                      disabled={!value.trim() || (needsContext(question) && targets.length > 0 && !placeFor[question.id])}
+                      disabled={!value.trim()}
                       className="rounded-full sm:mt-1"
                     >
                       <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -247,6 +251,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                     {addedNote[question.id] ? (
                       <span className="text-accent-ink">{addedNote[question.id]} </span>
                     ) : null}
+                    {addedNote[question.id] ? <button type="button" onClick={onShowMap} className="ml-2 underline">See it on your map</button> : null}
                     {count ? `${count} ${count === 1 ? "line" : "lines"} on the map from this question.` : ""}
                   </p>
                 </div>
@@ -254,16 +259,17 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
             })}
           </div>
         </div>
-      ) : (
+      )}
+      {step === PICK_STEP && (
         <div className="mt-6">
-          <h3 className="font-heading text-xl">Part {TOTAL}: Pick one thing worth exploring</h3>
+          <h3 className="font-heading text-xl">Part {TOTAL}: Look over your map and choose whether to explore</h3>
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted-foreground">
-            You are not choosing a career. You are not committing to a business. You are not announcing your life's
-            purpose. Pick one thread that makes you curious enough to look again.
+            If anything catches your attention, you can name something to understand better. You can also leave it open, pause, or keep things as they are.
           </p>
           <p className="mt-2 max-w-2xl text-[12.5px] leading-relaxed text-muted-faint">
             These are single answers, not lists. They show up at the end of your map as “Worth exploring.”
           </p>
+          <p className="mt-2 text-[13px] text-muted-foreground">A small way to learn more might be observing, asking a question, or looking up one practical detail. A plan is not a commitment.</p>
           <div className="mt-4 space-y-4">
             {MAP_PICK_FIELDS.map((field) => (
               <div key={field.id}>
@@ -294,8 +300,8 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                 }}
               />
               <span>
-                Nothing on the map is worth exploring yet.
-                <span className="block text-[13px] text-muted-faint">That counts as a complete answer. Your answer can change.</span>
+                I’m not choosing something to explore right now.
+                <span className="block text-[13px] text-muted-faint">That counts as a complete answer. Your earlier reflection text is kept and will reappear if you untick this.</span>
               </span>
             </label>
             <p className="text-[12.5px] text-muted-faint">Saved to your account as you type.</p>
@@ -306,7 +312,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
       <div className="mt-8 border-t border-border pt-5">
         {pending ? (
           <p className="mb-3 text-[12.5px] text-muted-faint">
-            Anything still typed above will be added to your map when you move on.
+            Draft only: use Add to map to keep an answer. Changing parts keeps drafts here; leaving or reloading this page clears unadded drafts.
           </p>
         ) : null}
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
