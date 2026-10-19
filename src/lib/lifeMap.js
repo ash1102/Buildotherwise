@@ -42,13 +42,13 @@ export const MAP_SECTIONS = [
 ];
 
 /**
- * The questions that find the lines for the map, in the order of the lesson
- * "Map the Life You're Actually Living" (Notion, Module 1, Parts 1-6). Wording is
- * the lesson's own. Each answer becomes a line under the section named here.
+ * Original question definitions retained for saved-answer compatibility.
+ * Revised draft prompts and sequence are defined below; they are not claimed
+ * to be verbatim Notion lesson text.
  * `starter: true` means the answer finishes the sentence. The sentence stays the
  * question label on the map. The line itself is only what the participant wrote.
  */
-export const MAP_QUESTION_PARTS = [
+const ORIGINAL_QUESTION_PARTS = [
   {
     key: "part-1",
     title: "Draw your week",
@@ -171,15 +171,160 @@ export const MAP_QUESTION_PARTS = [
   },
 ];
 
-/** Every map question by id, with the part and section it belongs to. */
+
+/** Draft for review: concrete recall before interpretation. Original definitions
+ * remain available so saved answers retain their question IDs and wording. */
+const QUESTION_UPDATES = {
+  "p1-places": {
+    "text": "Think about the past seven days, or another recent stretch you remember. Where did you spend time? Home counts."
+  },
+  "p1-do": {
+    "text": "What do you do at this place?"
+  },
+  "p1-how": {
+    "text": "How do you get to and from this place?"
+  },
+  "p2-placeless": {
+    "text": "What else did you do during that time—at home, online, while travelling, or in different places?",
+    "branch": "Other activities"
+  },
+  "p3-energy": {
+    "text": "Think of one recent time you did this or were here. How was your energy afterward compared with before?"
+  },
+  "p3-star": {
+    "text": "What, if anything, matters to you about this entry?",
+    "branch": "What matters to me"
+  },
+  "p3-question": {
+    "text": "Is there anything about this entry you would like to understand better?"
+  },
+  "p3-dollar": {
+    "text": "What role, if any, do money or resources play in doing this?",
+    "branch": "Money or resources"
+  },
+  "p3-bang": {
+    "text": "What part, if any, holds your attention? Can you remember a recent example?",
+    "branch": "What holds my attention"
+  },
+  "p4-used-to": {
+    "text": "Is there an activity or place you remember spending time on before that isn't part of your life now? Add it only if you want to."
+  },
+  "p4-rarely": {
+    "text": "Is there something you have wanted to do recently but haven't had the chance to do?"
+  },
+  "p4-in-the-way": {
+    "text": "What, if anything, made it difficult to do this or get there? 'I don't know' is an answer."
+  },
+  "p5-ending-up": {
+    "text": "Looking across your entries, does any activity, place, or kind of situation appear more than once? Which entries?",
+    "branch": "Details that repeat",
+    "starter": false
+  },
+  "p5-more-time": {
+    "text": "Which activities took up a lot of your time during the period you mapped, if any?",
+    "branch": "Where my time went",
+    "starter": false
+  },
+  "p5-come-to-me": {
+    "text": "Has anyone recently asked you for help, information, or company? What did they ask for?",
+    "branch": "Recent requests",
+    "section": "groups",
+    "starter": false
+  },
+  "p5-lose-track": {
+    "text": "Can you remember a recent time you did something longer than you intended? What were you doing?",
+    "branch": "Longer than intended",
+    "starter": false
+  },
+  "p5-researching": {
+    "text": "What have you looked up, read about, watched, or asked questions about recently, if anything?",
+    "branch": "Things I looked into",
+    "starter": false
+  },
+  "p5-weird-amount": {
+    "text": "Is there something you have spent time learning about or doing that you want to add?",
+    "branch": "Learning and experience",
+    "starter": false
+  },
+  "p5-improve": {
+    "text": "Have you recently tried to change, fix, practise, or improve something? What did you do?",
+    "branch": "Things I tried to change",
+    "starter": false
+  },
+  "p5-frustrated": {
+    "text": "Was there a moment in one of these activities when something didn't work as you wanted? What happened?",
+    "branch": "What happened",
+    "starter": false
+  },
+  "p5-miss": {
+    "section": "barriers"
+  },
+  "p5-bigger": {
+    "text": "Is there anything here you would like more room for, or would like to keep as it is?",
+    "branch": "More room or keep as it is",
+    "starter": false
+  },
+  "g-now": {
+    "text": "Who have you spent time with or been in contact with recently—in person or online? You can use a role or group label instead of a name.",
+    "branch": "People and groups in my life"
+  },
+  "g-close": {
+    "text": "If you want to mark it, how connected do you feel to this person or group right now?",
+    "chips": [
+      "Close",
+      "Somewhat connected",
+      "Not connected right now",
+      "Mixed",
+      "Not sure"
+    ]
+  },
+  "g-left": {
+    "text": "Do you want to do anything with this connection right now, leave it as it is, or leave the question open?",
+    "chips": [
+      "Find out more",
+      "Leave it as it is",
+      "Leave the question open"
+    ],
+    "branch": "What I choose about this connection"
+  },
+  "g-take": {
+    "text": "If you wanted to find out more, what would you need to know first? Is there any support or access you already know you would need?",
+    "branch": "Information, support or access"
+  }
+};
+const originalQuestions = Object.fromEntries(ORIGINAL_QUESTION_PARTS.flatMap(part =>
+  part.questions.map(question => [question.id, { ...question, section: question.section || part.section }])
+));
+const revisedQuestion = id => ({ ...originalQuestions[id], ...QUESTION_UPDATES[id] });
+const moved = new Set(["p5-come-to-me", "p5-miss", "p5-bigger", "g-left"]);
+const retired = new Set(["p3-plus", "p3-minus", "p4-barrier", "p4-circumstances", "p5-wish"]);
+const order = ["part-1", "part-2", "part-groups", "part-3", "part-4", "part-5"];
+export const MAP_QUESTION_PARTS = order.map(key => {
+  const part = ORIGINAL_QUESTION_PARTS.find(item => item.key === key);
+  const questions = part.questions.filter(q => !moved.has(q.id) && !retired.has(q.id)).map(q => revisedQuestion(q.id));
+  if (key === "part-groups") questions.splice(1, 0, revisedQuestion("p5-come-to-me"));
+  if (key === "part-4") questions.splice(1, 0, revisedQuestion("p5-miss"));
+  const introductions = {
+    "part-1": "Start with a recent stretch you remember. It does not have to be a typical week. Places and activities give you something concrete to look at before deciding what they mean. Use your own life, a clearly labelled fictional example, or just observe. You may skip, pause, or stop.",
+    "part-2": "Include everyday activities wherever they happened. Being at home does not mean you did nothing. You do not need to decide whether an activity has a set place.",
+    "part-3": "Choose an entry and, if you can, recall one recent occasion. Notice what happened before interpreting it. Energy can stay the same or vary. Other conditions may have contributed; this is not a fixed trait or proof of a cause.",
+    "part-4": "Something absent is not necessarily something you want back. If you want to add a past activity or something you could not access, you do not have to explain personal history. Unknowns are welcome.",
+    "part-5": "Look over the entries you have added. Choose any question that helps; this is an optional menu, not a checklist. A repeated detail might be worth noticing. It does not tell you yet why it repeats, whether you like it, or whether you want more of it."
+  };
+  return { ...part, questions, intro: introductions[key] || part.intro,
+    title: key === "part-2" ? "Add other everyday activities" : key === "part-3" ? "Notice particular experiences" : part.title };
+});
+export const MAP_CLOSING_QUESTIONS = [revisedQuestion("p5-bigger"), revisedQuestion("g-left")];
+
+/** Every map question by id, including retired IDs for saved-answer compatibility. */
 export const QUESTIONS_BY_ID = Object.fromEntries(
-  MAP_QUESTION_PARTS.flatMap((part, partIndex) =>
+  [...ORIGINAL_QUESTION_PARTS, ...MAP_QUESTION_PARTS, { section: "threads", questions: MAP_CLOSING_QUESTIONS }].flatMap((part) =>
     part.questions.map((question) => [
       question.id,
       {
         ...question,
         branch: question.branch || question.text.replace(/…$/, "").trim(),
-        partIndex,
+        partIndex: MAP_QUESTION_PARTS.findIndex(item => item.questions.some(q => q.id === question.id)),
         section: question.section || part.section,
       },
     ])
@@ -189,7 +334,7 @@ export const QUESTIONS_BY_ID = Object.fromEntries(
 /** Part 6 of the lesson: one thing worth exploring, or an honest unknown. */
 export const MAP_PICK_FIELDS = [
   { id: "one-thing", label: "One thing I might want to understand better is:" },
-  { id: "noticed-because", label: "I noticed it because:" },
+  { id: "noticed-because", label: "The entry or experience that brought this to my attention was:" },
   { id: "do-not-know", label: "I do NOT know yet:" },
   { id: "small-way", label: "One small way I could learn more about it:" },
 ];
@@ -209,7 +354,7 @@ export function exploreLines(pick) {
         id: "pick:nothing",
         fieldId: "nothing_yet",
         label: "",
-        text: "Nothing on the map is worth exploring yet.",
+        text: "I’m not choosing something to explore right now.",
       },
     ];
   }
@@ -296,7 +441,7 @@ export function saveEnergyMark(sourceId, choice, note) {
   const line = energyLine(source, choice, note);
   if (!line) return null;
   const energy = map.energy || [];
-  const existing = energy.find((item) => item.question_id === "p3-energy" && (item.links || []).includes(sourceId));
+  const existing = energy.find((item) => item.question_id === "p3-energy" && item.energy_version === 2 && (item.links || []).includes(sourceId));
   const item = { ...(existing || {}), ...line, parent_id: sourceId, id: existing?.id || makeId("map"), links: [...new Set([sourceId, ...(existing?.links || [])])] };
   setLifeMap({ ...map, energy: existing ? energy.map((old) => old.id === existing.id ? item : old) : [...energy, item] });
   return item;
@@ -359,7 +504,7 @@ export function buildGraph(map) {
     nodes: ((map || {})[section.key] || []).map((item) => ({
       id: item.id,
       section: section.key,
-      text: answerText(QUESTIONS_BY_ID[item.question_id], item.text || ""),
+      text: answerText(originalQuestions[item.question_id] || QUESTIONS_BY_ID[item.question_id], item.text || ""),
       label: item.label || "",
       entry_id: item.entry_id || "",
       links: item.links || [],
@@ -371,6 +516,7 @@ export function buildGraph(map) {
       branch_group: item.branch_group || "",
       energy_choice: item.energy_choice || "",
       energy_note: item.energy_note || "",
+      energy_version: item.energy_version || 1,
     })),
   }));
 
