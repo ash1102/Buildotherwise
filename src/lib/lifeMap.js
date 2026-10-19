@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { makeId, readStore, subscribeStore, writeStore } from "./store";
 import { LIFEMAP_KEY, setLifeMap } from "./workbook";
 import { energyLine } from "./mapEnergy";
+import { buildBranches, wouldCycle } from "./lifeMapBranches";
 
 /**
  * The five questions the map is drawn from. The keys are the ones the Life Map has
@@ -296,9 +297,24 @@ export function saveEnergyMark(sourceId, choice, note) {
   if (!line) return null;
   const energy = map.energy || [];
   const existing = energy.find((item) => item.question_id === "p3-energy" && (item.links || []).includes(sourceId));
-  const item = { ...(existing || {}), ...line, id: existing?.id || makeId("map"), links: [...new Set([sourceId, ...(existing?.links || [])])] };
+  const item = { ...(existing || {}), ...line, parent_id: sourceId, id: existing?.id || makeId("map"), links: [...new Set([sourceId, ...(existing?.links || [])])] };
   setLifeMap({ ...map, energy: existing ? energy.map((old) => old.id === existing.id ? item : old) : [...energy, item] });
   return item;
+}
+
+/** Changing a branch is an explicit participant choice; reject cycles. */
+export function setLineParent(childId, parentId) {
+  const map = readStore(LIFEMAP_KEY, {});
+  const graph = buildGraph(map);
+  const tree = buildBranches(graph);
+  const child = tree.nodesById[childId];
+  if (!child || (parentId && !tree.nodesById[parentId]) || wouldCycle(childId, parentId, tree.parentById)) return false;
+  updateLine(child.section, childId, {
+    parent_id: parentId || "",
+    parent_choice: parentId ? "chosen" : "standalone",
+    links: parentId ? [...new Set([...(child.links || []), parentId])] : child.links
+  });
+  return true;
 }
 
 export function updateLine(sectionKey, id, patch) {
@@ -314,7 +330,7 @@ export function mapWithoutLine(map, sectionKey, id) {
     const list = Array.isArray(items) ? items : [];
     next[key] = list
       .filter((item) => !(key === sectionKey && item.id === id))
-      .map((item) => ({ ...item, links: (item.links || []).filter((link) => link !== id) }));
+      .map((item) => ({ ...item, parent_id: item.parent_id === id ? "" : item.parent_id, links: (item.links || []).filter((link) => link !== id) }));
   });
   return next;
 }
@@ -345,6 +361,8 @@ export function buildGraph(map) {
       source_code: item.source_code || "",
       source_label: item.source_label || "",
       question_id: item.question_id || "",
+      parent_id: item.parent_id || "",
+      parent_choice: item.parent_choice || "",
       energy_choice: item.energy_choice || "",
       energy_note: item.energy_note || "",
     })),
