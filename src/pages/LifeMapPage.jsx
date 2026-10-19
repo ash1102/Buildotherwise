@@ -72,7 +72,7 @@ export default function LifeMapPage() {
     const text = draft.trim();
     if (!text) return;
     const questionId = { places: "p1-places", placeless: "p2-placeless", groups: "g-now" }[draftSection] || "";
-    addLine(draftSection, { text, question_id: questionId, parent_choice: "standalone" });
+    addLine(draftSection, { text, question_id: questionId, parent_choice: "standalone", branch_group: draftSection === "barriers" ? "barriers" : "" });
     setDraft("");
   };
 
@@ -133,6 +133,7 @@ export default function LifeMapPage() {
       source_code: selected.source_code || "",
       parent_id: selected.parent_id || "",
       parent_choice: selected.parent_choice || "",
+      branch_group: selected.branch_group || "",
       links: selected.links || [],
     };
     pieces.forEach((text) => addLine(selectedSection.key, { text, ...keep }));
