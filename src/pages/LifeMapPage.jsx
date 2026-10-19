@@ -10,6 +10,7 @@ import { downloadText } from "@/lib/download";
 import { readStore, useStore } from "@/lib/store";
 import { branchMarkdown } from "@/lib/lifeMapBranches";
 import {
+  MAP_PAUSE_TEXT,
   MAP_PICK_FIELDS,
   MAP_PICK_KEY,
   MAP_SECTIONS,
@@ -162,8 +163,10 @@ export default function LifeMapPage() {
     const fields = MAP_PICK_FIELDS.map((field) => ({ ...field, value: String(values[field.id] || "").trim() })).filter((field) => field.value);
     const actual = fields.filter((field) => !/^Fictional:/i.test(field.value));
     const examples = fields.filter((field) => /^Fictional:/i.test(field.value));
-    const pickBlock = values.nothing_yet ? "\n## One thing worth exploring\nNothing on the map is worth exploring yet.\n" :
-      actual.length ? "\n## One thing worth exploring\n" + actual.map((field) => field.label + " " + field.value).join("\n") + "\n" : "";
+    const kept = actual.length ? actual.map((field) => field.label + " " + field.value).join("\n") + "\n" : "";
+    const pickBlock = values.nothing_yet
+      ? "\n## Look over your map\n" + MAP_PAUSE_TEXT + "\n" + (kept ? "\nEarlier reflection text is still saved:\n" + kept : "")
+      : kept ? "\n## Look over your map\n" + kept : "";
     const exampleBlock = examples.length ? "\n## Saved example text to review\nThese fields are explicitly labelled fictional examples.\n" + examples.map((field) => field.label + " " + field.value).join("\n") + "\n" : "";
     downloadText("entrepalooza-life-map.md", "# Map the Life You're Actually Living\n\n" + body + pickBlock + exampleBlock);
   };
@@ -177,8 +180,8 @@ export default function LifeMapPage() {
             <p className="workbook-label">Your Life Map</p>
             <h1 className="mt-2 font-heading text-3xl sm:text-4xl">Map the life you’re actually living</h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-              Start with a place, activity, or group from your life. Open that entry to add what you do there, how you get there,
-              and what you notice. Later answers unfold beneath the entry they describe.
+              Start with places and activities from a recent stretch you remember, then people you were in contact with.
+              Observations and possible threads come after those entries are on the map. You choose what each connection means.
             </p>
             <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-muted-faint">
               Expand or collapse a branch to follow it. You choose the connections; answers without a chosen connection stay available to place later.
@@ -204,7 +207,7 @@ export default function LifeMapPage() {
             {asList ? "Show branches" : "Show all saved answers"}
           </Button>
           <PrivacyNote>
-            {total ? `${total} ${total === 1 ? "line" : "lines"} on this map, saved to your account.` : "Saved to your account."}
+            {total ? `${total} ${total === 1 ? "line" : "lines"} on this map. Saved on this device, then to your account.` : "Saved on this device, then to your account."}
           </PrivacyNote>
         </div>
       </header>
@@ -220,7 +223,7 @@ export default function LifeMapPage() {
           >
             {MAP_SECTIONS.map((section) => (
               <option key={section.key} value={section.key}>
-                {{ places: "A place I go", placeless: "An activity without a set place", groups: "A person or group", barriers: "Something missing", threads: "Another observation", energy: "An energy observation" }[section.key]}
+                {{ places: "A place I spent time", placeless: "An activity from that time", groups: "A person or group", barriers: "Something missing", threads: "A possible thread", energy: "An energy observation" }[section.key]}
               </option>
             ))}
           </select>
@@ -231,7 +234,7 @@ export default function LifeMapPage() {
             onKeyDown={(event) => {
               if (event.key === "Enter") quickAdd();
             }}
-            placeholder={draftSection === "places" ? "Name a place you go" : draftSection === "placeless" ? "Name an activity" : "Add one starting entry"}
+            placeholder={draftSection === "places" ? "Name a place, including home" : draftSection === "placeless" ? "Name an activity from that time" : "Add one starting entry"}
             className="border-border bg-background text-[14px] sm:flex-1"
           />
           <Button type="button" onClick={quickAdd} disabled={!draft.trim()} className="rounded-full">
@@ -288,13 +291,13 @@ export default function LifeMapPage() {
       </div>
       <details ref={guideRef} open={guideOpen} onToggle={(event) => setGuideOpen(event.currentTarget.open)} className="scroll-mt-4 rounded-xl border border-border bg-card p-4">
         <summary className="cursor-pointer text-[17px] font-medium">Guided questions and reflection</summary>
-        <div className="mt-4"><MapQuestions graph={graph} step={step} onStep={setStep} onShowMap={showMap} /></div>
+        <div className="mt-4"><MapQuestions graph={graph} step={step} onStep={setStep} onShowMap={showMap} onPlaced={(id) => { setSelectedId(id); setAsList(false); showMap(); }} /></div>
       </details>
       <BringInSavedAnswer options={options} onAdd={bringIn} />
 
       <div>
         <PrivacyNote>
-          The map is drawn from your saved lines and the links you choose. Downloading or printing it is yours to do.
+          The map is saved on this device and copied to your account. In the app, only your account can open it. A Markdown download includes the full text of any journal entry linked to a line, not only that journal entry’s title. Downloading or printing is yours to do.
         </PrivacyNote>
       </div>
 

@@ -33,14 +33,14 @@ export const module1 = {
           title: "The six moves",
           tag: TAG.PROPOSED,
           body:
-            "The map keeps all six moves the lesson already had:\n\n" +
-            "1. Draw the week you are actually living.\n" +
-            "2. Add what you do that has no place.\n" +
-            "3. Mark energy, meaning, curiosity and barriers.\n" +
-            "4. Note what is missing or out of reach.\n" +
-            "5. Find the threads your attention keeps returning to.\n" +
-            "6. Choose something worth exploring, or an honest unknown.\n\n" +
-            "Nothing on the map is read as a personality, and nothing is scored.",
+            "The map keeps six moves, in recall order:\n\n" +
+            "1. Recall places and activities from a recent stretch you remember.\n" +
+            "2. Add people or groups. A role or group label is enough.\n" +
+            "3. Add optional observations about particular entries.\n" +
+            "4. Add former activities, something you have wanted to do, and what affected access.\n" +
+            "5. Look across the visible entries for a repeated detail, if you want to.\n" +
+            "6. Choose whether to explore anything further, or leave that choice for later.\n\n" +
+            "A repeated detail does not yet say why it repeats, whether you like it, or whether you want more of it. Nothing on the map is read as a personality, and nothing is scored.",
         },
         {
           id: "M1-PREVIEW-L1-b2",
@@ -52,18 +52,19 @@ export const module1 = {
           instruction:
             "Add, edit, move and connect cards. The list view works over the same map, so dragging is never needed.",
           kinds: [
-            { id: "place", label: "A place I go", hint: "Something that happens somewhere." },
-            { id: "placeless", label: "Something without a place", hint: "Reading, walking, talking, making, fixing, helping." },
-            { id: "missing", label: "Missing or out of reach", hint: "Shown with a dashed border." },
+            { id: "place", label: "A place I spent time", hint: "Including home." },
+            { id: "placeless", label: "An activity from that time", hint: "At home, online, while travelling, or in different places." },
+            { id: "missing", label: "Missing or not yet reached", hint: "Absence is not the same as wanting it back. Shown with a dashed border." },
           ],
           marks: [
-            { id: "plus", label: "Gives me energy", meaning: "" },
-            { id: "minus", label: "Drains me", meaning: "" },
-            { id: "star", label: "I care about this", meaning: "" },
-            { id: "question", label: "I’m curious about this", meaning: "" },
-            { id: "dollar", label: "Mostly for money or resources", meaning: "" },
-            { id: "bang", label: "I get unusually focused here", meaning: "" },
-            { id: "blocked", label: "Something gets in the way", meaning: "" },
+            { id: "plus", label: "More energy after one time", meaning: "One observation, not a permanent description." },
+            { id: "minus", label: "Less energy after one time", meaning: "One observation, not a permanent description." },
+            { id: "same", label: "About the same energy", meaning: "One observation, not a permanent description." },
+            { id: "star", label: "Something about this matters to me", meaning: "Optional. Nothing has to matter." },
+            { id: "question", label: "I would like to understand something here", meaning: "Optional. Nothing coming to mind is an answer." },
+            { id: "dollar", label: "Money or resources play a role", meaning: "If any. Not assumed to be the main reason." },
+            { id: "bang", label: "A part of this holds my attention", meaning: "No requirement to be unusually focused." },
+            { id: "blocked", label: "Something makes this difficult", meaning: "If anything. A difficulty is not a plan." },
           ],
           example: {
             label: "Load the invented example map",
@@ -84,16 +85,16 @@ export const module1 = {
           },
           fields: [
             { id: "one-thing", label: "One thing I might want to understand better is" },
-            { id: "noticed-because", label: "I noticed it because" },
+            { id: "noticed-because", label: "The entry or experience that brought this to my attention was" },
             { id: "do-not-know", label: "I do NOT know yet" },
             { id: "small-way", label: "One small way I could learn more about it" },
           ],
           nothingYet: {
-            label: "Nothing on the map is worth exploring yet.",
-            message: "That counts as a complete answer. Your answer can change.",
+            label: "I'm not choosing something to explore right now.",
+            message: "That counts as a complete answer. Your answer can change. Text already written in the fields stays saved.",
           },
           plain:
-            "This step is a map of your week. You can add cards of three kinds (a place you go, something without a place, something missing or out of reach), tag them in plain words (gives me energy, drains me, I care about this, I’m curious about this, mostly for money or resources, I get unusually focused here, something gets in the way), and connect two cards. A list view shows the same content without dragging. You can load an invented example map. Four optional lines let you name one thing worth understanding better, why you noticed it, what you do not know yet, and one small way to learn more. If nothing on the map is worth exploring yet, that counts as a complete answer.",
+            "This step recalls a recent stretch. You can add cards for a place, an activity, or something missing or not yet reached, then tag an observation about one entry: energy after one time, something that matters, something to understand, a role for money or resources, a part that holds your attention, or a difficulty. You can connect a card to more than one other card. A list view shows the same content without dragging. You can load an invented example map. Optional lines let you name one thing worth understanding better, the entry that brought it to mind, what you do not know yet, and one small way to learn more. Choosing not to explore right now counts as a complete answer.",
         },
       ],
     },

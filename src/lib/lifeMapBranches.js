@@ -1,5 +1,5 @@
 /** Build a tree from explicit parent choices and unambiguous existing links. No text matching. */
-const ROOT_QUESTIONS = new Set(["p1-places", "p2-placeless", "g-now", "g-before", "g-curious"]);
+const ROOT_QUESTIONS = new Set(["p1-places", "p2-placeless", "g-now", "g-before", "g-curious", "p5-come-to-me"]);
 const isAnchor = (node) => ROOT_QUESTIONS.has(node.question_id) ||
   (!node.question_id && ["places", "placeless", "groups"].includes(node.section));
 

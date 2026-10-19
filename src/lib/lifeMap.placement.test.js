@@ -4,6 +4,7 @@ import { buildBranches, branchMarkdown, wouldCycle } from "./lifeMapBranches.js"
 import { nextOpenStep } from "./progress.js";
 import { LIFEMAP_KEY } from "./workbook.js";
 import {
+  MAP_PAUSE_TEXT,
   MAP_PICK_FIELDS,
   MAP_PICK_KEY,
   MAP_QUESTION_PARTS,
@@ -14,12 +15,15 @@ import {
   buildGraph,
   defaultPositions,
   exploreLines,
+  guideQuestions,
   layoutGraph,
   linesFromAnswer,
   mapWithoutLine,
+  placementForAnswer,
   settleLines,
   setLineParent,
 } from "./lifeMap.js";
+import { EPISODE_ENERGY_CHOICES, energyLine } from "./mapEnergy.js";
 
 /** Sample answers, one or more for each area the questions belong to. */
 const SAMPLES = [
@@ -68,7 +72,7 @@ test("answers are stored on the same keys the map has always used", () => {
     MAP_SECTIONS.map((section) => [section.key, section.label]),
     [
       ["places", "Your week"],
-      ["placeless", "No set place"],
+      ["placeless", "Activities"],
       ["energy", "Energy"],
       ["barriers", "What's missing"],
       ["threads", "Threads"],
@@ -88,8 +92,12 @@ test("every question belongs to a section the map draws, and an answer is read b
   });
 
   assert.deepEqual(linesFromAnswer(QUESTIONS_BY_ID["p3-plus"], "   "), []);
-  assert.equal(QUESTIONS_BY_ID["p5-ending-up"].branch, "I keep ending up around");
+  assert.equal(QUESTIONS_BY_ID["p5-ending-up"].branch, "Shows up more than once");
   assert.equal(linesFromAnswer(QUESTIONS_BY_ID["p5-ending-up"], "libraries")[0], "libraries");
+  assert.equal(
+    linesFromAnswer(QUESTIONS_BY_ID["p5-ending-up"], "I keep ending up around libraries")[0],
+    "libraries"
+  );
 
   const { map, expected } = sampleMap();
   const graph = buildGraph(map);
@@ -116,10 +124,13 @@ test("every question belongs to a section the map draws, and an answer is read b
   assert.equal(own.text, "walking the long way");
 });
 
-test("a Part 5 line already saved with its starter shows only the answer", () => {
+test("a saved thread line keeps its answer after the prompt changes", () => {
   const question = QUESTIONS_BY_ID["p5-researching"];
-  assert.equal(question.text, "I keep researching…");
-  assert.equal(question.branch, "I keep researching");
+  assert.equal(
+    question.text,
+    "What have you looked up, read about, watched, or asked questions about recently, if anything?"
+  );
+  assert.equal(question.branch, "Looked into recently");
   assert.equal(linesFromAnswer(question, "test thread")[0], "test thread");
 
   const graph = buildGraph({
@@ -229,7 +240,7 @@ test("part 6 answers are read from the pick store and blank fields stay off the 
       id: "pick:nothing",
       fieldId: "nothing_yet",
       label: "",
-      text: "Nothing on the map is worth exploring yet.",
+      text: MAP_PAUSE_TEXT,
     },
   ]);
   assert.deepEqual(exploreLines({}), []);
@@ -338,6 +349,58 @@ test("download follows the same branches and preserves unplaced answers and jour
   assert.ok(markdown.includes("Journal: A private observation."));
   assert.ok(markdown.includes("## Answers not yet placed in a branch"));
   assert.ok(markdown.includes("Success in my program"));
+});
+
+test("the guide recalls concrete life before patterns and keeps retired answer ids", () => {
+  assert.deepEqual(
+    MAP_QUESTION_PARTS.map((part) => part.key),
+    ["part-1", "part-2", "part-groups", "part-3", "part-4", "part-5"]
+  );
+  assert.ok(MAP_QUESTION_PARTS.findIndex((part) => part.key === "part-groups") < MAP_QUESTION_PARTS.findIndex((part) => part.key === "part-5"));
+  assert.equal(QUESTIONS_BY_ID["p5-come-to-me"].section, "groups");
+  assert.equal(QUESTIONS_BY_ID["p5-miss"].section, "barriers");
+  assert.ok(QUESTIONS_BY_ID["p3-plus"].retired);
+  assert.ok(QUESTIONS_BY_ID["p3-minus"].retired);
+  assert.ok(QUESTIONS_BY_ID["p4-barrier"].retired);
+  assert.ok(QUESTIONS_BY_ID["p4-circumstances"].retired);
+  assert.ok(QUESTIONS_BY_ID["p5-wish"].retired);
+  assert.ok(QUESTIONS_BY_ID["g-left"].retired);
+  assert.equal(guideQuestions(MAP_QUESTION_PARTS.find((part) => part.key === "part-3")).some((question) => question.id === "p3-plus"), false);
+  assert.equal(guideQuestions(MAP_QUESTION_PARTS.find((part) => part.key === "part-5")).some((question) => question.id === "p5-wish"), false);
+  assert.match(QUESTIONS_BY_ID["g-now"].text, /role or group label/);
+  assert.match(QUESTIONS_BY_ID["p1-do"].text, /at this place/);
+  assert.equal(MAP_PAUSE_TEXT, "I'm not choosing something to explore right now.");
+});
+
+test("several selected entries stay connected without a single parent standing in for all of them", () => {
+  const thread = QUESTIONS_BY_ID["p5-ending-up"];
+  const many = placementForAnswer(thread, { links: ["gym", "store"] });
+  assert.deepEqual(many.links, ["gym", "store"]);
+  assert.equal(many.parent_id, "");
+  assert.equal(many.parent_choice, "standalone");
+  const one = placementForAnswer(thread, { links: ["gym"] });
+  assert.equal(one.parent_id, "gym");
+  assert.equal(one.parent_choice, "chosen");
+  const alone = placementForAnswer(thread, { separate: true });
+  assert.equal(alone.parent_choice, "standalone");
+  assert.deepEqual(alone.links, []);
+  const missing = placementForAnswer(QUESTIONS_BY_ID["p4-in-the-way"], { links: ["wanted"] });
+  assert.equal(missing.parent_id, "wanted");
+  const missingAlone = placementForAnswer(QUESTIONS_BY_ID["p4-rarely"], { separate: true });
+  assert.equal(missingAlone.branch_group, "barriers");
+  assert.equal(missingAlone.parent_choice, "");
+});
+
+test("an energy mark can record that one recent time felt about the same", () => {
+  assert.ok(EPISODE_ENERGY_CHOICES.some((item) => item.id === "same" && item.label === "About the same"));
+  const line = energyLine({ id: "gym", text: "the gym" }, "same", "I had already eaten");
+  assert.equal(line.question_id, "p3-energy");
+  assert.equal(line.energy_choice, "same");
+  assert.match(line.label, /One recent time: About the same/);
+  assert.match(line.text, /already eaten/);
+  assert.match(line.source_label, /one recent time/i);
+  const legacy = energyLine({ id: "gym", text: "the gym" }, "gives", "");
+  assert.equal(legacy.label, "the gym — Gives me energy");
 });
 
 test("explicitly fictional saved examples are preserved in storage but excluded from participant takeaways", () => {
