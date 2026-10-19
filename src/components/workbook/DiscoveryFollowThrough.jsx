@@ -13,14 +13,14 @@ export default function DiscoveryFollowThrough() {
       <h3 className="text-[20px] font-semibold text-foreground">Work with something concrete</h3>
       {selected ? (
         <>
-          <p className="text-[15px] text-muted-foreground">You explored: <strong className="text-foreground">{selected.field}</strong>. Your choice came forward from Lesson 1; you don't need to choose it again.</p>
+          <p className="text-[15px] text-muted-foreground">Your selected starting point: <strong className="text-foreground">{selected.field}</strong>. This choice came forward from Lesson 1. It does not mean you completed the activity, and you can change it.</p>
           <p className="text-[16px] leading-relaxed text-foreground">{selected.fact}</p>
           <div className="rounded-lg bg-secondary p-4">
-            <p className="font-medium text-foreground">A guided observation</p>
+            <p className="font-medium text-foreground">An encounter you can choose</p>
             <p className="mt-2 text-[16px] leading-relaxed text-foreground">{selected.task}</p>
           </div>
           <p className="text-[15px] text-foreground">As you investigate, distinguish <strong>what the source actually shows</strong> from <strong>what you're inferring</strong>. You may decide to look at another source before drawing a conclusion.</p>
-          <a href={selected.source} target="_blank" rel="noopener noreferrer" className="inline-block text-[15px] text-accent-ink underline underline-offset-2">Open the official occupation profile ↗</a>
+          {selected.source ? <a href={selected.source} target="_blank" rel="noopener noreferrer" className="inline-block text-[15px] text-accent-ink underline underline-offset-2">Open the source ↗</a> : null}
         </>
       ) : (
         <>
@@ -28,7 +28,7 @@ export default function DiscoveryFollowThrough() {
           <Link to="/workbook" className="inline-block text-[15px] text-accent-ink underline underline-offset-2">Return to the workbook to find Lesson 1</Link>
         </>
       )}
-      <p className="text-[14px] text-muted-foreground">Below, record only what you've actually observed. If you have only read the occupation profile, describe that rather than saying you completed the hands-on task.</p>
+      <p className="text-[14px] text-muted-foreground">Below, record only what you've actually observed. Say whether you read, watched, talked with someone, visited, or did an activity yourself. Each gives different information; name what you actually encountered.</p>
     </section>
   );
 }
