@@ -218,7 +218,7 @@ export function exploreLines(pick) {
     fieldId: field.id,
     label: field.label,
     text: String(value[field.id] || "").trim(),
-  })).filter((line) => line.text);
+  })).filter((line) => line.text && !/^Fictional:/i.test(line.text));
 }
 
 function escapeRegExp(value) {
