@@ -193,10 +193,11 @@ function DiscoveryReviewNotes() {
   return (
     <div className="space-y-4">
       {selected ? <div className="rounded-lg bg-secondary p-4">
-        <p className="text-[14px] text-muted-foreground">Your discovery from Lesson 1</p>
+        <p className="text-[14px] text-muted-foreground">Your selected starting point from Lesson 1</p>
         <p className="mt-1 font-medium text-foreground">{selected.field}</p>
         <p className="mt-2 text-[15px] text-foreground">{selected.fact}</p>
-        <a className="mt-2 inline-block text-[14px] text-accent-ink underline" href={selected.source} target="_blank" rel="noopener noreferrer">Revisit the occupation profile</a>
+        {selected.source ? <a className="mt-2 inline-block text-[14px] text-accent-ink underline" href={selected.source} target="_blank" rel="noopener noreferrer">Revisit the source</a> : null}
+        <p className="mt-2 text-[14px] text-muted-foreground">Selecting this card does not establish that you completed the activity. Review what you actually recorded below.</p>
       </div> : <p className="text-[15px] text-muted-foreground">No sampler selection was saved. You may have explored something else.</p>}
       {notes.length ? <div className="space-y-3">
         <p className="text-[15px] font-medium">Your actual Lesson 2 observations</p>
