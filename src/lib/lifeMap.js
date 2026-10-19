@@ -358,6 +358,15 @@ export const MAP_PICK_FIELDS = [
 
 export const MAP_PICK_KEY = "lifeMapPick";
 
+/** A line on the map, or an explicit pause, means this step has been used. An empty map has not. */
+export function lifeMapHasEntries(map, pick) {
+  const sections = map && typeof map === "object" ? Object.values(map) : [];
+  const hasLine = sections.some(
+    (items) => Array.isArray(items) && items.some((item) => String(item?.text || item?.label || "").trim())
+  );
+  return hasLine || Boolean(pick && pick.nothing_yet);
+}
+
 /** Questions the guide shows. Retired prompts and the energy control stay addressable by id. */
 export function guideQuestions(part) {
   return (part?.questions || []).filter((question) => !question.retired && !question.energyControl);

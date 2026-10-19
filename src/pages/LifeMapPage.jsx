@@ -180,7 +180,7 @@ export default function LifeMapPage() {
             <p className="workbook-label">Your Life Map</p>
             <h1 className="mt-2 font-heading text-3xl sm:text-4xl">Map the life you’re actually living</h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-              Start with places and activities from a recent stretch you remember, then people you were in contact with.
+              This step comes after Getting Started and before Module 1. Start with places and activities from a recent stretch you remember, then people you were in contact with.
               Observations and possible threads come after those entries are on the map. You choose what each connection means.
             </p>
             <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-muted-faint">

@@ -40,7 +40,7 @@ export default function LessonPage() {
 
   const lesson = lessonsByCode[code];
   const module = lesson ? modules.find((item) => item.order === lesson.module_order) : null;
-  /** Getting Started is the five-step gate. Begin here is the opener, and it is not Module 1. */
+  /** Getting Started is the orientation gate. The Life Map lesson is the step before Module 1. */
   const gsLesson = isGettingStartedLesson(lesson);
   const opener = isOpenerLesson(lesson);
   const gsSteps = gettingStartedSteps(lessons);
@@ -122,7 +122,7 @@ export default function LessonPage() {
   const moduleTitle = gsLesson
     ? "Getting Started"
     : opener
-      ? "Begin here"
+      ? "Before Module 1"
       : module.kind === "orientation"
         ? "Getting Started"
         : `Module ${module.order}: ${module.title}`;
@@ -132,9 +132,9 @@ export default function LessonPage() {
   const forward =
     gsLesson && !next && stepsDone
       ? {
-          to: isAuthenticated ? "/" : "/login?returnTo=%2F",
+          to: isAuthenticated ? "/map" : "/login?returnTo=%2Fmap",
           kicker: "Next",
-          title: "Open the workbook",
+          title: "Map the life you’re actually living",
         }
       : null;
   const endNote = gsLesson && !next && !stepsDone ? "Finish this step to open the workbook." : undefined;

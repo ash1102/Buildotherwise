@@ -16,6 +16,7 @@ import {
   defaultPositions,
   exploreLines,
   guideQuestions,
+  lifeMapHasEntries,
   layoutGraph,
   linesFromAnswer,
   mapWithoutLine,
@@ -447,4 +448,11 @@ test("an existing answer can move into What's missing, survive reload and export
     globalThis.window = oldWindow;
     globalThis.CustomEvent = oldEvent;
   }
+});
+
+test("an empty Life Map is still the step before Module 1", () => {
+  assert.equal(lifeMapHasEntries({}, {}), false);
+  assert.equal(lifeMapHasEntries({ places: [{ text: "  " }] }, {}), false);
+  assert.equal(lifeMapHasEntries({ places: [{ text: "home" }] }, {}), true);
+  assert.equal(lifeMapHasEntries({}, { nothing_yet: true }), true);
 });

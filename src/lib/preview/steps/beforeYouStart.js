@@ -3,7 +3,7 @@ import { TAG } from "../tags";
 /**
  * "Before you start" — what used to be Module 0. It keeps its ground rules,
  * rights and setup lessons, shown as its own section, unnumbered. The
- * life-mapping step now stands ahead of this sequence as the opener, so it is
+ * Life Map is the next section, still before Module 1, so it is
  * not one of these steps. The reading and lesson text are rendered from the
  * existing records; the two verbatim lessons carry the owner's own wording.
  */

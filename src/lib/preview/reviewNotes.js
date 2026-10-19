@@ -75,7 +75,7 @@ export const FACILITATOR_NOTES = [
 ];
 
 export const TESTS = [
-  { item: "Module 1 Life Map", detail: "Cards added and edited, marks toggled, connections made and removed, list view used as an equal route, example map loaded, answer saved and deleted again." },
+  { item: "Life Map, before Module 1", detail: "The map section sits after Before you start and before Module 1. Cards added and edited, marks toggled, connections made and removed, list view used as an equal route, example map loaded, answer saved and deleted again." },
   { item: "Notice step", detail: "Sort sorted and cleared with Look again, explanations announced, both entry routes reaching their own step 3, closing line and take-away in your words." },
   { item: "Patterns step", detail: "A pick on each invented person showing its explanation, mixed and unclear accepted, optional reflection saved." },
   {
