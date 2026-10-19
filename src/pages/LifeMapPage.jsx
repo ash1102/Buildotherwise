@@ -115,7 +115,7 @@ export default function LifeMapPage() {
       const section = sectionOf(id);
       const node = nodesById[id];
       if (!section || !node) return;
-      updateLine(section.key, id, { links: (node.links || []).filter((link) => link !== other) });
+      updateLine(section.key, id, { links: (node.links || []).filter((link) => link !== other), parent_id: node.parent_id === other ? "" : node.parent_id, parent_choice: node.parent_id === other ? "standalone" : node.parent_choice });
     });
   };
 
@@ -246,7 +246,7 @@ export default function LifeMapPage() {
             graph={graph}
             explore={explore}
             selectedId={selectedId}
-            onSelect={setSelectedId}
+            onSelect={selectEntry}
             onRemove={(node) => {
               removeLine(node.section, node.id);
               if (selectedId === node.id) setSelectedId(null);
@@ -284,9 +284,6 @@ export default function LifeMapPage() {
           Open an entry to see its branch, answer a follow-up, or edit its wording and connections.
         </p>
       )}
-
-
-
       </div>
       <details ref={guideRef} open={guideOpen} onToggle={(event) => setGuideOpen(event.currentTarget.open)} className="scroll-mt-4 rounded-xl border border-border bg-card p-4">
         <summary className="cursor-pointer text-[17px] font-medium">Guided questions and reflection</summary>
