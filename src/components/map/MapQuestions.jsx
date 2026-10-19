@@ -3,6 +3,7 @@ import { ArrowDown, ArrowLeft, ArrowRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/lib/store";
+import EnergyMarks from "./EnergyMarks";
 import {
   MAP_PICK_FIELDS,
   MAP_PICK_KEY,
@@ -141,8 +142,9 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
             <p className="mt-2 max-w-2xl text-[13px] font-medium leading-relaxed text-accent-ink">{part.note}</p>
           ) : null}
 
+          {part.key === "part-3" ? <EnergyMarks graph={graph} onEarlierPart={() => go(0)} /> : null}
           <div className="mt-5 space-y-6">
-            {part.questions.map((question) => {
+            {part.questions.filter((question) => !["p3-energy", "p3-plus", "p3-minus"].includes(question.id)).map((question) => {
               const count = countFor(question.id);
               const value = drafts[question.id] || "";
               const branch = QUESTIONS_BY_ID[question.id].branch;
