@@ -40,7 +40,7 @@ function readJson(answers, code, key, fallback) {
   }
 }
 
-function useSaved(lesson, key, fallback) {
+function useSaved(lesson, key, fallback, route) {
   const answers = useAnswers();
   const value = readJson(answers, lesson.code, key, fallback);
   const save = (next, journalLabel, journalText) => {
@@ -51,13 +51,14 @@ function useSaved(lesson, key, fallback) {
       promptKey: `${lesson.code}#${key}`,
       promptLabel: journalLabel,
       body: journalText,
+      route,
     });
   };
   return [value, save];
 }
 
-function GardenSort({ lesson }) {
-  const [picks, save] = useSaved(lesson, "garden-sort", {});
+function GardenSort({ lesson, route }) {
+  const [picks, save] = useSaved(lesson, "garden-sort", {}, route);
   const choose = (itemId, categoryId) => {
     const next = { ...picks, [itemId]: picks[itemId] === categoryId ? "" : categoryId };
     const text = SORT_ITEMS.filter((item) => next[item.id])
@@ -95,8 +96,8 @@ function GardenSort({ lesson }) {
   );
 }
 
-function ExampleQuestions({ lesson }) {
-  const [picks, save] = useSaved(lesson, "garden-picks", { drawing: [], findOut: "" });
+function ExampleQuestions({ lesson, route }) {
+  const [picks, save] = useSaved(lesson, "garden-picks", { drawing: [], findOut: "" }, route);
   const drawing = picks.drawing || [];
   const persist = (next) => {
     const lines = [];
@@ -158,8 +159,8 @@ function OwnQuestions({ lesson, route }) {
   );
 }
 
-function Possibility({ lesson }) {
-  const [picked, save] = useSaved(lesson, "possibility", "");
+function Possibility({ lesson, route }) {
+  const [picked, save] = useSaved(lesson, "possibility", "", route);
   return (
     <section className="space-y-3" aria-label="Leave with a possibility">
       <ChipGroup
@@ -200,8 +201,8 @@ export default function NoticeFlow({ lesson, route }) {
 
       {example ? (
         <>
-          <GardenSort lesson={lesson} />
-          <ExampleQuestions lesson={lesson} />
+          <GardenSort lesson={lesson} route={route} />
+          <ExampleQuestions lesson={lesson} route={route} />
         </>
       ) : null}
 
@@ -213,7 +214,7 @@ export default function NoticeFlow({ lesson, route }) {
               Look at the garden example first (optional)
             </summary>
             <div className="mt-4">
-              <GardenSort lesson={lesson} />
+              <GardenSort lesson={lesson} route={route} />
             </div>
           </details>
           <OwnQuestions lesson={lesson} route={route} />
@@ -230,7 +231,7 @@ export default function NoticeFlow({ lesson, route }) {
         </details>
       ) : null}
 
-      {!passed ? <Possibility lesson={lesson} /> : null}
+      {!passed ? <Possibility lesson={lesson} route={route} /> : null}
 
       <div className="space-y-3 rounded-lg border border-border bg-secondary p-3 sm:p-4">
         <p className="text-[16px] leading-relaxed text-foreground">

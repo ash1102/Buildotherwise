@@ -57,4 +57,11 @@ export default [
       "react-hooks/rules-of-hooks": "error",
     },
   },
+  {
+    // src/lib uses react-hooks disable comments, so the plugin has to be known there too.
+    files: ["src/lib/**/*.js"],
+    plugins: {
+      "react-hooks": pluginReactHooks,
+    },
+  },
 ];
