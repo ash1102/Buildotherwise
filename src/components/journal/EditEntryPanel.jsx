@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import moment from "moment";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import DictateButton from "@/components/workbook/DictateButton";
 
 /** Editing asks, each time, whether the earlier wording stays. */
 export default function EditEntryPanel({ entry, onSave, onCancel }) {
@@ -23,7 +22,6 @@ export default function EditEntryPanel({ entry, onSave, onCancel }) {
         Keep the earlier wording beside this one, or replace it in place. Either way it stays in your journal.
       </p>
       <div className="mt-3">
-        <DictateButton value={text} onText={setText} />
       </div>
 
       <div className="mt-3 flex flex-wrap gap-3">
