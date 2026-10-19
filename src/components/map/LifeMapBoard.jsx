@@ -1,298 +1,133 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { QUESTIONS_BY_ID, layoutGraph, settleLines } from "@/lib/lifeMap";
+import React, { useMemo, useState } from "react";
+import { ChevronRight, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useStore } from "@/lib/store";
+import { QUESTIONS_BY_ID, addLine, saveEnergyMark } from "@/lib/lifeMap";
+import { ENERGY_CHOICES } from "@/lib/mapEnergy";
+import { buildBranches, wouldCycle } from "@/lib/lifeMapBranches";
 
-/** Each part keeps its own dot colour, so a line is recognisable at a glance. */
-const SECTION_DOT = {
-  places: "bg-primary",
-  placeless: "bg-accent-ink",
-  energy: "bg-accent-soft",
-  barriers: "bg-muted-foreground",
-  threads: "bg-primary-soft",
-  groups: "bg-accent-ink/50",
-};
+const FOLLOW_UPS = [
+  { id: "p1-do", label: "What I do here", prompt: "What do you do at this place?", placeOnly: true },
+  { id: "p1-how", label: "Getting here", prompt: "How do you get to and from this place?", placeOnly: true },
+  { id: "p3-energy", label: "Energy", prompt: "How does this affect your energy?" },
+  { id: "p3-star", label: "What matters to me", prompt: "What matters to you about this?" },
+  { id: "p3-question", label: "Curiosity", prompt: "What are you curious about here?" },
+  { id: "p3-bang", label: "Attention", prompt: "What part, if any, holds your attention?" },
+  { id: "p3-dollar", label: "Money or resources", prompt: "What role do money or resources play in doing this?" },
+  { id: "p4-in-the-way", label: "What gets in the way", prompt: "What gets in the way of this activity or place?" }
+];
 
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-
-/** The question a line answers, in the lesson's own words. */
-const branchFor = (node) => (QUESTIONS_BY_ID[node.question_id] || {}).branch || "";
-
-/** Stable small number from a string, so each line keeps the same gentle bend. */
-const bendFor = (id) => {
-  let h = 0;
-  for (let i = 0; i < id.length; i += 1) h = (h * 31 + id.charCodeAt(i)) | 0;
-  return ((Math.abs(h) % 100) / 100 - 0.5) * 2; // -1 … 1
-};
-
-/** A slightly curved, hand-drawn path between two points (pixel space). */
-const curve = (a, b, id, strength) => {
-  const mx = (a.x + b.x) / 2;
-  const my = (a.y + b.y) / 2;
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  const len = Math.hypot(dx, dy) || 1;
-  const offset = bendFor(id) * Math.min(len * strength, 40);
-  const cx = mx + (-dy / len) * offset;
-  const cy = my + (dx / len) * offset;
-  return `M ${a.x.toFixed(1)} ${a.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
-};
-
-const MAP_MOTION_CSS = `
-.lm-grow { stroke-dasharray: 1; stroke-dashoffset: 1; animation: lm-grow 900ms cubic-bezier(.3,.7,.2,1) forwards; }
-.lm-fade { opacity: 0; animation: lm-fade 700ms ease-out 350ms forwards; }
-.lm-appear { animation: lm-fade 500ms ease-out both; }
-@keyframes lm-grow { to { stroke-dashoffset: 0; } }
-@keyframes lm-fade { from { opacity: 0; } to { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) {
-  .lm-grow { animation: none; stroke-dashoffset: 0; }
-  .lm-fade, .lm-appear { animation: none; opacity: 1; }
-}
-`;
-
-const NUDGE_KEYS = {
-  ArrowLeft: [-0.02, 0],
-  ArrowRight: [0.02, 0],
-  ArrowUp: [0, -0.02],
-  ArrowDown: [0, 0.02],
-};
-
-/**
- * The Life Map as a connected map: a middle, one hub per part, and a pill for every
- * line, kept next to the question it answers. A pill can be dragged, nudged with the
- * arrow keys, or moved with the buttons in the panel — dragging is never the only way.
- */
-export default function LifeMapBoard({ graph, positions, selectedId, onSelect, onMove }) {
-  const boxRef = useRef(null);
-  const drag = useRef(null);
-  const justDragged = useRef(false);
-  const onMoveRef = useRef(onMove);
-  onMoveRef.current = onMove;
-  const [preview, setPreview] = useState(null);
-  const [box, setBox] = useState({ w: 0, h: 0 });
-
-  useEffect(() => {
-    const element = boxRef.current;
-    if (!element) return undefined;
-    const measure = () => setBox({ w: element.clientWidth, h: element.clientHeight });
-    measure();
-    if (typeof ResizeObserver === "undefined") return undefined;
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-
-  const layout = useMemo(() => layoutGraph(graph, positions), [graph, positions]);
-  const settled = useMemo(() => settleLines(graph, layout, positions, box), [graph, layout, positions, box]);
-
-  const spots = useMemo(() => {
-    const resolved = {};
-    Object.entries(settled).forEach(([id, spot]) => {
-      resolved[id] = preview && preview.id === id ? { x: preview.x, y: preview.y } : spot;
-    });
-    return resolved;
-  }, [settled, preview]);
-
-  const nodesById = useMemo(() => {
-    const map = {};
-    graph.nodes.forEach((node) => {
-      map[node.id] = node;
-    });
-    return map;
-  }, [graph.nodes]);
-
-  const edges = useMemo(() => {
-    const lines = [];
-    graph.sections.forEach((section) => {
-      const hub = layout.sections[section.key];
-      if (!hub) return;
-      lines.push({ id: `hub-${section.key}`, from: layout.hub, to: hub, kind: "root" });
-      section.nodes.forEach((node) => {
-        lines.push({ id: `stem-${node.id}`, from: hub, to: spots[node.id] || hub, kind: "stem" });
+function BranchAnswer({ node, onSaved, onCancel }) {
+  const isPlace = node.question_id === "p1-places" || (node.section === "places" && !node.question_id);
+  const options = FOLLOW_UPS.filter((item) => (!item.placeOnly || isPlace) && (item.id !== "p3-energy" || !node.question_id?.startsWith("p3-")));
+  const [questionId, setQuestionId] = useState(isPlace ? "p1-do" : options[0].id);
+  const [text, setText] = useState("");
+  const [energy, setEnergy] = useState("");
+  const question = options.find((item) => item.id === questionId) || options[0];
+  const [error, setError] = useState("");
+  const save = () => {
+    if (question.id === "p3-energy") {
+      if (!saveEnergyMark(node.id, energy, text)) { setError("This entry is no longer available."); return; }
+    } else {
+      addLine(QUESTIONS_BY_ID[question.id].section, {
+        text: text.trim(), question_id: question.id, source_label: question.prompt,
+        parent_id: node.id, parent_choice: "chosen", links: [node.id]
       });
-    });
-    graph.links.forEach(([a, b]) => {
-      if (!spots[a] || !spots[b]) return;
-      lines.push({ id: `link-${a}-${b}`, from: spots[a], to: spots[b], kind: "chosen" });
-    });
-    return lines;
-  }, [graph, layout, spots]);
-
-  /**
-   * A drag is followed across the whole page, so a line can be carried anywhere on the
-   * board and letting go always keeps the new spot. The spots themselves live in the
-   * ref, never in state, so the release commits what the pointer last showed.
-   */
-  useEffect(() => {
-    const move = (event) => {
-      const current = drag.current;
-      if (!current) return;
-      const bounds = boxRef.current?.getBoundingClientRect();
-      if (!bounds) return;
-      const spot = {
-        x: clamp((event.clientX - bounds.left) / bounds.width, 0.02, 0.98),
-        y: clamp((event.clientY - bounds.top) / bounds.height, 0.02, 0.98),
-      };
-      current.moved = true;
-      current.spot = spot;
-      setPreview({ id: current.id, ...spot });
-    };
-
-    const end = () => {
-      const current = drag.current;
-      drag.current = null;
-      setPreview(null);
-      if (!current || !current.moved || !current.spot) return;
-      onMoveRef.current(current.id, current.spot);
-      justDragged.current = true;
-    };
-
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", end);
-    window.addEventListener("pointercancel", end);
-    return () => {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", end);
-      window.removeEventListener("pointercancel", end);
-    };
-  }, []);
-
-  const startDrag = (event, id) => {
-    if (event.button !== undefined && event.button !== 0) return;
-    drag.current = { id, moved: false, spot: spots[id] || null };
+    }
+    onSaved();
   };
-
-  const nudge = (event, id) => {
-    const delta = NUDGE_KEYS[event.key];
-    if (!delta) return;
-    event.preventDefault();
-    const spot = spots[id] || { x: 0.5, y: 0.5 };
-    onMove(id, { x: clamp(spot.x + delta[0], 0.02, 0.98), y: clamp(spot.y + delta[1], 0.02, 0.98) });
-  };
-
-  return (
-    <div
-      ref={boxRef}
-      role="group"
-      aria-label="Life map. Move a line with the arrow keys, or open it to move it with buttons."
-      style={{ minHeight: `${38 + Math.max(0, graph.nodes.length - 10) * 1.8}rem` }}
-      className="relative h-[38rem] w-full overflow-hidden rounded-lg border border-border bg-card/60 sm:h-[42rem]"
-    >
-      <style>{MAP_MOTION_CSS}</style>
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse at 50% 50%, hsl(var(--primary) / 0.07), transparent 60%), radial-gradient(ellipse at 80% 15%, hsl(var(--accent-ink-soft) / 0.08), transparent 45%)",
-        }}
-      />
-
-      {box.w > 0 && box.h > 0 && (
-        <svg className="absolute inset-0 h-full w-full" viewBox={`0 0 ${box.w} ${box.h}`} aria-hidden="true">
-          {edges.map((edge) => {
-            const a = { x: edge.from.x * box.w, y: edge.from.y * box.h };
-            const b = { x: edge.to.x * box.w, y: edge.to.y * box.h };
-            const d = curve(a, b, edge.id, edge.kind === "root" ? 0.12 : 0.22);
-
-            if (edge.kind === "chosen") {
-              return (
-                <path
-                  key={edge.id}
-                  className="lm-fade"
-                  d={d}
-                  fill="none"
-                  stroke="hsl(var(--accent-ink-soft))"
-                  strokeWidth={1.75}
-                  strokeLinecap="round"
-                  strokeDasharray="5 5"
-                />
-              );
-            }
-
-            const root = edge.kind === "root";
-            return (
-              <g key={edge.id}>
-                {root ? (
-                  <path d={d} fill="none" stroke="hsl(var(--primary) / 0.08)" strokeWidth={9} strokeLinecap="round" />
-                ) : null}
-                <path
-                  className="lm-grow"
-                  pathLength={1}
-                  d={d}
-                  fill="none"
-                  stroke={root ? "hsl(var(--primary) / 0.45)" : "hsl(var(--muted-foreground) / 0.45)"}
-                  strokeWidth={root ? 2 : 1.25}
-                  strokeLinecap="round"
-                />
-              </g>
-            );
-          })}
-        </svg>
-      )}
-
-      <div
-        className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 rounded-full border border-dashed border-primary/40 bg-background px-4 py-3 text-center"
-        style={{ left: "50%", top: "50%" }}
-      >
-        <span className="font-heading text-[13px] leading-tight text-foreground">The life you’re actually living</span>
-        <span className="text-[11px] text-muted-faint">your lines, where you put them</span>
-      </div>
-
-      {graph.sections.map((section) => {
-        const hub = layout.sections[section.key];
-        if (!hub) return null;
-        return (
-          <div
-            key={section.key}
-            className="lm-appear absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-full border border-dashed border-border bg-card px-3 py-1.5 shadow-sm"
-            style={{ left: `${hub.x * 100}%`, top: `${hub.y * 100}%` }}
-          >
-            <span
-              className={`h-1.5 w-1.5 rounded-full ${SECTION_DOT[section.key] || "bg-primary"}`}
-              aria-hidden="true"
-            />
-            <span className="font-heading text-[12.5px] text-foreground">{section.label}</span>
-            <span className="text-[11px] text-muted-faint">{section.nodes.length}</span>
-          </div>
-        );
-      })}
-
-      {graph.nodes.map((node) => {
-        const spot = spots[node.id];
-        if (!spot) return null;
-        const branch = branchFor(node);
-        const label = node.label || node.text;
-        return (
-          <button
-            key={node.id}
-            type="button"
-            aria-pressed={selectedId === node.id}
-            aria-label={`${branch || "Answer"}. Line: ${node.text || "not written yet"}. Open it, or use the arrow keys to move it.`}
-            title={node.text}
-            onPointerDown={(event) => startDrag(event, node.id)}
-            onKeyDown={(event) => nudge(event, node.id)}
-            onClick={() => {
-              if (justDragged.current) {
-                justDragged.current = false;
-                return;
-              }
-              /** Opening a line pins it where it sits, so the move buttons carry on from there. */
-              if (!(positions || {})[node.id]) onMove(node.id, spot);
-              onSelect(node.id);
-            }}
-            style={{ left: `${spot.x * 100}%`, top: `${spot.y * 100}%` }}
-            className={`lm-appear absolute -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none rounded-xl border bg-background px-2.5 py-1 text-left shadow-[0_2px_8px_-2px_hsl(var(--primary)/0.25)] transition ${
-              selectedId === node.id ? "border-primary ring-2 ring-primary/30" : "border-border hover:border-primary/60"
-            }`}
-          >
-            <span className="block max-w-[9.5rem] truncate text-[12px] text-foreground">
-              {label || "Not written yet"}
-            </span>
-            {branch ? (
-              <span className="block max-w-[9.5rem] truncate text-[10px] text-muted-faint">{branch}</span>
-            ) : null}
-          </button>
-        );
-      })}
+  return <section className="mt-4 space-y-4 rounded-lg border border-primary/30 bg-secondary p-4" aria-label={"Answer about " + (node.label || node.text)}>
+    <p className="text-[14px] text-muted-foreground">Answering about:</p>
+    <p className="break-words text-[17px] font-medium">{node.label || node.text}</p>
+    <label className="block text-[14px] font-medium" htmlFor={"followup-" + node.id}>What would you like to add?</label>
+    <select id={"followup-" + node.id} value={question.id} onChange={(event) => { setQuestionId(event.target.value); setText(""); setEnergy(""); }}
+      className="w-full rounded-md border border-input bg-card px-3 py-2 text-[16px]">
+      {options.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+    </select>
+    <p className="text-[16px] font-medium">{question.prompt}</p>
+    {question.id === "p3-energy" ? <div className="flex flex-wrap gap-2" role="group" aria-label="Energy response">
+      {ENERGY_CHOICES.map((item) => <button key={item.id} type="button" aria-pressed={energy === item.id} onClick={() => setEnergy(item.id)}
+        className={`rounded-md border px-3 py-2 text-[15px] ${energy === item.id ? "border-primary bg-primary text-primary-foreground" : "border-input bg-card"}`}>{item.label}</button>)}
+    </div> : null}
+    <label htmlFor={"followup-note-" + node.id} className="block text-[14px]">{question.id === "p3-energy" ? "Your explanation (optional)" : "Your answer"}</label>
+    <Textarea id={"followup-note-" + node.id} value={text} onChange={(event) => setText(event.target.value)} rows={3} />
+    <div className="flex flex-wrap gap-3">
+      <Button type="button" onClick={save} disabled={question.id === "p3-energy" ? !energy : !text.trim()}>Add to this branch</Button>
+      <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
     </div>
-  );
+    {error ? <p role="alert">{error}</p> : null}
+  </section>;
+}
+
+function BranchNode({ id, tree, depth, selectedId, onSelect, onSetParent, expanded, setExpanded }) {
+  const node = tree.nodesById[id];
+  const children = tree.childrenById[id];
+  const [adding, setAdding] = useState(false);
+  const energy = ENERGY_CHOICES.find((item) => item.id === node.energy_choice);
+  const title = energy ? energy.label : node.label || node.text;
+  const note = energy ? node.energy_note : node.label && node.text !== node.label ? node.text : "";
+  const relation = QUESTIONS_BY_ID[node.question_id]?.branch || (node.section === "placeless" ? "Activity" : "");
+  const open = expanded[id] ?? depth === 0;
+  const otherLinks = (node.links || []).filter((other) => tree.nodesById[other] && other !== tree.parentById[id] && tree.parentById[other] !== id);
+  const parentOptions = Object.values(tree.nodesById).filter((other) => other.id !== id && !wouldCycle(id, other.id, tree.parentById));
+  return <li className="min-w-0">
+    <details open={open} onToggle={(event) => {
+      const next = event.currentTarget.open;
+      if (next !== open) setExpanded((current) => ({ ...current, [id]: next }));
+    }} className={`lm-branch min-w-0 rounded-xl border bg-card ${selectedId === id ? "border-primary ring-2 ring-primary/20" : "border-border"}`}>
+      <summary className="flex cursor-pointer list-none items-start gap-2 p-4 [&::-webkit-details-marker]:hidden">
+        <ChevronRight aria-hidden="true" className={`mt-0.5 h-5 w-5 shrink-0 transition-transform ${open ? "rotate-90" : ""}`} />
+        <span className="min-w-0 flex-1">
+          {relation ? <span className="mb-1 block text-[12px] text-muted-foreground">{relation}</span> : null}
+          <span className="block whitespace-pre-wrap break-words text-[17px] font-medium leading-snug">{title}</span>
+          <span className="mt-1 block text-[12px] text-muted-foreground">{children.length ? children.length + (children.length === 1 ? " answer attached" : " answers attached") : "Open to add an answer"}</span>
+        </span>
+      </summary>
+      <div className="px-4 pb-4">
+        {note ? <p className="mb-4 whitespace-pre-wrap break-words text-[16px] leading-relaxed">{note}</p> : null}
+        {children.length ? <ul className={`mb-4 space-y-3 border-l-2 border-primary/30 ${depth < 3 ? "ml-1 pl-3 sm:ml-2 sm:pl-4" : "pl-2"}`}>
+          {children.map((child) => <BranchNode key={child} id={child} tree={tree} depth={depth + 1} selectedId={selectedId} onSelect={onSelect} onSetParent={onSetParent} expanded={expanded} setExpanded={setExpanded} />)}
+        </ul> : null}
+        <div className="flex flex-wrap gap-x-4 gap-y-2">
+          <button type="button" onClick={() => setAdding((value) => !value)} className="inline-flex items-center gap-1 text-[14px] font-medium text-accent-ink underline underline-offset-2"><Plus className="h-4 w-4" aria-hidden="true" />Answer about this entry</button>
+          <button type="button" onClick={() => onSelect(id)} className="text-[14px] text-muted-foreground underline underline-offset-2">Edit entry or connections</button>
+        </div>
+        {adding ? <BranchAnswer node={node} onCancel={() => setAdding(false)} onSaved={() => { setAdding(false); setExpanded((current) => ({ ...current, [id]: true })); }} /> : null}
+        {onSetParent ? <details className="mt-3">
+          <summary className="cursor-pointer text-[13px] text-muted-foreground">Choose or change its branch</summary>
+          <label htmlFor={"parent-" + id} className="mt-2 block text-[14px]">Attach this answer beneath:</label>
+          <select id={"parent-" + id} value={tree.parentById[id] || "__separate"} onChange={(event) => onSetParent(id, event.target.value === "__separate" ? "" : event.target.value)}
+            className="mt-2 w-full rounded-md border border-input bg-background px-3 py-2 text-[16px]">
+            <option value="__separate">Keep as a separate starting entry</option>
+            {parentOptions.map((other) => <option key={other.id} value={other.id}>{other.label || other.text}</option>)}
+          </select>
+        </details> : null}
+        {otherLinks.length ? <div className="mt-3 text-[13px] text-muted-foreground">
+          Also connected to: {otherLinks.map((other) => <button key={other} type="button" onClick={() => onSelect(other)} className="mr-3 underline underline-offset-2">{tree.nodesById[other].label || tree.nodesById[other].text}</button>)}
+        </div> : null}
+      </div>
+    </details>
+  </li>;
+}
+
+/** Normal-flow branches grow around the entry they describe, so cards never overlap. */
+export default function LifeMapBoard({ graph, selectedId, onSelect, onSetParent }) {
+  const tree = useMemo(() => buildBranches(graph), [graph]);
+  const [expanded, setExpanded] = useStore("lifeMapBranchExpansion", {});
+  const all = (value) => setExpanded(Object.fromEntries(graph.nodes.map((node) => [node.id, value])));
+  const renderNode = (id) => <BranchNode key={id} id={id} tree={tree} depth={0} selectedId={selectedId} onSelect={onSelect} onSetParent={onSetParent} expanded={expanded} setExpanded={setExpanded} />;
+  return <section className="min-w-0 space-y-5 rounded-xl border border-border bg-secondary/30 p-3 sm:p-5" aria-label="Your unfolding Life Map">
+    <style>{`@media print { .lm-branch > div { display: block !important; } .lm-branch { break-inside: avoid; } }`}</style>
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <div><h2 className="font-heading text-2xl">Your life, unfolding</h2><p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">Open a place or activity. Its answers unfold underneath it. Add a follow-up from that entry to keep the connection clear.</p></div>
+      <div className="flex gap-3 text-[14px]"><button type="button" onClick={() => all(true)} className="underline underline-offset-2">Expand all</button><button type="button" onClick={() => all(false)} className="underline underline-offset-2">Collapse all</button></div>
+    </div>
+    {tree.roots.length ? <ul className="grid min-w-0 items-start gap-4 lg:grid-cols-2">{tree.roots.map(renderNode)}</ul> : <p className="rounded-lg border border-dashed border-border p-4 text-[15px] text-muted-foreground">Add a place or activity to start your first branch.</p>}
+    {tree.unlinked.length ? <section className="space-y-3 border-t border-border pt-5" aria-label="Answers not yet placed">
+      <h3 className="text-[17px] font-medium">Answers not yet placed in a branch</h3>
+      <p className="text-[14px] text-muted-foreground">These answers are preserved. Open one and choose its branch, or keep it as a separate starting entry.</p>
+      <ul className="space-y-3">{tree.unlinked.map(renderNode)}</ul>
+    </section> : null}
+  </section>;
 }
