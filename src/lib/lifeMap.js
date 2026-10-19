@@ -75,8 +75,9 @@ export const MAP_QUESTION_PARTS = [
     key: "part-3",
     title: "Mark the energy",
     section: "energy",
-    intro: "Look over what you have so far. Don't analyze it yet. Just mark it. There is no scoring system.",
+    intro: "Select an entry from your week, then mark how it affects your energy. You can add a note, change your answer, or leave it uncertain. There is no scoring system.",
     questions: [
+      { id: "p3-energy", branch: "Energy marks", text: "How does this entry affect your energy?" },
       { id: "p3-plus", branch: "Gives me energy", text: "What gives you energy?" },
       { id: "p3-minus", branch: "Drains me", text: "What drains you?" },
       { id: "p3-star", branch: "I care about", text: "What do you care about?" },
@@ -330,6 +331,8 @@ export function buildGraph(map) {
       source_code: item.source_code || "",
       source_label: item.source_label || "",
       question_id: item.question_id || "",
+      energy_choice: item.energy_choice || "",
+      energy_note: item.energy_note || "",
     })),
   }));
 
