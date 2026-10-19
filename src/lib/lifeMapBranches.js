@@ -46,7 +46,7 @@ export function buildBranches(graph) {
   return { nodesById, parentById, childrenById, roots, unlinked };
 }
 
-export function branchMarkdown(graph, questionLabels = {}) {
+export function branchMarkdown(graph, questionLabels = {}, journalEntries = []) {
   const tree = buildBranches(graph);
   const walk = (id, depth = 0) => {
     const node = tree.nodesById[id], indent = "  ".repeat(depth);
@@ -55,6 +55,8 @@ export function branchMarkdown(graph, questionLabels = {}) {
     if (node.label && node.text !== node.label) lines.push(indent + "  - Note: " + node.text.replace(/\n/g, "\n" + indent + "    "));
     const relation = questionLabels[node.question_id]?.branch || node.source_label;
     if (relation) lines.push(indent + "  - Answers: " + relation);
+    const journal = node.entry_id ? journalEntries.find((entry) => entry.id === node.entry_id) : null;
+    if (journal) lines.push(indent + "  - Journal: " + journal.body.replace(/\n/g, "\n" + indent + "    "));
     for (const child of tree.childrenById[id]) lines.push(walk(child, depth + 1));
     const extra = (node.links || []).filter((other) => tree.nodesById[other] && other !== tree.parentById[id] && tree.parentById[other] !== id);
     if (extra.length) lines.push(indent + "  - Also connected to: " + extra.map((other) => tree.nodesById[other].label || tree.nodesById[other].text).join("; "));
