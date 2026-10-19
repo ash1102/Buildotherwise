@@ -3,7 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { saveEnergyMark } from "@/lib/lifeMap";
-import { ENERGY_CHOICES, energyTargets } from "@/lib/mapEnergy";
+import { ENERGY_CHOICES, ENERGY_PROMPT, energyTargets } from "@/lib/mapEnergy";
 
 const DRAFT_KEY = "lifeMapEnergyDrafts";
 
@@ -13,8 +13,9 @@ export default function EnergyMarks({ graph, onEarlierPart }) {
   const [drafts, setDrafts] = useStore(DRAFT_KEY, {});
   const [saved, setSaved] = useState("");
   const source = targets.find((node) => node.id === selectedId);
-  const existing = source ? graph.nodes.find((node) => node.question_id === "p3-energy" && node.links.includes(source.id)) : null;
-  const draft = drafts[selectedId] || { choice: existing?.energy_choice || "", note: existing?.energy_note || "" };
+  const existing = source ? graph.nodes.find((node) => node.question_id === "p3-energy" && node.energy_version === 2 && node.links.includes(source.id)) : null;
+  const storedDraft = drafts[selectedId];
+  const draft = storedDraft && ENERGY_CHOICES.some(item => item.id === storedDraft.choice) ? storedDraft : { choice: existing?.energy_choice || "", note: existing?.energy_note || "" };
   const change = (patch) => {
     setSaved("");
     setDrafts((current) => ({ ...current, [selectedId]: { ...draft, ...patch } }));
@@ -29,7 +30,7 @@ export default function EnergyMarks({ graph, onEarlierPart }) {
     <section className="mt-5 space-y-4 rounded-xl border border-border bg-background p-4 sm:p-5" aria-label="Mark an existing map entry">
       <div>
         <h4 className="text-[18px] font-medium text-foreground">Which entry are you marking?</h4>
-        <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">Choose a place or activity you already added. Your energy response will be linked to that exact entry.</p>
+        <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">Choose a place, activity, or person/group you already added. This is one observation, not a permanent property of the entry or proof of what caused it.</p>
       </div>
       {targets.length ? <>
         <label htmlFor="energy-entry" className="block text-[15px] font-medium">Entry from your map</label>
@@ -45,7 +46,7 @@ export default function EnergyMarks({ graph, onEarlierPart }) {
             {source.label && source.text !== source.label ? <p className="mt-1 text-[15px]">{source.text}</p> : null}
           </div>
           <fieldset>
-            <legend className="text-[16px] font-medium">How does this affect your energy?</legend>
+            <legend className="text-[16px] font-medium">{ENERGY_PROMPT}</legend>
             <div className="mt-2 flex flex-wrap gap-2">
               {ENERGY_CHOICES.map((choice) => <button key={choice.id} type="button" aria-pressed={draft.choice === choice.id}
                 onClick={() => change({ choice: choice.id })}
@@ -54,6 +55,7 @@ export default function EnergyMarks({ graph, onEarlierPart }) {
           </fieldset>
           <div>
             <label htmlFor="energy-note" className="block text-[16px] font-medium">Anything you want to explain about this entry? (Optional)</label>
+            <p className="mt-2 text-[13px] text-muted-foreground">You could note when it happened, what else was going on, support, costs, or what you are unsure about. Saving updates your current observation for this entry.</p>
             <Textarea id="energy-note" aria-label={"Energy note about " + (source.label || source.text)} value={draft.note} onChange={(event) => change({ note: event.target.value })} rows={3} className="mt-2" />
           </div>
           <Button type="button" disabled={!draft.choice} onClick={save}>Save energy mark</Button>
