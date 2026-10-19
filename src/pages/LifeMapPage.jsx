@@ -30,6 +30,7 @@ import HybridMap from "@/components/map/HybridMap";
 import MapPickCard from "@/components/map/MapPickCard";
 import LifeMapNodePanel from "@/components/map/LifeMapNodePanel";
 import LifeMapList from "@/components/map/LifeMapList";
+import LifeMapVisual from "@/components/map/LifeMapVisual";
 import BringInSavedAnswer from "@/components/map/BringInSavedAnswer";
 import MapQuestions from "@/components/map/MapQuestions";
 import StepNav from "@/components/workbook/StepNav";
@@ -49,6 +50,7 @@ export default function LifeMapPage() {
   const [draftSection, setDraftSection] = useState(MAP_SECTIONS[0].key);
   const [selectedId, setSelectedId] = useState(null);
   const [asList, setAsList] = useState(false);
+  const [asMap, setAsMap] = useState(false);
 
   /** First unfinished Getting Started step, then the next unfinished workbook step. */
   const nextStep = useMemo(
@@ -199,8 +201,23 @@ export default function LifeMapPage() {
           <Button
             type="button"
             variant="outline"
+            aria-pressed={asMap}
+            onClick={() => {
+              setAsList(false);
+              setAsMap((value) => !value);
+            }}
+            className="rounded-full"
+          >
+            {asMap ? "Show branches" : "Show as map"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
             aria-pressed={asList}
-            onClick={() => setAsList((value) => !value)}
+            onClick={() => {
+              setAsMap(false);
+              setAsList((value) => !value);
+            }}
             className="rounded-full"
           >
             {asList ? "Show the map" : "Show as a list"}
