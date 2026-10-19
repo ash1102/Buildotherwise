@@ -5,7 +5,9 @@ import { MAP_PICK_FIELDS, MAP_QUESTION_PARTS } from "@/lib/lifeMap";
 export default function MapPickCard({ pick, onJumpToPart }) {
   const values = pick || {};
   const nothingYet = Boolean(values.nothing_yet);
-  const hasPick = MAP_PICK_FIELDS.some((field) => String(values[field.id] || "").trim());
+  const isExample = (value) => /^Fictional:/i.test(String(value || "").trim());
+  const hasPick = MAP_PICK_FIELDS.some((field) => String(values[field.id] || "").trim() && !isExample(values[field.id]));
+  const exampleFields = MAP_PICK_FIELDS.filter((field) => isExample(values[field.id]));
 
   return (
     <section className="mt-4 rounded-xl border border-border bg-card p-4 sm:p-5" aria-label="Worth exploring">
@@ -29,7 +31,7 @@ export default function MapPickCard({ pick, onJumpToPart }) {
           >
             {MAP_PICK_FIELDS.map((field) => {
               const value = String(values[field.id] || "").trim();
-              if (!value) return null;
+              if (!value || isExample(value)) return null;
               return (
                 <p key={field.id} className="text-[13px] leading-relaxed">
                   <span className="text-muted-faint">{field.label} </span>
@@ -48,6 +50,12 @@ export default function MapPickCard({ pick, onJumpToPart }) {
           </button>
         )}
       </div>
+      {exampleFields.length ? <details className="mt-4 rounded-lg border border-border p-3">
+        <summary className="cursor-pointer text-[14px] font-medium">Saved example text to review</summary>
+        <p className="mt-2 text-[14px] text-muted-foreground">These fields are explicitly labelled fictional examples. They are kept here separately from your reflection.</p>
+        {exampleFields.map((field) => <p key={field.id} className="mt-2 text-[14px]"><span className="text-muted-foreground">{field.label} </span>{values[field.id]}</p>)}
+        <button type="button" onClick={() => onJumpToPart?.(MAP_QUESTION_PARTS.length)} className="mt-3 text-[14px] text-accent-ink underline">Review or replace these fields</button>
+      </details> : null}
     </section>
   );
 }
