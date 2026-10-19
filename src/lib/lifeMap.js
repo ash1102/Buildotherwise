@@ -292,7 +292,7 @@ export function addLine(sectionKey, line) {
 /** Save against the current map so a repeated click updates rather than duplicates. */
 export function saveEnergyMark(sourceId, choice, note) {
   const map = readStore(LIFEMAP_KEY, {});
-  const source = [...(map.places || []), ...(map.placeless || [])].find((line) => line.id === sourceId);
+  const source = Object.values(map).flatMap((items) => Array.isArray(items) ? items : []).find((line) => line.id === sourceId);
   const line = energyLine(source, choice, note);
   if (!line) return null;
   const energy = map.energy || [];
