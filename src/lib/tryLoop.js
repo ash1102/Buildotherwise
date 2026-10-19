@@ -14,7 +14,7 @@
 export const PLAN_KEY = "plannedTry";
 export const CHECKIN_KEY = "tryCheckIns";
 
-export const EXPLORATION_MENU = [
+const EXPLORATION_MENU_BASE = [
   {
     "category": "Making",
     "items": [
@@ -222,8 +222,37 @@ export const EXPLORATION_MENU = [
         "alternative": "Watching, researching, or asking a question counts."
       }
     ]
+  },
+  {
+    category: "Nature",
+    items: [
+      { id: "explore-nature-0", label: "Observe a plant and describe three details", minutes: "5–20 minutes", cost: "Use what you can already access", alternative: "Use a real photograph or recording if direct observation is not accessible." },
+      { id: "explore-nature-1", label: "Listen for patterns in sounds around you", minutes: "5–20 minutes", cost: "Use what you can already access", alternative: "Use a recording, or describe visual patterns instead." },
+      { id: "explore-nature-2", label: "Investigate a question about a living thing", minutes: "5–20 minutes", cost: "Use what you can already access", alternative: "Observe, read an available source, or ask someone; no travel or collecting needed." }
+    ]
   }
 ];
+
+const MATERIALS_BY_CATEGORY = {
+  Making: "Everyday materials you already have; paper and a pencil for sketching.",
+  Solving: "An ordinary object, a question, or an available guide. No disassembly required.",
+  Building: "Recycled materials, paper for a plan, or an accessible assembly demonstration.",
+  Connecting: "A willing person to talk with, or an accessible public description or recording.",
+  Helping: "Permission from anyone involved, or public information about a community activity.",
+  Creating: "Paper, a camera you already have, or your voice and a surface for rhythm.",
+  Organizing: "A small collection you control, paper, or existing digital files.",
+  Unexpected: "An available description, demonstration, or person who can answer a question.",
+  Nature: "An accessible view, image, or recording; optional paper or notes."
+};
+
+export const EXPLORATION_MENU = EXPLORATION_MENU_BASE.map((group) => ({
+  ...group,
+  items: group.items.map((item) => ({
+    ...item,
+    materials: MATERIALS_BY_CATEGORY[group.category],
+    access: "Check what is available to you before planning. Choose a smaller version or another route if needed."
+  }))
+}));
 
 /** Example small tries. "own" and "reject" keep the lesson's other two routes open. */
 export const TRY_CARDS = [
