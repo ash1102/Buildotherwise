@@ -35,7 +35,7 @@ function normalizeDecisions(map) {
 }
 
 /** Getting Started. Other lessons use the routes stored on the lesson, including Pass. */
-export const GETTING_STARTED_ROUTES = ["Say it", "Write it", "Watch", "Pass"];
+export const GETTING_STARTED_ROUTES = ["Pass"];
 
 /** Kept so an older saved choice still reads as paused. It is not offered. */
 export const PAUSE_ROUTE = "Write one line, then pause";
@@ -61,7 +61,7 @@ export function routeGuidanceFor(route) {
 }
 
 /**
- * Getting Started always offers Say it, Write it, Watch, and Pass.
+ * Getting Started uses direct text fields with per-field dictation and a skip action.
  * Any other lesson shows the routes stored on it, and nothing when it has none.
  * The opener is a map, not one of those steps.
  */
