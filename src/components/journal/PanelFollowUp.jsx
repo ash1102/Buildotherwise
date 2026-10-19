@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import DictateButton from "@/components/workbook/DictateButton";
 
 /** Three ways back into an entry, so a thought can keep going. */
 const STARTERS = ["Here’s what happened next…", "I see this differently now…", "This question is still open…"];
@@ -37,7 +36,6 @@ export default function PanelFollowUp({ onSave, onCancel }) {
         className="mt-2 min-h-[4rem] border-natural bg-white text-[13px] leading-relaxed"
       />
       <div className="mt-2 flex flex-wrap items-center gap-2">
-        <DictateButton value={text} onText={setText} />
         <Button
           type="button"
           size="sm"
