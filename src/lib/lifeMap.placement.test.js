@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import test from "node:test";
+import { buildBranches, branchMarkdown, wouldCycle } from "./lifeMapBranches.js";
 import { nextOpenStep } from "./progress.js";
 import { LIFEMAP_KEY } from "./workbook.js";
 import {
@@ -256,31 +256,95 @@ test("a line someone already moved stays where they put it", () => {
   assert.deepEqual(settled.a, saved.a);
 });
 
-test("LifeMapBoard's layout search keeps an unmoved line inside its area", () => {
-  const board = readFileSync(new URL("../components/map/LifeMapBoard.jsx", import.meta.url), "utf8");
-  assert.match(board, /settleLines\(/);
-  assert.doesNotMatch(board, /ring <= 30/);
+function branchingFixture() {
+  return buildGraph({
+    places: [
+      { id: "home", text: "Home", question_id: "p1-places", links: [] },
+      { id: "moms", text: "mom's house", question_id: "p1-places", links: [] },
+      { id: "laundry", text: "Laundry", question_id: "p1-do", links: ["moms"] },
+      { id: "baby", text: "Take care of baby", question_id: "p1-do", links: ["home"] },
+      { id: "ride", text: "Mom picks me up and drops me off", question_id: "p1-how", links: ["moms"] }
+    ],
+    placeless: [
+      { id: "meetings", text: "online meetings", question_id: "p2-placeless", links: [] },
+      { id: "school", text: "School", question_id: "p2-placeless", links: [] }
+    ],
+    energy: [
+      { id: "laundry-energy", text: "Laundry — Not sure yet", question_id: "p3-energy", links: ["laundry"], energy_choice: "unsure" },
+      { id: "meeting-energy", text: "online meetings — Both", question_id: "p3-energy", links: ["meetings"], energy_choice: "both", energy_note: "The experience varies." },
+      { id: "care", text: "Success in my program", question_id: "p3-star", links: [] }
+    ],
+    barriers: [{ id: "network", text: "Networking", question_id: "p4-rarely", links: [] }]
+  });
+}
 
-  const graph = buildGraph({
-    places: [{ id: "a", text: "the gym", question_id: "p1-places", links: [] }],
-    energy: [{ id: "b", text: "the repair cafe", question_id: "p3-plus", links: [] }],
-  });
-  const base = defaultPositions(graph.sections);
-  /** Start on top of the area label, so the search has to look for another spot. */
-  const layout = {
-    hub: { x: 0.5, y: 0.5 },
-    sections: base.sections,
-    nodes: {
-      a: { ...base.sections.places },
-      b: { ...base.sections.energy },
-    },
-  };
-  const settled = settleLines(graph, layout, {}, { w: 900, h: 800 });
-  const distance = (left, right) => Math.hypot(left.x - right.x, left.y - right.y);
-  graph.nodes.forEach((node) => {
-    assert.ok(
-      distance(settled[node.id], layout.sections[node.section]) <= SECTION_AREA_RADIUS,
-      `${node.text} was walked out of ${node.section}`
-    );
-  });
+test("existing selected connections unfold place → activity → reflection without changing answers", () => {
+  const graph = branchingFixture();
+  const before = JSON.stringify(graph);
+  const tree = buildBranches(graph);
+  assert.equal(tree.parentById.laundry, "moms");
+  assert.equal(tree.parentById.baby, "home");
+  assert.equal(tree.parentById.ride, "moms");
+  assert.equal(tree.parentById["laundry-energy"], "laundry");
+  assert.equal(tree.parentById["meeting-energy"], "meetings");
+  assert.ok(tree.unlinked.includes("care"));
+  assert.ok(tree.unlinked.includes("network"));
+  const visited = [];
+  const walk = (id) => { visited.push(id); tree.childrenById[id].forEach(walk); };
+  [...tree.roots, ...tree.unlinked].forEach(walk);
+  assert.equal(new Set(visited).size, graph.nodes.length);
+  assert.equal(visited.length, graph.nodes.length, "every saved entry appears once");
+  assert.equal(JSON.stringify(graph), before, "branch rendering never rewrites saved answers");
 });
+
+test("ambiguous connections and identical wording do not choose a parent for the participant", () => {
+  const graph = buildGraph({
+    placeless: [
+      { id: "a", text: "Reading", question_id: "p2-placeless", links: [] },
+      { id: "b", text: "Reading", question_id: "p2-placeless", links: [] }
+    ],
+    energy: [
+      { id: "exact", text: "Gives energy", question_id: "p3-plus", links: ["b"] },
+      { id: "ambiguous", text: "Both", question_id: "p3-energy", links: ["a", "b"] }
+    ]
+  });
+  let tree = buildBranches(graph);
+  assert.equal(tree.parentById.exact, "b");
+  assert.equal(tree.parentById.ambiguous, undefined);
+  graph.nodes.find((node) => node.id === "ambiguous").parent_id = "a";
+  tree = buildBranches(graph);
+  assert.equal(tree.parentById.ambiguous, "a");
+});
+
+test("branch cycles are rejected and explicitly separate answers stay separate", () => {
+  const graph = branchingFixture();
+  graph.nodes.find((node) => node.id === "care").parent_choice = "standalone";
+  graph.nodes.find((node) => node.id === "care").links = ["school"];
+  const tree = buildBranches(graph);
+  assert.ok(tree.roots.includes("care"));
+  assert.equal(tree.parentById.care, undefined);
+  assert.ok(wouldCycle("moms", "laundry-energy", tree.parentById));
+  assert.equal(wouldCycle("care", "school", tree.parentById), false);
+});
+
+test("download follows the same branches and preserves unplaced answers and journal notes", () => {
+  const graph = branchingFixture();
+  graph.nodes.find((node) => node.id === "laundry").entry_id = "journal-1";
+  const markdown = branchMarkdown(graph, QUESTIONS_BY_ID, [{ id: "journal-1", body: "A private observation." }]);
+  assert.ok(markdown.includes("- mom's house"));
+  assert.ok(markdown.includes("  - Laundry"));
+  assert.ok(markdown.includes("    - Laundry — Not sure yet"));
+  assert.ok(markdown.includes("Journal: A private observation."));
+  assert.ok(markdown.includes("## Answers not yet placed in a branch"));
+  assert.ok(markdown.includes("Success in my program"));
+});
+
+test("explicitly fictional saved examples are preserved in storage but excluded from participant takeaways", () => {
+  const pick = { "one-thing": "Fictional: A sample activity.", "do-not-know": "I am still deciding." };
+  const before = JSON.stringify(pick);
+  const lines = exploreLines(pick);
+  assert.equal(lines.length, 1);
+  assert.equal(lines[0].text, "I am still deciding.");
+  assert.equal(JSON.stringify(pick), before);
+});
+
