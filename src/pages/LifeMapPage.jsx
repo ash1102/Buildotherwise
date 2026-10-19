@@ -262,7 +262,9 @@ export default function LifeMapPage() {
       </section>
 
       <div ref={mapRef} className="scroll-mt-4">
-        {asList ? (
+        {asMap ? (
+          <LifeMapVisual graph={graph} selectedId={selectedId} onSelect={selectEntry} />
+        ) : asList ? (
           <LifeMapList
             graph={graph}
             explore={explore}
