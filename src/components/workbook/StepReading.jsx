@@ -32,9 +32,9 @@ function groupReadingLines(text) {
 }
 
 /** One reading, in the words it was stored with. A long one stays short until Read more. */
-export default function StepReading({ title, body }) {
+export default function StepReading({ title, body, startOpen = false }) {
   const { preview, long } = readingPreview(body);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(startOpen);
   const text = groupReadingLines(long && !open ? preview : body);
 
   return (

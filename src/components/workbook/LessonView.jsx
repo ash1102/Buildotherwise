@@ -83,6 +83,30 @@ function JoinChoicePicker({ lessonCode, lessonTitle, index, label }) {
   );
 }
 
+/** Next Decision stays on the closing step. Earlier steps already have a route choice. */
+const DECISION_HELD_UNTIL_CLOSE = new Set(["M3-L1", "M3-L2", "M5-L1", "M5-L2"]);
+
+function routeChangesQuestions(code) {
+  return code === "M1-L1" || code === "M1-L3" || code === "M3-L2" || code === "M5-L2";
+}
+
+/** Hide prompts that belong to a route the participant did not pick. */
+function promptForRoute(lesson, prompt, route) {
+  const text = String(prompt || "");
+  const selected = String(route || "").trim();
+  if (lesson.code === "M5-L2") {
+    const continuation = /continuation/i.test(selected);
+    const navigation = /navigation/i.test(selected);
+    if (/^Continuation:/i.test(text)) return continuation;
+    if (/^Navigation:/i.test(text)) return navigation;
+    return continuation || navigation;
+  }
+  if (lesson.code === "M3-L2" && /what actually happened|effort or discomfort|might you try again/i.test(text)) {
+    return /^attempt it\b/i.test(selected);
+  }
+  return true;
+}
+
 /** The full journal-minimum paragraph is shown on the first steps; after that, a one-line reminder. */
 const JOURNAL_MINIMUM_FULL_ON = ["O.1", "O.6"];
 const JOURNAL_MINIMUM_SHORT =
@@ -224,11 +248,11 @@ export default function LessonView({
   // carry-forward sources use, so a saved answer still reads back where it was written.
   const tryPrompts = rawTry
     .map((prompt, index) => ({ prompt, index, fieldKey: `try-${index}` }))
-    .filter((item) => notAnOption(item.prompt));
+    .filter((item) => notAnOption(item.prompt) && promptForRoute(lesson, item.prompt, route));
   const reflectPrompts = rawReflect
     .map((prompt, index) => ({ prompt, index: rawTry.length + index, fieldKey: `reflect-${index}` }))
-    .filter((item) => notAnOption(item.prompt));
-  const routes = participationRoutesFor(lesson).filter((option) => !/^(say it|write it|watch)$/i.test(option));
+    .filter((item) => notAnOption(item.prompt) && promptForRoute(lesson, item.prompt, route));
+  const routes = participationRoutesFor(lesson);
   const guidance = routeGuidanceFor(route);
   const hasRoutes = routes.length > 0;
   const oneLine = guidance ? guidance.field === "line" : false;
@@ -249,6 +273,7 @@ export default function LessonView({
   // Reflection or reading questions do not implicitly require a decision.
   // Preserve explicit next-decision steps and deliberately configured decision choices.
   const asksForDecision =
+    !DECISION_HELD_UNTIL_CLOSE.has(lesson.code) &&
     lesson.has_decision !== false &&
     (decisionStep || (lesson.decision_options || []).length > 0 ||
       (lesson.type !== "reading" && (rawTry.length > 0 || rawReflect.length > 0)));
@@ -270,10 +295,13 @@ export default function LessonView({
   );
 
   const substantiveRoutes = routes.filter((option) => !/^pass$/i.test(option));
+  const watching = /^watch$/i.test(String(route || "").trim());
   const answerChoices = hasRoutes ? (
     <div className="space-y-3">
       {substantiveRoutes.length ? <>
-        <p id={`answer-route-${lesson.code}`} className="text-[15px] font-medium text-foreground">Where would you like to start?</p>
+        <p id={`answer-route-${lesson.code}`} className="text-[15px] font-medium text-foreground">
+          {routeChangesQuestions(lesson.code) ? "Where would you like to start?" : "How are you taking this step?"}
+        </p>
         <RouteChips routes={substantiveRoutes} value={route} onChange={(next) => onRouteChange(next)} labelledBy={`answer-route-${lesson.code}`} />
       </> : null}
       {routes.some((option) => /^pass$/i.test(option)) ? (
@@ -301,6 +329,22 @@ export default function LessonView({
       key: "teach",
       label: "What to know",
       content: <Prose text={teachTextFor(lesson)} />,
+    });
+  }
+
+  if (readings.length) {
+    beats.push({
+      key: "reading",
+      label: readings.length > 1 ? "Readings" : "Reading",
+      content: (
+        <div className="divide-y divide-border">
+          {readings.map((reading) => (
+            <div key={reading.id} className="py-5 first:pt-0 last:pb-0">
+              <StepReading title={reading.title} body={reading.body} startOpen={lesson.type === "reading"} />
+            </div>
+          ))}
+        </div>
+      ),
     });
   }
 
@@ -374,7 +418,9 @@ export default function LessonView({
             <CarryForward sources={carrySources} selected={carried} onChange={onCarriedChange} />
           ) : null}
           {interactions.map(renderInteraction)}
-          {hasPlanner || hasCheckIn ? (
+          {watching ? (
+            <p className="text-[15px] leading-relaxed text-muted-foreground">Watching counts. You can move on without writing.</p>
+          ) : hasPlanner || hasCheckIn ? (
             <details ref={detailRef} className="rounded-xl border border-border bg-card p-4 sm:p-5">
               <summary className="cursor-pointer text-[16px] font-medium text-foreground">
                 Add more detail (optional) · {tryPrompts.length} questions
@@ -414,7 +460,13 @@ export default function LessonView({
         <div className="space-y-6">
           {tryPrompts.length ? null : answerChoices}
           {tryPrompts.length ? null : <PrivacyNote />}
-          {reflectPrompts.map((item) => promptField(item.prompt, item.index, item.fieldKey))}
+          {watching ? (
+            tryPrompts.length ? null : (
+              <p className="text-[15px] leading-relaxed text-muted-foreground">Watching counts. You can move on without writing.</p>
+            )
+          ) : (
+            reflectPrompts.map((item) => promptField(item.prompt, item.index, item.fieldKey))
+          )}
         </div>
       ),
     });
@@ -447,7 +499,13 @@ export default function LessonView({
   const journalHref = journalStepHref(lesson.code);
   const savesToJournal =
     tryPrompts.length > 0 || reflectPrompts.length > 0 || asksForDecision || interactions.length > 0;
-  const closingJournalHref = lesson.what_comes_out || !savesToJournal ? "" : journalHref;
+  const moduleOrder = Number(lesson.module_order);
+  const focusModule = moduleOrder === 1 || moduleOrder === 3 || moduleOrder === 5;
+  const lastOfModule = !next || nextIsModule;
+  const showTribe = moduleOrder === 1 && lastOfModule;
+  // Journal sits beside Next for these modules, so the footer link stays off.
+  const closingJournalHref = focusModule || lesson.what_comes_out || !savesToJournal ? "" : journalHref;
+  const returnLink = lesson.code === "M5-L3" ? `${workbookLink}#continue` : workbookLink;
 
   if (lesson.what_comes_out) {
     beats.push({
@@ -457,27 +515,20 @@ export default function LessonView({
       content: (
         <div className="space-y-3">
           <p className="max-w-[68ch] text-[17px] leading-relaxed text-foreground">{lesson.what_comes_out}</p>
-          {lesson.module_order === 1 ? (
+          {showTribe ? (
             <div className="space-y-2">
-              <p className="text-[15px] leading-relaxed text-muted-foreground">
-                Your response is already saved. You don't need to answer the same question again.
-              </p>
-              <div className="flex flex-wrap gap-x-5 gap-y-2 text-[15px]">
-                <Link
-                  to={`/tribe-threads?lesson=${encodeURIComponent(lesson.code)}#lesson-thread`}
-                  className="font-medium text-accent-ink underline underline-offset-2"
-                >
-                  Explore the related Tribe Thread (optional)
-                </Link>
-                <Link to={journalHref} className="text-accent-ink underline underline-offset-2">
-                  Revisit or expand your private note
-                </Link>
-              </div>
+              <Link
+                to={`/tribe-threads?lesson=${encodeURIComponent(lesson.code)}#lesson-thread`}
+                className="inline-block text-[15px] font-medium text-accent-ink underline underline-offset-2"
+              >
+                Explore the related Tribe Thread (optional)
+              </Link>
               <p className="text-[14px] text-muted-faint">
                 Tribe replies are shared with other participants. Your journal stays private unless you choose to share.
               </p>
             </div>
-          ) : (
+          ) : null}
+          {focusModule ? null : (
             <Link to={journalHref} className="inline-block text-[15px] font-medium text-accent-ink underline underline-offset-2">
               See it in your journal
             </Link>
@@ -485,29 +536,6 @@ export default function LessonView({
         </div>
       ),
     });
-  }
-
-  if (readings.length) {
-    const readingBeat = {
-      key: "reading",
-      label: readings.length > 1 ? "Readings" : "Reading",
-      content: (
-        <div className="divide-y divide-border">
-          {readings.map((reading) => (
-            <div key={reading.id} className="py-5 first:pt-0 last:pb-0">
-              <StepReading title={reading.title} body={reading.body} />
-            </div>
-          ))}
-        </div>
-      ),
-    };
-    const tryAt = beats.findIndex((beat) => beat.key === "try");
-    const reflectAt = beats.findIndex((beat) => beat.key === "reflect");
-    const decisionAt = beats.findIndex((beat) => beat.key === "decision");
-    const endingAt = beats.findIndex((beat) => beat.key === "ending");
-    const at = [tryAt, reflectAt, decisionAt, endingAt].find((index) => index >= 0);
-    if (at >= 0) beats.splice(at, 0, readingBeat);
-    else beats.push(readingBeat);
   }
 
   return (
@@ -529,17 +557,26 @@ export default function LessonView({
       <FeedbackForm moduleOrder={lesson.module_order} lessonCode={lesson.code} />
 
       {next && isAfterTryStep(lesson.code) ? (
-        <ComeBackAfterTry lesson={lesson} next={next} workbookLink={workbookLink} backLabel={backLabel} />
+        <ComeBackAfterTry
+          lesson={lesson}
+          next={next}
+          workbookLink={workbookLink}
+          backLabel={backLabel}
+          journalHref={focusModule ? journalHref : ""}
+        />
       ) : (
         <StepNav
           prev={prev}
           next={next}
           nextIsModule={nextIsModule}
-          workbookLink={workbookLink}
+          workbookLink={returnLink}
           backLabel={backLabel}
           forward={forward}
           endNote={endNote}
-          nextLabel="Next"
+          nextLabel={focusModule ? "" : "Next"}
+          nameNext={focusModule}
+          journalHref={focusModule ? journalHref : ""}
+          backEqual={lesson.code === "M5-L3"}
         />
       )}
     </article>
