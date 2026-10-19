@@ -102,7 +102,7 @@ function Module3ExperienceBridge({ lessonCode }) {
   return (
     <div className="space-y-3">
       <p className="text-[16px] leading-relaxed text-foreground">
-        Module 3 examines the <strong>conditions around a task</strong>—instructions, time, noise, help, and choice. You can work with something from Module 2, or use the self-contained task below.
+        Module 3 examines the <strong>conditions around a task</strong>—instructions, time, noise, help, and choice. Start with your Module 2 encounter when you have one. Otherwise use an ordinary task from this week, or the reply example below.
       </p>
       {choice ? <div className="rounded-lg bg-secondary p-3">
         <p className="text-[14px] text-muted-foreground">A possibility you explored in Module 2</p>
@@ -115,12 +115,10 @@ function Module3ExperienceBridge({ lessonCode }) {
         <p className="mt-1 whitespace-pre-wrap text-[15px] text-foreground">{firstNote}</p>
       </div> : notes.length ? <p className="text-[14px] text-muted-foreground">You saved other observations in Module 2, but did not describe a completed activity.</p> : <p className="text-[14px] text-muted-foreground">No Module 2 observations are recorded. You can still complete this lesson without inventing a past experience.</p>}
       <div className="rounded-lg border border-border p-3">
-        <p className="text-[15px] font-medium text-foreground">A task you can do here, without materials</p>
-        <p className="mt-1 text-[15px] leading-relaxed text-foreground">Find the information in this notice: “Community workshop — Saturday 11 a.m. Free entry. Bring a notebook. Registration closes Friday at 5 p.m.”</p>
-        <p className="mt-2 text-[15px] text-foreground">First, identify the deadline using the paragraph. Then read it as a checklist: <strong>When:</strong> Saturday 11 a.m. · <strong>Cost:</strong> Free · <strong>Bring:</strong> notebook · <strong>Register by:</strong> Friday 5 p.m.</p>
-        <p className="mt-2 text-[14px] text-muted-foreground">Both formats have the same facts. Compare how easily you locate the deadline, not which answer is correct. This is a constructed formatting exercise, not a real workshop listing.</p>
+        <p className="text-[15px] font-medium text-foreground">If you are not using a real task</p>
+        <p className="mt-1 text-[15px] leading-relaxed text-foreground">The example below is a three-sentence reply, shown once as a paragraph and once as a checklist. You can write it or only read the two setups.</p>
       </div>
-      {lessonCode === "M3-L2" ? <p className="text-[15px] text-foreground">To compare conditions, use the same notice with different formats—or choose a real task you already know. Keep the task similar, and remember that familiarity from the first attempt could affect the second.</p> : null}
+      {lessonCode === "M3-L2" ? <p className="text-[15px] text-foreground">To compare conditions, use the same reply with the two instruction formats, or choose a real task you already know. Keep the task similar, and remember that familiarity from the first attempt could affect the second.</p> : null}
     </div>
   );
 }
@@ -147,7 +145,7 @@ function Module3ReviewBridge() {
           </div>)}
           <p className="text-[15px] text-muted-foreground">What does this support? What else could explain the result? What did the task cost in time, effort, or support?</p>
         </div>
-      ) : <p className="rounded-lg border border-dashed border-input p-3 text-[15px] text-muted-foreground">You haven't recorded a task-condition attempt yet. You may use the provided word-sorting example to check its correct order, or leave the outcome unknown. No made-up result is needed.</p>}
+      ) : <p className="rounded-lg border border-dashed border-input p-3 text-[15px] text-muted-foreground">You haven't recorded a task-condition attempt yet. You may use the reply example to notice what the two instruction formats ask for, or leave the outcome unknown. There is no single correct reply, and no made-up result is needed.</p>}
       <p className="text-[14px] text-muted-foreground">A useful takeaway can be a tentative observation, a condition to test again, or a question you cannot answer yet. The next module will examine how claims compare with available evidence.</p>
     </div>
   );
