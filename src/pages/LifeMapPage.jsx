@@ -13,9 +13,10 @@ import {
   MAP_PAUSE_TEXT,
   MAP_PICK_FIELDS,
   MAP_PICK_KEY,
+  MAP_QUESTION_PARTS,
   MAP_SECTIONS,
   QUESTIONS_BY_ID,
-  setLineParent,
+  setNodePosition,
   addLine,
   buildGraph,
   exploreLines,
@@ -25,7 +26,7 @@ import {
 } from "@/lib/lifeMap";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import DashedMotif from "@/components/workbook/DashedMotif";
-import LifeMapBoard from "@/components/map/LifeMapBoard";
+import HybridMap from "@/components/map/HybridMap";
 import MapPickCard from "@/components/map/MapPickCard";
 import LifeMapNodePanel from "@/components/map/LifeMapNodePanel";
 import LifeMapList from "@/components/map/LifeMapList";
@@ -41,7 +42,6 @@ export default function LifeMapPage() {
   const mapRef = useRef(null);
   const guideRef = useRef(null);
   const editorRef = useRef(null);
-  const [guideOpen, setGuideOpen] = useState(false);
   const entries = useJournalEntries();
   const { answers, states } = useWorkbook();
   const { lessons, orderedLessons } = useCurriculum();
@@ -152,7 +152,6 @@ export default function LifeMapPage() {
 
   const openGuide = (index) => {
     setStep(index);
-    setGuideOpen(true);
     requestAnimationFrame(() => guideRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
   const selectEntry = (id) => {
@@ -186,7 +185,7 @@ export default function LifeMapPage() {
               Observations and possible threads come after those entries are on the map. You choose what each connection means.
             </p>
             <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-muted-faint">
-              Expand or collapse a branch to follow it. You choose the connections; answers without a chosen connection stay available to place later.
+              The map is the picture. Areas organize it, and a line between entries appears only when you connect them. The list shows the same answers without the picture.
             </p>
           </div>
         </div>
@@ -221,7 +220,7 @@ export default function LifeMapPage() {
             }}
             className="rounded-full"
           >
-            {asList ? "Show branches" : "Show all saved answers"}
+            {asList ? "Show the map" : "Show as a list"}
           </Button>
           <PrivacyNote>
             {total ? `${total} ${total === 1 ? "line" : "lines"} on this map. Saved on this device, then to your account.` : "Saved on this device, then to your account."}
@@ -261,29 +260,39 @@ export default function LifeMapPage() {
         </div>
       </section>
 
-      <div ref={mapRef} className="scroll-mt-4">
-        {asMap ? (
-          <LifeMapVisual graph={graph} selectedId={selectedId} onSelect={selectEntry} />
-        ) : asList ? (
-          <LifeMapList
-            graph={graph}
-            explore={explore}
-            selectedId={selectedId}
-            onSelect={selectEntry}
-            onRemove={(node) => {
-              removeLine(node.section, node.id);
-              if (selectedId === node.id) setSelectedId(null);
-            }}
-          />
-        ) : (
-          <LifeMapBoard
-            graph={graph}
-            selectedId={selectedId}
-            onSelect={selectEntry}
-            onSetParent={setLineParent}
-          />
-        )}
-        <MapPickCard pick={pick} onJumpToPart={openGuide} />
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
+        <div ref={mapRef} className="scroll-mt-4 min-w-0">
+          {asList ? (
+            <LifeMapList
+              graph={graph}
+              explore={explore}
+              selectedId={selectedId}
+              onSelect={selectEntry}
+              onRemove={(node) => {
+                removeLine(node.section, node.id);
+                if (selectedId === node.id) setSelectedId(null);
+              }}
+            />
+          ) : (
+            <HybridMap
+              graph={graph}
+              selectedId={selectedId}
+              highlightSection={MAP_QUESTION_PARTS[step]?.section || ""}
+              onSelect={selectEntry}
+              onMove={setNodePosition}
+            />
+          )}
+          <MapPickCard pick={pick} onJumpToPart={openGuide} />
+        </div>
+        <div ref={guideRef} className="scroll-mt-4 rounded-xl border border-border bg-card p-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
+          <h2 className="text-[17px] font-medium">Questions</h2>
+          <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+            The question you are answering stays here. The map beside it shows where the answer lands, and it updates when you add the answer.
+          </p>
+          <div className="mt-4">
+            <MapQuestions graph={graph} step={step} onStep={setStep} onShowMap={showMap} onPlaced={(id) => { setSelectedId(id); setAsList(false); showMap(); }} />
+          </div>
+        </div>
       </div>
 
       <div ref={editorRef} className="scroll-mt-4">
@@ -308,10 +317,6 @@ export default function LifeMapPage() {
         </p>
       )}
       </div>
-      <details ref={guideRef} open={guideOpen} onToggle={(event) => setGuideOpen(event.currentTarget.open)} className="scroll-mt-4 rounded-xl border border-border bg-card p-4">
-        <summary className="cursor-pointer text-[17px] font-medium">Guided questions and reflection</summary>
-        <div className="mt-4"><MapQuestions graph={graph} step={step} onStep={setStep} onShowMap={showMap} onPlaced={(id) => { setSelectedId(id); setAsList(false); showMap(); }} /></div>
-      </details>
       <BringInSavedAnswer options={options} onAdd={bringIn} />
 
       <div>
