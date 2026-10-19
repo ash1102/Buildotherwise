@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
+import { Textarea } from "@/components/ui/textarea";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import Prose from "./Prose";
@@ -15,7 +16,6 @@ import WorkedExample from "./WorkedExample";
 import StepReading from "./StepReading";
 import DiscoverySampler, { OPTIONS as DISCOVERY_OPTIONS } from "./DiscoverySampler";
 import DiscoveryFollowThrough from "./DiscoveryFollowThrough";
-import DictateButton from "./DictateButton";
 import TryPlanner from "./TryPlanner";
 import TryCheckIn from "./TryCheckIn";
 import NoticeFlow from "./NoticeFlow";
@@ -71,7 +71,7 @@ function JoinChoicePicker({ lessonCode, lessonTitle, index, label }) {
       <label htmlFor={id} className="mt-3 block text-[14px] text-muted-foreground">
         Add a note if you want (for example, the adjustments you'd like)
       </label>
-      <textarea
+      <Textarea
         id={id}
         rows={2}
         value={note}
@@ -92,31 +92,6 @@ function teachTextFor(lesson) {
   const text = String(lesson.teach || "");
   if (JOURNAL_MINIMUM_FULL_ON.includes(lesson.code)) return text;
   return text.replace(/\*\*Journal minimum:\*\*[^\n]*/, JOURNAL_MINIMUM_SHORT);
-}
-
-function TalkBar({ hasRoutes, talking, onSay, onWrite, onText, buttonRef }) {
-  if (hasRoutes && !talking) return null;
-
-  const chip = (active) =>
-    `rounded-md border px-3.5 py-2 text-[15px] transition ${
-      active ? "border-accent-ink bg-accent-ink text-white" : "border-input bg-card text-foreground hover:bg-secondary"
-    }`;
-
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      {hasRoutes ? null : (
-        <>
-          <button type="button" aria-pressed={talking} onClick={onSay} className={chip(talking)}>
-            Say it
-          </button>
-          <button type="button" aria-pressed={!talking} onClick={onWrite} className={chip(!talking)}>
-            Write it
-          </button>
-        </>
-      )}
-      {talking ? <DictateButton onText={onText} buttonRef={buttonRef} /> : null}
-    </div>
-  );
 }
 
 function Module3ExperienceBridge({ lessonCode }) {
@@ -255,7 +230,7 @@ export default function LessonView({
   const reflectPrompts = rawReflect
     .map((prompt, index) => ({ prompt, index: rawTry.length + index, fieldKey: `reflect-${index}` }))
     .filter((item) => notAnOption(item.prompt));
-  const routes = participationRoutesFor(lesson);
+  const routes = participationRoutesFor(lesson).filter((option) => !/^(say it|write it|watch)$/i.test(option));
   const guidance = routeGuidanceFor(route);
   const hasRoutes = routes.length > 0;
   const oneLine = guidance ? guidance.field === "line" : false;
@@ -271,29 +246,7 @@ export default function LessonView({
     return null;
   };
 
-  const [sayIt, setSayIt] = useState(false);
-  const talking = hasRoutes ? Boolean(guidance && guidance.voice) : sayIt;
-  const fieldApis = useRef({});
-  const activeField = useRef(null);
-  const talkButtonRef = useRef(null);
-  const exampleRef = useRef(null);
   const detailRef = useRef(null);
-  const routeIntent = useRef("");
-  const writeTarget = useRef(null);
-  const watching = /^watch$/i.test(String(route || "").trim());
-  writeTarget.current = tryPrompts[0] || reflectPrompts[0] || null;
-
-  const bindField = useCallback((key, api) => {
-    if (api) fieldApis.current[key] = api;
-    else delete fieldApis.current[key];
-  }, []);
-
-  const currentApi = () => {
-    const key = activeField.current;
-    if (key && fieldApis.current[key]) return fieldApis.current[key];
-    const first = Object.keys(fieldApis.current)[0];
-    return first ? fieldApis.current[first] : null;
-  };
 
   // Reflection or reading questions do not implicitly require a decision.
   // Preserve explicit next-decision steps and deliberately configured decision choices.
@@ -315,87 +268,21 @@ export default function LessonView({
       route={route}
       variant="inline"
       compact={oneLine}
-      fieldKey={key}
-      onBind={bindField}
-      onActivate={(fieldKey) => {
-        activeField.current = fieldKey;
-      }}
     />
   );
 
-  const chooseRoute = (next) => {
-    routeIntent.current = next;
-    onRouteChange(next);
-  };
-
-  useEffect(() => {
-    const intent = routeIntent.current;
-    if (!intent || String(route || "") !== intent) return undefined;
-    routeIntent.current = "";
-    const action = intent.trim().toLowerCase();
-    const frame = requestAnimationFrame(() => {
-      if (action === "write it") {
-        if (detailRef.current) detailRef.current.open = true;
-        const target = writeTarget.current;
-        const api = target ? fieldApis.current[target.fieldKey] : null;
-        if (api && api.focus) api.focus();
-        else if (target) {
-          const node = document.getElementById(`${lesson.code}-${target.index}`);
-          if (node) node.focus();
-        }
-      } else if (action === "say it" && talkButtonRef.current) {
-        talkButtonRef.current.focus();
-      } else if (action === "watch" && exampleRef.current) {
-        exampleRef.current.scrollIntoView({ block: "nearest" });
-      }
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [route, lesson.code]);
-
-  const talkControl =
-    tryPrompts.length || reflectPrompts.length ? (
-      <TalkBar
-        hasRoutes={hasRoutes}
-        talking={talking}
-        onSay={() => setSayIt(true)}
-        onWrite={() => setSayIt(false)}
-        onText={(heard, previousTail) => {
-          const api = currentApi();
-          if (api) api.insertText(heard, previousTail);
-        }}
-        buttonRef={talkButtonRef}
-      />
-    ) : null;
-
-  // Route choices sit at the top of the writing section and act on this step.
-  // Part numbers follow the sections that remain.
+  const substantiveRoutes = routes.filter((option) => !/^pass$/i.test(option));
   const answerChoices = hasRoutes ? (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <p id={`answer-route-${lesson.code}`} className="text-[15px] font-medium text-foreground">
-          How do you want to answer?
-        </p>
-        <RouteChips
-          routes={routes}
-          value={route}
-          onChange={chooseRoute}
-          labelledBy={`answer-route-${lesson.code}`}
-        />
-      </div>
-      {/^pass$/i.test(String(route || "").trim()) ? (
-        <p role="status" className="rounded-lg border border-border bg-secondary px-3 py-2 text-[15px] text-foreground">
-          Passed. That counts as an answer. You can still write something below if you change your mind.
-        </p>
-      ) : null}
-      {watching ? (
-        <p role="status" className="rounded-lg border border-border bg-secondary px-3 py-2 text-[15px] text-foreground">
-          Watching counts as taking part. Writing below is optional.
-        </p>
-      ) : null}
-      {watching && lesson.show ? (
-        <div ref={exampleRef} className="rounded-lg border border-border bg-secondary p-3 sm:p-4">
-          <WorkedExample text={lesson.show} />
-        </div>
+      {substantiveRoutes.length ? <>
+        <p id={`answer-route-${lesson.code}`} className="text-[15px] font-medium text-foreground">Where would you like to start?</p>
+        <RouteChips routes={substantiveRoutes} value={route} onChange={(next) => onRouteChange(next)} labelledBy={`answer-route-${lesson.code}`} />
+      </> : null}
+      {routes.some((option) => /^pass$/i.test(option)) ? (
+        <button type="button" className="text-[14px] text-muted-foreground underline underline-offset-2"
+          onClick={() => onRouteChange(/^pass$/i.test(String(route || "")) ? "" : "Pass")}>
+          {/^pass$/i.test(String(route || "")) ? "Step skipped · Undo" : "Skip this step"}
+        </button>
       ) : null}
     </div>
   ) : null;
@@ -484,7 +371,6 @@ export default function LessonView({
       content: (
         <div className="space-y-6">
           {answerChoices}
-          {talkControl}
           <PrivacyNote />
           {carrySources && carrySources.length ? (
             <CarryForward sources={carrySources} selected={carried} onChange={onCarriedChange} />
@@ -529,7 +415,6 @@ export default function LessonView({
       content: (
         <div className="space-y-6">
           {tryPrompts.length ? null : answerChoices}
-          {tryPrompts.length ? null : talkControl}
           {tryPrompts.length ? null : <PrivacyNote />}
           {reflectPrompts.map((item) => promptField(item.prompt, item.index, item.fieldKey))}
         </div>
