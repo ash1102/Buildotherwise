@@ -219,6 +219,9 @@ export function buildCarrySources(codes, lessonsByCode) {
     // M1-L1 uses interactive named answers, not its obsolete numbered prompt fields.
     const prompts = code === "M1-L1"
       ? [
+          { index: "time-energy", label: "Where my time and energy go" },
+          { index: "activity-parts", label: "Parts I pay more attention to" },
+          { index: "missing-experience", label: "An experience missing from my week" },
           { index: "own-caught", label: "What caught your attention" },
           { index: "own-dont-know", label: "What I don't know yet" },
           { index: "possibility", label: "What might help you learn a little more?" },
