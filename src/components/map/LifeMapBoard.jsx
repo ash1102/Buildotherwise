@@ -97,9 +97,10 @@ function BranchNode({ id, tree, depth, selectedId, onSelect, onSetParent, expand
         {onSetParent ? <details className="mt-3">
           <summary className="cursor-pointer text-[13px] text-muted-foreground">Choose or change its branch</summary>
           <label htmlFor={"parent-" + id} className="mt-2 block text-[14px]">Attach this answer beneath:</label>
-          <select id={"parent-" + id} value={tree.parentById[id] || "__separate"} onChange={(event) => onSetParent(id, event.target.value === "__separate" ? "" : event.target.value)}
+          <select id={"parent-" + id} value={tree.parentById[id] || (tree.missing.includes(id) ? "__missing" : "__separate")} onChange={(event) => onSetParent(id, event.target.value === "__separate" ? "" : event.target.value)}
             className="mt-2 w-full rounded-md border border-input bg-background px-3 py-2 text-[16px]">
             <option value="__separate">Keep as a separate starting entry</option>
+            <option value="__missing">What’s missing</option>
             {parentOptions.map((other) => <option key={other.id} value={other.id}>{other.label || other.text}</option>)}
           </select>
         </details> : null}
@@ -124,6 +125,11 @@ export default function LifeMapBoard({ graph, selectedId, onSelect, onSetParent 
       <div className="flex gap-3 text-[14px]"><button type="button" onClick={() => all(true)} className="underline underline-offset-2">Expand all</button><button type="button" onClick={() => all(false)} className="underline underline-offset-2">Collapse all</button></div>
     </div>
     {tree.roots.length ? <ul className="grid min-w-0 items-start gap-4 lg:grid-cols-2">{tree.roots.map(renderNode)}</ul> : <p className="rounded-lg border border-dashed border-border p-4 text-[15px] text-muted-foreground">Add a place or activity to start your first branch.</p>}
+    <section className="space-y-3 border-t border-border pt-5" aria-label="What’s missing">
+      <h3 className="text-[17px] font-medium">What’s missing</h3>
+      <p className="text-[14px] text-muted-foreground">Things absent from your life, things you want more access to, or what gets in the way. To move an existing answer here, open “Choose or change its branch” and select “What’s missing”.</p>
+      {tree.missing.length ? <ul className="space-y-3">{tree.missing.map(renderNode)}</ul> : <p className="text-[14px] text-muted-foreground">No answers placed here yet.</p>}
+    </section>
     {tree.unlinked.length ? <section className="space-y-3 border-t border-border pt-5" aria-label="Answers not yet placed">
       <h3 className="text-[17px] font-medium">Answers not yet placed in a branch</h3>
       <p className="text-[14px] text-muted-foreground">These answers are preserved. Open one and choose its branch, or keep it as a separate starting entry.</p>
