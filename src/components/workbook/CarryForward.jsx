@@ -6,9 +6,14 @@ import { getAnswer } from "@/lib/workbook";
  * Carry-forward: earlier answers appear as optional, selectable context.
  * Nothing moves forward unless it is chosen here, and nothing is retyped.
  */
+function readableAnswer(value) {
+  try { const parsed = JSON.parse(value); return typeof parsed === "string" ? parsed : value; }
+  catch { return value; }
+}
+
 export default function CarryForward({ sources, selected, onChange }) {
   const items = sources
-    .map((source) => ({ ...source, value: getAnswer(source.code, source.index) }))
+    .map((source) => ({ ...source, value: readableAnswer(getAnswer(source.code, source.index)) }))
     .filter((item) => item.value && item.value.trim());
 
   if (!items.length) return null;
