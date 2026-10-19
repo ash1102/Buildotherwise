@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import moment from "moment";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import DictateButton from "@/components/workbook/DictateButton";
 
 /** Writing what happened next, without changing the entry being answered. */
 export default function FollowUpPanel({ entry, onSave, onCancel }) {
@@ -25,7 +24,6 @@ export default function FollowUpPanel({ entry, onSave, onCancel }) {
         className="mt-3 border-natural bg-ivory/40 text-[14px] leading-relaxed"
       />
       <div className="mt-3">
-        <DictateButton value={text} onText={setText} />
       </div>
 
       <div className="mt-3 flex flex-wrap gap-3">
