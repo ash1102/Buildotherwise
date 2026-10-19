@@ -19,7 +19,7 @@ export default function DiscoveryFollowThrough() {
             <p className="font-medium text-foreground">An encounter you can choose</p>
             <p className="mt-2 text-[16px] leading-relaxed text-foreground">{selected.task}</p>
           </div>
-          <p className="text-[15px] text-foreground">As you investigate, distinguish <strong>what the source actually shows</strong> from <strong>what you're inferring</strong>. You may decide to look at another source before drawing a conclusion.</p>
+          <p className="text-[15px] text-foreground">As you explore, distinguish <strong>what you actually did, observed, or learned from a source</strong> from <strong>what you are inferring</strong>. Notice which parts draw your attention and what you still want to find out.</p>
           {selected.source ? <a href={selected.source} target="_blank" rel="noopener noreferrer" className="inline-block text-[15px] text-accent-ink underline underline-offset-2">Open the source ↗</a> : null}
         </>
       ) : (
