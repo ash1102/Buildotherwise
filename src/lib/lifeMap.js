@@ -308,10 +308,15 @@ export function setLineParent(childId, parentId) {
   const graph = buildGraph(map);
   const tree = buildBranches(graph);
   const child = tree.nodesById[childId];
+  if (child && parentId === "__missing") {
+    updateLine(child.section, childId, { parent_id: "", parent_choice: "chosen", branch_group: "barriers" });
+    return true;
+  }
   if (!child || (parentId && !tree.nodesById[parentId]) || wouldCycle(childId, parentId, tree.parentById)) return false;
   updateLine(child.section, childId, {
     parent_id: parentId || "",
     parent_choice: parentId ? "chosen" : "standalone",
+    branch_group: "",
     links: parentId ? [...new Set([...(child.links || []), parentId])] : child.links
   });
   return true;
@@ -363,6 +368,7 @@ export function buildGraph(map) {
       question_id: item.question_id || "",
       parent_id: item.parent_id || "",
       parent_choice: item.parent_choice || "",
+      branch_group: item.branch_group || "",
       energy_choice: item.energy_choice || "",
       energy_note: item.energy_note || "",
     })),
