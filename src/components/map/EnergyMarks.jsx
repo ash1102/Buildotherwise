@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
-import { addLine, updateLine } from "@/lib/lifeMap";
-import { ENERGY_CHOICES, energyLine, energyTargets } from "@/lib/mapEnergy";
+import { saveEnergyMark } from "@/lib/lifeMap";
+import { ENERGY_CHOICES, energyTargets } from "@/lib/mapEnergy";
 
 const DRAFT_KEY = "lifeMapEnergyDrafts";
 
@@ -20,10 +20,8 @@ export default function EnergyMarks({ graph, onEarlierPart }) {
     setDrafts((current) => ({ ...current, [selectedId]: { ...draft, ...patch } }));
   };
   const save = () => {
-    const line = energyLine(source, draft.choice, draft.note);
-    if (!line) return;
-    if (existing) updateLine("energy", existing.id, line);
-    else addLine("energy", line);
+    const line = saveEnergyMark(source?.id, draft.choice, draft.note);
+    if (!line) { setSaved("This entry is no longer available. Choose another entry."); return; }
     setSaved("Saved for “" + (source.label || source.text) + "”.");
   };
 
