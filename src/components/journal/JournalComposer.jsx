@@ -5,8 +5,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { addEntry } from "@/lib/journal";
 import { readStore, writeStore } from "@/lib/store";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
-import DictateButton from "@/components/workbook/DictateButton";
-import { addSpokenWords } from "@/lib/dictation";
 
 const DRAFT_KEY = "journalPageDraft";
 
@@ -87,7 +85,6 @@ export default function JournalComposer() {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <DictateButton onText={(heard, previousTail) => write(addSpokenWords(draft, heard, previousTail))} />
         <Button
           type="button"
           onClick={save}
