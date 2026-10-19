@@ -349,3 +349,39 @@ test("explicitly fictional saved examples are preserved in storage but excluded 
   assert.equal(JSON.stringify(pick), before);
 });
 
+
+test("an existing answer can move into What's missing, survive reload and export, then move to another branch", () => {
+  const oldWindow = globalThis.window;
+  const oldEvent = globalThis.CustomEvent;
+  const values = new Map();
+  globalThis.window = {
+    localStorage: { getItem: (key) => values.get(key) || null, setItem: (key, value) => values.set(key, value) },
+    dispatchEvent() {},
+  };
+  globalThis.CustomEvent = class { constructor(type, options) { this.type = type; this.detail = options.detail; } };
+  try {
+    const key = "entrepalooza.v1.lifeMap";
+    const graph = branchingFixture();
+    const map = Object.fromEntries(graph.sections.map((section) => [section.key, section.nodes]));
+    values.set(key, JSON.stringify(map));
+    assert.equal(setLineParent("care", "__missing"), true);
+    let reloaded = JSON.parse(values.get(key));
+    assert.equal(reloaded.energy.find((node) => node.id === "care").question_id, "p3-star");
+    let tree = buildBranches(buildGraph(reloaded));
+    assert.ok(tree.missing.includes("care"));
+    assert.ok(tree.missing.includes("network"));
+    assert.ok(!tree.unlinked.includes("care"));
+    const markdown = branchMarkdown(buildGraph(reloaded), QUESTIONS_BY_ID);
+    assert.ok(markdown.includes("## What’s missing\n- Success in my program"));
+    assert.ok(markdown.includes("- Networking"));
+    assert.equal(setLineParent("care", "school"), true);
+    reloaded = JSON.parse(values.get(key));
+    tree = buildBranches(buildGraph(reloaded));
+    assert.equal(tree.parentById.care, "school");
+    assert.ok(!tree.missing.includes("care"));
+    assert.equal(tree.nodesById.care.text, "Success in my program");
+  } finally {
+    globalThis.window = oldWindow;
+    globalThis.CustomEvent = oldEvent;
+  }
+});
