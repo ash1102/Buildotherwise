@@ -15,6 +15,7 @@ import {
   toggleItem,
 } from "@/lib/tryLoop";
 import { Chip, ChipGroup } from "./TryChips";
+import { OPTIONS } from "./DiscoverySampler";
 
 /**
  * Plan one small try by tapping. Saving writes the plan as plain sentences into the
@@ -25,7 +26,8 @@ export default function TryPlanner({ lesson }) {
   const [plans, setPlans] = useStore(PLAN_KEY, {});
   const saved = plans[lesson.code] || null;
   const previous = useAnswers();
-  const priorNotes = ["own-caught", "own-dont-know", "possibility"].map((key) => previous[`M1-L1#${key}`]).filter((value) => value && String(value).trim());
+  const priorNotes = ["time-energy", "activity-parts", "missing-experience", "own-caught", "own-dont-know"].map((key) => previous[`M1-L1#${key}`]).filter((value) => value && String(value).trim());
+  const startingPoint = OPTIONS.find((item) => item.id === previous["M2-L1#20"]);
   const [draft, setDraft] = useState(() => (saved ? { ...EMPTY_PLAN, ...saved } : EMPTY_PLAN));
   const [editing, setEditing] = useState(!saved);
 
@@ -82,6 +84,13 @@ export default function TryPlanner({ lesson }) {
         </p>
       </div>
 
+      {startingPoint ? <div className="space-y-2 rounded-lg border border-border p-4">
+        <p className="text-[15px] font-medium">Starting point you selected: {startingPoint.title}</p>
+        <p className="text-[15px] text-muted-foreground">{startingPoint.task}</p>
+        <button type="button" className="text-[15px] text-accent-ink underline underline-offset-2"
+          onClick={() => change({ route: "thread", card: "own", own: startingPoint.task, experiment: "", category: "" })}>Use this encounter in my plan</button>
+      </div> : null}
+
       <ChipGroup label="Where would you like to start?" hint="You can change your mind. You are exploring, not choosing a career.">
         {[
           ["thread", "Something caught my attention"],
@@ -120,7 +129,9 @@ export default function TryPlanner({ lesson }) {
                 className={`rounded-lg border p-3 text-left ${draft.experiment===item.id ? "border-accent-ink bg-secondary":"border-input bg-card"}`}>
                 <span className="block font-medium">{item.label}</span>
                 <span className="block text-[14px] text-muted-foreground">{item.minutes} · {item.cost}</span>
+                <span className="mt-1 block text-[14px] text-muted-foreground">What you need: {item.materials}</span>
                 <span className="block text-[14px] text-muted-foreground">{item.alternative}</span>
+                <span className="block text-[14px] text-muted-foreground">{item.access}</span>
               </button>
             ))}
           </div>
