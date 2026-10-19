@@ -32,18 +32,19 @@ export function buildBranches(graph) {
     }
   }
   for (const node of graph.nodes) {
-    if (Object.prototype.hasOwnProperty.call(parentById, node.id) || node.parent_choice === "standalone") continue;
+    if (Object.prototype.hasOwnProperty.call(parentById, node.id) || node.parent_choice === "standalone" || node.branch_group === "barriers") continue;
     const candidates = candidatesFor(node, nodesById);
     if (candidates.length === 1 && !wouldCycle(node.id, candidates[0].id, parentById)) parentById[node.id] = candidates[0].id;
   }
   const childrenById = Object.fromEntries(graph.nodes.map((node) => [node.id, []]));
-  const roots = [], unlinked = [];
+  const roots = [], unlinked = [], missing = [];
   for (const node of graph.nodes) {
     if (parentById[node.id]) childrenById[parentById[node.id]].push(node.id);
+    else if (node.branch_group === "barriers" || (node.section === "barriers" && node.parent_choice !== "standalone")) missing.push(node.id);
     else if (isAnchor(node) || node.parent_choice === "standalone") roots.push(node.id);
     else unlinked.push(node.id);
   }
-  return { nodesById, parentById, childrenById, roots, unlinked };
+  return { nodesById, parentById, childrenById, roots, unlinked, missing };
 }
 
 export function branchMarkdown(graph, questionLabels = {}, journalEntries = []) {
@@ -63,6 +64,7 @@ export function branchMarkdown(graph, questionLabels = {}, journalEntries = []) 
     return lines.join("\n");
   };
   const blocks = [tree.roots.map((id) => walk(id)).join("\n") || "(No starting entries yet.)"];
+  if (tree.missing.length) blocks.push("## What’s missing\n" + tree.missing.map((id) => walk(id)).join("\n"));
   if (tree.unlinked.length) blocks.push("## Answers not yet placed in a branch\n" + tree.unlinked.map((id) => walk(id)).join("\n"));
   return blocks.join("\n\n");
 }
