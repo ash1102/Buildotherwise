@@ -31,13 +31,15 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
   const [pick, setPick] = useStore(MAP_PICK_KEY, {});
 
   const places = graph.nodes.filter((node) => node.question_id === "p1-places");
-  /** The lines a question can be about: places for aboutPlace, or the answers to the question named in `about`. */
-  const targetsFor = (question) =>
-    question.about
-      ? graph.nodes.filter((node) => node.question_id === question.about)
-      : question.aboutPlace
-        ? places
-        : [];
+  const needsContext = (question) => Boolean(question.aboutPlace || question.about || /^p[345]-/.test(question.id));
+  const targetsFor = (question) => {
+    if (question.about) return graph.nodes.filter((node) => node.question_id === question.about);
+    if (question.aboutPlace) return places;
+    if (/^p[345]-/.test(question.id)) return graph.nodes.filter((node) =>
+      ["places", "placeless", "groups"].includes(node.section) && node.question_id !== "p1-how"
+    );
+    return [];
+  };
   const countFor = (questionId) => graph.nodes.filter((node) => node.question_id === questionId).length;
 
   useEffect(() => {
@@ -51,7 +53,8 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
   const add = (part, question) => {
     const lines = linesFromAnswer(question, drafts[question.id]);
     if (!lines.length) return 0;
-    const placeId = question.aboutPlace || question.about ? placeFor[question.id] : "";
+    const selectedParent = needsContext(question) ? placeFor[question.id] : "";
+    const placeId = selectedParent === "__separate" ? "" : selectedParent;
     const section = QUESTIONS_BY_ID[question.id].section || part.section;
     lines.forEach((text) =>
       addLine(section, {
@@ -59,6 +62,8 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
         question_id: question.id,
         source_label: question.text,
         links: placeId ? [placeId] : [],
+        parent_id: placeId || "",
+        parent_choice: selectedParent === "__separate" ? "standalone" : placeId ? "chosen" : "",
       })
     );
     setDrafts((current) => ({ ...current, [question.id]: "" }));
@@ -78,6 +83,12 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
   };
 
   const go = (next) => {
+    const currentPart = step < PICK_STEP ? MAP_QUESTION_PARTS[step] : null;
+    const missing = currentPart?.questions.find((question) => String(drafts[question.id] || "").trim() && needsContext(question) && targetsFor(question).length && !placeFor[question.id]);
+    if (missing) {
+      setAddedNote((current) => ({ ...current, [missing.id]: "Choose which earlier entry this describes, or keep it as a separate answer." }));
+      return;
+    }
     flush();
     onStep(Math.max(0, Math.min(PICK_STEP, next)));
   };
@@ -147,7 +158,6 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
             {part.questions.filter((question) => !["p3-energy", "p3-plus", "p3-minus"].includes(question.id)).map((question) => {
               const count = countFor(question.id);
               const value = drafts[question.id] || "";
-              const branch = QUESTIONS_BY_ID[question.id].branch;
               const targets = targetsFor(question);
               return (
                 <div key={question.id}>
@@ -158,12 +168,12 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                     {question.list
                       ? "List as many as fit, separated by commas or new lines. Each one becomes its own line on the map."
                       : "One answer at a time. It shows up on the map under this question."}{" "}
-                    On the map: <span className="text-accent-ink">{branch}</span>.
+                    It can unfold beneath an earlier entry, or stay separate.
                   </p>
 
-                  {(question.aboutPlace || question.about) && targets.length ? (
+                  {needsContext(question) && targets.length ? (
                     <select
-                      aria-label={`${question.aboutLabel || "Which place?"} (optional)`}
+                      aria-label={`Which earlier entry does this answer describe? ${question.text}`}
                       value={placeFor[question.id] || ""}
                       onChange={(event) => {
                         const next = event.target.value;
@@ -171,7 +181,8 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                       }}
                       className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-[13.5px] sm:w-72"
                     >
-                      <option value="">{question.aboutLabel || "Which place?"} (optional)</option>
+                      <option value="">Which earlier entry does this describe?</option>
+                      <option value="__separate">Keep this as a separate answer</option>
                       {targets.map((place) => (
                         <option key={place.id} value={place.id}>
                           {place.label || place.text}
@@ -179,6 +190,10 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                       ))}
                     </select>
                   ) : null}
+
+                  {placeFor[question.id] && placeFor[question.id] !== "__separate" ? <p className="mt-2 rounded-md bg-secondary p-3 text-[15px]">
+                    Answering about: <strong>{targets.find((node) => node.id === placeFor[question.id])?.text || "the entry you selected"}</strong>
+                  </p> : null}
 
                   {question.chips ? (
                     <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Quick answers">
@@ -221,7 +236,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                     <Button
                       type="button"
                       onClick={() => add(part, question)}
-                      disabled={!value.trim()}
+                      disabled={!value.trim() || (needsContext(question) && targets.length > 0 && !placeFor[question.id])}
                       className="rounded-full sm:mt-1"
                     >
                       <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
