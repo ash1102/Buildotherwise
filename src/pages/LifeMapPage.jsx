@@ -8,19 +8,19 @@ import useCurriculum from "@/hooks/useCurriculum";
 import { nextOpenStep } from "@/lib/progress";
 import { downloadText } from "@/lib/download";
 import { readStore, useStore } from "@/lib/store";
+import { branchMarkdown } from "@/lib/lifeMapBranches";
 import {
   MAP_PICK_FIELDS,
   MAP_PICK_KEY,
   MAP_SECTIONS,
+  QUESTIONS_BY_ID,
+  setLineParent,
   addLine,
   buildGraph,
   exploreLines,
-  layoutGraph,
   removeLine,
   savedAnswerOptions,
-  setNodePosition,
   updateLine,
-  usePositions,
 } from "@/lib/lifeMap";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import DashedMotif from "@/components/workbook/DashedMotif";
@@ -32,14 +32,14 @@ import BringInSavedAnswer from "@/components/map/BringInSavedAnswer";
 import MapQuestions from "@/components/map/MapQuestions";
 import StepNav from "@/components/workbook/StepNav";
 
-const clamp = (value) => Math.min(0.98, Math.max(0.02, value));
-
 export default function LifeMapPage() {
   const map = useLifeMap();
-  const positions = usePositions();
   const [pick] = useStore(MAP_PICK_KEY, {});
   const [step, setStep] = useState(0);
   const mapRef = useRef(null);
+  const guideRef = useRef(null);
+  const editorRef = useRef(null);
+  const [guideOpen, setGuideOpen] = useState(false);
   const entries = useJournalEntries();
   const { answers, states } = useWorkbook();
   const { lessons, orderedLessons } = useCurriculum();
@@ -55,7 +55,6 @@ export default function LifeMapPage() {
     [lessons, orderedLessons, answers, states]
   );
   const graph = useMemo(() => buildGraph(map), [map]);
-  const layout = useMemo(() => layoutGraph(graph, positions), [graph, positions]);
   const explore = useMemo(() => exploreLines(pick), [pick]);
   const options = useMemo(() => savedAnswerOptions(lessons, answers), [lessons, answers]);
   const nodesById = useMemo(
@@ -72,7 +71,8 @@ export default function LifeMapPage() {
   const quickAdd = () => {
     const text = draft.trim();
     if (!text) return;
-    addLine(draftSection, { text });
+    const questionId = { places: "p1-places", placeless: "p2-placeless", groups: "g-now" }[draftSection] || "";
+    addLine(draftSection, { text, question_id: questionId, parent_choice: "standalone" });
     setDraft("");
   };
 
@@ -124,13 +124,6 @@ export default function LifeMapPage() {
     requestAnimationFrame(() => mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
 
-  /** The move buttons in the panel: the same small steps as the arrow keys. */
-  const nudge = (dx, dy) => {
-    if (!selected) return;
-    const spot = positions[selected.id] || layout.nodes[selected.id] || { x: 0.5, y: 0.5 };
-    setNodePosition(selected.id, { x: clamp(spot.x + dx), y: clamp(spot.y + dy) });
-  };
-
   /** One line that holds a list becomes one line per item, in the same area. */
   const splitSelected = (pieces) => {
     if (!selected || !selectedSection) return;
@@ -138,6 +131,9 @@ export default function LifeMapPage() {
       question_id: selected.question_id || "",
       source_label: selected.source_label || "",
       source_code: selected.source_code || "",
+      parent_id: selected.parent_id || "",
+      parent_choice: selected.parent_choice || "",
+      links: selected.links || [],
     };
     pieces.forEach((text) => addLine(selectedSection.key, { text, ...keep }));
     removeLine(selectedSection.key, selected.id);
@@ -150,35 +146,25 @@ export default function LifeMapPage() {
     setSelectedId(null);
   };
 
+  const openGuide = (index) => {
+    setStep(index);
+    setGuideOpen(true);
+    requestAnimationFrame(() => guideRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
+  const selectEntry = (id) => {
+    setSelectedId(id);
+    requestAnimationFrame(() => editorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
   const download = () => {
-    const body = graph.sections
-      .map((section) => {
-        const lines = section.nodes.map((node) => {
-          const entry = node.entry_id ? entries.find((item) => item.id === node.entry_id) : null;
-          const links = (node.links || [])
-            .map((id) => nodesById[id])
-            .filter(Boolean)
-            .map((other) => other.label || other.text);
-          return [
-            `- ${node.label || node.text}`,
-            node.label ? `  - the line: ${node.text}` : null,
-            node.source_label ? `  - from: ${node.source_label}` : null,
-            entry ? `  - journal: ${entry.body}` : null,
-            links.length ? `  - linked to: ${links.join("; ")}` : null,
-          ]
-            .filter(Boolean)
-            .join("\n");
-        });
-        return `## ${section.label}\n${lines.length ? lines.join("\n") : "- (nothing yet)"}\n`;
-      })
-      .join("\n");
-    const pick = readStore(MAP_PICK_KEY, {}) || {};
-    const pickLines = pick.nothing_yet
-      ? "Nothing on the map is worth exploring yet."
-      : MAP_PICK_FIELDS.map((field) => `${field.label} ${(pick[field.id] || "").trim()}`).join("\n");
-    const hasPick = pick.nothing_yet || MAP_PICK_FIELDS.some((field) => (pick[field.id] || "").trim());
-    const pickBlock = hasPick ? `\n## One thing worth exploring\n${pickLines}\n` : "";
-    downloadText("entrepalooza-life-map.md", `# Map the Life You're Actually Living\n\n${body}${pickBlock}`);
+    const body = branchMarkdown(graph, QUESTIONS_BY_ID, entries);
+    const values = readStore(MAP_PICK_KEY, {}) || {};
+    const fields = MAP_PICK_FIELDS.map((field) => ({ ...field, value: String(values[field.id] || "").trim() })).filter((field) => field.value);
+    const actual = fields.filter((field) => !/^Fictional:/i.test(field.value));
+    const examples = fields.filter((field) => /^Fictional:/i.test(field.value));
+    const pickBlock = values.nothing_yet ? "\n## One thing worth exploring\nNothing on the map is worth exploring yet.\n" :
+      actual.length ? "\n## One thing worth exploring\n" + actual.map((field) => field.label + " " + field.value).join("\n") + "\n" : "";
+    const exampleBlock = examples.length ? "\n## Saved example text to review\nThese fields are explicitly labelled fictional examples.\n" + examples.map((field) => field.label + " " + field.value).join("\n") + "\n" : "";
+    downloadText("entrepalooza-life-map.md", "# Map the Life You're Actually Living\n\n" + body + pickBlock + exampleBlock);
   };
 
   return (
@@ -190,12 +176,11 @@ export default function LifeMapPage() {
             <p className="workbook-label">Your Life Map</p>
             <h1 className="mt-2 font-heading text-3xl sm:text-4xl">Map the life you’re actually living</h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-              Start with the questions below. Answer one thing at a time: each answer becomes one line, and every line
-              from a question stays with that question. Lines from different questions only join up when you link them
-              yourself. Nothing is guessed from what you wrote.
+              Start with a place, activity, or group from your life. Open that entry to add what you do there, how you get there,
+              and what you notice. Later answers unfold beneath the entry they describe.
             </p>
             <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-muted-faint">
-              Come back and change any line, move it, or leave a question empty. Empty is honest too.
+              Expand or collapse a branch to follow it. You choose the connections; answers without a chosen connection stay available to place later.
             </p>
           </div>
         </div>
@@ -215,7 +200,7 @@ export default function LifeMapPage() {
             onClick={() => setAsList((value) => !value)}
             className="rounded-full"
           >
-            {asList ? "Show as a map" : "Show as a list"}
+            {asList ? "Show branches" : "Show all saved answers"}
           </Button>
           <PrivacyNote>
             {total ? `${total} ${total === 1 ? "line" : "lines"} on this map, saved to your account.` : "Saved to your account."}
@@ -223,7 +208,37 @@ export default function LifeMapPage() {
         </div>
       </header>
 
-      <MapQuestions graph={graph} step={step} onStep={setStep} onShowMap={showMap} />
+      <section className="rounded-lg border border-border bg-card p-5">
+        <p className="workbook-label">Start a branch</p>
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <select
+            aria-label="What kind of starting entry?"
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-[13.5px] sm:w-56"
+            value={draftSection}
+            onChange={(event) => setDraftSection(event.target.value)}
+          >
+            {MAP_SECTIONS.map((section) => (
+              <option key={section.key} value={section.key}>
+                {{ places: "A place I go", placeless: "An activity without a set place", groups: "A person or group", barriers: "Something missing", threads: "Another observation", energy: "An energy observation" }[section.key]}
+              </option>
+            ))}
+          </select>
+          <Input
+            aria-label="A starting entry for your map"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") quickAdd();
+            }}
+            placeholder={draftSection === "places" ? "Name a place you go" : draftSection === "placeless" ? "Name an activity" : "Add one starting entry"}
+            className="border-border bg-background text-[14px] sm:flex-1"
+          />
+          <Button type="button" onClick={quickAdd} disabled={!draft.trim()} className="rounded-full">
+            <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+            Add
+          </Button>
+        </div>
+      </section>
 
       <div ref={mapRef} className="scroll-mt-4">
         {asList ? (
@@ -240,15 +255,15 @@ export default function LifeMapPage() {
         ) : (
           <LifeMapBoard
             graph={graph}
-            positions={positions}
             selectedId={selectedId}
-            onSelect={setSelectedId}
-            onMove={(id, spot) => setNodePosition(id, spot)}
+            onSelect={selectEntry}
+            onSetParent={setLineParent}
           />
         )}
-        <MapPickCard pick={pick} onJumpToPart={(index) => setStep(index)} />
+        <MapPickCard pick={pick} onJumpToPart={openGuide} />
       </div>
 
+      <div ref={editorRef} className="scroll-mt-4">
       {selected && selectedSection ? (
         <LifeMapNodePanel
           node={selected}
@@ -260,51 +275,23 @@ export default function LifeMapPage() {
           onLinkEntry={(entryId) => saveSelected({ entry_id: entryId })}
           onConnect={connect}
           onDisconnect={disconnect}
-          onNudge={nudge}
           onRemove={removeSelected}
           onSplit={splitSelected}
           onClose={() => setSelectedId(null)}
         />
       ) : (
         <p className="text-[13px] leading-relaxed text-muted-faint">
-          Tap a line to read it in full, rename it, remove it, link it to a journal entry, or connect it to another line. Drag a
-          line to move it, use the arrow keys while it is focused, or use the move buttons once it is open. Connections
-          you make show as dashed gold curves.
+          Open an entry to see its branch, answer a follow-up, or edit its wording and connections.
         </p>
       )}
 
-      <section className="rounded-lg border border-border bg-card p-5">
-        <p className="workbook-label">Add your own line</p>
-        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-          <select
-            aria-label="Which question this line answers"
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-[13.5px] sm:w-56"
-            value={draftSection}
-            onChange={(event) => setDraftSection(event.target.value)}
-          >
-            {MAP_SECTIONS.map((section) => (
-              <option key={section.key} value={section.key}>
-                {section.label}
-              </option>
-            ))}
-          </select>
-          <Input
-            aria-label="A line to add to the map"
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") quickAdd();
-            }}
-            placeholder={MAP_SECTIONS.find((section) => section.key === draftSection)?.prompt || "Add a line…"}
-            className="border-border bg-background text-[14px] sm:flex-1"
-          />
-          <Button type="button" onClick={quickAdd} disabled={!draft.trim()} className="rounded-full">
-            <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
-            Add
-          </Button>
-        </div>
-      </section>
 
+
+      </div>
+      <details ref={guideRef} open={guideOpen} onToggle={(event) => setGuideOpen(event.currentTarget.open)} className="scroll-mt-4 rounded-xl border border-border bg-card p-4">
+        <summary className="cursor-pointer text-[17px] font-medium">Guided questions and reflection</summary>
+        <div className="mt-4"><MapQuestions graph={graph} step={step} onStep={setStep} onShowMap={showMap} /></div>
+      </details>
       <BringInSavedAnswer options={options} onAdd={bringIn} />
 
       <div>
