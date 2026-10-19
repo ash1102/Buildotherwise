@@ -1,150 +1,130 @@
 import { useEffect, useState } from "react";
 import { makeId, readStore, subscribeStore, writeStore } from "./store";
 import { LIFEMAP_KEY, setLifeMap } from "./workbook";
-import { energyLine } from "./mapEnergy";
+import { ENERGY_QUESTION, energyLine } from "./mapEnergy";
 import { buildBranches, wouldCycle } from "./lifeMapBranches";
 
 /**
- * The five questions the map is drawn from. The keys are the ones the Life Map has
- * always used, so lines saved before today stay exactly where they were.
+ * The map areas. The keys are the ones the Life Map has always used, so lines
+ * saved before today stay in the same place.
  */
 export const MAP_SECTIONS = [
   {
     key: "places",
     label: "Your week",
-    prompt: "Where this kind of activity happens, and whether you can get there, feel welcome, and afford it.",
+    prompt: "Places from a recent stretch you remember. Home counts.",
   },
   {
     key: "placeless",
-    label: "No set place",
-    prompt: "Things you do anywhere: reading, walking, talking, making, fixing, helping.",
+    label: "Activities",
+    prompt: "Other things you did then, including at home, online, while travelling, or in different places.",
   },
   {
     key: "energy",
     label: "Energy",
-    prompt: "What left you steadier, and what took more than it gave.",
+    prompt: "One recent observation about energy. Not a permanent description of the activity.",
   },
   {
     key: "barriers",
     label: "What's missing",
-    prompt: "Cost, transport, childcare, accessibility, schedule, credentials. Facts about the situation, not failings.",
+    prompt: "Something that used to be part of life, something wanted but not reached, or what made access difficult. Absence is not the same as wanting it back.",
   },
   {
     key: "threads",
     label: "Threads",
-    prompt: "What your attention keeps coming back to.",
+    prompt: "A repeated detail might be worth noticing. It does not tell you yet why it repeats, whether you like it, or whether you want more of it.",
   },
   {
     key: "groups",
     label: "People and groups",
-    prompt: "The groups you're part of, used to be part of, or might want to try. Where you belong, not a headcount.",
+    prompt: "People and groups you have been in contact with, used to be with, or have wondered about. A role or group label is enough.",
   },
 ];
 
 /**
- * Original question definitions retained for saved-answer compatibility.
- * Revised draft prompts and sequence are defined below; they are not claimed
- * to be verbatim Notion lesson text.
- * `starter: true` means the answer finishes the sentence. The sentence stays the
- * question label on the map. The line itself is only what the participant wrote.
+ * Guided questions, in recall order. Saved lines keep these ids. `retired` questions
+ * stay here so older answers still have a label; they are not shown in the guide.
+ * `starter` / `legacyStarters` strip an old sentence opening off a saved line.
+ * `context: "entry"` attaches a new answer to something already on the map.
  */
-const ORIGINAL_QUESTION_PARTS = [
+export const MAP_QUESTION_PARTS = [
   {
     key: "part-1",
-    title: "Draw your week",
+    title: "Recent places",
     section: "places",
     intro:
-      "Think about a normal week. You are not trying to make a geographically accurate map. You're making a map of your lived week.",
+      "Think about the past seven days, or another recent stretch you remember. You are not trying to make a geographically accurate map.",
     examples:
-      "Work, someone else's house, school, stores, a gym, church, meetings, appointments, parks, restaurants, a garage, a friend's place, treatment or recovery spaces, community organizations, places connected to your kids, anywhere else that is actually part of your life.",
+      "Home, work, someone else's house, school, stores, a gym, church, meetings, appointments, parks, restaurants, a garage, a friend's place, treatment or recovery spaces, community organizations, places connected to your kids, anywhere else that is actually part of your life.",
     questions: [
-      { id: "p1-places", branch: "Places I go", text: "What places do you go in a typical week and weekend?", list: true },
-      { id: "p1-do", branch: "What I do there", text: "What do you usually do when you get there?", aboutPlace: "at" },
-      { id: "p1-how", branch: "Getting there", text: "How do you get to and from those places?", aboutPlace: "to" },
+      {
+        id: "p1-places",
+        branch: "Places I go",
+        text: "Think about the past seven days, or another recent stretch you remember. Where did you spend time? Home counts.",
+        list: true,
+      },
+      { id: "p1-do", branch: "What I do there", text: "What do you do at this place?", aboutPlace: "at" },
+      {
+        id: "p1-how",
+        branch: "Getting there",
+        text: "How do you get to and from this place?",
+        aboutPlace: "to",
+        helper: "“I’m already there” is an answer.",
+        chips: ["I'm already there"],
+      },
     ],
   },
   {
     key: "part-2",
-    title: "Add the things that don't have a place",
+    title: "Other activities",
     section: "placeless",
     intro:
-      "Some important parts of life happen without going anywhere. Don't let \"I didn't go anywhere\" turn into \"I didn't do anything.\"",
+      "Include what you did at home, online, while travelling, or in more than one place. You do not have to decide whether an activity is literally placeless.",
     examples:
       "Research something for hours from your phone, fix things, draw, game, cook, sell things online, talk people through problems, scroll, write, care for somebody, organize things, watch tutorials, work on a car, make music.",
-    questions: [{ id: "p2-placeless", branch: "Things I do anywhere", text: "What do you do that doesn't have a place?", list: true }],
-  },
-  {
-    key: "part-3",
-    title: "Mark the energy",
-    section: "energy",
-    intro: "Select an entry from your week, then mark how it affects your energy. You can add a note, change your answer, or leave it uncertain. There is no scoring system.",
     questions: [
-      { id: "p3-energy", branch: "Energy marks", text: "How does this entry affect your energy?" },
-      { id: "p3-plus", branch: "Gives me energy", text: "What gives you energy?" },
-      { id: "p3-minus", branch: "Drains me", text: "What drains you?" },
-      { id: "p3-star", branch: "I care about", text: "What do you care about?" },
-      { id: "p3-question", branch: "I'm curious about", text: "What are you curious about?" },
-      { id: "p3-dollar", branch: "Mostly for money or resources", text: "What do you do mostly because you need money or resources?" },
-      { id: "p3-bang", branch: "Where I get focused", text: "Where do you get unusually focused?" },
-    ],
-  },
-  {
-    key: "part-4",
-    title: "Look at what's missing",
-    section: "barriers",
-    intro:
-      "Sometimes something is missing because you don't care about it. Sometimes it's missing because you can't currently reach it. Those are not the same thing.",
-    questions: [
-      { id: "p4-used-to", branch: "Used to be part of my life", text: "What used to be part of my life that isn't anymore?" },
-      { id: "p4-rarely", branch: "Want, but rarely get to", text: "What do I want to do but rarely get access to?" },
       {
-        id: "p4-barrier",
-        branch: "If nothing was stopping me",
-        text: "Where would I go if money, transportation, time, childcare, fear, paperwork, health, or another barrier weren't stopping me?",
+        id: "p2-placeless",
+        branch: "Other things I did",
+        text: "What else did you do during that time—at home, online, while travelling, or in different places?",
+        list: true,
       },
-      { id: "p4-circumstances", branch: "If things were different", text: "Who or what would be on this map if my circumstances were different?" },
-      { id: "p4-in-the-way", branch: "What gets in the way", text: "What gets in the way?" },
-    ],
-  },
-  {
-    key: "part-5",
-    title: "Find the threads",
-    section: "threads",
-    intro: "Now stop looking at individual places. Look for patterns. Finish any of these that actually fit.",
-    questions: [
-      { id: "p5-ending-up", text: "I keep ending up around…", starter: true },
-      { id: "p5-more-time", text: "I spend more time than I realized doing…", starter: true },
-      { id: "p5-come-to-me", text: "People seem to come to me for…", starter: true },
-      { id: "p5-lose-track", text: "I lose track of time when…", starter: true },
-      { id: "p5-researching", text: "I keep researching…", starter: true },
-      { id: "p5-weird-amount", text: "I seem to know a weird amount about…", starter: true },
-      { id: "p5-improve", text: "I keep trying to improve…", starter: true },
-      { id: "p5-frustrated", text: "I get frustrated when…", starter: true },
-      { id: "p5-miss", text: "Something I miss is…", starter: true },
-      { id: "p5-wish", text: "Something I wish I had access to is…", starter: true },
-      { id: "p5-bigger", text: "One part of this map I would willingly make bigger is…", starter: true },
     ],
   },
   {
     key: "part-groups",
-    title: "Add the people and groups",
+    title: "People and groups",
     section: "groups",
     intro:
-      "A lot of life happens with other people. A group doesn't need a name or a meeting. It can be the people you text, the crew at work, the regulars somewhere, or people online. You don't have to explain any of it.",
+      "Who has been part of this recent stretch, in person or online? A group does not need a name or a meeting. You can use a role or group label instead of a name.",
     examples:
       "Family, a circle of friends, coworkers, neighbors, people at church, a team, a crew, a class, other parents, people you game with, an online community, a recovery or support group, people who share your language or where you're from.",
     note: "Skip any of these. A blank line is a real answer.",
     questions: [
-      { id: "g-now", branch: "Groups I'm in now", text: "Which groups or circles are part of your life right now?", list: true },
+      {
+        id: "g-now",
+        branch: "People and groups now",
+        text: "Who have you spent time with or been in contact with recently—in person or online? You can use a role or group label instead of a name.",
+        list: true,
+      },
+      {
+        id: "p5-come-to-me",
+        branch: "Asked me for",
+        text: "Has anyone recently asked you for help, information, or company? What did they ask for?",
+        helper: "One request does not establish a recurring role.",
+        legacyStarters: ["People seem to come to me for"],
+      },
       {
         id: "g-close",
-        branch: "How close it feels",
-        text: "For each one, how close does it feel right now?",
+        branch: "How connected it feels",
+        text: "If you want to mark it, how connected do you feel to this person or group right now?",
+        helper: "Optional. Contact and closeness are different, and you can leave this unmarked.",
         about: "g-now",
-        aboutLabel: "Which group?",
+        aboutLabel: "Which person or group?",
         chips: ["Close", "In the middle", "At the edge", "Not sure"],
+        optional: true,
       },
-      { id: "g-before", branch: "Groups from before", text: "Are there groups you used to be part of?", list: true },
+      { id: "g-before", branch: "Groups from before", text: "Are there groups you used to be part of?", list: true, optional: true },
       {
         id: "g-left",
         branch: "What's left of it",
@@ -152,199 +132,250 @@ const ORIGINAL_QUESTION_PARTS = [
         about: "g-before",
         aboutLabel: "Which group?",
         chips: ["Worth reconnecting", "Changed, but still part of me", "Leaving it where it is", "Not sure"],
+        retired: true,
       },
       {
         id: "g-curious",
         branch: "Groups I'm curious about",
         text: "Is there a group, place, or kind of people you've wondered about joining, or just seeing?",
+        helper: "This is a possibility, not present involvement.",
         list: true,
+        optional: true,
       },
       {
         id: "g-take",
-        branch: "What it would take",
-        text: "What would it take to show up there?",
+        branch: "What I would need to know",
+        text: "If you wanted to find out more, what would you need to know first? Is there any support or access you already know you would need?",
         section: "barriers",
         about: "g-curious",
         aboutLabel: "Which group?",
+        optional: true,
+      },
+    ],
+  },
+  {
+    key: "part-3",
+    title: "Observations",
+    section: "energy",
+    intro:
+      "Optional. Choose one entry and describe one recent time, or one thing you notice about that entry. Nothing here is a score, and one answer does not become a permanent description.",
+    questions: [
+      { id: "p3-energy", branch: "Energy observation", text: ENERGY_QUESTION, energyControl: true },
+      { id: "p3-plus", branch: "Gives me energy", text: "What gives you energy?", retired: true },
+      { id: "p3-minus", branch: "Drains me", text: "What drains you?", retired: true },
+      {
+        id: "p3-star",
+        branch: "What matters to me",
+        text: "What, if anything, matters to you about this entry?",
+        context: "entry",
+        optional: true,
+      },
+      {
+        id: "p3-question",
+        branch: "Curiosity",
+        text: "Is there anything about this entry you would like to understand better?",
+        helper: "“Nothing comes to mind” is an answer.",
+        context: "entry",
+        optional: true,
+      },
+      {
+        id: "p3-dollar",
+        branch: "Money or resources",
+        text: "What role, if any, do money or resources play in doing this?",
+        context: "entry",
+        optional: true,
+      },
+      {
+        id: "p3-bang",
+        branch: "Attention",
+        text: "What part, if any, holds your attention?",
+        helper: "Can you remember a recent example?",
+        context: "entry",
+        optional: true,
+      },
+    ],
+  },
+  {
+    key: "part-4",
+    title: "What's missing",
+    section: "barriers",
+    intro:
+      "Something can be absent without being missed, and a difficulty does not prove you want to pursue the activity. Add only what you want to add.",
+    questions: [
+      {
+        id: "p4-used-to",
+        branch: "Used to be part of my life",
+        text: "Is there an activity or place you remember spending time on before that isn't part of your life now? Add it only if you want to.",
+        optional: true,
+      },
+      {
+        id: "p5-miss",
+        branch: "Something I miss",
+        text: "Something I miss is…",
+        starter: true,
+        about: "p4-used-to",
+        aboutLabel: "Which former activity or place?",
+        helper: "Optional. Something can be absent without being missed.",
+        optional: true,
+      },
+      {
+        id: "p4-rarely",
+        branch: "Wanted, but have not had the chance",
+        text: "Is there something you have wanted to do recently but haven't had the chance to do?",
+        optional: true,
+      },
+      {
+        id: "p4-in-the-way",
+        branch: "What gets in the way",
+        text: "What, if anything, made it difficult to do this or get there? “I don’t know” is an answer.",
+        helper: "Money, transportation, time, childcare, fear, paperwork, health, or something else might be relevant. A difficulty is not a plan.",
+        aboutQuestions: ["p4-rarely"],
+        aboutLabel: "Which desired activity?",
+      },
+      {
+        id: "p4-else",
+        branch: "Something else missing",
+        text: "Is there something else missing from this map that you want to add?",
+        optional: true,
+      },
+      {
+        id: "p4-barrier",
+        branch: "If nothing was stopping me",
+        text: "Where would I go if money, transportation, time, childcare, fear, paperwork, health, or another barrier weren't stopping me?",
+        retired: true,
+      },
+      {
+        id: "p4-circumstances",
+        branch: "If things were different",
+        text: "Who or what would be on this map if my circumstances were different?",
+        retired: true,
+      },
+    ],
+  },
+  {
+    key: "part-5",
+    title: "Possible threads",
+    section: "threads",
+    menu: true,
+    intro:
+      "Optional. Look across the entries you can already see. A repeated detail might be worth noticing. It does not tell you yet why it repeats, whether you like it, or whether you want more of it.",
+    note: "Choose one prompt if you want to. You do not need a discovery for every prompt.",
+    questions: [
+      {
+        id: "p5-ending-up",
+        branch: "Shows up more than once",
+        text: "Looking across your entries, does any activity, place, or kind of situation appear more than once? Which entries?",
+        legacyStarters: ["I keep ending up around"],
+        multi: true,
+      },
+      {
+        id: "p5-more-time",
+        branch: "Took a lot of time",
+        text: "Which activities took up a lot of your time during the period you mapped, if any?",
+        legacyStarters: ["I spend more time than I realized doing"],
+        multi: true,
+      },
+      {
+        id: "p5-lose-track",
+        branch: "Longer than intended",
+        text: "Can you remember a recent time you did something longer than you intended? What were you doing?",
+        helper: "This does not by itself mean you enjoyed it.",
+        legacyStarters: ["I lose track of time when"],
+      },
+      {
+        id: "p5-researching",
+        branch: "Looked into recently",
+        text: "What have you looked up, read about, watched, or asked questions about recently, if anything?",
+        legacyStarters: ["I keep researching"],
+      },
+      {
+        id: "p5-weird-amount",
+        branch: "Spent time learning",
+        text: "Is there something you have spent time learning about or doing that you want to add?",
+        legacyStarters: ["I seem to know a weird amount about"],
+      },
+      {
+        id: "p5-improve",
+        branch: "Tried to change or improve",
+        text: "Have you recently tried to change, fix, practise, or improve something? What did you do?",
+        legacyStarters: ["I keep trying to improve"],
+      },
+      {
+        id: "p5-frustrated",
+        branch: "Didn't work as wanted",
+        text: "Was there a moment in one of these activities when something didn't work as you wanted? What happened?",
+        legacyStarters: ["I get frustrated when"],
+        multi: true,
+      },
+      { id: "p5-wish", branch: "Something I wish I had access to", text: "Something I wish I had access to is…", starter: true, retired: true },
+      {
+        id: "p5-bigger",
+        branch: "One part I would make bigger",
+        text: "One part of this map I would willingly make bigger is…",
+        starter: true,
+        retired: true,
       },
     ],
   },
 ];
 
-
-/** Draft for review: concrete recall before interpretation. Original definitions
- * remain available so saved answers retain their question IDs and wording. */
-const QUESTION_UPDATES = {
-  "p1-places": {
-    "text": "Think about the past seven days, or another recent stretch you remember. Where did you spend time? Home counts."
-  },
-  "p1-do": {
-    "text": "What do you do at this place?"
-  },
-  "p1-how": {
-    "text": "How do you get to and from this place?"
-  },
-  "p2-placeless": {
-    "text": "What else did you do during that time—at home, online, while travelling, or in different places?",
-    "branch": "Other activities"
-  },
-  "p3-energy": {
-    "text": "Think of one recent time you did this or were here. How was your energy afterward compared with before?"
-  },
-  "p3-star": {
-    "text": "What, if anything, matters to you about this entry?",
-    "branch": "What matters to me"
-  },
-  "p3-question": {
-    "text": "Is there anything about this entry you would like to understand better?"
-  },
-  "p3-dollar": {
-    "text": "What role, if any, do money or resources play in doing this?",
-    "branch": "Money or resources"
-  },
-  "p3-bang": {
-    "text": "What part, if any, holds your attention? Can you remember a recent example?",
-    "branch": "What holds my attention"
-  },
-  "p4-used-to": {
-    "text": "Is there an activity or place you remember spending time on before that isn't part of your life now? Add it only if you want to."
-  },
-  "p4-rarely": {
-    "text": "Is there something you have wanted to do recently but haven't had the chance to do?"
-  },
-  "p4-in-the-way": {
-    "text": "What, if anything, made it difficult to do this or get there? 'I don't know' is an answer."
-  },
-  "p5-ending-up": {
-    "text": "Looking across your entries, does any activity, place, or kind of situation appear more than once? Which entries?",
-    "branch": "Details that repeat",
-    "starter": false
-  },
-  "p5-more-time": {
-    "text": "Which activities took up a lot of your time during the period you mapped, if any?",
-    "branch": "Where my time went",
-    "starter": false
-  },
-  "p5-come-to-me": {
-    "text": "Has anyone recently asked you for help, information, or company? What did they ask for?",
-    "branch": "Recent requests",
-    "section": "groups",
-    "starter": false
-  },
-  "p5-lose-track": {
-    "text": "Can you remember a recent time you did something longer than you intended? What were you doing?",
-    "branch": "Longer than intended",
-    "starter": false
-  },
-  "p5-researching": {
-    "text": "What have you looked up, read about, watched, or asked questions about recently, if anything?",
-    "branch": "Things I looked into",
-    "starter": false
-  },
-  "p5-weird-amount": {
-    "text": "Is there something you have spent time learning about or doing that you want to add?",
-    "branch": "Learning and experience",
-    "starter": false
-  },
-  "p5-improve": {
-    "text": "Have you recently tried to change, fix, practise, or improve something? What did you do?",
-    "branch": "Things I tried to change",
-    "starter": false
-  },
-  "p5-frustrated": {
-    "text": "Was there a moment in one of these activities when something didn't work as you wanted? What happened?",
-    "branch": "What happened",
-    "starter": false
-  },
-  "p5-miss": {
-    "section": "barriers"
-  },
-  "p5-bigger": {
-    "text": "Is there anything here you would like more room for, or would like to keep as it is?",
-    "branch": "More room or keep as it is",
-    "starter": false
-  },
-  "g-now": {
-    "text": "Who have you spent time with or been in contact with recently—in person or online? You can use a role or group label instead of a name.",
-    "branch": "People and groups in my life"
-  },
-  "g-close": {
-    "text": "If you want to mark it, how connected do you feel to this person or group right now?",
-    "chips": [
-      "Close",
-      "Somewhat connected",
-      "Not connected right now",
-      "Mixed",
-      "Not sure"
-    ]
-  },
-  "g-left": {
-    "text": "Do you want to do anything with this connection right now, leave it as it is, or leave the question open?",
-    "chips": [
-      "Find out more",
-      "Leave it as it is",
-      "Leave the question open"
-    ],
-    "branch": "What I choose about this connection"
-  },
-  "g-take": {
-    "text": "If you wanted to find out more, what would you need to know first? Is there any support or access you already know you would need?",
-    "branch": "Information, support or access"
-  }
-};
-const originalQuestions = Object.fromEntries(ORIGINAL_QUESTION_PARTS.flatMap(part =>
-  part.questions.map(question => [question.id, { ...question, section: question.section || part.section }])
-));
-const revisedQuestion = id => ({ ...originalQuestions[id], ...QUESTION_UPDATES[id] });
-const moved = new Set(["p5-come-to-me", "p5-miss", "p5-bigger", "g-left"]);
-const retired = new Set(["p3-plus", "p3-minus", "p4-barrier", "p4-circumstances", "p5-wish"]);
-const order = ["part-1", "part-2", "part-groups", "part-3", "part-4", "part-5"];
-export const MAP_QUESTION_PARTS = order.map(key => {
-  const part = ORIGINAL_QUESTION_PARTS.find(item => item.key === key);
-  const questions = part.questions.filter(q => !moved.has(q.id) && !retired.has(q.id)).map(q => revisedQuestion(q.id));
-  if (key === "part-groups") questions.splice(1, 0, revisedQuestion("p5-come-to-me"));
-  if (key === "part-4") questions.splice(1, 0, revisedQuestion("p5-miss"));
-  const introductions = {
-    "part-1": "Start with a recent stretch you remember. It does not have to be a typical week. Places and activities give you something concrete to look at before deciding what they mean. Use your own life, a clearly labelled fictional example, or just observe. You may skip, pause, or stop.",
-    "part-2": "Include everyday activities wherever they happened. Being at home does not mean you did nothing. You do not need to decide whether an activity has a set place.",
-    "part-3": "Choose an entry and, if you can, recall one recent occasion. Notice what happened before interpreting it. Energy can stay the same or vary. Other conditions may have contributed; this is not a fixed trait or proof of a cause.",
-    "part-4": "Something absent is not necessarily something you want back. If you want to add a past activity or something you could not access, you do not have to explain personal history. Unknowns are welcome.",
-    "part-5": "Look over the entries you have added. Choose any question that helps; this is an optional menu, not a checklist. A repeated detail might be worth noticing. It does not tell you yet why it repeats, whether you like it, or whether you want more of it."
-  };
-  return { ...part, questions, intro: introductions[key] || part.intro,
-    title: key === "part-2" ? "Add other everyday activities" : key === "part-3" ? "Notice particular experiences" : part.title };
-});
-export const MAP_CLOSING_QUESTIONS = [revisedQuestion("p5-bigger"), revisedQuestion("g-left")];
-
-/** Every map question by id, including retired IDs for saved-answer compatibility. */
+/** Every map question by id, with the part and section it belongs to. */
 export const QUESTIONS_BY_ID = Object.fromEntries(
-  [...ORIGINAL_QUESTION_PARTS, ...MAP_QUESTION_PARTS, { section: "threads", questions: MAP_CLOSING_QUESTIONS }].flatMap((part) =>
+  MAP_QUESTION_PARTS.flatMap((part, partIndex) =>
     part.questions.map((question) => [
       question.id,
       {
         ...question,
         branch: question.branch || question.text.replace(/…$/, "").trim(),
-        partIndex: MAP_QUESTION_PARTS.findIndex(item => item.questions.some(q => q.id === question.id)),
+        partIndex,
         section: question.section || part.section,
       },
     ])
   )
 );
 
-/** Part 6 of the lesson: one thing worth exploring, or an honest unknown. */
+/** Closing reflection. Field ids stay stable so saved text is not dropped. */
+export const MAP_PAUSE_TEXT = "I'm not choosing something to explore right now.";
+
 export const MAP_PICK_FIELDS = [
   { id: "one-thing", label: "One thing I might want to understand better is:" },
   { id: "noticed-because", label: "The entry or experience that brought this to my attention was:" },
   { id: "do-not-know", label: "I do NOT know yet:" },
-  { id: "small-way", label: "One small way I could learn more about it:" },
+  {
+    id: "small-way",
+    label: "One small way I could learn more about it:",
+    hint: "For example: observing, asking a question, or looking up one practical detail. A plan is not a commitment.",
+  },
+  {
+    id: "more-room",
+    label: "Is there anything here you would like more room for, or would like to keep as it is?",
+  },
+  {
+    id: "connection-now",
+    label: "Do you want to do anything with a former connection right now, leave it as it is, or leave the question open?",
+  },
 ];
 
 export const MAP_PICK_KEY = "lifeMapPick";
 
+/** A line on the map, or an explicit pause, means this step has been used. An empty map has not. */
+export function lifeMapHasEntries(map, pick) {
+  const sections = map && typeof map === "object" ? Object.values(map) : [];
+  const hasLine = sections.some(
+    (items) => Array.isArray(items) && items.some((item) => String(item?.text || item?.label || "").trim())
+  );
+  return hasLine || Boolean(pick && pick.nothing_yet);
+}
+
+/** Questions the guide shows. Retired prompts and the energy control stay addressable by id. */
+export function guideQuestions(part) {
+  return (part?.questions || []).filter((question) => !question.retired && !question.energyControl);
+}
+
 /**
- * Part 6 is not a line in the lifeMap store. It lives under lifeMapPick, one field
- * per prompt. Only filled answers are drawn, so a blank box does not become an
- * empty spot. "Nothing yet" replaces the four fields while it is ticked.
+ * The closing reflection is not a line in the lifeMap store. It lives under
+ * lifeMapPick, one field per prompt. Only filled answers are drawn. Choosing not
+ * to explore right now hides those fields on the map without deleting them.
  */
 export function exploreLines(pick) {
   const value = pick || {};
@@ -354,7 +385,7 @@ export function exploreLines(pick) {
         id: "pick:nothing",
         fieldId: "nothing_yet",
         label: "",
-        text: "I’m not choosing something to explore right now.",
+        text: MAP_PAUSE_TEXT,
       },
     ];
   }
@@ -375,16 +406,57 @@ function escapeRegExp(value) {
  * An older line may still have that starter glued on the front. Take it back off
  * so the node shows only what the participant wrote.
  */
+function starterPrefixes(question) {
+  if (!question) return [];
+  const raw = [];
+  if (question.starter) raw.push(question.text);
+  raw.push(...(question.legacyStarters || []));
+  return raw.map((item) => String(item || "").replace(/…$/, "").trim()).filter(Boolean);
+}
+
 export function answerText(question, text) {
   const value = String(text || "").trim();
-  if (!value || !question || !question.starter) return value;
-  const prefix = String(question.text || "").replace(/…$/, "").trim();
-  if (!prefix) return value;
-  const pattern = new RegExp(`^${escapeRegExp(prefix)}(?:[\\s….:,;\\-–—]+)`, "i");
-  const matched = value.match(pattern);
-  if (!matched) return value;
-  const rest = value.slice(matched[0].length).trim();
-  return rest || value;
+  const prefixes = starterPrefixes(question);
+  if (!value || !prefixes.length) return value;
+  for (const prefix of prefixes) {
+    const pattern = new RegExp(`^${escapeRegExp(prefix)}(?:[\\s….:,;\\-–—]+)`, "i");
+    const matched = value.match(pattern);
+    if (!matched) continue;
+    const rest = value.slice(matched[0].length).trim();
+    return rest || value;
+  }
+  return value;
+}
+
+/**
+ * Where an explicit "Add to map" places a line. Uncommitted draft text must not
+ * call this. One selected entry becomes the parent. Several selected entries stay
+ * connected without pretending one of them proves a pattern. A missing-section
+ * answer with no parent stays in What's missing.
+ */
+export function placementForAnswer(question, { links = [], separate = false } = {}) {
+  const chosen = separate ? [] : [...new Set(links.filter(Boolean))];
+  const missing = (question?.section || "") === "barriers";
+  if (chosen.length === 1) {
+    return { links: chosen, parent_id: chosen[0], parent_choice: "chosen", branch_group: "" };
+  }
+  if (chosen.length > 1) {
+    return {
+      links: chosen,
+      parent_id: "",
+      parent_choice: missing ? "" : "standalone",
+      branch_group: missing ? "barriers" : "",
+    };
+  }
+  if (separate || missing) {
+    return {
+      links: [],
+      parent_id: "",
+      parent_choice: missing ? "" : "standalone",
+      branch_group: missing ? "barriers" : "",
+    };
+  }
+  return { links: [], parent_id: "", parent_choice: "", branch_group: "" };
 }
 
 /** The line an answer becomes. The starter is not copied onto the line. */
@@ -441,7 +513,7 @@ export function saveEnergyMark(sourceId, choice, note) {
   const line = energyLine(source, choice, note);
   if (!line) return null;
   const energy = map.energy || [];
-  const existing = energy.find((item) => item.question_id === "p3-energy" && item.energy_version === 2 && (item.links || []).includes(sourceId));
+  const existing = energy.find((item) => item.question_id === "p3-energy" && (item.links || []).includes(sourceId));
   const item = { ...(existing || {}), ...line, parent_id: sourceId, id: existing?.id || makeId("map"), links: [...new Set([sourceId, ...(existing?.links || [])])] };
   setLifeMap({ ...map, energy: existing ? energy.map((old) => old.id === existing.id ? item : old) : [...energy, item] });
   return item;
@@ -504,7 +576,7 @@ export function buildGraph(map) {
     nodes: ((map || {})[section.key] || []).map((item) => ({
       id: item.id,
       section: section.key,
-      text: answerText(originalQuestions[item.question_id] || QUESTIONS_BY_ID[item.question_id], item.text || ""),
+      text: answerText(QUESTIONS_BY_ID[item.question_id], item.text || ""),
       label: item.label || "",
       entry_id: item.entry_id || "",
       links: item.links || [],
@@ -516,7 +588,6 @@ export function buildGraph(map) {
       branch_group: item.branch_group || "",
       energy_choice: item.energy_choice || "",
       energy_note: item.energy_note || "",
-      energy_version: item.energy_version || 1,
     })),
   }));
 

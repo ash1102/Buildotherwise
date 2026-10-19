@@ -9,8 +9,8 @@ import { OPTIONAL_AFTER_PILOT_ONE, PILOT_ONE } from "./tags";
 /** Numbered modules in curriculum order. */
 export const modules = [module1, module2, ...otherModules, module4].sort((a, b) => a.order - b.order);
 
-/** The opener stands at the very front, then "Before you start" without a number, then Modules 1 to 10. */
-export const sections = [opener, beforeYouStart, ...modules];
+/** Before you start, then the Life Map, then Modules 1 to 10. The map is not orientation and not a numbered module. */
+export const sections = [beforeYouStart, opener, ...modules];
 
 export const stepsByCode = {};
 sections.forEach((section) => {

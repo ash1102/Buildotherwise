@@ -5,39 +5,54 @@ import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/lib/store";
 import EnergyMarks from "./EnergyMarks";
 import {
+  MAP_PAUSE_TEXT,
   MAP_PICK_FIELDS,
-  MAP_CLOSING_QUESTIONS,
   MAP_PICK_KEY,
   MAP_QUESTION_PARTS,
   QUESTIONS_BY_ID,
   addLine,
+  guideQuestions,
   linesFromAnswer,
+  placementForAnswer,
 } from "@/lib/lifeMap";
 
 const PICK_STEP = MAP_QUESTION_PARTS.length;
 const TOTAL = PICK_STEP + 1;
-const STEP_TITLES = [...MAP_QUESTION_PARTS.map((item) => item.title), "Look over your map and choose whether to explore"];
+const STEP_TITLES = [...MAP_QUESTION_PARTS.map((item) => item.title), "Choose whether to explore"];
+
+function needsContext(question) {
+  return Boolean(question.aboutPlace || question.about || (question.aboutQuestions || []).length || question.context === "entry");
+}
 
 /**
- * The questions that build the map, one Part at a time. Each answer becomes a line on
- * the branch the participant chooses. Navigation keeps drafts without submitting.
- * Nothing has to be answered.
+ * The questions that build the map, one part at a time. A line is added only when
+ * the participant chooses Add to map. Moving between parts leaves a draft where it
+ * was typed. Nothing has to be answered.
  */
-export default function MapQuestions({ graph, step, onStep, onShowMap }) {
+export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced }) {
   const cardRef = useRef(null);
   const firstRender = useRef(true);
   const [drafts, setDrafts] = useState({});
   const [placeFor, setPlaceFor] = useState({});
+  const [linksFor, setLinksFor] = useState({});
+  const [menuFor, setMenuFor] = useState({});
   const [addedNote, setAddedNote] = useState({});
-  const [connections, setConnections] = useState({});
+  const [lastAdded, setLastAdded] = useState(null);
   const [pick, setPick] = useStore(MAP_PICK_KEY, {});
 
-  const places = graph.nodes.filter((node) => node.question_id === "p1-places");
-  const needsContext = (question) => Boolean(question.aboutPlace || question.about || /^p[345]-/.test(question.id));
   const targetsFor = (question) => {
     if (question.about) return graph.nodes.filter((node) => node.question_id === question.about);
-    if (question.aboutPlace) return places;
-    if (/^p[345]-/.test(question.id)) return graph.nodes;
+    if (question.aboutPlace) {
+      return graph.nodes.filter((node) => node.question_id === "p1-places" || (node.section === "places" && !node.question_id));
+    }
+    if (question.aboutQuestions) return graph.nodes.filter((node) => question.aboutQuestions.includes(node.question_id));
+    if (question.context === "entry" || question.multi) {
+      return graph.nodes.filter((node) => {
+        const questionId = String(node.question_id || "");
+        if (questionId === "p1-how" || questionId.startsWith("p3-") || questionId.startsWith("p5-")) return false;
+        return ["places", "placeless", "groups", "barriers"].includes(node.section);
+      });
+    }
     return [];
   };
   const countFor = (questionId) => graph.nodes.filter((node) => node.question_id === questionId).length;
@@ -53,36 +68,58 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
   const add = (part, question) => {
     const lines = linesFromAnswer(question, drafts[question.id]);
     if (!lines.length) return 0;
-    const selectedParent = needsContext(question) ? placeFor[question.id] : "";
-    const placeId = selectedParent === "__separate" ? "" : selectedParent;
-    const section = QUESTIONS_BY_ID[question.id].section || part.section;
-    lines.forEach((text) =>
-      addLine(section, {
+    const targets = targetsFor(question);
+    const chosen = question.multi
+      ? linksFor[question.id] || []
+      : placeFor[question.id] && placeFor[question.id] !== "__separate"
+        ? [placeFor[question.id]]
+        : [];
+    const separate = question.multi
+      ? chosen.length === 0
+      : placeFor[question.id] === "__separate" || (needsContext(question) && targets.length === 0);
+    const full = QUESTIONS_BY_ID[question.id];
+    const placement = needsContext(question) || question.multi
+      ? placementForAnswer(full, { links: chosen, separate })
+      : placementForAnswer(full, { links: [], separate: false });
+    const section = full.section || part.section;
+    let firstId = "";
+    lines.forEach((text) => {
+      const item = addLine(section, {
         text,
         question_id: question.id,
         source_label: question.text,
-        links: [...new Set([...(placeId ? [placeId] : []), ...(connections[question.id] || [])])],
-        parent_id: placeId || "",
-        parent_choice: placeId ? "chosen" : "standalone",
-        branch_group: section === "barriers" && !placeId ? "barriers" : "",
-      })
-    );
+        ...placement,
+        branch_group: placement.parent_id ? "" : placement.branch_group || (section === "barriers" ? "barriers" : ""),
+      });
+      if (!firstId) firstId = item.id;
+    });
     setDrafts((current) => ({ ...current, [question.id]: "" }));
+    const names = chosen
+      .map((id) => targets.find((node) => node.id === id) || graph.nodes.find((node) => node.id === id))
+      .filter(Boolean)
+      .map((node) => node.label || node.text);
+    const where = names.length
+      ? ` Connected to ${names.join(", ")}.`
+      : needsContext(question) || question.multi
+        ? " Kept separate from other entries."
+        : "";
     const added = lines.length === 1 ? "1 line" : `${lines.length} lines`;
-    setAddedNote((current) => ({
-      ...current,
-      [question.id]: `Added ${added}${placeId ? " beneath “" + (graph.nodes.find(node => node.id === placeId)?.label || graph.nodes.find(node => node.id === placeId)?.text || "your selected entry") + "”" : " as a separate entry"}.`,
-    }));
+    const note = `Added ${added} to the map under “${full.branch}”.${where}`;
+    setAddedNote((current) => ({ ...current, [question.id]: note }));
+    setLastAdded({ questionId: question.id, id: firstId });
     return lines.length;
   };
 
-  // Navigation never submits tentative answers. Drafts stay in this mounted guide.
-  const go = (next) => onStep(Math.max(0, Math.min(PICK_STEP, next)));
-  const part = step < PICK_STEP ? MAP_QUESTION_PARTS[step] : {
-    title: "Optional closing reflections", intro: "You can leave things as they are, leave a question open, or choose to explore. No decision is required.",
-    section: "threads", questions: MAP_CLOSING_QUESTIONS
+  const go = (next) => {
+    onStep(Math.max(0, Math.min(PICK_STEP, next)));
   };
-  const pending = part.questions.some(question => String(drafts[question.id] || "").trim());
+
+  const part = step < PICK_STEP ? MAP_QUESTION_PARTS[step] : null;
+  const visible = part ? guideQuestions(part) : [];
+  const menuId = part?.menu ? menuFor[part.key] || visible[0]?.id || "" : "";
+  const shown = part?.menu ? visible.filter((question) => question.id === menuId) : visible;
+  const pending = part ? part.questions.some((question) => String(drafts[question.id] || "").trim()) : false;
+  const keptReflection = MAP_PICK_FIELDS.some((field) => String((pick || {})[field.id] || "").trim());
 
   return (
     <section
@@ -128,10 +165,10 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
         ))}
       </ol>
 
-      {(
+      {part ? (
         <div className="mt-6">
           <h3 className="font-heading text-xl">
-            {step < PICK_STEP ? `Part ${step + 1}: ` : ""}{part.title}
+            Part {step + 1}: {part.title}
           </h3>
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted-foreground">{part.intro}</p>
           {part.examples ? (
@@ -142,26 +179,48 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
           ) : null}
 
           {part.key === "part-3" ? <EnergyMarks graph={graph} onEarlierPart={() => go(0)} /> : null}
+          {part.menu && visible.length ? (
+            <label className="mt-5 block text-[14px] font-medium" htmlFor={`menu-${part.key}`}>
+              Choose one prompt
+              <select
+                id={`menu-${part.key}`}
+                value={menuId}
+                onChange={(event) => setMenuFor((current) => ({ ...current, [part.key]: event.target.value }))}
+                className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-[14px]"
+              >
+                {visible.map((question) => (
+                  <option key={question.id} value={question.id}>
+                    {question.text}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
           <div className="mt-5 space-y-6">
-            {part.questions.filter((question) => !["p3-energy", "p3-plus", "p3-minus"].includes(question.id)).map((question) => {
+            {shown.map((question) => {
               const count = countFor(question.id);
               const value = drafts[question.id] || "";
               const targets = targetsFor(question);
+              const contextual = needsContext(question);
+              const selectedLinks = linksFor[question.id] || [];
+              const awaitingChoice = contextual && targets.length > 0 && !placeFor[question.id];
               return (
                 <div key={question.id}>
                   <label htmlFor={`mapq-${question.id}`} className="block text-[15px] font-medium text-foreground">
                     {question.text}
+                    {question.optional ? <span className="ml-2 text-[12px] font-normal text-muted-faint">Optional</span> : null}
                   </label>
+                  {question.helper ? <p className="mt-1 text-[13px] text-muted-foreground">{question.helper}</p> : null}
                   <p className="mt-1 text-[12.5px] text-muted-faint">
                     {question.list
-                      ? "List as many as fit, separated by commas or new lines. Each one becomes its own line on the map."
-                      : "One answer at a time. It shows up on the map under this question."}{" "}
-                    Choose Add to map when ready. Moving between parts keeps your draft without adding it.
+                      ? "List as many as fit, separated by commas or new lines. Each one becomes its own line when you add it."
+                      : "One answer at a time. It stays a draft until you add it."}{" "}
+                    {value.trim() ? "Draft — not on the map yet." : "Nothing is added by leaving this box."}
                   </p>
 
-                  {needsContext(question) && targets.length ? (
+                  {contextual && targets.length ? (
                     <select
-                      aria-label={`Which earlier entry does this answer describe? ${question.text}`}
+                      aria-label={`${question.aboutLabel || "Which earlier entry does this describe?"} ${question.text}`}
                       value={placeFor[question.id] || ""}
                       onChange={(event) => {
                         const next = event.target.value;
@@ -169,7 +228,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                       }}
                       className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-[13.5px] sm:w-72"
                     >
-                      <option value="">Keep separate, or choose an entry…</option>
+                      <option value="">{question.aboutLabel || "Which earlier entry does this describe?"}</option>
                       <option value="__separate">Keep this as a separate answer</option>
                       {targets.map((place) => (
                         <option key={place.id} value={place.id}>
@@ -178,25 +237,41 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                       ))}
                     </select>
                   ) : null}
+                  {contextual && !targets.length ? (
+                    <p className="mt-2 text-[13px] text-muted-foreground">
+                      There is no matching entry yet. You can add this as its own line, or add that entry first.
+                    </p>
+                  ) : null}
 
-                  {placeFor[question.id] && placeFor[question.id] !== "__separate" ? <p className="mt-2 rounded-md bg-secondary p-3 text-[15px]">
-                    Answering about: <strong>{targets.find((node) => node.id === placeFor[question.id])?.text || "the entry you selected"}</strong>
-                  </p> : null}
+                  {question.multi && targets.length ? (
+                    <fieldset className="mt-2 max-h-48 space-y-1 overflow-y-auto rounded-md border border-border p-3">
+                      <legend className="px-1 text-[13px] text-muted-foreground">
+                        If this refers to entries already on the map, select them. More than one is allowed. Leave them unchecked to keep this separate.
+                      </legend>
+                      {targets.map((place) => (
+                        <label key={place.id} className="flex items-start gap-2 text-[14px]">
+                          <input
+                            type="checkbox"
+                            className="mt-1"
+                            checked={selectedLinks.includes(place.id)}
+                            onChange={() => {
+                              setLinksFor((current) => {
+                                const list = current[question.id] || [];
+                                const next = list.includes(place.id) ? list.filter((id) => id !== place.id) : [...list, place.id];
+                                return { ...current, [question.id]: next };
+                              });
+                            }}
+                          />
+                          <span>{place.label || place.text}</span>
+                        </label>
+                      ))}
+                    </fieldset>
+                  ) : null}
 
-                  {/^p5-/.test(question.id) && graph.nodes.length > 0 ? (
-                    <details className="mt-3">
-                      <summary className="cursor-pointer text-[13px]">Connect this observation to more entries (optional)</summary>
-                      <p className="mt-2 text-[13px]">Choose only connections you see. Selecting entries does not establish a pattern or its cause.</p>
-                      <div className="mt-2 max-h-48 space-y-2 overflow-auto">
-                        {graph.nodes.map(node => <label key={node.id} className="flex items-start gap-2 text-[14px]">
-                          <input type="checkbox" checked={(connections[question.id] || []).includes(node.id)}
-                            onChange={event => { const checked = event.target.checked; setConnections(current => ({
-                              ...current, [question.id]: checked ? [...(current[question.id] || []), node.id] : (current[question.id] || []).filter(id => id !== node.id)
-                            })); }} />
-                          {node.label || node.text}
-                        </label>)}
-                      </div>
-                    </details>
+                  {placeFor[question.id] && placeFor[question.id] !== "__separate" ? (
+                    <p className="mt-2 rounded-md bg-secondary p-3 text-[15px]">
+                      Answering about: <strong>{targets.find((node) => node.id === placeFor[question.id])?.text || "the entry you selected"}</strong>
+                    </p>
                   ) : null}
 
                   {question.chips ? (
@@ -240,7 +315,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                     <Button
                       type="button"
                       onClick={() => add(part, question)}
-                      disabled={!value.trim()}
+                      disabled={!value.trim() || awaitingChoice}
                       className="rounded-full sm:mt-1"
                     >
                       <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -248,10 +323,12 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                     </Button>
                   </div>
                   <p className="mt-1 text-[12.5px] text-muted-faint" aria-live="polite">
-                    {addedNote[question.id] ? (
-                      <span className="text-accent-ink">{addedNote[question.id]} </span>
-                    ) : null}
-                    {addedNote[question.id] ? <button type="button" onClick={onShowMap} className="ml-2 underline">See it on your map</button> : null}
+                    {addedNote[question.id] ? <span className="text-accent-ink">{addedNote[question.id]} </span> : null}
+                    {lastAdded?.questionId === question.id && lastAdded.id ? (
+                      <button type="button" className="text-accent-ink underline" onClick={() => onPlaced?.(lastAdded.id)}>
+                        Show it on the map
+                      </button>
+                    ) : null}{" "}
                     {count ? `${count} ${count === 1 ? "line" : "lines"} on the map from this question.` : ""}
                   </p>
                 </div>
@@ -259,23 +336,24 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
             })}
           </div>
         </div>
-      )}
-      {step === PICK_STEP && (
+      ) : (
         <div className="mt-6">
-          <h3 className="font-heading text-xl">Part {TOTAL}: Look over your map and choose whether to explore</h3>
+          <h3 className="font-heading text-xl">Look over your map and choose whether to explore</h3>
           <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-muted-foreground">
-            If anything catches your attention, you can name something to understand better. You can also leave it open, pause, or keep things as they are.
+            Look over the entries on your map. You can name one thing you might want to understand better, or leave that
+            choice for later. This is not a career, a business, or a purpose you have to announce.
           </p>
           <p className="mt-2 max-w-2xl text-[12.5px] leading-relaxed text-muted-faint">
-            These are single answers, not lists. They show up at the end of your map as “Worth exploring.”
+            These save as you type. They are not added by moving between parts. While you are not choosing, the text stays
+            saved and is hidden on the map.
           </p>
-          <p className="mt-2 text-[13px] text-muted-foreground">A small way to learn more might be observing, asking a question, or looking up one practical detail. A plan is not a commitment.</p>
           <div className="mt-4 space-y-4">
             {MAP_PICK_FIELDS.map((field) => (
               <div key={field.id}>
                 <label htmlFor={`mappick-${field.id}`} className="block text-[15px] font-medium text-foreground">
                   {field.label}
                 </label>
+                {field.hint ? <p className="mt-1 text-[13px] text-muted-foreground">{field.hint}</p> : null}
                 <Textarea
                   id={`mappick-${field.id}`}
                   rows={2}
@@ -300,11 +378,14 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
                 }}
               />
               <span>
-                I’m not choosing something to explore right now.
-                <span className="block text-[13px] text-muted-faint">That counts as a complete answer. Your earlier reflection text is kept and will reappear if you untick this.</span>
+                {MAP_PAUSE_TEXT}
+                <span className="block text-[13px] text-muted-faint">
+                  That is a complete way to pause. Your answer can change.
+                  {keptReflection ? " Text already in the fields stays saved. Uncheck this to edit it again." : ""}
+                </span>
               </span>
             </label>
-            <p className="text-[12.5px] text-muted-faint">Saved to your account as you type.</p>
+            <p className="text-[12.5px] text-muted-faint">Saved to your account as you type. On this device first, then copied to your account.</p>
           </div>
         </div>
       )}
@@ -312,9 +393,11 @@ export default function MapQuestions({ graph, step, onStep, onShowMap }) {
       <div className="mt-8 border-t border-border pt-5">
         {pending ? (
           <p className="mb-3 text-[12.5px] text-muted-faint">
-            Draft only: use Add to map to keep an answer. Changing parts keeps drafts here; leaving or reloading this page clears unadded drafts.
+            Text still in a box is a draft. Back and Next leave it here and do not add it to the map.
           </p>
-        ) : null}
+        ) : (
+          <p className="mb-3 text-[12.5px] text-muted-faint">You can skip any part. Empty questions are not added.</p>
+        )}
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Button
             type="button"

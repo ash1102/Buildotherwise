@@ -16,7 +16,7 @@ import { useWorkbook } from "@/lib/workbook";
 
 /**
  * Getting Started stands on its own, before the workbook.
- * It is not a section of Module 1, and it does not use the Begin here label.
+ * It is not a section of Module 1. The Life Map is the next step, still before Module 1.
  */
 export default function GettingStartedPage() {
   const { lessons, loading, error } = useCurriculum();
@@ -37,16 +37,16 @@ export default function GettingStartedPage() {
 
   if (!admin && stepsDone) {
     if (!isAuthenticated) return <LoginRedirect />;
-    return <Navigate to="/" replace />;
+    return <Navigate to="/map" replace />;
   }
 
   return (
     <div className="space-y-8">
       <header className="border-b border-border pb-5">
         <p className="workbook-label">Getting Started</p>
-        <h1 className="mt-2">Four steps, then the workbook</h1>
+        <h1 className="mt-2">Four steps, then your Life Map</h1>
         <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-          The workbook starts at Module 1. These steps come first. Pass counts. A saved answer counts too.
+          These steps come first. Your Life Map comes next, before Module 1. Pass counts. A saved answer counts too.
         </p>
       </header>
 

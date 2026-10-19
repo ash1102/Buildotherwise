@@ -4,18 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/lib/store";
 import { QUESTIONS_BY_ID, addLine, saveEnergyMark } from "@/lib/lifeMap";
-import { ENERGY_CHOICES, ALL_ENERGY_CHOICES, ENERGY_PROMPT } from "@/lib/mapEnergy";
+import { EPISODE_ENERGY_CHOICES, energyObservationLabel } from "@/lib/mapEnergy";
 import { buildBranches, wouldCycle } from "@/lib/lifeMapBranches";
 
 const FOLLOW_UPS = [
   { id: "p1-do", label: "What I do here", prompt: "What do you do at this place?", placeOnly: true },
-  { id: "p1-how", label: "Getting here", prompt: "How do you get to and from this place?", placeOnly: true },
-  { id: "p3-energy", label: "Energy", prompt: ENERGY_PROMPT },
+  { id: "p1-how", label: "Getting here", prompt: "How do you get to and from this place?", helper: "“I’m already there” is an answer.", placeOnly: true },
+  { id: "p3-energy", label: "Energy after one time", prompt: "Think of one recent time you did this or were here. How was your energy afterward compared with before?", helper: "You could note what happened, what else was going on, or what you’re unsure about. One time does not show what caused the difference." },
   { id: "p3-star", label: "What matters to me", prompt: "What, if anything, matters to you about this?" },
   { id: "p3-question", label: "Curiosity", prompt: "Is there anything here you would like to understand better?" },
-  { id: "p3-bang", label: "Attention", prompt: "What part, if any, holds your attention?" },
+  { id: "p3-bang", label: "Attention", prompt: "What part, if any, holds your attention?", helper: "Can you remember a recent example?" },
   { id: "p3-dollar", label: "Money or resources", prompt: "What role, if any, do money or resources play in doing this?" },
-  { id: "p4-in-the-way", label: "What gets in the way", prompt: "What, if anything, makes this difficult to do or reach?" }
+  { id: "p4-in-the-way", label: "What gets in the way", prompt: "What, if anything, makes this difficult to do or reach?" },
 ];
 
 function BranchAnswer({ node, onSaved, onCancel }) {
@@ -46,11 +46,11 @@ function BranchAnswer({ node, onSaved, onCancel }) {
       {options.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
     </select>
     <p className="text-[16px] font-medium">{question.prompt}</p>
-    {question.id === "p3-energy" ? <div className="flex flex-wrap gap-2" role="group" aria-label="Energy response">
-      {ENERGY_CHOICES.map((item) => <button key={item.id} type="button" aria-pressed={energy === item.id} onClick={() => setEnergy(item.id)}
+    {question.id === "p3-energy" ? <div className="flex flex-wrap gap-2" role="group" aria-label="Energy after one recent time">
+      {EPISODE_ENERGY_CHOICES.map((item) => <button key={item.id} type="button" aria-pressed={energy === item.id} onClick={() => setEnergy(item.id)}
         className={`rounded-md border px-3 py-2 text-[15px] ${energy === item.id ? "border-primary bg-primary text-primary-foreground" : "border-input bg-card"}`}>{item.label}</button>)}
     </div> : null}
-    {question.id === "p3-energy" ? <p className="text-[14px]">One recent observation, not a fixed trait. Note when it happened and any other conditions if useful. Saving updates your current observation for this entry; older energy summaries are retained.</p> : null}
+    {question.helper ? <p className="text-[14px] text-muted-foreground">{question.helper}</p> : null}
     <label htmlFor={"followup-note-" + node.id} className="block text-[14px]">{question.id === "p3-energy" ? "Your explanation (optional)" : "Your answer"}</label>
     <Textarea id={"followup-note-" + node.id} value={text} onChange={(event) => setText(event.target.value)} rows={3} />
     <div className="flex flex-wrap gap-3">
@@ -65,10 +65,10 @@ function BranchNode({ id, tree, depth, selectedId, onSelect, onSetParent, expand
   const node = tree.nodesById[id];
   const children = tree.childrenById[id];
   const [adding, setAdding] = useState(false);
-  const energy = ALL_ENERGY_CHOICES.find((item) => item.id === node.energy_choice);
-  const title = energy ? energy.label : node.label || node.text;
-  const note = energy ? node.energy_note : node.label && node.text !== node.label ? node.text : "";
-  const relation = node.source_label || QUESTIONS_BY_ID[node.question_id]?.branch || (node.section === "placeless" ? "Activity" : "");
+  const energyLabel = node.energy_choice ? energyObservationLabel(node.energy_choice) : "";
+  const title = energyLabel || node.label || node.text;
+  const note = energyLabel ? node.energy_note : node.label && node.text !== node.label ? node.text : "";
+  const relation = QUESTIONS_BY_ID[node.question_id]?.branch || (node.section === "placeless" ? "Activity" : "");
   const open = expanded[id] ?? depth === 0;
   const otherLinks = (node.links || []).filter((other) => tree.nodesById[other] && other !== tree.parentById[id] && tree.parentById[other] !== id);
   const parentOptions = Object.values(tree.nodesById).filter((other) => other.id !== id && !wouldCycle(id, other.id, tree.parentById));
@@ -86,6 +86,7 @@ function BranchNode({ id, tree, depth, selectedId, onSelect, onSetParent, expand
         </span>
       </summary>
       <div className="px-4 pb-4">
+        {energyLabel ? <p className="mb-3 text-[13px] text-muted-foreground">This is one observation about a recent time. It is not a permanent description of the activity.</p> : null}
         {note ? <p className="mb-4 whitespace-pre-wrap break-words text-[16px] leading-relaxed">{note}</p> : null}
         {children.length ? <ul className={`mb-4 space-y-3 border-l-2 border-primary/30 ${depth < 3 ? "ml-1 pl-3 sm:ml-2 sm:pl-4" : "pl-2"}`}>
           {children.map((child) => <BranchNode key={child} id={child} tree={tree} depth={depth + 1} selectedId={selectedId} onSelect={onSelect} onSetParent={onSetParent} expanded={expanded} setExpanded={setExpanded} />)}
@@ -128,7 +129,7 @@ export default function LifeMapBoard({ graph, selectedId, onSelect, onSetParent 
     {tree.roots.length ? <ul className="grid min-w-0 items-start gap-4 lg:grid-cols-2">{tree.roots.map(renderNode)}</ul> : <p className="rounded-lg border border-dashed border-border p-4 text-[15px] text-muted-foreground">Add a place or activity to start your first branch.</p>}
     <section className="space-y-3 border-t border-border pt-5" aria-label="What’s missing">
       <h3 className="text-[17px] font-medium">What’s missing</h3>
-      <p className="text-[14px] text-muted-foreground">Things absent from your life, things you want more access to, or what gets in the way. To move an existing answer here, open “Choose or change its branch” and select “What’s missing”.</p>
+      <p className="text-[14px] text-muted-foreground">Something that used to be part of your life, something you have wanted to do, or what made that difficult. Absence is not the same as wanting it back. To move an existing answer here, open “Choose or change its branch” and select “What’s missing”.</p>
       {tree.missing.length ? <ul className="space-y-3">{tree.missing.map(renderNode)}</ul> : <p className="text-[14px] text-muted-foreground">No answers placed here yet.</p>}
     </section>
     {tree.unlinked.length ? <section className="space-y-3 border-t border-border pt-5" aria-label="Answers not yet placed">

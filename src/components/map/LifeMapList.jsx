@@ -66,7 +66,7 @@ export default function LifeMapList({ graph, explore = [], selectedId, onSelect,
       ))}
       {explore.length ? (
         <section className="rounded-lg border border-border bg-card p-5">
-          <p className="workbook-label">Worth exploring</p>
+          <p className="workbook-label">Look over your map</p>
           <ul className="mt-4 space-y-3">
             {explore.map((line) => (
               <li key={line.id} className="border-l-2 border-primary/30 pl-3">

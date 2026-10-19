@@ -1,9 +1,8 @@
 import { isGettingStartedLesson } from "./gettingStartedProgress";
 
 /**
- * The opening step: mapping the life you are actually living. It is its own
- * step. It is not one of Getting Started's five steps, and it is not part of
- * Module 1.
+ * The Life Map lesson. It comes after Getting Started and before Module 1.
+ * It is not one of Getting Started's steps, and it is not part of Module 1.
  */
 export const OPENER_LESSON_CODE = "O.6";
 

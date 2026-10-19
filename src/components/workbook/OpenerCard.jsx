@@ -4,15 +4,14 @@ import { ArrowRight, Map } from "lucide-react";
 import { OPENER_LESSON_CODE } from "@/lib/curriculum";
 
 /**
- * The life-mapping step, on its own. Begin here is this step's label.
- * It is not a section of Module 1, and Getting Started does not sit inside it.
+ * The life-mapping step, on its own. It sits after Getting Started and before Module 1.
  */
 export default function OpenerCard({ lesson }) {
   if (!lesson) return null;
 
   return (
     <section>
-      <h2 className="workbook-label">Begin here</h2>
+      <h2 className="workbook-label">Before Module 1</h2>
       <Link
         to={`/lesson/${OPENER_LESSON_CODE}`}
         className="mt-3 flex flex-col gap-2 rounded-xl border border-border bg-card p-5 transition hover:bg-secondary sm:flex-row sm:items-center sm:justify-between sm:gap-8"

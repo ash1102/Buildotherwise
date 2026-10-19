@@ -187,6 +187,7 @@ export default function LifeMapNodePanel({
           <label className="workbook-label block" htmlFor="map-node-connect">
             Connect this line to another
           </label>
+          <p className="mt-1 text-[12.5px] text-muted-faint">You can connect this to more than one entry. A connection shows an association you chose.</p>
           {others.length > 1 ? (
             <select
               id="map-node-connect"

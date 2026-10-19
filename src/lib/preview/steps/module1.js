@@ -1,10 +1,10 @@
 import { TAG } from "../tags";
 
 /**
- * Module 1, built in detail for review. The Notice lesson carries the garden
- * flow in the owner's wording; the Life Map lesson carries the six moves and the
- * card interactions; the patterns lesson reuses the approved lesson record and
- * adds the fictional comparison. No Next Decision anywhere in this module.
+ * Module 1, built in detail for review. The Life Map is the section before this
+ * one. The Notice lesson carries the garden flow in the owner's wording; the
+ * patterns lesson reuses the approved lesson record and adds the fictional
+ * comparison. No Next Decision anywhere in this module.
  */
 export const module1 = {
   key: "module-1",
@@ -19,84 +19,6 @@ export const module1 = {
     { id: "M1-R2", title: "When Something Matters, How It Holds You Matters", tag: TAG.NEEDS_FULL_TEXT },
   ],
   steps: [
-    {
-      code: "M1-PREVIEW-L1",
-      title: "Map the Life You’re Actually Living",
-      sourceLesson: null,
-      readings: [],
-      blocks: [
-        {
-          id: "M1-PREVIEW-L1-b1",
-          version: "1.0",
-          type: "teaching",
-          part: "lesson",
-          title: "The six moves",
-          tag: TAG.PROPOSED,
-          body:
-            "The map keeps all six moves the lesson already had:\n\n" +
-            "1. Draw the week you are actually living.\n" +
-            "2. Add what you do that has no place.\n" +
-            "3. Mark energy, meaning, curiosity and barriers.\n" +
-            "4. Note what is missing or out of reach.\n" +
-            "5. Find the threads your attention keeps returning to.\n" +
-            "6. Choose something worth exploring, or an honest unknown.\n\n" +
-            "Nothing on the map is read as a personality, and nothing is scored.",
-        },
-        {
-          id: "M1-PREVIEW-L1-b2",
-          version: "1.0",
-          type: "life_map",
-          part: "activity",
-          title: "Your map",
-          tag: TAG.PROPOSED,
-          instruction:
-            "Add, edit, move and connect cards. The list view works over the same map, so dragging is never needed.",
-          kinds: [
-            { id: "place", label: "A place I go", hint: "Something that happens somewhere." },
-            { id: "placeless", label: "Something without a place", hint: "Reading, walking, talking, making, fixing, helping." },
-            { id: "missing", label: "Missing or out of reach", hint: "Shown with a dashed border." },
-          ],
-          marks: [
-            { id: "plus", label: "Gives me energy", meaning: "" },
-            { id: "minus", label: "Drains me", meaning: "" },
-            { id: "star", label: "I care about this", meaning: "" },
-            { id: "question", label: "I’m curious about this", meaning: "" },
-            { id: "dollar", label: "Mostly for money or resources", meaning: "" },
-            { id: "bang", label: "I get unusually focused here", meaning: "" },
-            { id: "blocked", label: "Something gets in the way", meaning: "" },
-          ],
-          example: {
-            label: "Load the invented example map",
-            note: "Invented for this preview. Not a participant story.",
-            cards: [
-              { id: "ex-1", kind: "place", text: "Tuesday evening class at the community centre", marks: ["plus", "star"], x: 0.2, y: 0.25 },
-              { id: "ex-2", kind: "placeless", text: "Reading on the bus", marks: ["plus"], x: 0.5, y: 0.12 },
-              { id: "ex-3", kind: "place", text: "The repair café on the first Saturday", marks: ["plus", "dollar"], x: 0.79, y: 0.28 },
-              { id: "ex-4", kind: "placeless", text: "Drawing while waiting", marks: ["question"], x: 0.62, y: 0.62 },
-              { id: "ex-5", kind: "missing", text: "Someone to go with", marks: ["blocked"], x: 0.28, y: 0.68 },
-              { id: "ex-6", kind: "missing", text: "Evening childcare", marks: ["blocked"], x: 0.5, y: 0.85 },
-            ],
-            connections: [
-              ["ex-1", "ex-5"],
-              ["ex-3", "ex-6"],
-              ["ex-2", "ex-4"],
-            ],
-          },
-          fields: [
-            { id: "one-thing", label: "One thing I might want to understand better is" },
-            { id: "noticed-because", label: "I noticed it because" },
-            { id: "do-not-know", label: "I do NOT know yet" },
-            { id: "small-way", label: "One small way I could learn more about it" },
-          ],
-          nothingYet: {
-            label: "Nothing on the map is worth exploring yet.",
-            message: "That counts as a complete answer. Your answer can change.",
-          },
-          plain:
-            "This step is a map of your week. You can add cards of three kinds (a place you go, something without a place, something missing or out of reach), tag them in plain words (gives me energy, drains me, I care about this, I’m curious about this, mostly for money or resources, I get unusually focused here, something gets in the way), and connect two cards. A list view shows the same content without dragging. You can load an invented example map. Four optional lines let you name one thing worth understanding better, why you noticed it, what you do not know yet, and one small way to learn more. If nothing on the map is worth exploring yet, that counts as a complete answer.",
-        },
-      ],
-    },
     {
       code: "M1-PREVIEW-L2",
       title: "Notice without forcing an answer",
