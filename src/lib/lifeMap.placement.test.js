@@ -18,6 +18,7 @@ import {
   linesFromAnswer,
   mapWithoutLine,
   settleLines,
+  setLineParent,
 } from "./lifeMap.js";
 
 /** Sample answers, one or more for each area the questions belong to. */
@@ -288,10 +289,10 @@ test("existing selected connections unfold place → activity → reflection wit
   assert.equal(tree.parentById["laundry-energy"], "laundry");
   assert.equal(tree.parentById["meeting-energy"], "meetings");
   assert.ok(tree.unlinked.includes("care"));
-  assert.ok(tree.unlinked.includes("network"));
+  assert.ok(tree.missing.includes("network"));
   const visited = [];
   const walk = (id) => { visited.push(id); tree.childrenById[id].forEach(walk); };
-  [...tree.roots, ...tree.unlinked].forEach(walk);
+  [...tree.roots, ...tree.missing, ...tree.unlinked].forEach(walk);
   assert.equal(new Set(visited).size, graph.nodes.length);
   assert.equal(visited.length, graph.nodes.length, "every saved entry appears once");
   assert.equal(JSON.stringify(graph), before, "branch rendering never rewrites saved answers");
