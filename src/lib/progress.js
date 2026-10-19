@@ -30,7 +30,7 @@ function hasInteractionLine(lesson, answers) {
 
 /** Module 1 uses interactive question keys rather than the old numbered Try inputs. */
 function hasNoticeResponse(answers) {
-  return ["own-caught", "own-dont-know", "possibility", "garden-picks"]
+  return ["time-energy", "activity-parts", "missing-experience", "own-caught", "own-dont-know", "possibility", "garden-picks"]
     .some((key) => !isBlank((answers || {})[`M1-L1#${key}`]));
 }
 
