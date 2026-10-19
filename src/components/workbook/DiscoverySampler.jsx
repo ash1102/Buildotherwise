@@ -31,7 +31,61 @@ export const OPTIONS = [
     answer: 0,
     explanation: "The Bureau of Labor Statistics describes researching services, coordinating resources, and helping people complete applications. Accurate information and follow-through matter.",
     task: "Find one public information page for a local library or community service. Check whether it clearly states eligibility, how to apply or access it, and whom to contact. Don't submit personal information."
-  }
+  },
+{
+  "id": "making",
+  "title": "Make or sketch something",
+  "field": "Making",
+  "fact": "Choose an everyday object and sketch it from more than one angle. Notice which part of looking, drawing, or changing the sketch catches your attention.",
+  "task": "Use paper and a pencil, or a drawing tool you already have. Sketch for a time you choose; a few minutes is enough to begin. You can watch a real drawing demonstration instead.",
+  "materials": "Paper and pencil, or an existing drawing tool.",
+  "access": "No purchase or specialist equipment needed. Watching shows you someone else’s process; drawing gives you information about your own experience."
+},
+{
+  "id": "music",
+  "title": "Explore rhythm or sound",
+  "field": "Music and sound",
+  "fact": "Listen closely to a short piece of music you can already access, then choose whether to explore its rhythm yourself.",
+  "task": "Listen for one repeating pattern. If you want, tap or hum a short pattern and change one part. You can listen only, make sounds, or ask someone how they create a rhythm.",
+  "materials": "A recording you can already access, or your voice and a surface you can tap.",
+  "access": "No instrument or public performance required. Choose a volume and setting that work for you and others."
+},
+{
+  "id": "nature",
+  "title": "Look closely at something living",
+  "field": "Nature",
+  "fact": "Observe one plant or other living thing you can see from an accessible place. Attend to details before trying to identify it.",
+  "task": "Choose a plant indoors, outside, or visible from a window. Sketch or describe three details and write one question. If that is not accessible, examine a real nature photograph or recording and note that you used an image.",
+  "materials": "A view of a plant, a real image or recording, and optional paper or notes.",
+  "access": "No travel or collecting required. A photograph offers different information from observing something directly."
+},
+{
+  "id": "organizing",
+  "title": "Make a small space easier to use",
+  "field": "Organizing",
+  "fact": "Explore how arranging objects or information changes the way you use a small space.",
+  "task": "Choose a drawer, a few files, or a small collection you control. Notice how you find something, try one change if you want, and check what is easier, harder, or unchanged.",
+  "materials": "A small collection of your own objects or files.",
+  "access": "No storage products needed. You can sketch a possible arrangement rather than move anything."
+},
+{
+  "id": "community",
+  "title": "Explore something happening around you",
+  "field": "Community activities",
+  "fact": "Learn what people actually do in a community activity before deciding whether you want to take part.",
+  "task": "Look at a public description of a library group, neighborhood activity, or volunteer opportunity. Identify the activity, access requirements, and one unanswered question. If appropriate and available, ask an organizer or observe a session.",
+  "materials": "A public notice or information page, or a conversation with someone involved.",
+  "access": "Check availability, cost, timing, and access before planning a visit. Reading about a group does not establish that you attended it."
+},
+{
+  "id": "investigating",
+  "title": "Investigate an everyday question",
+  "field": "Investigating",
+  "fact": "Choose a question about an ordinary object or process and look for information that could answer it.",
+  "task": "Write a question about something you can safely observe. Look at it closely, consult an instruction guide, or ask someone how it works. Separate what you observed from what remains a possible explanation.",
+  "materials": "An everyday object or process, and an available guide or person if needed.",
+  "access": "No disassembly or repair required. You can investigate through observation, reading, or conversation."
+}
 ];
 
 export default function DiscoverySampler() {
@@ -52,7 +106,7 @@ export default function DiscoverySampler() {
       <div>
         <h3 className="text-[20px] font-semibold text-foreground">First, encounter something real</h3>
         <p className="mt-2 text-[16px] leading-relaxed text-muted-foreground">
-          You don't need an interest in mind. Explore one of three kinds of work, make a prediction, and try a small observation task. These are starter encounters, not career recommendations or tests of your personality.
+          Start with something from Module 1, browse an unfamiliar possibility, or talk through the choices with someone. These activities can be part of everyday life, a hobby, community participation, study, or work. You do not need an interest in mind.
         </p>
       </div>
       <div className="grid gap-2 sm:grid-cols-3" role="group" aria-label="Pick a possibility">
@@ -67,13 +121,13 @@ export default function DiscoverySampler() {
       {current ? (
         <div className="space-y-4 rounded-lg border border-border p-4">
           <div>
-            <p className="text-[13px] font-medium uppercase tracking-wide text-muted-foreground">Real work: {current.field}</p>
+            <p className="text-[13px] font-medium uppercase tracking-wide text-muted-foreground">Explore: {current.field}</p>
             <p className="mt-2 text-[16px] leading-relaxed text-foreground">{current.fact}</p>
-            <a href={current.source} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-[14px] text-accent-ink underline underline-offset-2">
+            {current.source ? <a href={current.source} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-[14px] text-accent-ink underline underline-offset-2">
               Read the official Bureau of Labor Statistics occupation profile ↗
-            </a>
+            </a> : null}
           </div>
-          <div>
+          {current.choices ? <div>
             <p className="text-[16px] font-medium text-foreground">{current.prediction}</p>
             <div className="mt-2 grid gap-2">
               {current.choices.map((choice, index) => (
@@ -90,18 +144,20 @@ export default function DiscoverySampler() {
                 <p className="mt-1">{current.explanation}</p>
               </div>
             ) : null}
-          </div>
+          </div> : null}
           <div>
-            <p className="text-[15px] font-medium text-foreground">A small observation you could try</p>
+            <p className="text-[15px] font-medium text-foreground">One way to encounter it</p>
             <p className="mt-1 text-[15px] leading-relaxed text-foreground">{current.task}</p>
-            <p className="mt-2 text-[13px] text-muted-foreground">You may simply explore the source today and return for the observation later. No journal entry or public post is required.</p>
+            <p className="mt-2 text-[13px] text-muted-foreground">Choose a time limit that works for you. You may read, watch, talk with someone, visit, or try a beginner task; record which you actually did. You can switch possibilities.</p>
           </div>
+          <p className="text-[14px] text-muted-foreground"><strong>What you need:</strong> {current.materials || "An accessible public information page, demonstration, or real example. No specialist tools needed for the suggested observation."}</p>
+          <p className="text-[14px] text-muted-foreground"><strong>Access:</strong> {current.access || "Check that the source is available with your device, data, language, and access needs. No repair, purchase, application, or visit is required for this starting point."}</p>
         </div>
       ) : (
-        <p className="text-[15px] text-muted-foreground">Choose any one to begin. You can switch or explore all three.</p>
+        <p className="text-[15px] text-muted-foreground">Choose a starting point, or use the broader activity menu and your own possibility below.</p>
       )}
-      {seen.length > 1 ? <p className="text-[14px] text-muted-foreground">Explored {seen.length} different possibilities. Notice what the actual work has in common or how it differs.</p> : null}
-      <p className="text-[13px] text-muted-foreground">Prototype: three curated starting points. A broader, verified discovery library is still to be developed.</p>
+      {seen.length > 1 ? <p className="text-[14px] text-muted-foreground">Viewed {seen.length} starting points. Opening a card does not mean you completed its activity.</p> : null}
+      <p className="text-[13px] text-muted-foreground">These are starting activities, not promises of local opportunities. The planning tool below offers more possibilities, your own idea, and a route for uncertainty.</p>
     </section>
   );
 }
