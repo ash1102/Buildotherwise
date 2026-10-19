@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { makeId, readStore, subscribeStore, writeStore } from "./store";
 import { LIFEMAP_KEY, setLifeMap } from "./workbook";
+import { energyLine } from "./mapEnergy";
 
 /**
  * The five questions the map is drawn from. The keys are the ones the Life Map has
@@ -284,6 +285,19 @@ export function addLine(sectionKey, line) {
   const items = map[sectionKey] || [];
   const item = { id: makeId("map"), text: "", entry_id: "", links: [], ...line };
   setLifeMap({ ...map, [sectionKey]: [...items, item] });
+  return item;
+}
+
+/** Save against the current map so a repeated click updates rather than duplicates. */
+export function saveEnergyMark(sourceId, choice, note) {
+  const map = readStore(LIFEMAP_KEY, {});
+  const source = [...(map.places || []), ...(map.placeless || [])].find((line) => line.id === sourceId);
+  const line = energyLine(source, choice, note);
+  if (!line) return null;
+  const energy = map.energy || [];
+  const existing = energy.find((item) => item.question_id === "p3-energy" && (item.links || []).includes(sourceId));
+  const item = { ...(existing || {}), ...line, id: existing?.id || makeId("map"), links: [...new Set([sourceId, ...(existing?.links || [])])] };
+  setLifeMap({ ...map, energy: existing ? energy.map((old) => old.id === existing.id ? item : old) : [...energy, item] });
   return item;
 }
 
