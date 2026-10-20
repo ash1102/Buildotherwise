@@ -9,7 +9,13 @@ import { Chip, ChipGroup } from "./TryChips";
  * Gives the try time to happen before the step that asks what happened.
  * The next step always stays reachable. Not trying is a valid result.
  */
-export default function ComeBackAfterTry({ lesson, next, workbookLink = "/", backLabel = "Back to the workbook" }) {
+export default function ComeBackAfterTry({
+  lesson,
+  next,
+  workbookLink = "/",
+  backLabel = "Back to the workbook",
+  journalHref = "",
+}) {
   const [open, setOpen] = useState(false);
   const [when, setWhen] = useState("");
   const [added, setAdded] = useState("");
@@ -35,14 +41,21 @@ export default function ComeBackAfterTry({ lesson, next, workbookLink = "/", bac
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           {backLabel}
         </Link>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="inline-flex items-center gap-2 self-start rounded-md bg-primary px-4 py-2.5 text-[15px] font-medium text-primary-foreground transition hover:bg-primary/90 sm:ml-auto sm:self-auto"
-        >
-          Next
-          <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
-        </button>
+        <div className="flex flex-col items-start gap-3 sm:ml-auto sm:flex-row sm:items-center">
+          {journalHref ? (
+            <Link to={journalHref} className="text-[15px] font-medium text-accent-ink underline underline-offset-2">
+              See it in your journal
+            </Link>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="inline-flex items-center gap-2 self-start rounded-md bg-primary px-4 py-2.5 text-[15px] font-medium text-primary-foreground transition hover:bg-primary/90"
+          >
+            Next
+            <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+          </button>
+        </div>
       </nav>
     );
   }

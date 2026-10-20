@@ -10,6 +10,20 @@ import StepList from "@/components/workbook/StepList";
 import WorkbookGate from "@/components/WorkbookGate";
 import LoginRedirect from "@/components/LoginRedirect";
 import { useAuth } from "@/lib/AuthContext";
+
+/** From Module 5, returning to the module continues into Module 6's first lesson. */
+export function ModuleFiveContinue({ lesson }) {
+  if (!lesson) return null;
+  return (
+    <Link
+      to={`/lesson/${lesson.code}`}
+      className="mt-4 inline-flex max-w-full items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-[15px] font-medium text-primary-foreground transition hover:bg-primary/90"
+    >
+      Continue into Module 6
+      <span className="truncate font-normal">{lesson.title}</span>
+    </Link>
+  );
+}
 import { useWorkbook } from "@/lib/workbook";
 import { usePacedProgress } from "@/lib/pacing";
 
@@ -54,6 +68,7 @@ function ModuleBody() {
   }
 
   const lessons = (lessonsByOrder[module.order] || []).filter(isWorkbookLesson);
+  const moduleSixStart = module.order === 5 ? (lessonsByOrder[6] || []).filter(isWorkbookLesson)[0] : null;
   const coming = isComingLater(module);
   const row = progress.byOrder[module.order];
   const locked = Boolean(row && !row.unlocked && !coming);
@@ -80,16 +95,17 @@ function ModuleBody() {
           <StepList lessons={lessons} scopeLabel="in this module" />
 
           {module.order === 5 ? (
-            <section className="rounded-xl border border-border bg-card p-5 sm:p-6">
+            <section id="continue" className="rounded-xl border border-border bg-card p-5 sm:p-6">
               <p className="workbook-label">The halfway point</p>
               <p className="mt-2 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
                 The last step is a chance to take stock: one piece of evidence, one thing worth keeping, one support that
                 mattered, one Next Decision, and one optional question for later. Modules 6–10 turn outward. Moving on is
                 optional, and there is no readiness judgment.
               </p>
+              <ModuleFiveContinue lesson={moduleSixStart} />
               <Link
                 to="/record"
-                className="mt-4 inline-flex items-center gap-2 text-[15px] font-medium text-accent-ink underline underline-offset-2"
+                className="mt-4 flex items-center gap-2 text-[15px] font-medium text-accent-ink underline underline-offset-2"
               >
                 <BookOpen className="h-4 w-4" aria-hidden="true" />
                 Look at your Discovery Record

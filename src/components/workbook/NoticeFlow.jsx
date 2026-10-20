@@ -12,8 +12,8 @@ import { saveAnswer } from "@/lib/journal";
  * Module 1 preview blocks unless marked SUGGESTED.
  */
 
-const OWN_ROUTES = ["Something that caught my attention", "A thread from my Life Map", "Use something I noticed", "Bring a Life Map thread", "Explore something unfamiliar", "Nothing draws me in yet"];
-const EXAMPLE_ROUTES = ["The garden example", "I’m not sure yet", "I'm not sure yet"];
+const OWN_ROUTES = ["Something that caught my attention", "A thread from my Life Map", "Use something I noticed", "Bring a Life Map thread"];
+const EXAMPLE_ROUTES = ["The garden example", "I’m not sure yet", "I'm not sure yet", "Explore something unfamiliar", "Nothing draws me in yet"];
 
 const SORT_CATEGORIES = [
   { id: "tells", label: "The example tells us this" },
