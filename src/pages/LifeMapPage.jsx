@@ -26,7 +26,7 @@ import {
 } from "@/lib/lifeMap";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import DashedMotif from "@/components/workbook/DashedMotif";
-import HybridMap from "@/components/map/HybridMap";
+import LifeMapTree from "@/components/map/LifeMapTree";
 import MapPickCard from "@/components/map/MapPickCard";
 import LifeMapNodePanel from "@/components/map/LifeMapNodePanel";
 import LifeMapList from "@/components/map/LifeMapList";
@@ -274,13 +274,7 @@ export default function LifeMapPage() {
               }}
             />
           ) : (
-            <HybridMap
-              graph={graph}
-              selectedId={selectedId}
-              highlightSection={MAP_QUESTION_PARTS[step]?.section || ""}
-              onSelect={selectEntry}
-              onMove={setNodePosition}
-            />
+            <LifeMapTree graph={graph} selectedId={selectedId} onSelect={selectEntry} />
           )}
           <MapPickCard pick={pick} onJumpToPart={openGuide} />
         </div>
