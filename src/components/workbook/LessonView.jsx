@@ -528,7 +528,7 @@ export default function LessonView({
       key: "bridge-out",
       label: `Bridge to Module ${outgoing.to}`,
       hasInput: true,
-      content: <BridgeOut bridge={outgoing} />,
+      content: <BridgeOut bridge={outgoing} lesson={lesson} />,
     });
   }
 
