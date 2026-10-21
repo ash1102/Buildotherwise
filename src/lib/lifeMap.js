@@ -281,24 +281,28 @@ export const MAP_QUESTION_PARTS = [
         text: "Can you remember a recent time you did something longer than you intended? What were you doing?",
         helper: "This does not by itself mean you enjoyed it.",
         legacyStarters: ["I lose track of time when"],
+        multi: true,
       },
       {
         id: "p5-researching",
         branch: "Looked into recently",
         text: "What have you looked up, read about, watched, or asked questions about recently, if anything?",
         legacyStarters: ["I keep researching"],
+        multi: true,
       },
       {
         id: "p5-weird-amount",
         branch: "Spent time learning",
         text: "Is there something you have spent time learning about or doing that you want to add?",
         legacyStarters: ["I seem to know a weird amount about"],
+        multi: true,
       },
       {
         id: "p5-improve",
         branch: "Tried to change or improve",
         text: "Have you recently tried to change, fix, practise, or improve something? What did you do?",
         legacyStarters: ["I keep trying to improve"],
+        multi: true,
       },
       {
         id: "p5-frustrated",
@@ -365,6 +369,31 @@ export function lifeMapHasEntries(map, pick) {
     (items) => Array.isArray(items) && items.some((item) => String(item?.text || item?.label || "").trim())
   );
   return hasLine || Boolean(pick && pick.nothing_yet);
+}
+
+/**
+ * A follow-up that belongs to one earlier entry (a place, a group, a former
+ * activity). The guide asks it once per entry, so the answer always lands on
+ * the entry it is about.
+ */
+export function isPerEntryQuestion(question) {
+  return Boolean(question && (question.aboutPlace || question.about || (question.aboutQuestions || []).length));
+}
+
+/** Entries a per-entry follow-up can be asked about, in the order they were added. */
+export function followUpTargets(question, nodes) {
+  const list = nodes || [];
+  if (question.about) return list.filter((node) => node.question_id === question.about);
+  if (question.aboutPlace) return list.filter((node) => node.question_id === "p1-places" || (node.section === "places" && !node.question_id));
+  if ((question.aboutQuestions || []).length) return list.filter((node) => question.aboutQuestions.includes(node.question_id));
+  return [];
+}
+
+/** The question whose answers a follow-up is asked about, so the guide can point back to it. */
+export function sourceQuestionId(question) {
+  if (question.about) return question.about;
+  if (question.aboutPlace) return "p1-places";
+  return (question.aboutQuestions || [])[0] || "";
 }
 
 /** Questions the guide shows. Retired prompts and the energy control stay addressable by id. */
