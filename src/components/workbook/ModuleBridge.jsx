@@ -126,7 +126,7 @@ export function BridgeOut({ bridge, lesson }) {
  * is still empty, they can choose to start from their bridge answer. Nothing is
  * copied unless they ask.
  */
-export function BridgeIn({ bridge, onUsed }) {
+export function BridgeIn({ bridge, lesson, onUsed }) {
   const answers = useAnswers();
   const [pick] = useStore(MAP_PICK_KEY, {});
   const code = bridgeCode(bridge);
@@ -140,7 +140,7 @@ export function BridgeIn({ bridge, onUsed }) {
     setAnswer(target.code, target.index, carried);
     saveAnswer({
       lessonCode: target.code,
-      lessonTitle: "",
+      lessonTitle: lesson?.title || "",
       promptKey: answerKey(target.code, target.index),
       promptLabel: target.label,
       body: carried,
