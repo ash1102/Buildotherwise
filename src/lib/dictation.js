@@ -32,8 +32,11 @@ export function addSpokenWords(current, nextTail, previousTail) {
 export function insertDictatedText(node, words, onChange, afterFrame = (callback) => requestAnimationFrame(callback)) {
   if (!node || node.disabled || node.readOnly || !words) return;
   const current = node.value || "";
-  const start = node.selectionStart ?? current.length;
-  const end = node.selectionEnd ?? start;
+  // Use the cursor only when the box is actually focused. Otherwise (for example on a phone,
+  // where the box is not focused so the keyboard stays closed) add the words at the end.
+  const focused = typeof document !== "undefined" && document.activeElement === node;
+  const start = focused ? (node.selectionStart ?? current.length) : current.length;
+  const end = focused ? (node.selectionEnd ?? start) : start;
   const before = current.slice(0, start);
   const after = current.slice(end);
   const phrase = (before && !/\s$/.test(before) ? " " : "") + words + (after && !/^\s|^[.,!?;:]/.test(after) ? " " : "");
@@ -42,6 +45,7 @@ export function insertDictatedText(node, words, onChange, afterFrame = (callback
   if (setter) setter.call(node, next); else node.value = next;
   if (onChange) onChange({ target: node, currentTarget: node, type: "change", preventDefault() {}, stopPropagation() {}, persist() {} });
   else node.dispatchEvent(new Event("input", { bubbles: true }));
+  if (!focused) return;
   const cursor = before.length + phrase.length;
   node.setSelectionRange(cursor, cursor);
   afterFrame(() => { if (node.isConnected !== false) node.setSelectionRange(cursor, cursor); });
