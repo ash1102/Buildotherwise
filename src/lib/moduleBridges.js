@@ -22,7 +22,7 @@ export const BRIDGES = {
     sources: [
       { code: "M1-L1", index: 0, label: "Something you might want to understand better" },
       { code: "M1-L1", index: 1, label: "What you’d need to encounter, ask, or try" },
-      { code: "M1-L3", index: 4, label: "What you wanted to bring into Module 2" },
+      { code: "M1-L3", index: 1, label: "What you wanted to bring into Module 2" },
       { lifeMapPick: "one-thing", label: "From your Life Map" },
     ],
     question:
