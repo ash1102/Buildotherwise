@@ -325,7 +325,7 @@ export default function LessonView({
     beats.push({
       key: "bridge-in",
       label: `Picking up from Module ${incoming.from}`,
-      content: <BridgeIn bridge={incoming} onUsed={() => setBridgeRev((value) => value + 1)} />,
+      content: <BridgeIn bridge={incoming} lesson={lesson} onUsed={() => setBridgeRev((value) => value + 1)} />,
     });
   }
 
