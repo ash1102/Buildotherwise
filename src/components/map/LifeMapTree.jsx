@@ -21,6 +21,7 @@ const AREAS = [
   { key: "barriers", label: "What’s missing" },
   { key: "threads", label: "Threads" },
   { key: "energy", label: "Energy" },
+  { key: "unplaced", label: "Not placed in a branch yet — open one to choose where it goes" },
 ];
 
 const SECTION_TYPE = {
@@ -37,8 +38,8 @@ function typeLabel(node) {
   return SECTION_TYPE[node.section] || "Entry";
 }
 
-function layoutTree(graph) {
-  const tree = buildBranches(graph);
+function layoutTree(graph, given) {
+  const tree = given || buildBranches(graph);
   const { nodesById, childrenById, parentById } = tree;
   // Nothing hidden: roots, "missing" and not-yet-placed answers all start branches.
   const starts = [...tree.roots, ...tree.missing, ...tree.unlinked];
@@ -65,7 +66,7 @@ function layoutTree(graph) {
   AREAS.forEach((area) => {
     const group = starts.filter((id) => {
       const node = nodesById[id];
-      const key = tree.missing.includes(id) ? "barriers" : node.section;
+      const key = tree.unlinked.includes(id) ? "unplaced" : tree.missing.includes(id) ? "barriers" : node.section;
       return (AREAS.some((a) => a.key === key) ? key : "threads") === area.key;
     });
     if (!group.length) return;
@@ -94,12 +95,12 @@ function layoutTree(graph) {
       return { key: `${parent}-${child}`, d: `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}` };
     });
 
-  return { pos, areas, links, width, height, nodesById, parentById };
+  return { pos, areas, links, width, height, nodesById, parentById, unlinked: new Set(tree.unlinked) };
 }
 
-export default function LifeMapTree({ graph, selectedId, onSelect }) {
-  const layout = useMemo(() => layoutTree(graph), [graph]);
-  const { pos, areas, links, width, height, nodesById, parentById } = layout;
+export default function LifeMapTree({ graph, tree, selectedId, onSelect }) {
+  const layout = useMemo(() => layoutTree(graph, tree), [graph, tree]);
+  const { pos, areas, links, width, height, nodesById, parentById, unlinked } = layout;
   const name = (node) => node.label || node.text || "Not written yet";
 
   return (
@@ -142,7 +143,8 @@ export default function LifeMapTree({ graph, selectedId, onSelect }) {
               {Object.entries(pos).map(([id, at]) => {
                 const node = nodesById[id];
                 const parent = parentById[id] ? nodesById[parentById[id]] : null;
-                const isStart = !parent;
+                const unplaced = unlinked.has(id);
+                const isStart = !parent && !unplaced;
                 const selected = id === selectedId;
                 const type = typeLabel(node);
                 return (
@@ -150,7 +152,7 @@ export default function LifeMapTree({ graph, selectedId, onSelect }) {
                     <button
                       type="button"
                       aria-pressed={selected}
-                      aria-label={`${isStart ? "Starting entry" : "Answer"}, ${type}: ${name(node)}${parent ? `. Branches from ${name(parent)}` : ""}`}
+                      aria-label={`${isStart ? "Starting entry" : unplaced ? "Not placed yet" : "Answer"}, ${type}: ${name(node)}${parent ? `. Branches from ${name(parent)}` : ""}`}
                       title={name(node)}
                       onClick={() => onSelect(id)}
                       className={[
@@ -160,12 +162,15 @@ export default function LifeMapTree({ graph, selectedId, onSelect }) {
                           ? "border-2 border-primary bg-primary/25"
                           : isStart
                             ? "border-2 border-muted-foreground/70 bg-card"
+                            : unplaced
+                              ? "border border-dashed border-muted-foreground/70 bg-card"
                             : "border border-border bg-card",
                       ].join(" ")}
                     >
                       <span className="flex items-baseline gap-1.5 overflow-hidden whitespace-nowrap text-[10.5px] font-bold uppercase tracking-[0.1em] text-muted-foreground">
                         <span>{type}</span>
                         {isStart ? <span className="text-foreground">· Start</span> : null}
+                        {unplaced ? <span className="text-foreground">· Not placed</span> : null}
                       </span>
                       <span className="block min-w-0">
                         <span className="line-clamp-2 break-words text-[14px] leading-[1.35]">{name(node)}</span>

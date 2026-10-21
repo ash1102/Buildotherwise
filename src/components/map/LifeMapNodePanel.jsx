@@ -27,6 +27,9 @@ export default function LifeMapNodePanel({
   onRemove,
   onClose,
   onSplit,
+  placement = "",
+  parentOptions = [],
+  onPlace,
 }) {
   const [label, setLabel] = useState(node.label || "");
   const [text, setText] = useState(node.text || "");
@@ -152,6 +155,38 @@ export default function LifeMapNodePanel({
         <p className="mt-4 border-l-2 border-primary/30 pl-3 text-[13px] leading-relaxed text-muted-foreground">
           Your answer to: {node.source_label}
         </p>
+      ) : null}
+
+      {onPlace ? (
+        <div className="mt-5 rounded-md border border-border bg-secondary/40 p-3">
+          <label className="workbook-label block" htmlFor="map-node-parent">
+            Where this sits on the map
+          </label>
+          <p className="mt-1 text-[12.5px] text-muted-faint">
+            {placement === "__unplaced"
+              ? "Not placed in a branch yet. Choose the entry it belongs under, or make it its own starting entry."
+              : "Move it under a different entry, or make it its own starting entry. Its own answers move with it."}
+          </p>
+          <select
+            id="map-node-parent"
+            className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-[13px]"
+            value={placement === "__unplaced" ? "__unplaced" : placement}
+            onChange={(event) => {
+              const next = event.target.value;
+              if (next === "__unplaced") return;
+              onPlace(next);
+            }}
+          >
+            {placement === "__unplaced" ? <option value="__unplaced">Not placed yet — choose…</option> : null}
+            <option value="">Its own starting entry</option>
+            {node.section === "barriers" ? <option value="__missing">In “What’s missing”</option> : null}
+            {parentOptions.map((item) => (
+              <option key={item.id} value={item.id}>
+                Under: {item.label || item.text}
+              </option>
+            ))}
+          </select>
+        </div>
       ) : null}
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
