@@ -42,7 +42,7 @@ function EarlierWords({ items }) {
  * End of a module: the participant's own earlier answers, then one short question.
  * The answer is saved like any step answer and shown again at the start of the next module.
  */
-export function BridgeOut({ bridge }) {
+export function BridgeOut({ bridge, lesson }) {
   const answers = useAnswers();
   const [pick] = useStore(MAP_PICK_KEY, {});
   const code = bridgeCode(bridge);
@@ -57,8 +57,9 @@ export function BridgeOut({ bridge }) {
   const keepInJournal = () => {
     if (!value.trim()) return;
     saveAnswer({
-      lessonCode: code,
-      lessonTitle: `Bridge to Module ${bridge.to}`,
+      // Filed under the step the bridge sits on, so the journal links back to it.
+      lessonCode: lesson?.code || code,
+      lessonTitle: lesson?.title ? `${lesson.title} · Bridge to Module ${bridge.to}` : `Bridge to Module ${bridge.to}`,
       promptKey: answerKey(code, 0),
       promptLabel: bridge.question,
       body: value.trim(),
