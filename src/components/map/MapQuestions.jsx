@@ -11,12 +11,19 @@ import {
   MAP_QUESTION_PARTS,
   QUESTIONS_BY_ID,
   addLine,
+  followUpTargets,
   guideQuestions,
+  isPerEntryQuestion,
+  sourceQuestionId,
   linesFromAnswer,
   placementForAnswer,
 } from "@/lib/lifeMap";
 
 const PICK_STEP = MAP_QUESTION_PARTS.length;
+const DRAFTS_KEY = "lifeMapGuideDrafts";
+const FOCUS_KEY = "lifeMapGuideFocus";
+const SEPARATE = "__separate";
+const draftKey = (questionId, targetId) => (targetId ? `${questionId}::${targetId}` : questionId);
 const TOTAL = PICK_STEP + 1;
 const STEP_TITLES = [...MAP_QUESTION_PARTS.map((item) => item.title), "Choose whether to explore"];
 
@@ -29,23 +36,23 @@ function needsContext(question) {
  * the participant chooses Add to map. Moving between parts leaves a draft where it
  * was typed. Nothing has to be answered.
  */
-export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced }) {
+export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced, onOpen }) {
   const cardRef = useRef(null);
   const firstRender = useRef(true);
-  const [drafts, setDrafts] = useState({});
-  const [placeFor, setPlaceFor] = useState({});
+  // Drafts stay on this device (not synced), so leaving the page doesn't lose them.
+  const [drafts, setDrafts] = useStore(DRAFTS_KEY, {});
   const [linksFor, setLinksFor] = useState({});
+  // Part 3: the one entry being looked at. Every question in that part attaches to it.
+  const [focusId, setFocusId] = useStore(FOCUS_KEY, "");
+  const [showSeparate, setShowSeparate] = useState({});
   const [menuFor, setMenuFor] = useState({});
   const [addedNote, setAddedNote] = useState({});
   const [lastAdded, setLastAdded] = useState(null);
   const [pick, setPick] = useStore(MAP_PICK_KEY, {});
 
+  const nodeById = Object.fromEntries(graph.nodes.map((node) => [node.id, node]));
   const targetsFor = (question) => {
-    if (question.about) return graph.nodes.filter((node) => node.question_id === question.about);
-    if (question.aboutPlace) {
-      return graph.nodes.filter((node) => node.question_id === "p1-places" || (node.section === "places" && !node.question_id));
-    }
-    if (question.aboutQuestions) return graph.nodes.filter((node) => question.aboutQuestions.includes(node.question_id));
+    if (isPerEntryQuestion(question)) return followUpTargets(question, graph.nodes);
     if (question.context === "entry" || question.multi) {
       return graph.nodes.filter((node) => {
         const questionId = String(node.question_id || "");
@@ -56,6 +63,14 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced 
     return [];
   };
   const countFor = (questionId) => graph.nodes.filter((node) => node.question_id === questionId).length;
+  const answersFor = (questionId, parentId) =>
+    graph.nodes.filter((node) => node.question_id === questionId && (parentId === undefined || node.parent_id === parentId));
+  const partCount = (item) => item.questions.reduce((sum, question) => sum + countFor(question.id), 0);
+  const setDraft = (key, value) => {
+    setDrafts((current) => ({ ...(current || {}), [key]: value }));
+    setAddedNote((current) => ({ ...current, [key]: "" }));
+  };
+  const focus = focusId && nodeById[focusId] ? nodeById[focusId] : null;
 
   useEffect(() => {
     if (firstRender.current) {
@@ -65,20 +80,22 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced 
     cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [step]);
 
-  const add = (part, question) => {
-    const lines = linesFromAnswer(question, drafts[question.id]);
+  /**
+   * Add one answer. `targetId` is the entry it belongs to (a per-entry follow-up,
+   * or the Part 3 focus), SEPARATE to keep it on its own, or empty for questions
+   * that start their own entries. Only ids still on the map are used.
+   */
+  const add = (part, question, targetId = "") => {
+    const key = draftKey(question.id, targetId);
+    const lines = linesFromAnswer(question, (drafts || {})[key]);
     if (!lines.length) return 0;
-    const targets = targetsFor(question);
-    const chosen = question.multi
-      ? linksFor[question.id] || []
-      : placeFor[question.id] && placeFor[question.id] !== "__separate"
-        ? [placeFor[question.id]]
-        : [];
-    const separate = question.multi
-      ? chosen.length === 0
-      : placeFor[question.id] === "__separate" || (needsContext(question) && targets.length === 0);
     const full = QUESTIONS_BY_ID[question.id];
-    const placement = needsContext(question) || question.multi
+    const contextual = needsContext(question);
+    let chosen = [];
+    if (question.multi) chosen = (linksFor[question.id] || []).filter((id) => nodeById[id]);
+    else if (targetId && targetId !== SEPARATE && nodeById[targetId]) chosen = [targetId];
+    const separate = (contextual || question.multi) && chosen.length === 0;
+    const placement = contextual || question.multi
       ? placementForAnswer(full, { links: chosen, separate })
       : placementForAnswer(full, { links: [], separate: false });
     const section = full.section || part.section;
@@ -93,20 +110,17 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced 
       });
       if (!firstId) firstId = item.id;
     });
-    setDrafts((current) => ({ ...current, [question.id]: "" }));
-    const names = chosen
-      .map((id) => targets.find((node) => node.id === id) || graph.nodes.find((node) => node.id === id))
-      .filter(Boolean)
-      .map((node) => node.label || node.text);
+    setDrafts((current) => ({ ...(current || {}), [key]: "" }));
+    if (question.multi) setLinksFor((current) => ({ ...current, [question.id]: [] }));
+    const names = chosen.map((id) => nodeById[id]).filter(Boolean).map((node) => node.label || node.text);
     const where = names.length
-      ? ` Connected to ${names.join(", ")}.`
-      : needsContext(question) || question.multi
-        ? " Kept separate from other entries."
+      ? ` Attached to “${names.join("”, “")}”.`
+      : contextual || question.multi
+        ? " Kept as its own entry."
         : "";
     const added = lines.length === 1 ? "1 line" : `${lines.length} lines`;
-    const note = `Added ${added} to the map under “${full.branch}”.${where}`;
-    setAddedNote((current) => ({ ...current, [question.id]: note }));
-    setLastAdded({ questionId: question.id, id: firstId });
+    setAddedNote((current) => ({ ...current, [key]: `Added ${added} under “${full.branch}”.${where}` }));
+    setLastAdded({ key, id: firstId });
     return lines.length;
   };
 
