@@ -165,8 +165,8 @@ export const WAYS = {
       needs: ["travel"],
     },
     watch: {
-      text: "Read a group’s public calendar or description, or watch a recorded public meeting. Many city meetings are posted online.",
-      needs: ["internet"],
+      text: "Check a bulletin board somewhere you already go, like a laundromat, store, library, or place of worship. Which groups are there, when do they meet, and what do they cost? A group’s online calendar works too.",
+      needs: [],
     },
     ask: {
       text: "Call or message an organizer: “What happens on a first visit, and does it cost anything?”",
