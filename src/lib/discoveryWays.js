@@ -79,7 +79,7 @@ export const WAYS = {
       needs: [],
     },
     ask: {
-      text: "Ask at a library desk or a community center front desk: “If someone needed help finding this kind of service, where would you send them?” You don’t need to know anyone there.",
+      text: "Ask at a library or community center front desk, in person or by phone: “If someone needed help finding this kind of service, where would you send them?” You don’t need to know anyone there.",
       needs: [],
     },
     notYet: {
