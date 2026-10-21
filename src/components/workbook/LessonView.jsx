@@ -130,13 +130,14 @@ function Module3ExperienceBridge({ lessonCode }) {
       <p className="text-[16px] leading-relaxed text-foreground">
         Module 3 examines the <strong>conditions around a task</strong>—instructions, time, noise, help, and choice. Start with your Module 2 encounter when you have one. Otherwise use an ordinary task from this week, or the reply example below.
       </p>
-      {choice ? <div className="rounded-lg bg-secondary p-3">
+      {/* On M3-L1 the Module 2 recap lives in "Picking up from Module 2" above, so it isn't repeated here. */}
+      {lessonCode !== "M3-L1" && choice ? <div className="rounded-lg bg-secondary p-3">
         <p className="text-[14px] text-muted-foreground">A possibility you explored in Module 2</p>
         <p className="mt-1 font-medium text-foreground">{choice.field}</p>
         <p className="mt-1 text-[15px] text-foreground">{choice.task}</p>
         <p className="mt-2 text-[14px] text-muted-foreground">This suggests a subject to investigate, not proof you completed the task.</p>
       </div> : null}
-      {firstNote ? <div className="rounded-lg border border-border p-3">
+      {lessonCode === "M3-L1" ? null : firstNote ? <div className="rounded-lg border border-border p-3">
         <p className="text-[14px] text-muted-foreground">What you recorded doing or observing</p>
         <p className="mt-1 whitespace-pre-wrap text-[15px] text-foreground">{firstNote}</p>
       </div> : notes.length ? <p className="text-[14px] text-muted-foreground">You saved other observations in Module 2, but did not describe a completed activity.</p> : <p className="text-[14px] text-muted-foreground">No Module 2 observations are recorded. You can still complete this lesson without inventing a past experience.</p>}
