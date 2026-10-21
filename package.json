@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "test:life-map": "node --import ./scripts/register-js-extension.mjs --test src/lib/lifeMap.placement.test.js src/lib/lifeMapBranching.test.js src/lib/lifeMapHybrid.test.js",
+    "test:life-map": "node --import ./scripts/register-js-extension.mjs --test src/lib/lifeMap.placement.test.js src/lib/lifeMapBranching.test.js src/lib/lifeMapHybrid.test.js src/lib/moduleBridges.test.js",
     "test:gate": "node --import ./scripts/register-js-extension.mjs --test src/lib/postAuthPath.test.js",
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",

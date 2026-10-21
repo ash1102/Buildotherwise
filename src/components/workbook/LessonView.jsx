@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -24,6 +24,8 @@ import { isAfterTryStep } from "@/lib/afterTry";
 import { interactionsFor } from "@/lib/interactions";
 import { journalStepHref, saveAnswer } from "@/lib/journal";
 import DecisionFollowUp from "./DecisionFollowUp";
+import { BridgeIn, BridgeOut } from "./ModuleBridge";
+import { bridgeIn, bridgeOut } from "@/lib/moduleBridges";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor, setAnswer, useAnswers, answerKey } from "@/lib/workbook";
 import { JOIN_CHOICES, joinChoiceText, splitChoice } from "@/lib/gettingStarted";
 
@@ -128,13 +130,14 @@ function Module3ExperienceBridge({ lessonCode }) {
       <p className="text-[16px] leading-relaxed text-foreground">
         Module 3 examines the <strong>conditions around a task</strong>—instructions, time, noise, help, and choice. Start with your Module 2 encounter when you have one. Otherwise use an ordinary task from this week, or the reply example below.
       </p>
-      {choice ? <div className="rounded-lg bg-secondary p-3">
+      {/* On M3-L1 the Module 2 recap lives in "Picking up from Module 2" above, so it isn't repeated here. */}
+      {lessonCode !== "M3-L1" && choice ? <div className="rounded-lg bg-secondary p-3">
         <p className="text-[14px] text-muted-foreground">A possibility you explored in Module 2</p>
         <p className="mt-1 font-medium text-foreground">{choice.field}</p>
         <p className="mt-1 text-[15px] text-foreground">{choice.task}</p>
         <p className="mt-2 text-[14px] text-muted-foreground">This suggests a subject to investigate, not proof you completed the task.</p>
       </div> : null}
-      {firstNote ? <div className="rounded-lg border border-border p-3">
+      {lessonCode === "M3-L1" ? null : firstNote ? <div className="rounded-lg border border-border p-3">
         <p className="text-[14px] text-muted-foreground">What you recorded doing or observing</p>
         <p className="mt-1 whitespace-pre-wrap text-[15px] text-foreground">{firstNote}</p>
       </div> : notes.length ? <p className="text-[14px] text-muted-foreground">You saved other observations in Module 2, but did not describe a completed activity.</p> : <p className="text-[14px] text-muted-foreground">No Module 2 observations are recorded. You can still complete this lesson without inventing a past experience.</p>}
@@ -269,6 +272,8 @@ export default function LessonView({
   };
 
   const detailRef = useRef(null);
+  // Bumped when a carried-over answer is copied in, so the boxes below re-read it.
+  const [bridgeRev, setBridgeRev] = useState(0);
 
   // Reflection or reading questions do not implicitly require a decision.
   // Preserve explicit next-decision steps and deliberately configured decision choices.
@@ -283,7 +288,7 @@ export default function LessonView({
       <JoinChoicePicker key={key} lessonCode={lesson.code} lessonTitle={lesson.title} index={index} label={prompt} />
     ) : (
     <PromptField
-      key={key}
+      key={`${key}-${bridgeRev}`}
       lessonCode={lesson.code}
       lessonTitle={lesson.title}
       index={index}
@@ -314,6 +319,16 @@ export default function LessonView({
   ) : null;
 
   const beats = [];
+
+  // First step of a module: pick up where the last module left off.
+  const incoming = stepNumber === 1 ? bridgeIn(lesson.module_order) : null;
+  if (incoming) {
+    beats.push({
+      key: "bridge-in",
+      label: `Picking up from Module ${incoming.from}`,
+      content: <BridgeIn bridge={incoming} lesson={lesson} onUsed={() => setBridgeRev((value) => value + 1)} />,
+    });
+  }
 
   if (lesson.readings_note) {
     beats.push({
@@ -506,6 +521,17 @@ export default function LessonView({
   // Journal sits beside Next for these modules, so the footer link stays off.
   const closingJournalHref = focusModule || lesson.what_comes_out || !savesToJournal ? "" : journalHref;
   const returnLink = lesson.code === "M5-L3" ? `${workbookLink}#continue` : workbookLink;
+
+  // Last step of a module: a short bridge built from the participant's own earlier answers.
+  const outgoing = lastOfModule && stepNumber > 0 ? bridgeOut(moduleOrder) : null;
+  if (outgoing) {
+    beats.push({
+      key: "bridge-out",
+      label: `Bridge to Module ${outgoing.to}`,
+      hasInput: true,
+      content: <BridgeOut bridge={outgoing} lesson={lesson} />,
+    });
+  }
 
   if (lesson.what_comes_out) {
     beats.push({
