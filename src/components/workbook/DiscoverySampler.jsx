@@ -225,7 +225,7 @@ export default function DiscoverySampler({ route = "" }) {
                 onClick={() => toggleNeed(need.id)}
                 className={`rounded-md border px-3 py-1.5 text-[14px] transition ${off ? "border-accent-ink bg-accent-ink text-white" : "border-input bg-card text-foreground hover:bg-secondary"}`}
               >
-                {off ? "No " : ""}{need.label.charAt(0).toLowerCase() + need.label.slice(1)}
+                {off ? `No ${need.label.charAt(0).toLowerCase()}${need.label.slice(1)}` : need.label}
               </button>
             );
           })}
