@@ -28,6 +28,6 @@ test("routes map to ways, and missing needs are flagged", () => {
   assert.equal(wayForRoute("I couldn't access an opportunity yet"), "notYet");
   assert.equal(wayForRoute("I observed or spoke with someone"), "watch");
   assert.equal(wayForRoute("I tried something"), "try");
-  assert.deepEqual(missingNeeds(WAYS.community.watch, ["internet"]), ["internet"]);
+  assert.deepEqual(missingNeeds(WAYS.repair.watch, ["internet"]), ["internet"]);
   assert.deepEqual(missingNeeds(WAYS.design.try, ["internet", "travel"]), []);
 });
