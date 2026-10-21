@@ -31,12 +31,12 @@ export function mergeFinals(finals) {
   return merged;
 }
 
-/** The words in `all` that come after what was already delivered. */
+/**
+ * The words in `all` that come after what was already delivered. If the browser rewrote an
+ * earlier word, it is not delivered again; only words past the delivered count are new.
+ */
 export function newWords(all, delivered) {
-  let shared = 0;
-  while (shared < delivered.length && shared < all.length && norm(all[shared]) === norm(delivered[shared])) shared += 1;
-  // If the browser rewrote earlier words, never repeat them: only add what is past the delivered length.
-  return all.slice(Math.max(shared, shared === delivered.length ? shared : delivered.length));
+  return all.slice(delivered.length);
 }
 
 export function createSpeechSession({
@@ -102,7 +102,7 @@ export function createSpeechSession({
       deliver(merged);
       // What is still a preview, minus anything already delivered.
       pending = interim ? newWords(merged.concat(words(interim)), delivered).join(" ") : "";
-      if (wanted || mobile) onState(true, pending);
+      if (wanted) onState(true, pending);
     };
     recognition.onerror = (event) => {
       if (active !== recognition) return;
