@@ -58,7 +58,7 @@ export function buildBranches(graph) {
     }
   }
   for (const node of graph.nodes) {
-    if (Object.prototype.hasOwnProperty.call(parentById, node.id) || node.parent_choice === "standalone" || node.branch_group === "barriers") continue;
+    if (Object.prototype.hasOwnProperty.call(parentById, node.id) || node.parent_choice === "standalone" || node.parent_choice === "chosen" || node.branch_group === "barriers") continue;
     const candidates = candidatesFor(node, nodesById);
     if (candidates.length === 1 && !wouldCycle(node.id, candidates[0].id, parentById)) parentById[node.id] = candidates[0].id;
   }
