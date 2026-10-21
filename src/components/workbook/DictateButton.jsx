@@ -1,6 +1,6 @@
 import React, { useEffect, useId, useRef, useState } from "react";
 import { Mic, Square } from "lucide-react";
-import { createSpeechSession } from "@/lib/speechSession";
+import { createSpeechSession, isTouchDevice } from "@/lib/speechSession";
 
 const START_EVENT = "entrepalooza:dictation-start";
 
@@ -29,7 +29,9 @@ export default function DictateButton({ onText, onBeforeStart, buttonRef = null,
   const start = () => {
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     setNote("");
-    latest.current.onBeforeStart?.();
+    // On phones, focusing the box opens the keyboard, which can take the microphone away from
+    // in-page dictation. Words are added at the end of the box instead.
+    if (!isTouchDevice()) latest.current.onBeforeStart?.();
     if (!Recognition) {
       setNote("Use the microphone on your keyboard to dictate into this box. This browser does not provide in-page dictation.");
       return;
@@ -56,7 +58,7 @@ export default function DictateButton({ onText, onBeforeStart, buttonRef = null,
         {listening ? <Square className="h-3 w-3" aria-hidden="true" /> : <Mic className="h-4 w-4" aria-hidden="true" />}
         {listening ? "Stop dictation" : "Dictate"}
       </button>
-      {listening ? <span role="status" className="text-[14px] text-accent-ink">{preview || "Listening… Tap Stop when finished."}</span> : null}
+      {listening ? <span role="status" className="text-[14px] text-accent-ink">{preview || (isTouchDevice() ? "Listening… Speak, then pause or tap Stop." : "Listening… Tap Stop when finished.")}</span> : null}
       {note ? <span role="status" className="text-[14px] leading-snug text-muted-foreground">{note}</span> : null}
     </span>
   );
