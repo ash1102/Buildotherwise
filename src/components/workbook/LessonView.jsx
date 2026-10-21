@@ -195,7 +195,7 @@ function DiscoveryReviewNotes() {
   ];
   const notes = [
     ...questions.map((label, index) => ({ label, value: answers[answerKey("M2-L2", index)] })),
-    ...["What kind of encounter did you actually have: reading, watching, a conversation, a visit, doing an activity yourself, or a combination? If you did not have an opportunity, record that.","At what point did your attention change? Was there a particular part you wanted to understand better?","How did the people, setting, instructions, or available support affect the experience? What remains uncertain?"].map((label, index) => ({ label, value: answers[answerKey("M2-L2", 11 + index)] }))
+    ...["What kind of encounter did you actually have: reading, watching, a conversation, a visit, doing an activity yourself, or a combination? If you did not have an opportunity, record that.","At what point did your attention change? Was there a particular part you wanted to understand better?","How did the people, setting, instructions, or available support affect the experience? What remains uncertain?"].map((label, index) => ({ label, value: answers[answerKey("M2-L2", 11 + index)] })),
     { label: "What got in the way", value: answers[answerKey("M2-L2", 30)] },
     { label: "The smallest version that doesn't need it", value: answers[answerKey("M2-L2", 31)] },
     { label: "Who or what might know a way around it", value: answers[answerKey("M2-L2", 32)] },
