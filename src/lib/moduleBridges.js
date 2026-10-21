@@ -41,6 +41,8 @@ export const BRIDGES = {
       { code: "M2-L2", index: 3, label: "What helped or made it difficult" },
       { code: "M2-L2", index: 13, label: "How the people, setting, or support affected it" },
       { code: "M2-L3", index: 0, label: "What was different from what you expected" },
+      { code: "M2-L2", index: 30, label: "What got in the way" },
+      { code: "M2-L2", index: 31, label: "The smallest version that doesn’t need it" },
     ],
     question: "Pick one real moment from that experience. What helped, and what got in the way?",
     helper: "If you didn’t get the chance to try, say that. It’s a real result.",
