@@ -8,15 +8,14 @@ import useCurriculum from "@/hooks/useCurriculum";
 import { nextOpenStep } from "@/lib/progress";
 import { downloadText } from "@/lib/download";
 import { readStore, useStore } from "@/lib/store";
-import { branchMarkdown } from "@/lib/lifeMapBranches";
+import { branchMarkdown, buildBranches, descendantsOf, freezePlacement } from "@/lib/lifeMapBranches";
 import {
   MAP_PAUSE_TEXT,
   MAP_PICK_FIELDS,
   MAP_PICK_KEY,
-  MAP_QUESTION_PARTS,
   MAP_SECTIONS,
   QUESTIONS_BY_ID,
-  setNodePosition,
+  setLineParent,
   addLine,
   buildGraph,
   exploreLines,
@@ -30,7 +29,6 @@ import LifeMapTree from "@/components/map/LifeMapTree";
 import MapPickCard from "@/components/map/MapPickCard";
 import LifeMapNodePanel from "@/components/map/LifeMapNodePanel";
 import LifeMapList from "@/components/map/LifeMapList";
-import LifeMapVisual from "@/components/map/LifeMapVisual";
 import BringInSavedAnswer from "@/components/map/BringInSavedAnswer";
 import MapQuestions from "@/components/map/MapQuestions";
 import StepNav from "@/components/workbook/StepNav";
@@ -38,7 +36,8 @@ import StepNav from "@/components/workbook/StepNav";
 export default function LifeMapPage() {
   const map = useLifeMap();
   const [pick] = useStore(MAP_PICK_KEY, {});
-  const [step, setStep] = useState(0);
+  // Remember the part someone was on, so coming back picks up where they left off.
+  const [step, setStep] = useStore("lifeMapGuideStep", 0);
   const mapRef = useRef(null);
   const guideRef = useRef(null);
   const editorRef = useRef(null);
@@ -50,7 +49,6 @@ export default function LifeMapPage() {
   const [draftSection, setDraftSection] = useState(MAP_SECTIONS[0].key);
   const [selectedId, setSelectedId] = useState(null);
   const [asList, setAsList] = useState(false);
-  const [asMap, setAsMap] = useState(false);
 
   /** First unfinished Getting Started step, then the next unfinished workbook step. */
   const nextStep = useMemo(
@@ -58,6 +56,7 @@ export default function LifeMapPage() {
     [lessons, orderedLessons, answers, states]
   );
   const graph = useMemo(() => buildGraph(map), [map]);
+  const tree = useMemo(() => buildBranches(graph), [graph]);
   const explore = useMemo(() => exploreLines(pick), [pick]);
   const options = useMemo(() => savedAnswerOptions(lessons, answers), [lessons, answers]);
   const nodesById = useMemo(
@@ -69,6 +68,21 @@ export default function LifeMapPage() {
   const selected = selectedId ? nodesById[selectedId] || null : null;
   const selectedSection = selected ? sectionOf(selected.id) : null;
   const connections = selected ? graph.links.filter((pair) => pair.includes(selected.id)) : [];
+  const parentOptions = selected
+    ? (() => {
+        const below = descendantsOf(selected.id, tree);
+        return graph.nodes.filter((node) => node.id !== selected.id && !below.has(node.id));
+      })()
+    : [];
+  const placement = selected
+    ? tree.parentById[selected.id]
+      ? tree.parentById[selected.id]
+      : tree.missing.includes(selected.id)
+        ? "__missing"
+        : tree.unlinked.includes(selected.id)
+          ? "__unplaced"
+          : ""
+    : "";
   const total = graph.nodes.length;
 
   const quickAdd = () => {
@@ -95,9 +109,18 @@ export default function LifeMapPage() {
     updateLine(selectedSection.key, selected.id, patch);
   };
 
-  /** Connections are made by hand, in both directions, so either line shows the link. */
+  /**
+   * Connections are made by hand, in both directions, so either line shows the link.
+   * A connection never moves a line to another branch: where each line sits is
+   * written down first, and only "Where this sits" changes it.
+   */
   const connect = (otherId) => {
     if (!selected) return;
+    [selected.id, otherId].forEach((id) => {
+      const freeze = freezePlacement(nodesById[id], tree);
+      const section = sectionOf(id);
+      if (freeze && section) updateLine(section.key, id, freeze);
+    });
     [
       [selected.id, otherId],
       [otherId, selected.id],
@@ -201,23 +224,8 @@ export default function LifeMapPage() {
           <Button
             type="button"
             variant="outline"
-            aria-pressed={asMap}
-            onClick={() => {
-              setAsList(false);
-              setAsMap((value) => !value);
-            }}
-            className="rounded-full"
-          >
-            {asMap ? "Show branches" : "Show as map"}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
             aria-pressed={asList}
-            onClick={() => {
-              setAsMap(false);
-              setAsList((value) => !value);
-            }}
+            onClick={() => setAsList((value) => !value)}
             className="rounded-full"
           >
             {asList ? "Show the map" : "Show as a list"}
@@ -274,7 +282,7 @@ export default function LifeMapPage() {
               }}
             />
           ) : (
-            <LifeMapTree graph={graph} selectedId={selectedId} onSelect={selectEntry} />
+            <LifeMapTree graph={graph} tree={tree} selectedId={selectedId} onSelect={selectEntry} />
           )}
           <MapPickCard pick={pick} onJumpToPart={openGuide} />
         </div>
@@ -284,7 +292,7 @@ export default function LifeMapPage() {
             The question you are answering stays here. The map beside it shows where the answer lands, and it updates when you add the answer.
           </p>
           <div className="mt-4">
-            <MapQuestions graph={graph} step={step} onStep={setStep} onShowMap={showMap} onPlaced={(id) => { setSelectedId(id); setAsList(false); showMap(); }} />
+            <MapQuestions graph={graph} step={step} onStep={setStep} onShowMap={showMap} onPlaced={(id) => { setSelectedId(id); setAsList(false); showMap(); }} onOpen={selectEntry} />
           </div>
         </div>
       </div>
@@ -303,6 +311,9 @@ export default function LifeMapPage() {
           onDisconnect={disconnect}
           onRemove={removeSelected}
           onSplit={splitSelected}
+          placement={placement}
+          parentOptions={parentOptions}
+          onPlace={(parentId) => setLineParent(selected.id, parentId)}
           onClose={() => setSelectedId(null)}
         />
       ) : (

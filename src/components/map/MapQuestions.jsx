@@ -11,12 +11,19 @@ import {
   MAP_QUESTION_PARTS,
   QUESTIONS_BY_ID,
   addLine,
+  followUpTargets,
   guideQuestions,
+  isPerEntryQuestion,
+  sourceQuestionId,
   linesFromAnswer,
   placementForAnswer,
 } from "@/lib/lifeMap";
 
 const PICK_STEP = MAP_QUESTION_PARTS.length;
+const DRAFTS_KEY = "lifeMapGuideDrafts";
+const FOCUS_KEY = "lifeMapGuideFocus";
+const SEPARATE = "__separate";
+const draftKey = (questionId, targetId) => (targetId ? `${questionId}::${targetId}` : questionId);
 const TOTAL = PICK_STEP + 1;
 const STEP_TITLES = [...MAP_QUESTION_PARTS.map((item) => item.title), "Choose whether to explore"];
 
@@ -29,23 +36,23 @@ function needsContext(question) {
  * the participant chooses Add to map. Moving between parts leaves a draft where it
  * was typed. Nothing has to be answered.
  */
-export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced }) {
+export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced, onOpen }) {
   const cardRef = useRef(null);
   const firstRender = useRef(true);
-  const [drafts, setDrafts] = useState({});
-  const [placeFor, setPlaceFor] = useState({});
+  // Drafts stay on this device (not synced), so leaving the page doesn't lose them.
+  const [drafts, setDrafts] = useStore(DRAFTS_KEY, {});
   const [linksFor, setLinksFor] = useState({});
+  // Part 3: the one entry being looked at. Every question in that part attaches to it.
+  const [focusId, setFocusId] = useStore(FOCUS_KEY, "");
+  const [showSeparate, setShowSeparate] = useState({});
   const [menuFor, setMenuFor] = useState({});
   const [addedNote, setAddedNote] = useState({});
   const [lastAdded, setLastAdded] = useState(null);
   const [pick, setPick] = useStore(MAP_PICK_KEY, {});
 
+  const nodeById = Object.fromEntries(graph.nodes.map((node) => [node.id, node]));
   const targetsFor = (question) => {
-    if (question.about) return graph.nodes.filter((node) => node.question_id === question.about);
-    if (question.aboutPlace) {
-      return graph.nodes.filter((node) => node.question_id === "p1-places" || (node.section === "places" && !node.question_id));
-    }
-    if (question.aboutQuestions) return graph.nodes.filter((node) => question.aboutQuestions.includes(node.question_id));
+    if (isPerEntryQuestion(question)) return followUpTargets(question, graph.nodes);
     if (question.context === "entry" || question.multi) {
       return graph.nodes.filter((node) => {
         const questionId = String(node.question_id || "");
@@ -56,6 +63,14 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced 
     return [];
   };
   const countFor = (questionId) => graph.nodes.filter((node) => node.question_id === questionId).length;
+  const answersFor = (questionId, parentId) =>
+    graph.nodes.filter((node) => node.question_id === questionId && (parentId === undefined || node.parent_id === parentId));
+  const partCount = (item) => item.questions.reduce((sum, question) => sum + countFor(question.id), 0);
+  const setDraft = (key, value) => {
+    setDrafts((current) => ({ ...(current || {}), [key]: value }));
+    setAddedNote((current) => ({ ...current, [key]: "" }));
+  };
+  const focus = focusId && nodeById[focusId] ? nodeById[focusId] : null;
 
   useEffect(() => {
     if (firstRender.current) {
@@ -65,20 +80,22 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced 
     cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [step]);
 
-  const add = (part, question) => {
-    const lines = linesFromAnswer(question, drafts[question.id]);
+  /**
+   * Add one answer. `targetId` is the entry it belongs to (a per-entry follow-up,
+   * or the Part 3 focus), SEPARATE to keep it on its own, or empty for questions
+   * that start their own entries. Only ids still on the map are used.
+   */
+  const add = (part, question, targetId = "") => {
+    const key = draftKey(question.id, targetId);
+    const lines = linesFromAnswer(question, (drafts || {})[key]);
     if (!lines.length) return 0;
-    const targets = targetsFor(question);
-    const chosen = question.multi
-      ? linksFor[question.id] || []
-      : placeFor[question.id] && placeFor[question.id] !== "__separate"
-        ? [placeFor[question.id]]
-        : [];
-    const separate = question.multi
-      ? chosen.length === 0
-      : placeFor[question.id] === "__separate" || (needsContext(question) && targets.length === 0);
     const full = QUESTIONS_BY_ID[question.id];
-    const placement = needsContext(question) || question.multi
+    const contextual = needsContext(question);
+    let chosen = [];
+    if (question.multi) chosen = (linksFor[question.id] || []).filter((id) => nodeById[id]);
+    else if (targetId && targetId !== SEPARATE && nodeById[targetId]) chosen = [targetId];
+    const separate = (contextual || question.multi) && chosen.length === 0;
+    const placement = contextual || question.multi
       ? placementForAnswer(full, { links: chosen, separate })
       : placementForAnswer(full, { links: [], separate: false });
     const section = full.section || part.section;
@@ -93,20 +110,17 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced 
       });
       if (!firstId) firstId = item.id;
     });
-    setDrafts((current) => ({ ...current, [question.id]: "" }));
-    const names = chosen
-      .map((id) => targets.find((node) => node.id === id) || graph.nodes.find((node) => node.id === id))
-      .filter(Boolean)
-      .map((node) => node.label || node.text);
+    setDrafts((current) => ({ ...(current || {}), [key]: "" }));
+    if (question.multi) setLinksFor((current) => ({ ...current, [question.id]: [] }));
+    const names = chosen.map((id) => nodeById[id]).filter(Boolean).map((node) => node.label || node.text);
     const where = names.length
-      ? ` Connected to ${names.join(", ")}.`
-      : needsContext(question) || question.multi
-        ? " Kept separate from other entries."
+      ? ` Attached to “${names.join("”, “")}”.`
+      : contextual || question.multi
+        ? " Kept as its own entry."
         : "";
     const added = lines.length === 1 ? "1 line" : `${lines.length} lines`;
-    const note = `Added ${added} to the map under “${full.branch}”.${where}`;
-    setAddedNote((current) => ({ ...current, [question.id]: note }));
-    setLastAdded({ questionId: question.id, id: firstId });
+    setAddedNote((current) => ({ ...current, [key]: `Added ${added} under “${full.branch}”.${where}` }));
+    setLastAdded({ key, id: firstId });
     return lines.length;
   };
 
@@ -115,10 +129,72 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced 
   };
 
   const part = step < PICK_STEP ? MAP_QUESTION_PARTS[step] : null;
+  const focusTargets = targetsFor({ context: "entry" });
+
+  /** One answer box: chips, text, Add, and what just happened. */
+  const answerBox = (currentPart, question, targetId, ariaLabel) => {
+    const key = draftKey(question.id, targetId);
+    const value = (drafts || {})[key] || "";
+    return (
+      <div className="mt-2">
+        {question.chips ? (
+          <div className="mb-2 flex flex-wrap gap-2" role="group" aria-label="Quick answers">
+            {question.chips.map((chip) => {
+              const active = value.trim() === chip;
+              return (
+                <button
+                  key={chip}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setDraft(key, chip)}
+                  className={`rounded-full border px-3 py-1 text-[13px] transition ${
+                    active
+                      ? "border-primary bg-primary-wash font-medium text-foreground"
+                      : "border-border bg-background text-muted-foreground hover:border-primary/50"
+                  }`}
+                >
+                  {chip}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+          <Textarea
+            aria-label={ariaLabel}
+            value={value}
+            rows={2}
+            onChange={(event) => setDraft(key, event.target.value)}
+            className="min-h-[60px] sm:flex-1"
+          />
+          <Button
+            type="button"
+            onClick={() => add(currentPart, question, targetId)}
+            disabled={!value.trim()}
+            className="rounded-full sm:mt-1"
+          >
+            <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+            Add to map
+          </Button>
+        </div>
+        <p className="mt-1 text-[12.5px] text-muted-faint" aria-live="polite">
+          {value.trim() ? "Draft — saved on this device, not on the map yet. " : ""}
+          {addedNote[key] ? <span className="text-accent-ink">{addedNote[key]} </span> : null}
+          {lastAdded?.key === key && lastAdded.id ? (
+            <button type="button" className="text-accent-ink underline" onClick={() => onPlaced?.(lastAdded.id)}>
+              Show it on the map
+            </button>
+          ) : null}
+        </p>
+      </div>
+    );
+  };
   const visible = part ? guideQuestions(part) : [];
   const menuId = part?.menu ? menuFor[part.key] || visible[0]?.id || "" : "";
   const shown = part?.menu ? visible.filter((question) => question.id === menuId) : visible;
-  const pending = part ? part.questions.some((question) => String(drafts[question.id] || "").trim()) : false;
+  const pending = part
+    ? Object.entries(drafts || {}).some(([key, value]) => part.questions.some((question) => key === question.id || key.startsWith(`${question.id}::`)) && String(value || "").trim())
+    : false;
   const keptReflection = MAP_PICK_FIELDS.some((field) => String((pick || {})[field.id] || "").trim());
 
   return (
@@ -145,7 +221,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced 
         ))}
       </div>
 
-      <p className="mt-4 text-[12px] text-muted-faint">Jump to any part:</p>
+      <p className="mt-4 text-[12px] text-muted-faint">Jump to any part. The number is how many entries you’ve added there.</p>
       <ol className="-mx-1 mt-1.5 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible" aria-label="Parts">
         {STEP_TITLES.map((title, index) => (
           <li key={title}>
@@ -160,6 +236,9 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced 
               }`}
             >
               {index + 1}. {title}
+              {index < PICK_STEP && partCount(MAP_QUESTION_PARTS[index]) ? (
+                <span className="ml-1.5 opacity-80">· {partCount(MAP_QUESTION_PARTS[index])}</span>
+              ) : null}
             </button>
           </li>
         ))}
@@ -179,6 +258,36 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced 
           ) : null}
 
           {part.key === "part-3" ? <EnergyMarks graph={graph} onEarlierPart={() => go(0)} /> : null}
+
+          {part.questions.some((question) => question.context === "entry" && !question.retired) ? (
+            <div className="mt-5 rounded-md border border-border bg-secondary/40 p-3">
+              <label htmlFor="map-focus" className="block text-[14px] font-medium text-foreground">
+                Which entry are you looking at?
+              </label>
+              <p className="mt-1 text-[12.5px] text-muted-faint">
+                The questions below attach to this entry. Switch entries any time; what you already added stays where it is.
+              </p>
+              {focusTargets.length ? (
+                <select
+                  id="map-focus"
+                  value={focus ? focus.id : ""}
+                  onChange={(event) => setFocusId(event.target.value)}
+                  className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-[13.5px]"
+                >
+                  <option value="">Choose an entry…</option>
+                  <option value={SEPARATE}>None — keep my answers as their own entries</option>
+                  {focusTargets.map((node) => (
+                    <option key={node.id} value={node.id}>
+                      {node.label || node.text}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <EmptyTargets text="Nothing on the map yet to look at." onJump={() => go(0)} jumpLabel="Go to Part 1" />
+              )}
+            </div>
+          ) : null}
+
           {part.menu && visible.length ? (
             <label className="mt-5 block text-[14px] font-medium" htmlFor={`menu-${part.key}`}>
               Choose one prompt
@@ -191,146 +300,109 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced 
                 {visible.map((question) => (
                   <option key={question.id} value={question.id}>
                     {question.text}
+                    {countFor(question.id) ? ` (${countFor(question.id)} added)` : ""}
                   </option>
                 ))}
               </select>
             </label>
           ) : null}
-          <div className="mt-5 space-y-6">
+          <div className="mt-5 space-y-8">
             {shown.map((question) => {
-              const count = countFor(question.id);
-              const value = drafts[question.id] || "";
               const targets = targetsFor(question);
-              const contextual = needsContext(question);
+              const perEntry = isPerEntryQuestion(question);
+              const entryContext = question.context === "entry";
               const selectedLinks = linksFor[question.id] || [];
-              const awaitingChoice = contextual && targets.length > 0 && !placeFor[question.id];
+              const sourcePart = QUESTIONS_BY_ID[sourceQuestionId(question)]?.partIndex;
+              const sourceBranch = QUESTIONS_BY_ID[sourceQuestionId(question)]?.branch;
               return (
                 <div key={question.id}>
-                  <label htmlFor={`mapq-${question.id}`} className="block text-[15px] font-medium text-foreground">
+                  <p className="block text-[15px] font-medium text-foreground" id={`mapq-label-${question.id}`}>
                     {question.text}
                     {question.optional ? <span className="ml-2 text-[12px] font-normal text-muted-faint">Optional</span> : null}
-                  </label>
+                  </p>
                   {question.helper ? <p className="mt-1 text-[13px] text-muted-foreground">{question.helper}</p> : null}
-                  <p className="mt-1 text-[12.5px] text-muted-faint">
-                    {question.list
-                      ? "List as many as fit, separated by commas or new lines. Each one becomes its own line when you add it."
-                      : "One answer at a time. It stays a draft until you add it."}{" "}
-                    {value.trim() ? "Draft — not on the map yet." : "Nothing is added by leaving this box."}
-                  </p>
 
-                  {contextual && targets.length ? (
-                    <select
-                      aria-label={`${question.aboutLabel || "Which earlier entry does this describe?"} ${question.text}`}
-                      value={placeFor[question.id] || ""}
-                      onChange={(event) => {
-                        const next = event.target.value;
-                        setPlaceFor((current) => ({ ...current, [question.id]: next }));
-                      }}
-                      className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-[13.5px] sm:w-72"
-                    >
-                      <option value="">{question.aboutLabel || "Which earlier entry does this describe?"}</option>
-                      <option value="__separate">Keep this as a separate answer</option>
-                      {targets.map((place) => (
-                        <option key={place.id} value={place.id}>
-                          {place.label || place.text}
-                        </option>
-                      ))}
-                    </select>
-                  ) : null}
-                  {contextual && !targets.length ? (
-                    <p className="mt-2 text-[13px] text-muted-foreground">
-                      There is no matching entry yet. You can add this as its own line, or add that entry first.
-                    </p>
-                  ) : null}
-
-                  {question.multi && targets.length ? (
-                    <fieldset className="mt-2 max-h-48 space-y-1 overflow-y-auto rounded-md border border-border p-3">
-                      <legend className="px-1 text-[13px] text-muted-foreground">
-                        If this refers to entries already on the map, select them. More than one is allowed. Leave them unchecked to keep this separate.
-                      </legend>
-                      {targets.map((place) => (
-                        <label key={place.id} className="flex items-start gap-2 text-[14px]">
-                          <input
-                            type="checkbox"
-                            className="mt-1"
-                            checked={selectedLinks.includes(place.id)}
-                            onChange={() => {
-                              setLinksFor((current) => {
-                                const list = current[question.id] || [];
-                                const next = list.includes(place.id) ? list.filter((id) => id !== place.id) : [...list, place.id];
-                                return { ...current, [question.id]: next };
-                              });
-                            }}
-                          />
-                          <span>{place.label || place.text}</span>
-                        </label>
-                      ))}
-                    </fieldset>
-                  ) : null}
-
-                  {placeFor[question.id] && placeFor[question.id] !== "__separate" ? (
-                    <p className="mt-2 rounded-md bg-secondary p-3 text-[15px]">
-                      Answering about: <strong>{targets.find((node) => node.id === placeFor[question.id])?.text || "the entry you selected"}</strong>
-                    </p>
-                  ) : null}
-
-                  {question.chips ? (
-                    <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Quick answers">
-                      {question.chips.map((chip) => {
-                        const active = value.trim() === chip;
-                        return (
-                          <button
-                            key={chip}
-                            type="button"
-                            aria-pressed={active}
-                            onClick={() => {
-                              setDrafts((current) => ({ ...current, [question.id]: chip }));
-                              setAddedNote((current) => ({ ...current, [question.id]: "" }));
-                            }}
-                            className={`rounded-full border px-3 py-1 text-[13px] transition ${
-                              active
-                                ? "border-primary bg-primary-wash font-medium text-foreground"
-                                : "border-border bg-background text-muted-foreground hover:border-primary/50"
-                            }`}
-                          >
-                            {chip}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-
-                  <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-start">
-                    <Textarea
-                      id={`mapq-${question.id}`}
-                      value={value}
-                      rows={2}
-                      onChange={(event) => {
-                        const next = event.target.value;
-                        setDrafts((current) => ({ ...current, [question.id]: next }));
-                        setAddedNote((current) => ({ ...current, [question.id]: "" }));
-                      }}
-                      className="min-h-[60px] sm:flex-1"
-                    />
-                    <Button
-                      type="button"
-                      onClick={() => add(part, question)}
-                      disabled={!value.trim() || awaitingChoice}
-                      className="rounded-full sm:mt-1"
-                    >
-                      <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
-                      Add to map
-                    </Button>
-                  </div>
-                  <p className="mt-1 text-[12.5px] text-muted-faint" aria-live="polite">
-                    {addedNote[question.id] ? <span className="text-accent-ink">{addedNote[question.id]} </span> : null}
-                    {lastAdded?.questionId === question.id && lastAdded.id ? (
-                      <button type="button" className="text-accent-ink underline" onClick={() => onPlaced?.(lastAdded.id)}>
-                        Show it on the map
-                      </button>
-                    ) : null}{" "}
-                    {count ? `${count} ${count === 1 ? "line" : "lines"} on the map from this question.` : ""}
-                  </p>
+                  {perEntry ? (
+                    targets.length ? (
+                      <div className="mt-3 space-y-3">
+                        <p className="text-[12.5px] text-muted-faint">
+                          Asked once for each entry under “{sourceBranch}”. Skip any of them.
+                        </p>
+                        {targets.map((target) => (
+                          <div key={target.id} className="rounded-md border border-border bg-background p-3">
+                            <p className="text-[14px] font-semibold text-foreground">{target.label || target.text}</p>
+                            <PreviousAnswers list={answersFor(question.id, target.id)} onOpen={onOpen} />
+                            {answerBox(part, question, target.id, `${question.text} — ${target.label || target.text}`)}
+                          </div>
+                        ))}
+                        <SeparateToggle
+                          open={Boolean(showSeparate[question.id]) || answersFor(question.id, "").length > 0}
+                          onOpen={() => setShowSeparate((current) => ({ ...current, [question.id]: true }))}
+                        >
+                          <PreviousAnswers list={answersFor(question.id, "")} onOpen={onOpen} />
+                          {answerBox(part, question, SEPARATE, `${question.text} — not tied to one entry`)}
+                        </SeparateToggle>
+                      </div>
+                    ) : (
+                      <>
+                        <EmptyTargets
+                          text={`This follow-up attaches to an entry under “${sourceBranch}”. There isn’t one yet.`}
+                          onJump={sourcePart != null && sourcePart !== step ? () => go(sourcePart) : null}
+                          jumpLabel={sourcePart != null ? `Go to Part ${sourcePart + 1}` : ""}
+                        />
+                        <PreviousAnswers list={answersFor(question.id)} onOpen={onOpen} />
+                        {answerBox(part, question, SEPARATE, question.text)}
+                      </>
+                    )
+                  ) : entryContext ? (
+                    <>
+                      {focus ? (
+                        <p className="mt-2 rounded-md bg-secondary p-2.5 text-[14px]">
+                          About: <strong>{focus.label || focus.text}</strong>
+                        </p>
+                      ) : null}
+                      <PreviousAnswers list={answersFor(question.id, focus ? focus.id : focusId === SEPARATE ? "" : undefined)} onOpen={onOpen} />
+                      {focus || focusId === SEPARATE || !focusTargets.length ? (
+                        answerBox(part, question, focus ? focus.id : SEPARATE, question.text)
+                      ) : (
+                        <p className="mt-2 text-[13px] text-muted-foreground">Choose an entry above to answer this one.</p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <p className="mt-1 text-[12.5px] text-muted-faint">
+                        {question.list
+                          ? "List as many as fit, separated by commas or new lines. Each one becomes its own entry."
+                          : "One answer at a time."}
+                      </p>
+                      {question.multi && targets.length ? (
+                        <fieldset className="mt-2 max-h-48 space-y-1 overflow-y-auto rounded-md border border-border p-3">
+                          <legend className="px-1 text-[13px] text-muted-foreground">
+                            Does this come from entries already on the map? Tick any that apply, or leave them all unticked to keep it as its own entry.
+                          </legend>
+                          {targets.map((place) => (
+                            <label key={place.id} className="flex items-start gap-2 text-[14px]">
+                              <input
+                                type="checkbox"
+                                className="mt-1"
+                                checked={selectedLinks.includes(place.id)}
+                                onChange={() => {
+                                  setLinksFor((current) => {
+                                    const list = current[question.id] || [];
+                                    const next = list.includes(place.id) ? list.filter((id) => id !== place.id) : [...list, place.id];
+                                    return { ...current, [question.id]: next };
+                                  });
+                                }}
+                              />
+                              <span>{place.label || place.text}</span>
+                            </label>
+                          ))}
+                        </fieldset>
+                      ) : null}
+                      <PreviousAnswers list={answersFor(question.id)} onOpen={onOpen} />
+                      {answerBox(part, question, "", question.text)}
+                    </>
+                  )}
                 </div>
               );
             })}
@@ -428,5 +500,55 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced 
         </div>
       </div>
     </section>
+  );
+}
+
+/** What this question has already put on the map. Each one opens in the editor. */
+function PreviousAnswers({ list, onOpen }) {
+  if (!list || !list.length) return null;
+  return (
+    <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Already on the map">
+      {list.map((node) => (
+        <li key={node.id}>
+          <button
+            type="button"
+            onClick={() => onOpen?.(node.id)}
+            title="Open to edit, move, or remove"
+            className="max-w-[16rem] truncate rounded-full border border-primary/40 bg-primary-wash px-2.5 py-0.5 text-[12.5px] text-foreground transition hover:border-primary"
+          >
+            {node.label || node.text}
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function EmptyTargets({ text, onJump, jumpLabel }) {
+  return (
+    <p className="mt-2 text-[13px] text-muted-foreground">
+      {text}{" "}
+      {onJump ? (
+        <button type="button" onClick={onJump} className="text-accent-ink underline underline-offset-2">
+          {jumpLabel}
+        </button>
+      ) : null}
+    </p>
+  );
+}
+
+function SeparateToggle({ open, onOpen, children }) {
+  if (open) {
+    return (
+      <div className="rounded-md border border-dashed border-border p-3">
+        <p className="text-[13px] font-medium text-muted-foreground">Not tied to one of these</p>
+        {children}
+      </div>
+    );
+  }
+  return (
+    <button type="button" onClick={onOpen} className="text-[13px] text-accent-ink underline underline-offset-2">
+      Add an answer that isn’t about one of these
+    </button>
   );
 }
