@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useAnswers, answerKey, setAnswer } from "@/lib/workbook";
+import { useStore } from "@/lib/store";
+import { ASK_QUESTIONS, NEEDS, NEED_LABEL, NO_CONTACTS, WAY_KINDS, missingNeeds, waysFor } from "@/lib/discoveryWays";
 
 export const OPTIONS = [
   {
@@ -86,43 +88,173 @@ export const OPTIONS = [
   "materials": "An everyday object or process, and an available guide or person if needed.",
   "access": "No disassembly or repair required. You can investigate through observation, reading, or conversation."
 }
+,
+{
+  "id": "own",
+  "title": "Something of my own",
+  "field": "Something of my own",
+  "fact": "A possibility you chose yourself, from Module 1 or from anything you’re curious about.",
+  "task": "Find the smallest beginner version you can do with what you already have, or watch or ask someone who does it."
+}
 ];
 
-export default function DiscoverySampler() {
+/** Saved answer slots for this activity. */
+export const CARD_SLOT = 20;
+export const WAY_SLOT = 21;
+/** What someone doesn't have this week stays on this device only. */
+const UNAVAILABLE_KEY = "module2Unavailable";
+
+function readable(value) {
+  try { const parsed = JSON.parse(value); return typeof parsed === "string" ? parsed : String(value || ""); }
+  catch { return String(value || ""); }
+}
+
+/** The questions and places to find someone, for the Ask way. */
+export function AskHelp() {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      <div className="rounded-md bg-secondary p-3">
+        <p className="text-[14px] font-medium text-foreground">Questions that work for almost anything</p>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-[14px] text-foreground">
+          {ASK_QUESTIONS.map((question) => <li key={question}>{question}</li>)}
+        </ul>
+      </div>
+      <div className="rounded-md bg-secondary p-3">
+        <p className="text-[14px] font-medium text-foreground">If you don’t know anyone to ask</p>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-[14px] text-foreground">
+          {NO_CONTACTS.map((place) => <li key={place}>{place}</li>)}
+        </ul>
+        <p className="mt-2 text-[13px] text-muted-foreground">Share only what you want to. You don’t have to explain why you’re asking.</p>
+      </div>
+    </div>
+  );
+}
+
+/** One way in: what to do, what it needs, and whether that fits this week. */
+function WayButton({ kind, way, active, missing, onChoose }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onChoose}
+      className={`flex h-full flex-col rounded-lg border p-3 text-left transition ${
+        active ? "border-accent-ink bg-secondary" : "border-border bg-card hover:bg-secondary"
+      } ${missing.length && !active ? "opacity-70" : ""}`}
+    >
+      <span className="text-[15px] font-semibold text-foreground">{kind.label}</span>
+      <span className="mt-1 text-[14.5px] leading-relaxed text-foreground">{way.text}</span>
+      {way.note ? <span className="mt-1 text-[13px] text-muted-foreground">{way.note}</span> : null}
+      <span className="mt-2 flex flex-wrap gap-1.5 text-[12px]">
+        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-foreground">Free</span>
+        {way.needs.length ? (
+          way.needs.map((need) => (
+            <span
+              key={need}
+              className={`rounded-full px-2 py-0.5 ${missing.includes(need) ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground"}`}
+            >
+              Needs {NEED_LABEL[need].toLowerCase()}
+            </span>
+          ))
+        ) : (
+          <span className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">Nothing extra needed</span>
+        )}
+      </span>
+      {missing.length ? (
+        <span className="mt-1 text-[12.5px] text-muted-foreground">You said you don’t have this right now. Another way may fit better, or pick it anyway.</span>
+      ) : null}
+    </button>
+  );
+}
+
+export default function DiscoverySampler({ route = "" }) {
   const answers = useAnswers();
-  const saved = (answers || {})[answerKey("M2-L1", 20)];
+  const saved = (answers || {})[answerKey("M2-L1", CARD_SLOT)];
+  const savedWay = (answers || {})[answerKey("M2-L1", WAY_SLOT)] || "";
   const [selected, setSelected] = useState(() => saved || null);
   const [guesses, setGuesses] = useState({});
   const [seen, setSeen] = useState([]);
-  const current = OPTIONS.find((option) => option.id === selected);
+  const [unavailable, setUnavailable] = useStore(UNAVAILABLE_KEY, []);
+  const following = /already curious/i.test(String(route || ""));
+  const shownId = selected || (following ? "own" : null);
+  const current = OPTIONS.find((option) => option.id === shownId);
+  const ways = current ? waysFor(current.id) : null;
+  const ownWords = readable((answers || {})[answerKey("M2-L1", 0)]).trim() || readable((answers || {})[answerKey("BRIDGE-1-2", 0)]).trim();
+
   const choose = (id) => {
     setSelected(id);
-    setAnswer("M2-L1", 20, id);
+    setAnswer("M2-L1", CARD_SLOT, id);
     setSeen((previous) => previous.includes(id) ? previous : [...previous, id]);
   };
+  const chooseWay = (id) => {
+    if (current && current.id !== saved) choose(current.id);
+    setAnswer("M2-L1", WAY_SLOT, savedWay === id ? "" : id);
+  };
+  const toggleNeed = (id) => setUnavailable((list) => {
+    const current = Array.isArray(list) ? list : [];
+    return current.includes(id) ? current.filter((item) => item !== id) : [...current, id];
+  });
+
+  const ordered = [OPTIONS.find((option) => option.id === "own"), ...OPTIONS.filter((option) => option.id !== "own")];
 
   return (
-    <section aria-label="Explore real possibilities" className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
+    <section aria-label="Explore real possibilities" className="space-y-5 rounded-xl border border-border bg-card p-4 sm:p-6">
       <div>
-        <h3 className="text-[20px] font-semibold text-foreground">First, encounter something real</h3>
+        <h3 className="text-[20px] font-semibold text-foreground">First, pick something to get closer to</h3>
         <p className="mt-2 text-[16px] leading-relaxed text-muted-foreground">
-          Start with something from Module 1, browse an unfamiliar possibility, or talk through the choices with someone. These activities can be part of everyday life, a hobby, community participation, study, or work. You do not need an interest in mind.
+          Start with your own idea from Module 1, or browse one of these. Each one has four ways in: try it, watch someone,
+          ask someone, or note what’s in the way. Every way here is free.
         </p>
       </div>
+
+      <details className="rounded-lg border border-border p-3" open={Array.isArray(unavailable) && unavailable.length > 0}>
+        <summary className="cursor-pointer text-[15px] font-medium text-foreground">
+          Anything you don’t have this week? (optional)
+        </summary>
+        <p className="mt-2 text-[14px] text-muted-foreground">
+          Tick anything that isn’t available to you right now. Ways that need it get marked, so you can pick one that fits.
+          This stays on this device and isn’t shared.
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {NEEDS.map((need) => {
+            const off = Array.isArray(unavailable) && unavailable.includes(need.id);
+            return (
+              <button
+                key={need.id}
+                type="button"
+                aria-pressed={off}
+                onClick={() => toggleNeed(need.id)}
+                className={`rounded-md border px-3 py-1.5 text-[14px] transition ${off ? "border-accent-ink bg-accent-ink text-white" : "border-input bg-card text-foreground hover:bg-secondary"}`}
+              >
+                {off ? `No ${need.label.charAt(0).toLowerCase()}${need.label.slice(1)}` : need.label}
+              </button>
+            );
+          })}
+        </div>
+      </details>
+
       <div className="grid gap-2 sm:grid-cols-3" role="group" aria-label="Pick a possibility">
-        {OPTIONS.map((option) => (
-          <button key={option.id} type="button" aria-pressed={selected === option.id}
+        {ordered.map((option) => (
+          <button key={option.id} type="button" aria-pressed={shownId === option.id}
             onClick={() => choose(option.id)}
-            className={`rounded-lg border p-3 text-left text-[15px] font-medium transition ${selected === option.id ? "border-accent-ink bg-secondary text-foreground" : "border-border bg-card text-foreground hover:bg-secondary"}`}>
+            className={`rounded-lg border p-3 text-left text-[15px] font-medium transition ${shownId === option.id ? "border-accent-ink bg-secondary text-foreground" : "border-border bg-card text-foreground hover:bg-secondary"}`}>
             {option.title}
           </button>
         ))}
       </div>
+
       {current ? (
         <div className="space-y-4 rounded-lg border border-border p-4">
           <div>
             <p className="text-[13px] font-medium uppercase tracking-wide text-muted-foreground">Explore: {current.field}</p>
-            <p className="mt-2 text-[16px] leading-relaxed text-foreground">{current.fact}</p>
+            {current.id === "own" ? (
+              ownWords ? (
+                <p className="mt-2 text-[16px] leading-relaxed text-foreground">You wrote: <strong>{ownWords}</strong></p>
+              ) : (
+                <p className="mt-2 text-[16px] leading-relaxed text-foreground">Use what you noticed in Module 1, or anything you’re curious about. Write it in the first box below.</p>
+              )
+            ) : (
+              <p className="mt-2 text-[16px] leading-relaxed text-foreground">{current.fact}</p>
+            )}
             {current.source ? <a href={current.source} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-[14px] text-accent-ink underline underline-offset-2">
               Read the official Bureau of Labor Statistics occupation profile ↗
             </a> : null}
@@ -145,19 +277,38 @@ export default function DiscoverySampler() {
               </div>
             ) : null}
           </div> : null}
+
           <div>
-            <p className="text-[15px] font-medium text-foreground">One way to encounter it</p>
-            <p className="mt-1 text-[15px] leading-relaxed text-foreground">{current.task}</p>
-            <p className="mt-2 text-[13px] text-muted-foreground">Choose a time limit that works for you. You may read, watch, talk with someone, visit, or try a beginner task; record which you actually did. You can switch possibilities.</p>
+            <p className="text-[16px] font-medium text-foreground">How will you get close to it?</p>
+            <p className="mt-1 text-[14px] text-muted-foreground">Pick the one that fits your week. You can change it later. Each gives you real information.</p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2" role="group" aria-label="Ways in">
+              {WAY_KINDS.map((kind) => (
+                <WayButton
+                  key={kind.id}
+                  kind={kind}
+                  way={ways[kind.id]}
+                  active={savedWay === kind.id && saved === current.id}
+                  missing={missingNeeds(ways[kind.id], unavailable)}
+                  onChoose={() => chooseWay(kind.id)}
+                />
+              ))}
+            </div>
           </div>
-          <p className="text-[14px] text-muted-foreground"><strong>What you need:</strong> {current.materials || "An accessible public information page, demonstration, or real example. No specialist tools needed for the suggested observation."}</p>
-          <p className="text-[14px] text-muted-foreground"><strong>Access:</strong> {current.access || "Check that the source is available with your device, data, language, and access needs. No repair, purchase, application, or visit is required for this starting point."}</p>
+
+          {savedWay === "ask" && saved === current.id ? <AskHelp /> : null}
+          {savedWay === "notYet" && saved === current.id ? (
+            <p className="rounded-md bg-secondary p-3 text-[15px] leading-relaxed text-foreground">
+              Not being able to get to something yet is a real result. It tells you about conditions, not about you. In the next
+              step you’ll note what’s in the way and the smallest version that doesn’t need it.
+            </p>
+          ) : null}
+          <p className="text-[13px] text-muted-foreground">Picking a way records a plan, not something you’ve done. In the next step you’ll write what actually happened.</p>
         </div>
       ) : (
-        <p className="text-[15px] text-muted-foreground">Choose a starting point, or use the broader activity menu and your own possibility below.</p>
+        <p className="text-[15px] text-muted-foreground">Pick a starting point, or write your own possibility in the boxes below.</p>
       )}
-      {seen.length > 1 ? <p className="text-[14px] text-muted-foreground">Viewed {seen.length} starting points. Opening a card does not mean you completed its activity.</p> : null}
-      <p className="text-[13px] text-muted-foreground">These are starting activities, not promises of local opportunities. The planning tool below offers more possibilities, your own idea, and a route for uncertainty.</p>
+      {seen.length > 1 ? <p className="text-[14px] text-muted-foreground">Looked at {seen.length} starting points. Opening a card doesn’t mean you did its activity.</p> : null}
+      <p className="text-[13px] text-muted-foreground">These are starting activities, not promises of local opportunities. Check times, costs, and access before planning a visit.</p>
     </section>
   );
 }

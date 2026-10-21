@@ -16,12 +16,15 @@ const PROMPTS = {
   "M2-L1": { tries: 9, reflects: 1 },
 };
 
+// Slots written by app pieces rather than lesson prompt boxes.
+const EXTRA = { "M2-L2": [30, 31, 32] };
+
 test("every bridge source and target points at a real answer slot", () => {
   Object.values(BRIDGES).forEach((bridge) => {
     [...bridge.sources.filter((s) => s.code), ...(bridge.target ? [bridge.target] : [])].forEach((slot) => {
       const shape = PROMPTS[slot.code];
       assert.ok(shape, `${slot.code} is known`);
-      assert.ok(slot.index < shape.tries + shape.reflects, `${slot.code}#${slot.index} exists`);
+      assert.ok(slot.index < shape.tries + shape.reflects || (EXTRA[slot.code] || []).includes(slot.index), `${slot.code}#${slot.index} exists`);
     });
   });
 });

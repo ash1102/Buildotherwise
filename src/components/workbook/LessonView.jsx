@@ -103,6 +103,11 @@ function promptForRoute(lesson, prompt, route) {
     if (/^Navigation:/i.test(text)) return navigation;
     return continuation || navigation;
   }
+  // Couldn't get to it yet: questions about an encounter that didn't happen are left out;
+  // the access questions above take their place.
+  if (lesson.code === "M2-L2" && /couldn.?t access/i.test(selected)) {
+    return !/actually do or observe|surprised, frustrated|helped or made participation|take in time, money|attention change|people, setting, instructions/i.test(text);
+  }
   if (lesson.code === "M3-L2" && /what actually happened|effort or discomfort|might you try again/i.test(text)) {
     return /^attempt it\b/i.test(selected);
   }
@@ -190,7 +195,10 @@ function DiscoveryReviewNotes() {
   ];
   const notes = [
     ...questions.map((label, index) => ({ label, value: answers[answerKey("M2-L2", index)] })),
-    ...["What kind of encounter did you actually have: reading, watching, a conversation, a visit, doing an activity yourself, or a combination? If you did not have an opportunity, record that.","At what point did your attention change? Was there a particular part you wanted to understand better?","How did the people, setting, instructions, or available support affect the experience? What remains uncertain?"].map((label, index) => ({ label, value: answers[answerKey("M2-L2", 11 + index)] }))
+    ...["What kind of encounter did you actually have: reading, watching, a conversation, a visit, doing an activity yourself, or a combination? If you did not have an opportunity, record that.","At what point did your attention change? Was there a particular part you wanted to understand better?","How did the people, setting, instructions, or available support affect the experience? What remains uncertain?"].map((label, index) => ({ label, value: answers[answerKey("M2-L2", 11 + index)] })),
+    { label: "What got in the way", value: answers[answerKey("M2-L2", 30)] },
+    { label: "The smallest version that doesn't need it", value: answers[answerKey("M2-L2", 31)] },
+    { label: "Who or what might know a way around it", value: answers[answerKey("M2-L2", 32)] },
   ]
     .filter((item) => String(item.value || "").trim());
   return (
@@ -203,7 +211,7 @@ function DiscoveryReviewNotes() {
         <p className="mt-2 text-[14px] text-muted-foreground">Selecting this card does not establish that you completed the activity. Review what you actually recorded below.</p>
       </div> : <p className="text-[15px] text-muted-foreground">No sampler selection was saved. You may have explored something else.</p>}
       {notes.length ? <div className="space-y-3">
-        <p className="text-[15px] font-medium">Your actual Lesson 2 observations</p>
+        <p className="text-[15px] font-medium">What you recorded in Lesson 2</p>
         {notes.map((note) => <div key={note.label} className="border-l-2 border-border pl-3">
           <p className="text-[13px] text-muted-foreground">{note.label}</p>
           <p className="mt-1 whitespace-pre-wrap text-[15px]">{note.value}</p>
@@ -384,14 +392,14 @@ export default function LessonView({
   }
 
   if (lesson.code === "M2-L2") {
-    beats.push({ key: "guided-follow-through", label: "Explore what you encountered", content: <DiscoveryFollowThrough /> });
+    beats.push({ key: "guided-follow-through", label: "Explore what you encountered", content: <DiscoveryFollowThrough lesson={lesson} route={route} /> });
   }
 
   if (lesson.code === "M2-L1") {
     beats.push({
       key: "discovery-sampler",
       label: "Explore real possibilities",
-      content: <DiscoverySampler />,
+      content: <DiscoverySampler route={route} />,
     });
   }
 
