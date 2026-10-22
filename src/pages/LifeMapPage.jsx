@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useLifeMap, useWorkbook } from "@/lib/workbook";
 import { useJournalEntries } from "@/lib/journal";
 import useCurriculum from "@/hooks/useCurriculum";
-import { nextOpenStep } from "@/lib/progress";
+import { nextStepAfterLifeMap } from "@/lib/progress";
 import { downloadText } from "@/lib/download";
 import { readStore, useStore } from "@/lib/store";
 import { branchMarkdown, buildBranches, descendantsOf, freezePlacement } from "@/lib/lifeMapBranches";
@@ -50,9 +50,9 @@ export default function LifeMapPage() {
   const [selectedId, setSelectedId] = useState(null);
   const [asList, setAsList] = useState(false);
 
-  /** First unfinished Getting Started step, then the next unfinished workbook step. */
+  /** The Life Map comes after Getting Started, so next is the first unfinished workbook step (Module 1 onward). */
   const nextStep = useMemo(
-    () => nextOpenStep({ lessons, workbookLessons: orderedLessons, answers, states }),
+    () => nextStepAfterLifeMap({ lessons, workbookLessons: orderedLessons, answers, states }),
     [lessons, orderedLessons, answers, states]
   );
   const graph = useMemo(() => buildGraph(map), [map]);

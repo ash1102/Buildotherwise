@@ -15,7 +15,12 @@ import {
 import { saveAnswer } from "@/lib/journal";
 import { isComingLater, isLiveOnlyModule, isOpenerLesson, isWorkbookLesson } from "@/lib/curriculum";
 import CarryForwardScreen from "@/components/records/CarryForwardScreen";
-import { gettingStartedFinished, gettingStartedSteps, isGettingStartedLesson } from "@/lib/gettingStarted";
+import {
+  gettingStartedFinished,
+  gettingStartedStepDone,
+  gettingStartedSteps,
+  isGettingStartedLesson,
+} from "@/lib/gettingStarted";
 import { usePacedProgress } from "@/lib/pacing";
 import LockedNotice from "@/components/workbook/LockedNotice";
 import ComingLaterNotice from "@/components/workbook/ComingLaterNotice";
@@ -34,7 +39,8 @@ export default function LessonPage() {
   const carriedMap = useCarried();
   const decisionsMap = useDecisions();
   const { setLesson } = useJournalContext();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const admin = Boolean(isAuthenticated && user?.role === "admin");
   const [readingState, setReadingState] = useState({ code: "", items: [], ready: false });
   const gate = useWorkbookGate();
 
@@ -129,15 +135,32 @@ export default function LessonPage() {
   const workbookLink = gsLesson || (module && module.kind === "orientation") ? "/getting-started" : opener ? "/" : `/module/${module.slug}`;
   const backLabel = gsLesson ? "Back to Getting Started" : "Back to the workbook";
   const stepsDone = gettingStartedFinished(lessons, answers, states);
-  const forward =
-    gsLesson && !next && stepsDone
-      ? {
-          to: isAuthenticated ? "/map" : "/login?returnTo=%2Fmap",
-          kicker: "Next",
-          title: "Map the life you’re actually living",
-        }
-      : null;
-  const endNote = gsLesson && !next && !stepsDone ? "Finish this step to open the workbook." : undefined;
+  /**
+   * The last Getting Started step never dead-ends.
+   * All steps done (or an admin previewing): go straight to the Life Map.
+   * An earlier step still open: go to that step.
+   * Only this step open: say what opens it.
+   */
+  const openGsStep = gsSteps.find((item) => !gettingStartedStepDone(item, answers, states)) || null;
+  const lastGs = gsLesson && !next;
+  let forward = null;
+  let endNote;
+  if (lastGs && (stepsDone || admin)) {
+    forward = {
+      to: isAuthenticated ? "/map" : "/login?returnTo=%2Fmap",
+      kicker: "Next",
+      title: "Map the life you’re actually living",
+    };
+  } else if (lastGs && openGsStep && openGsStep.code !== lesson.code) {
+    const openNumber = gsSteps.findIndex((item) => item.code === openGsStep.code) + 1;
+    forward = {
+      to: `/lesson/${openGsStep.code}`,
+      kicker: `Step ${openNumber} is still open`,
+      title: openGsStep.title,
+    };
+  } else if (lastGs) {
+    endNote = "Answer or skip this step, and your Life Map opens next.";
+  }
 
   // A live-only module has no self-paced steps in the app.
   if (!gsLesson && module && isLiveOnlyModule(module)) {
