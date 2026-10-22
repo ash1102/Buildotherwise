@@ -1,3 +1,4 @@
+import MobileSelect from "@/components/ui/MobileSelect";
 import React from "react";
 import { Input } from "@/components/ui/input";
 
@@ -94,7 +95,7 @@ export default function LifeMapCardPanel({
         <label htmlFor={`${card.id}-connect`} className="block text-[15px] font-medium text-foreground">
           Connect this card to another (optional)
         </label>
-        <select
+        <MobileSelect
           id={`${card.id}-connect`}
           value=""
           onChange={(event) => event.target.value && onConnect(card.id, event.target.value)}
@@ -106,7 +107,7 @@ export default function LifeMapCardPanel({
               {item.text || "Untitled card"}
             </option>
           ))}
-        </select>
+        </MobileSelect>
         {linked.length ? (
           <ul className="mt-2 space-y-1">
             {linked.map((pair) => {
