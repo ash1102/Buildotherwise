@@ -138,7 +138,7 @@ export default function HybridMap({ graph, selectedId, highlightSection, onSelec
       </div>
       <div
         ref={viewportRef}
-        className="relative h-[70vh] min-h-[520px] overflow-hidden rounded-xl border border-border bg-secondary/40"
+        className="relative h-[70vh] min-h-[520px] touch-none overflow-hidden rounded-xl border border-border bg-secondary/40"
         onPointerDown={onBackgroundPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
