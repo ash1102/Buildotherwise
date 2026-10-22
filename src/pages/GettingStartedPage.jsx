@@ -27,7 +27,6 @@ export default function GettingStartedPage() {
   const steps = gettingStartedSteps(lessons);
   const stepsDone = gettingStartedFinished(lessons, answers, states);
   const open = firstOpenGettingStartedStep(lessons, answers, states);
-  const openIndex = open ? steps.findIndex((lesson) => lesson.code === open.code) : -1;
   const anyDone = steps.some((lesson) => gettingStartedStepDone(lesson, answers, states));
   const missing = GS_CODES.filter((code) => !steps.some((lesson) => lesson.code === code));
   const optional = OPTIONAL_GS_CODES.map((code) => (lessons || []).find((lesson) => lesson.code === code)).filter(Boolean);
