@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { BookOpen, ClipboardList, LogOut, Map as MapIcon, Menu, MoreHorizontal, PenLine, Settings as SettingsIcon, X } from "lucide-react";
 import { useJournalContext } from "@/components/journal/JournalContext";
 import { useAuth } from "@/lib/AuthContext";
+import { resumePath } from "@/lib/tabs";
 
 const LINKS = [
   { to: "/", label: "Workbook", end: true },
@@ -222,7 +223,7 @@ export default function SiteHeader() {
               return (
                 <li key={to}>
                   <Link
-                    to={to}
+                    to={active ? to : resumePath(to)}
                     replace
                     aria-current={active ? "page" : undefined}
                     onClick={() => {
