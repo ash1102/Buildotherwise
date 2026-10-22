@@ -142,7 +142,7 @@ export default function JournalPanel({ open, onClose, lesson }) {
         aria-labelledby="journal-panel-title"
         className="animate-journal-slide relative ml-auto flex h-full w-full max-w-full flex-col border-l border-border bg-card shadow-xl sm:max-w-[26rem]"
       >
-        <header className="flex items-start justify-between gap-3 border-b border-border px-5 py-4">
+        <header className="flex items-start justify-between gap-3 border-b border-border px-5 pt-[calc(1rem+env(safe-area-inset-top))] pb-4">
           <div className="min-w-0">
             <h2 id="journal-panel-title" className="text-[20px]">
               Add a note
@@ -167,7 +167,7 @@ export default function JournalPanel({ open, onClose, lesson }) {
           </button>
         </header>
 
-        <div className="flex-1 overscroll-contain overflow-y-auto px-5 py-4">
+        <div className="flex-1 overscroll-contain overflow-y-auto px-5 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           <label htmlFor="journal-note" className="block text-[15px] font-medium text-foreground">
             What’s on your mind?
           </label>
