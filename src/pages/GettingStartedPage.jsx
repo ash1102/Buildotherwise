@@ -44,9 +44,9 @@ export default function GettingStartedPage() {
     <div className="space-y-8">
       <header className="border-b border-border pb-5">
         <p className="workbook-label">Getting Started</p>
-        <h1 className="mt-2">Four steps, then your Life Map</h1>
+        <h1 className="mt-2">Three short steps, then your Life Map</h1>
         <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-          These steps come first. Your Life Map comes next, before Module 1. Pass counts. A saved answer counts too.
+          About ten minutes. Skipping counts. Your Life Map comes next, before Module 1.
         </p>
       </header>
 
@@ -96,7 +96,7 @@ export default function GettingStartedPage() {
               <li key={lesson.code} className="text-[16px] text-foreground">
                 {lesson.title}
                 {lesson.duration_min ? <span className="text-muted-faint"> · About {lesson.duration_min} min</span> : null}
-                <span className="block text-[14px] text-muted-faint">Opens once the four steps above are done.</span>
+                <span className="block text-[14px] text-muted-faint">Opens once the three steps above are done.</span>
               </li>
             ))}
           </ul>
