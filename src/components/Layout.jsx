@@ -1,14 +1,23 @@
-import React, { useEffect, useRef } from "react";
+import React, { Suspense, useEffect, useRef } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { JournalProvider } from "@/components/journal/JournalContext";
 import JournalWidget from "@/components/journal/JournalWidget";
 import SiteHeader from "@/components/SiteHeader";
 import TabPanels from "@/components/TabPanels";
+import BackBar, { needsBackBar } from "@/components/BackBar";
 import PullToRefresh from "@/components/PullToRefresh";
 import { useAuth } from "@/lib/AuthContext";
 import { isTabPath, rememberTabPath } from "@/lib/tabs";
 import GettingStartedHost from "@/components/gettingStarted/GettingStartedHost";
 import { useApplyDisplay } from "@/lib/display";
+
+function RouteFallback() {
+  return (
+    <div className="flex justify-center py-16" role="status" aria-label="Loading">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+    </div>
+  );
+}
 
 export default function Layout() {
   const { pathname } = useLocation();
@@ -29,12 +38,15 @@ export default function Layout() {
         <SiteHeader />
 
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-16 sm:px-6 sm:pt-8 sm:pb-20 lg:px-8">
-          {isAuthenticated ? <TabPanels pathname={pathname} visited={visitedTabs.current} /> : null}
-          {onTab ? null : (
-            <div key={pathname} className="animate-page-in">
-              <Outlet />
-            </div>
-          )}
+          <Suspense fallback={<RouteFallback />}>
+            {isAuthenticated ? <TabPanels pathname={pathname} visited={visitedTabs.current} /> : null}
+            {onTab ? null : (
+              <div key={pathname} className="animate-page-in">
+                {needsBackBar(pathname) ? <BackBar /> : null}
+                <Outlet />
+              </div>
+            )}
+          </Suspense>
         </main>
 
         <footer className="no-print border-t border-border bg-card">
