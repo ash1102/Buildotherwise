@@ -3,6 +3,7 @@ import { useAuth } from "@/lib/AuthContext";
 import useCurriculum from "@/hooks/useCurriculum";
 import { GS_CODES, useGettingStartedSubmitted, useOpenGettingStartedListener } from "@/lib/gettingStarted";
 import GettingStartedPopup from "./GettingStartedPopup";
+import useBackClose from "@/lib/useBackClose";
 
 /**
  * The workbook gate is the Getting Started page, not this popup.
@@ -22,6 +23,10 @@ export default function GettingStartedHost() {
   }, [submitted]);
   useOpenGettingStartedListener(reopen);
 
-  if (!open || !isAuthenticated || !hasSteps) return null;
+  const showing = open && isAuthenticated && hasSteps;
+  // System Back closes the pop-up instead of leaving the page.
+  useBackClose(showing, () => setOpen(false), "getting-started");
+
+  if (!showing) return null;
   return <GettingStartedPopup lessons={lessons} onClose={() => setOpen(false)} />;
 }
