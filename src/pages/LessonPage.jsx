@@ -16,8 +16,8 @@ import { saveAnswer } from "@/lib/journal";
 import { isComingLater, isLiveOnlyModule, isOpenerLesson, isWorkbookLesson } from "@/lib/curriculum";
 import CarryForwardScreen from "@/components/records/CarryForwardScreen";
 import {
+  firstOpenGettingStartedStep,
   gettingStartedFinished,
-  gettingStartedStepDone,
   gettingStartedSteps,
   isGettingStartedLesson,
 } from "@/lib/gettingStarted";
@@ -141,7 +141,7 @@ export default function LessonPage() {
    * An earlier step still open: go to that step.
    * Only this step open: say what opens it.
    */
-  const openGsStep = gsSteps.find((item) => !gettingStartedStepDone(item, answers, states)) || null;
+  const openGsStep = firstOpenGettingStartedStep(lessons, answers, states);
   const lastGs = gsLesson && !next;
   let forward = null;
   let endNote;
