@@ -21,7 +21,7 @@ export default function Layout() {
         </main>
 
         <footer className="no-print border-t border-border bg-card">
-          <div className="mx-auto w-full max-w-6xl px-4 pt-6 pb-24 text-[14px] leading-relaxed text-muted-faint sm:px-6 lg:px-8">
+          <div className="mx-auto w-full max-w-6xl px-4 pt-6 pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-24 text-[14px] leading-relaxed text-muted-faint sm:px-6 lg:px-8">
             <div className="mb-3 flex flex-wrap gap-x-5 gap-y-2">
               <Link to="/about" className="font-medium text-accent-ink underline underline-offset-2">
                 About Entrepalooza
