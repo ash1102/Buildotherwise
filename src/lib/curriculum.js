@@ -1,4 +1,5 @@
 import { base44 } from "@/api/base44Client";
+import { applyGettingStartedContent, applyGettingStartedContentOne } from "./gettingStartedContent";
 
 export { OPENER_LESSON_CODE, isOpenerLesson, isWorkbookLesson } from "./lessonKind";
 
@@ -10,12 +11,12 @@ export async function loadModules() {
 
 export async function loadLessons(moduleOrder) {
   const lessons = await base44.entities.Lesson.filter({ module_order: moduleOrder }, "order", 40);
-  return lessons;
+  return applyGettingStartedContent(lessons);
 }
 
 export async function loadLesson(code) {
   const matches = await base44.entities.Lesson.filter({ code }, "-created_date", 1);
-  return matches[0] || null;
+  return applyGettingStartedContentOne(matches[0] || null);
 }
 
 /**
