@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { buildBranches, branchMarkdown, wouldCycle } from "./lifeMapBranches.js";
-import { nextOpenStep } from "./progress.js";
+import { nextOpenStep, nextStepAfterLifeMap } from "./progress.js";
 import { LIFEMAP_KEY } from "./workbook.js";
 import {
   MAP_PAUSE_TEXT,
@@ -448,6 +448,19 @@ test("an existing answer can move into What's missing, survive reload and export
     globalThis.window = oldWindow;
     globalThis.CustomEvent = oldEvent;
   }
+});
+
+test("the Life Map's next button never sends anyone back into Getting Started", () => {
+  const gettingStarted = ["O.1", "O.2", "O.3", "O.4", "O.5"].map((code, index) => step(code, 0, { order: index }));
+  const opener = step("O.6", 0, { order: 6, try_prompts: ["map"] });
+  const first = step("M1-L1", 1, { order: 1 });
+  const second = step("M1-L2", 1, { order: 2 });
+  const lessons = [...gettingStarted, opener, first, second];
+  assert.equal(nextStepAfterLifeMap({ lessons, workbookLessons: lessons, answers: {}, states: {} }).code, "M1-L1");
+  assert.equal(
+    nextStepAfterLifeMap({ lessons, workbookLessons: lessons, answers: { "M1-L1#0": "noticed" }, states: {} }).code,
+    "M1-L2"
+  );
 });
 
 test("an empty Life Map is still the step before Module 1", () => {
