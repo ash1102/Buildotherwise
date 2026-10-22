@@ -1,3 +1,4 @@
+import MobileSelect from "@/components/ui/MobileSelect";
 import React, { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowLeft, ArrowRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -268,7 +269,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced,
                 The questions below attach to this entry. Switch entries any time; what you already added stays where it is.
               </p>
               {focusTargets.length ? (
-                <select
+                <MobileSelect
                   id="map-focus"
                   value={focus ? focus.id : ""}
                   onChange={(event) => setFocusId(event.target.value)}
@@ -281,7 +282,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced,
                       {node.label || node.text}
                     </option>
                   ))}
-                </select>
+                </MobileSelect>
               ) : (
                 <EmptyTargets text="Nothing on the map yet to look at." onJump={() => go(0)} jumpLabel="Go to Part 1" />
               )}
@@ -291,7 +292,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced,
           {part.menu && visible.length ? (
             <label className="mt-5 block text-[14px] font-medium" htmlFor={`menu-${part.key}`}>
               Choose one prompt
-              <select
+              <MobileSelect
                 id={`menu-${part.key}`}
                 value={menuId}
                 onChange={(event) => setMenuFor((current) => ({ ...current, [part.key]: event.target.value }))}
@@ -303,7 +304,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced,
                     {countFor(question.id) ? ` (${countFor(question.id)} added)` : ""}
                   </option>
                 ))}
-              </select>
+              </MobileSelect>
             </label>
           ) : null}
           <div className="mt-5 space-y-8">
