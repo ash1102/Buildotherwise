@@ -216,7 +216,7 @@ export default function SiteHeader() {
           aria-label="Main tabs"
           className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur lg:hidden"
         >
-          <ul className="mx-auto grid max-w-md grid-cols-4 px-2 pt-1 pb-[env(safe-area-inset-bottom)]">
+          <ul className="mx-auto grid max-w-md grid-cols-4 pt-1 pb-[env(safe-area-inset-bottom)] pl-[calc(0.5rem+env(safe-area-inset-left))] pr-[calc(0.5rem+env(safe-area-inset-right))]">
             {TAB_LINKS.map(({ to, label, icon: Icon, prefixes }) => {
               // Nested pages (a module, a lesson, a record) keep their parent tab highlighted.
               const active = prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
