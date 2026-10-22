@@ -91,8 +91,8 @@ test("admins and finished participants keep returnTo, and other flows are left a
     "/oauth/consent?ctx=abc"
   );
   assert.equal(
-    postAuthDestination({ user: { id: "p", role: "user" }, returnTo: "/lesson/O.2", lessons, answers: {}, states: {} }),
-    "/lesson/O.2"
+    postAuthDestination({ user: { id: "p", role: "user" }, returnTo: "/lesson/O.4", lessons, answers: {}, states: {} }),
+    "/lesson/O.4"
   );
 });
 
