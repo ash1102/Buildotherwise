@@ -95,13 +95,13 @@ export default function SiteHeader() {
             ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           {isAuthenticated ? (
             <>
               {user?.role === "admin" ? (
                 <Link
                   to="/preview"
-                  className="rounded-md px-2 py-2 text-[14px] font-medium text-accent-ink transition hover:bg-secondary"
+                  className="hidden rounded-md px-2 py-2 text-[14px] font-medium text-accent-ink transition hover:bg-secondary sm:inline-flex"
                 >
                   Preview
                 </Link>
@@ -136,7 +136,7 @@ export default function SiteHeader() {
               <Link
                 to="/settings"
                 aria-label="Settings"
-                className="inline-flex items-center justify-center rounded-md border border-input bg-card p-2 text-foreground transition hover:bg-secondary lg:hidden"
+                className="hidden items-center justify-center rounded-md border border-input bg-card p-2 text-foreground transition hover:bg-secondary sm:inline-flex lg:hidden"
               >
                 <SettingsIcon className="h-4 w-4" aria-hidden="true" />
               </Link>
@@ -185,6 +185,13 @@ export default function SiteHeader() {
             ))}
             {isAuthenticated ? (
               <>
+                {user?.role === "admin" ? (
+                  <li className="mt-1 border-t border-border pt-1 sm:hidden">
+                    <NavLink to="/preview" className={({ isActive }) => `block ${linkClass({ isActive })}`}>
+                      Preview
+                    </NavLink>
+                  </li>
+                ) : null}
                 <li className="mt-1 border-t border-border pt-1">
                   <NavLink to="/settings" className={({ isActive }) => `flex items-center gap-2 ${linkClass({ isActive })}`}>
                     <SettingsIcon className="h-4 w-4" aria-hidden="true" />
