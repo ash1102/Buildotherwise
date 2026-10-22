@@ -1,4 +1,4 @@
-import { gettingStartedFinished, gettingStartedStepDone, gettingStartedSteps } from "./gettingStartedProgress";
+import { firstOpenGettingStartedStep, gettingStartedFinished } from "./gettingStartedProgress";
 import { isWorkbookLesson } from "./lessonKind";
 import { answerKey, routeSkipsWriting } from "./workbook";
 
