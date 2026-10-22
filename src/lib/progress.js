@@ -166,3 +166,13 @@ export function nextOpenStep({ lessons, workbookLessons, answers, states }) {
   const book = workbookLessons || lessons || [];
   return book.find((lesson) => isWorkbookLesson(lesson) && !stepComplete(lesson, answers, states)) || null;
 }
+
+/**
+ * The step the Life Map's "next" button opens.
+ * The Life Map comes after Getting Started, so its next step never points back into
+ * Getting Started. It is the next unfinished workbook step, starting at Module 1.
+ */
+export function nextStepAfterLifeMap({ lessons, workbookLessons, answers, states }) {
+  const book = workbookLessons || lessons || [];
+  return book.find((lesson) => isWorkbookLesson(lesson) && !stepComplete(lesson, answers, states)) || null;
+}
