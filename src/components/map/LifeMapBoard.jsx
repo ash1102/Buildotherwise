@@ -1,3 +1,4 @@
+import MobileSelect from "@/components/ui/MobileSelect";
 import React, { useMemo, useState } from "react";
 import { ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -41,10 +42,10 @@ function BranchAnswer({ node, onSaved, onCancel }) {
     <p className="text-[14px] text-muted-foreground">Answering about:</p>
     <p className="break-words text-[17px] font-medium">{node.label || node.text}</p>
     <label className="block text-[14px] font-medium" htmlFor={"followup-" + node.id}>What would you like to add?</label>
-    <select id={"followup-" + node.id} value={question.id} onChange={(event) => { setQuestionId(event.target.value); setText(""); setEnergy(""); }}
+    <MobileSelect id={"followup-" + node.id} value={question.id} onChange={(event) => { setQuestionId(event.target.value); setText(""); setEnergy(""); }}
       className="w-full rounded-md border border-input bg-card px-3 py-2 text-[16px]">
       {options.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-    </select>
+    </MobileSelect>
     <p className="text-[16px] font-medium">{question.prompt}</p>
     {question.id === "p3-energy" ? <div className="flex flex-wrap gap-2" role="group" aria-label="Energy after one recent time">
       {EPISODE_ENERGY_CHOICES.map((item) => <button key={item.id} type="button" aria-pressed={energy === item.id} onClick={() => setEnergy(item.id)}
@@ -99,12 +100,12 @@ function BranchNode({ id, tree, depth, selectedId, onSelect, onSetParent, expand
         {onSetParent ? <details className="mt-3">
           <summary className="cursor-pointer text-[13px] text-muted-foreground">Choose or change its branch</summary>
           <label htmlFor={"parent-" + id} className="mt-2 block text-[14px]">Attach this answer beneath:</label>
-          <select id={"parent-" + id} value={tree.parentById[id] || (tree.missing.includes(id) ? "__missing" : "__separate")} onChange={(event) => onSetParent(id, event.target.value === "__separate" ? "" : event.target.value)}
+          <MobileSelect id={"parent-" + id} value={tree.parentById[id] || (tree.missing.includes(id) ? "__missing" : "__separate")} onChange={(event) => onSetParent(id, event.target.value === "__separate" ? "" : event.target.value)}
             className="mt-2 w-full rounded-md border border-input bg-background px-3 py-2 text-[16px]">
             <option value="__separate">Keep as a separate starting entry</option>
             <option value="__missing">What’s missing</option>
             {parentOptions.map((other) => <option key={other.id} value={other.id}>{other.label || other.text}</option>)}
-          </select>
+          </MobileSelect>
         </details> : null}
         {otherLinks.length ? <div className="mt-3 text-[13px] text-muted-foreground">
           Also connected to: {otherLinks.map((other) => <button key={other} type="button" onClick={() => onSelect(other)} className="mr-3 underline underline-offset-2">{tree.nodesById[other].label || tree.nodesById[other].text}</button>)}
