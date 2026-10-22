@@ -167,7 +167,7 @@ export default function GettingStartedPopup({ lessons, onClose }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="gs-title"
-        className="flex h-full w-full max-w-2xl flex-col overflow-hidden bg-background shadow-2xl sm:h-auto sm:max-h-[92vh] sm:rounded-2xl"
+        className="flex h-full w-full max-w-2xl flex-col overflow-hidden bg-background pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] shadow-2xl sm:h-auto sm:max-h-[92vh] sm:rounded-2xl"
       >
         <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
           <div className="min-w-0">
@@ -307,7 +307,7 @@ export default function GettingStartedPopup({ lessons, onClose }) {
           ) : null}
         </div>
 
-        <div className="flex flex-col-reverse gap-2 border-t border-border px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col-reverse gap-2 border-t border-border px-5 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:flex-row sm:items-center sm:justify-between">
           {index > -1 && index < doneAt ? (
             <Button type="button" variant="outline" className="rounded-full" onClick={() => setIndex(index - 1)}>
               <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
