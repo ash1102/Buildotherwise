@@ -1,8 +1,10 @@
-import React, { useEffect, useLayoutEffect, useRef } from "react";
-import CurriculumHome from "@/pages/CurriculumHome";
-import JournalPage from "@/pages/JournalPage";
-import LifeMapPage from "@/pages/LifeMapPage";
-import MyRecordsPage from "@/pages/MyRecordsPage";
+import React, { lazy, useEffect, useLayoutEffect, useRef } from "react";
+
+// Tab pages load on first visit, so the first screen starts faster in the WebView.
+const CurriculumHome = lazy(() => import("@/pages/CurriculumHome"));
+const JournalPage = lazy(() => import("@/pages/JournalPage"));
+const LifeMapPage = lazy(() => import("@/pages/LifeMapPage"));
+const MyRecordsPage = lazy(() => import("@/pages/MyRecordsPage"));
 
 const TAB_PAGES = [
   { path: "/", Page: CurriculumHome },
