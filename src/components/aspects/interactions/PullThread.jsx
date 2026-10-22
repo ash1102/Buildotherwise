@@ -103,7 +103,7 @@ export default function PullThread() {
             key={option.label}
             type="button"
             onClick={() => pull(option)}
-            className="rounded-full border border-natural bg-white px-4 py-2 text-[13.5px] text-ink-soft transition hover:border-copper/50 hover:text-copper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper"
+            className="rounded-full border border-natural bg-card px-4 py-2 text-[13.5px] text-ink-soft transition hover:border-copper/50 hover:text-copper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper"
           >
             {option.label}
           </button>

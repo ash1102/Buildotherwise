@@ -62,7 +62,7 @@ function JoinChoicePicker({ lessonCode, lessonTitle, index, label }) {
               aria-pressed={active}
               onClick={() => record(joinChoiceText(active ? "" : option, note))}
               className={`rounded-md border px-3.5 py-2 text-[15px] transition ${
-                active ? "border-accent-ink bg-accent-ink text-white" : "border-input bg-card text-foreground hover:bg-secondary"
+                active ? "border-accent-ink bg-accent-ink text-primary-foreground" : "border-input bg-card text-foreground hover:bg-secondary"
               }`}
             >
               {option}

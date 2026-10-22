@@ -32,7 +32,7 @@ export default function AspectShell({ aspect, children }) {
           <span className="workbook-label">{aspect.tryLabel}</span>
           <span className="h-px flex-1 bg-natural" />
         </div>
-        <div className="mt-4 rounded-lg border border-natural bg-white p-5 sm:p-6">{children}</div>
+        <div className="mt-4 rounded-lg border border-natural bg-card p-5 sm:p-6">{children}</div>
         {aspect.note ? (
           <p className="mt-3 max-w-2xl text-[12.5px] leading-relaxed text-ink-faint">{aspect.note}</p>
         ) : null}
@@ -45,7 +45,7 @@ export default function AspectShell({ aspect, children }) {
             <Link
               key={place.to}
               to={place.to}
-              className="inline-flex items-center gap-2 rounded-full border border-natural bg-white px-4 py-2 text-[13px] text-teal-deep transition hover:border-teal-deep/50"
+              className="inline-flex items-center gap-2 rounded-full border border-natural bg-card px-4 py-2 text-[13px] text-teal-deep transition hover:border-teal-deep/50"
             >
               {place.label}
               <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />

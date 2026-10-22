@@ -21,7 +21,7 @@ export default function PanelFollowUp({ onSave, onCancel }) {
             key={starter}
             type="button"
             onClick={() => startWith(starter)}
-            className="rounded-full border border-natural bg-white px-2.5 py-1 text-[11.5px] text-ink-soft transition hover:border-teal-deep/50"
+            className="rounded-full border border-natural bg-card px-2.5 py-1 text-[11.5px] text-ink-soft transition hover:border-teal-deep/50"
           >
             {starter}
           </button>
@@ -33,7 +33,7 @@ export default function PanelFollowUp({ onSave, onCancel }) {
         rows={3}
         autoFocus
         aria-label="Follow-up to this entry"
-        className="mt-2 min-h-[4rem] border-natural bg-white text-[13px] leading-relaxed"
+        className="mt-2 min-h-[4rem] border-natural bg-card text-[13px] leading-relaxed"
       />
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <Button

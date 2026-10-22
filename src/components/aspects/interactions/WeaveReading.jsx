@@ -30,7 +30,7 @@ export default function WeaveReading() {
         <button
           type="button"
           onClick={() => setWoven((current) => !current)}
-          className="inline-flex items-center rounded-full border border-natural bg-white px-4 py-1.5 text-[13px] text-teal-deep transition hover:border-teal-deep/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper"
+          className="inline-flex items-center rounded-full border border-natural bg-card px-4 py-1.5 text-[13px] text-teal-deep transition hover:border-teal-deep/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper"
         >
           {woven ? "Pull them apart" : "Weave them together"}
         </button>

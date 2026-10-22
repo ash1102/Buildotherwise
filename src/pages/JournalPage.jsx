@@ -242,7 +242,7 @@ export default function JournalPage() {
         {selected.length ? (
           <Button
             type="button"
-            className="rounded-md bg-accent-ink text-white hover:bg-accent-ink/90"
+            className="rounded-md bg-accent-ink text-primary-foreground hover:bg-accent-ink/90"
             onClick={() => {
               const chosen = entries.filter((entry) => selected.includes(entry.id));
               setPending({
@@ -282,7 +282,7 @@ export default function JournalPage() {
               type="button"
               onClick={send}
               disabled={sending}
-              className="rounded-md bg-accent-ink text-white hover:bg-accent-ink/90"
+              className="rounded-md bg-accent-ink text-primary-foreground hover:bg-accent-ink/90"
             >
               <Send className="mr-2 h-4 w-4" aria-hidden="true" />
               {sending ? "Sending…" : "Send this"}

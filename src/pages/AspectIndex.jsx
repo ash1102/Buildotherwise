@@ -26,7 +26,7 @@ export default function AspectIndex() {
           <Link
             key={aspect.slug}
             to={`/aspect/${aspect.slug}`}
-            className="group flex flex-col rounded-lg border border-natural bg-white p-5 transition hover:border-teal-deep/50 hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper"
+            className="group flex flex-col rounded-lg border border-natural bg-card p-5 transition hover:border-teal-deep/50 hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper"
           >
             <span className="font-heading text-[13px] text-copper">{aspect.number}</span>
             <h2 className="mt-2 font-heading text-xl leading-snug">{aspect.label}</h2>
@@ -42,7 +42,7 @@ export default function AspectIndex() {
         ))}
       </section>
 
-      <section className="rounded-lg border border-dashed border-teal-deep/40 bg-white/60 p-6">
+      <section className="rounded-lg border border-dashed border-teal-deep/40 bg-card/60 p-6">
         <p className="workbook-label">What stays the same</p>
         <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-ink-soft">
           The demonstrations on these pages save nothing to your account. Pausing and stopping are complete

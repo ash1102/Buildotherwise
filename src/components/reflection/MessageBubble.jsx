@@ -14,7 +14,7 @@ export default function MessageBubble({ message }) {
 
   return (
     <div className="flex justify-start">
-      <div className="max-w-[92%] break-words rounded-lg border border-natural bg-white px-4 py-3 text-[14.5px] leading-relaxed text-ink-soft [&_h1]:mt-4 [&_h2]:mt-4 [&_h3]:mt-3 [&_h3]:font-heading [&_h3]:text-[15px] [&_h3]:text-ink [&_li]:mt-1 [&_p]:mt-3 [&_p:first-child]:mt-0 [&_strong]:text-ink [&_ul]:mt-2 [&_ul]:list-disc [&_ul]:pl-5">
+      <div className="max-w-[92%] break-words rounded-lg border border-natural bg-card px-4 py-3 text-[14.5px] leading-relaxed text-ink-soft [&_h1]:mt-4 [&_h2]:mt-4 [&_h3]:mt-3 [&_h3]:font-heading [&_h3]:text-[15px] [&_h3]:text-ink [&_li]:mt-1 [&_p]:mt-3 [&_p:first-child]:mt-0 [&_strong]:text-ink [&_ul]:mt-2 [&_ul]:list-disc [&_ul]:pl-5">
         <ReactMarkdown>{message.content || ""}</ReactMarkdown>
       </div>
     </div>

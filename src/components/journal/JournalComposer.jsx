@@ -52,7 +52,7 @@ export default function JournalComposer() {
   };
 
   return (
-    <section className="rounded-lg border border-teal-deep/25 bg-white p-5 sm:p-6">
+    <section className="rounded-lg border border-teal-deep/25 bg-card p-5 sm:p-6">
       <label htmlFor="journal-entry-box" className="workbook-label block">
         What’s on your mind?
       </label>
@@ -76,7 +76,7 @@ export default function JournalComposer() {
             className={`rounded-full border px-3 py-1.5 text-[12.5px] transition ${
               opener === label
                 ? "border-primary bg-primary text-primary-foreground"
-                : "border-natural bg-white text-ink-soft hover:border-teal-deep/50"
+                : "border-natural bg-card text-ink-soft hover:border-teal-deep/50"
             }`}
           >
             {label}

@@ -35,7 +35,7 @@ export default function DiscoveryForm({
   };
 
   return (
-    <form onSubmit={submit} className="rounded-lg border border-natural bg-white p-5 sm:p-6">
+    <form onSubmit={submit} className="rounded-lg border border-natural bg-card p-5 sm:p-6">
       {sourceNote ? (
         <p className="mb-3 border-b border-natural pb-3 text-[12.5px] leading-relaxed text-teal-deep">
           {sourceNote}
@@ -114,7 +114,7 @@ export default function DiscoveryForm({
           {submitLabel}
         </Button>
         {onCancel ? (
-          <Button type="button" variant="outline" onClick={onCancel} className="rounded-full border-natural bg-white">
+          <Button type="button" variant="outline" onClick={onCancel} className="rounded-full border-natural bg-card">
             Cancel
           </Button>
         ) : null}

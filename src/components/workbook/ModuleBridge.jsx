@@ -95,7 +95,7 @@ export function BridgeOut({ bridge, lesson }) {
                     save(active ? rest : `${chip}: ${rest}`);
                   }}
                   className={`rounded-md border px-3 py-1.5 text-[14px] transition ${
-                    active ? "border-accent-ink bg-accent-ink text-white" : "border-input bg-card text-foreground hover:bg-secondary"
+                    active ? "border-accent-ink bg-accent-ink text-primary-foreground" : "border-input bg-card text-foreground hover:bg-secondary"
                   }`}
                 >
                   {chip}

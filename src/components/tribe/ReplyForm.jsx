@@ -58,7 +58,7 @@ export default function ReplyForm({ thread, user, onPosted }) {
         rows={3}
         aria-label={`Your reply to ${thread.title}`}
         placeholder="Add your answer. Nothing from your journal is copied here."
-        className="min-h-[5rem] resize-y border-natural bg-white text-[14px] leading-relaxed"
+        className="min-h-[5rem] resize-y border-natural bg-card text-[14px] leading-relaxed"
       />
       <div className="mt-2 flex flex-wrap items-center gap-3">
         <Button

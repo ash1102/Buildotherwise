@@ -9,7 +9,7 @@ export default function EditEntryPanel({ entry, onSave, onCancel }) {
   const empty = !text.trim();
 
   return (
-    <section className="rounded-lg border border-teal-deep/30 bg-white p-5">
+    <section className="rounded-lg border border-teal-deep/30 bg-card p-5">
       <p className="workbook-label">Editing the entry from {moment(entry.created_date).format("D MMM YYYY, HH:mm")}</p>
       <Textarea
         value={text}
@@ -38,7 +38,7 @@ export default function EditEntryPanel({ entry, onSave, onCancel }) {
           variant="outline"
           disabled={empty}
           onClick={() => onSave("replace", text.trim())}
-          className="rounded-full border-natural bg-white"
+          className="rounded-full border-natural bg-card"
         >
           Replace the wording
         </Button>
