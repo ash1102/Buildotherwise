@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { BookOpen, ClipboardList, LogOut, Map as MapIcon, Menu, PenLine, Settings as SettingsIcon, X } from "lucide-react";
+import { BookOpen, ClipboardList, LogOut, Map as MapIcon, Menu, MoreHorizontal, PenLine, Settings as SettingsIcon, X } from "lucide-react";
 import { useJournalContext } from "@/components/journal/JournalContext";
 import { useAuth } from "@/lib/AuthContext";
 
@@ -107,7 +107,7 @@ export default function SiteHeader() {
               ) : null}
               <Link
                 to="/journal"
-                className="inline-flex items-center rounded-md px-2.5 py-2 text-[14px] font-medium text-foreground transition hover:bg-secondary"
+                className="hidden lg:inline-flex items-center rounded-md px-2.5 py-2 text-[14px] font-medium text-foreground transition hover:bg-secondary"
               >
                 Journal
               </Link>
@@ -130,6 +130,27 @@ export default function SiteHeader() {
               Log in
             </Link>
           )}
+          {isAuthenticated ? (
+            <>
+              <Link
+                to="/settings"
+                aria-label="Settings"
+                className="inline-flex items-center justify-center rounded-md border border-input bg-card p-2 text-foreground transition hover:bg-secondary lg:hidden"
+              >
+                <SettingsIcon className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setMenuOpen((value) => !value)}
+                aria-expanded={menuOpen}
+                aria-controls="site-menu"
+                className="inline-flex items-center gap-1 rounded-md border border-input bg-card px-2.5 py-2 text-[14px] font-medium text-foreground transition hover:bg-secondary lg:hidden"
+              >
+                <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
+                <span>More</span>
+              </button>
+            </>
+          ) : null}
           <button
             type="button"
             onClick={() => setMenuOpen((value) => !value)}
