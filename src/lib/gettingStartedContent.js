@@ -3,7 +3,7 @@
  *
  * - O.1 now covers what this is AND what stays private (O.2 folded in).
  * - O.2 is retired from the app. Its record stays in the database, unused.
- * - O.4 is a few optional lines, private to the participant. Nothing is sent.
+ * - O.4 is a few optional lines, private to the participant. Nothing is sent. The whole step is optional.
  * - O.5 is only the choice to join. The decision words move to the lessons that use them.
  *
  * These fields replace the Lesson records' fields for these codes wherever the
@@ -24,7 +24,7 @@ export const GETTING_STARTED_CONTENT = {
     teach:
       "This is a structured way to notice, try something small, reflect on what happened, and decide what’s next. A job, training, a project, a business, a pause, or still looking all count as finishing.\n\n" +
       "It is not therapy or treatment. It is not a promise of a job, income, or business success. It is not a test of whether you’re ready. You don’t have to tell your story.\n\n" +
-      "What you write stays in your account. Other participants can’t see it. You can skip any question without giving a reason. You can download or delete what you’ve written in Settings. You will never be asked for medical, legal, or personal history to take part. If we ever ask to use your words, record something, or follow up later, each one gets its own yes or no.\n\n" +
+      "What you write stays in your account. Other participants can’t see it. Ashley, who runs the program, can technically access what’s stored, but doesn’t read it unless you share it. You can skip any question without giving a reason. You can download or delete what you’ve written in Settings. You will never be asked for medical, legal, or personal history to take part. If we ever ask to use your words, record something, or follow up later, each one gets its own yes or no.\n\n" +
       "Type in any box, or use the Dictate button beside it. Questions or concerns: Start@buildotherwise.org.",
     show: null,
     try_prompts: ["", "", ""],
@@ -33,8 +33,9 @@ export const GETTING_STARTED_CONTENT = {
   },
   "O.4": {
     title: "What makes it work for you",
-    purpose: "A few optional lines so taking part fits your life.",
+    purpose: "Optional. A few lines so taking part fits your life.",
     teach:
+      "This step is optional. Fill it in now, later, or not at all. It doesn’t hold anything up.\n\n" +
       "Fill in what’s useful. Leave the rest blank. “None” and “I don’t know yet” are complete answers.\n\n" +
       "This stays private in your workbook. If you want Ashley to know something, email Start@buildotherwise.org.",
     show: "**Example:** “Phone only, limited data. I work Saturdays. No extra support for now.”",
