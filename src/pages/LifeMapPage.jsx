@@ -17,6 +17,7 @@ import {
   MAP_SECTIONS,
   QUESTIONS_BY_ID,
   setLineParent,
+  setNodePosition,
   addLine,
   buildGraph,
   exploreLines,
@@ -26,7 +27,7 @@ import {
 } from "@/lib/lifeMap";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import DashedMotif from "@/components/workbook/DashedMotif";
-import LifeMapTree from "@/components/map/LifeMapTree";
+import HybridMap from "@/components/map/HybridMap";
 import MapPickCard from "@/components/map/MapPickCard";
 import LifeMapNodePanel from "@/components/map/LifeMapNodePanel";
 import LifeMapList from "@/components/map/LifeMapList";
@@ -283,7 +284,12 @@ export default function LifeMapPage() {
               }}
             />
           ) : (
-            <LifeMapTree graph={graph} tree={tree} selectedId={selectedId} onSelect={selectEntry} />
+            <HybridMap
+              graph={graph}
+              selectedId={selectedId}
+              onSelect={selectEntry}
+              onMove={(id, position) => setNodePosition(id, position)}
+            />
           )}
           <MapPickCard pick={pick} onJumpToPart={openGuide} />
         </div>
