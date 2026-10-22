@@ -1,3 +1,4 @@
+import MobileSelect from "@/components/ui/MobileSelect";
 import React from "react";
 import { Input } from "@/components/ui/input";
 
@@ -68,7 +69,7 @@ export default function LifeMapListView({ block, cards, connections, onUpdate, o
                         <label htmlFor={`list-${card.id}-connect`} className="block text-[14px] font-medium text-foreground">
                           Start a connection
                         </label>
-                        <select
+                        <MobileSelect
                           id={`list-${card.id}-connect`}
                           value=""
                           onChange={(event) => event.target.value && onConnect(card.id, event.target.value)}
@@ -80,7 +81,7 @@ export default function LifeMapListView({ block, cards, connections, onUpdate, o
                               {item.text || "Untitled card"}
                             </option>
                           ))}
-                        </select>
+                        </MobileSelect>
                       </div>
                       <div>
                         <p className="text-[14px] font-medium text-foreground">Connections</p>
