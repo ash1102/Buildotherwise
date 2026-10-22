@@ -51,7 +51,7 @@ test("an unfinished non-admin leaves returnTo for the first open Getting Started
       answers: { "O.1#0": "one thing" },
       states: {},
     }),
-    "/lesson/O.2"
+    "/lesson/O.4"
   );
   assert.equal(
     postAuthDestination({ user, returnTo: "/lesson/M1-L1", lessons, answers: {}, states: {} }),
