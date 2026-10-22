@@ -15,7 +15,6 @@ export function needsBackBar(pathname) {
 /** Where Back goes when there is no earlier page in the app, such as after opening a link directly. */
 function fallbackFor(pathname) {
   if (pathname.startsWith("/record")) return "/my-records";
-  if (pathname.startsWith("/aspects")) return "/";
   return "/";
 }
 
