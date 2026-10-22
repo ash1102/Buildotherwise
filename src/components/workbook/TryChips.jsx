@@ -9,7 +9,7 @@ export function Chip({ active, onClick, children, block = false }) {
       onClick={onClick}
       className={`rounded-md border px-3.5 py-2 text-left text-[15px] transition ${block ? "w-full" : ""} ${
         active
-          ? "border-accent-ink bg-accent-ink text-white"
+          ? "border-accent-ink bg-accent-ink text-primary-foreground"
           : "border-input bg-card text-foreground hover:bg-secondary"
       }`}
     >
