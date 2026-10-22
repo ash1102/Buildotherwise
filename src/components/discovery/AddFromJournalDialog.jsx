@@ -36,7 +36,7 @@ export default function AddFromJournalDialog({ entry, onClose, onConfirm }) {
             value={body}
             onChange={(event) => setBody(event.target.value)}
             rows={5}
-            className="mt-2 min-h-[7rem] resize-y border-natural bg-white text-[14px] leading-relaxed"
+            className="mt-2 min-h-[7rem] resize-y border-natural bg-card text-[14px] leading-relaxed"
           />
           <p className="mt-2 text-[12px] leading-relaxed text-ink-faint">
             Edit the wording to keep only the part you want. The original stays untouched.
@@ -44,7 +44,7 @@ export default function AddFromJournalDialog({ entry, onClose, onConfirm }) {
         </div>
 
         <div className="flex flex-wrap justify-end gap-3">
-          <Button type="button" variant="outline" onClick={onClose} className="rounded-full border-natural bg-white">
+          <Button type="button" variant="outline" onClick={onClose} className="rounded-full border-natural bg-card">
             Cancel
           </Button>
           <Button

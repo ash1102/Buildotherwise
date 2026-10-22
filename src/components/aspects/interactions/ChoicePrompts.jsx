@@ -52,7 +52,7 @@ export default function ChoicePrompts() {
             className={`rounded-full border px-4 py-2 text-[13.5px] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper ${
               selected === item.label
                 ? "border-copper bg-copper-wash text-ink"
-                : "border-natural bg-white text-ink-soft hover:border-teal-deep/50 hover:text-teal-deep"
+                : "border-natural bg-card text-ink-soft hover:border-teal-deep/50 hover:text-teal-deep"
             }`}
           >
             {item.label}

@@ -19,7 +19,7 @@ export default function Composer({ value, onChange, onSend, busy }) {
         rows={3}
         aria-label="Your message to the reflection agent"
         placeholder="Write what you want to reflect on, or bring an entry in first."
-        className="resize-y bg-white text-[14px]"
+        className="resize-y bg-card text-[14px]"
       />
       <div className="mt-3 flex items-center justify-between gap-3">
         <span className="text-[12px] text-ink-faint">Ctrl or ⌘ + Enter sends</span>

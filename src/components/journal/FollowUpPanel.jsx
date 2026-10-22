@@ -9,7 +9,7 @@ export default function FollowUpPanel({ entry, onSave, onCancel }) {
   const empty = !text.trim();
 
   return (
-    <section className="rounded-lg border border-teal-deep/30 bg-white p-5">
+    <section className="rounded-lg border border-teal-deep/30 bg-card p-5">
       <p className="workbook-label">Follow-up to {moment(entry.created_date).format("D MMM YYYY")}</p>
       <p className="mt-2 border-l border-dashed border-natural-deep pl-3 text-[13px] leading-relaxed text-ink-faint">
         {entry.body}

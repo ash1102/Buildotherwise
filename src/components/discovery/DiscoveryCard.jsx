@@ -41,7 +41,7 @@ export default function DiscoveryCard({ entry }) {
   }
 
   return (
-    <article className="rounded-lg border border-natural bg-white p-5">
+    <article className="rounded-lg border border-natural bg-card p-5">
       <header className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h3 className="font-heading text-[17px] leading-snug text-ink">
           {entry.title || moment(entry.created_date).format("D MMMM YYYY")}
@@ -148,7 +148,7 @@ export default function DiscoveryCard({ entry }) {
             onChange={(event) => setNote(event.target.value)}
             rows={2}
             placeholder="Anything you want kept with this update (optional)."
-            className="mt-3 min-h-[3.5rem] resize-y border-natural bg-white text-[13.5px] leading-relaxed"
+            className="mt-3 min-h-[3.5rem] resize-y border-natural bg-card text-[13.5px] leading-relaxed"
           />
           <div className="mt-3 flex flex-wrap gap-2">
             <Button
@@ -169,7 +169,7 @@ export default function DiscoveryCard({ entry }) {
               size="sm"
               variant="outline"
               onClick={() => setMode("view")}
-              className="rounded-full border-natural bg-white"
+              className="rounded-full border-natural bg-card"
             >
               Cancel
             </Button>
@@ -197,7 +197,7 @@ export default function DiscoveryCard({ entry }) {
               size="sm"
               variant="outline"
               onClick={() => setMode("view")}
-              className="rounded-full border-natural bg-white"
+              className="rounded-full border-natural bg-card"
             >
               Keep it
             </Button>
