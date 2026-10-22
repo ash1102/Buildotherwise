@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { LogOut, Menu, PenLine, Settings as SettingsIcon, X } from "lucide-react";
+import { BookOpen, ClipboardList, LogOut, Map as MapIcon, Menu, PenLine, Settings as SettingsIcon, X } from "lucide-react";
 import { useJournalContext } from "@/components/journal/JournalContext";
 import { useAuth } from "@/lib/AuthContext";
 
@@ -32,6 +32,14 @@ const PUBLIC_LINKS = [
   { to: "/contact", label: "Contact" },
 ];
 
+/** Bottom tab bar on screens below 1024px, signed-in only. Each entry points at an existing route. */
+const TAB_LINKS = [
+  { to: "/", label: "Workbook", end: true, icon: BookOpen },
+  { to: "/journal", label: "Journal", icon: PenLine },
+  { to: "/map", label: "Life Map", icon: MapIcon },
+  { to: "/my-records", label: "Records", icon: ClipboardList },
+];
+
 const linkClass = ({ isActive }) =>
   `rounded-md px-3 py-2 text-[15px] transition ${
     isActive ? "bg-secondary font-semibold text-foreground" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
@@ -59,7 +67,8 @@ export default function SiteHeader() {
   }, [menuOpen]);
 
   return (
-    <header className="no-print sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
+    <>
+    <header className="no-print sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur pt-[env(safe-area-inset-top)]">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
         <Link to="/" className="flex min-w-0 items-center gap-2.5">
           <span
@@ -128,7 +137,7 @@ export default function SiteHeader() {
             aria-controls="site-menu"
             aria-label={menuOpen ? "Close the menu" : "Open the menu"}
             className={`inline-flex items-center justify-center rounded-md border border-input bg-card p-2 text-foreground transition hover:bg-secondary ${
-              isAuthenticated ? "" : "lg:hidden"
+              isAuthenticated ? "hidden lg:inline-flex" : "lg:hidden"
             }`}
           >
             {menuOpen ? <X className="h-4 w-4" aria-hidden="true" /> : <Menu className="h-4 w-4" aria-hidden="true" />}
@@ -179,5 +188,32 @@ export default function SiteHeader() {
         </nav>
       ) : null}
     </header>
+
+      {isAuthenticated ? (
+        <nav
+          aria-label="Main tabs"
+          className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur lg:hidden"
+        >
+          <ul className="mx-auto grid max-w-md grid-cols-4 px-2 pt-1 pb-[env(safe-area-inset-bottom)]">
+            {TAB_LINKS.map(({ to, label, icon: Icon, end }) => (
+              <li key={to}>
+                <NavLink
+                  to={to}
+                  end={end}
+                  className={({ isActive }) =>
+                    `flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-md text-[12px] transition ${
+                      isActive ? "font-semibold text-primary" : "text-muted-foreground hover:text-foreground"
+                    }`
+                  }
+                >
+                  <Icon className="h-5 w-5" aria-hidden="true" />
+                  {label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
+    </>
   );
 }
