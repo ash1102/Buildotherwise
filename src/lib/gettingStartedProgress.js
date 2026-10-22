@@ -52,7 +52,7 @@ export function gettingStartedFinished(lessons, answers, states) {
 
 /**
  * The first step that is not done yet.
- * The Getting Started page is the fallback when the five steps are not all loaded.
+ * The Getting Started page is the fallback when the steps are not all loaded.
  */
 export function gettingStartedResumePath(lessons, answers, states) {
   const open = gettingStartedSteps(lessons).find((lesson) => !gettingStartedStepDone(lesson, answers, states));

@@ -153,7 +153,7 @@ export function buildProgress({ modules, lessonsByOrder, answers, states, pacing
 
 /**
  * The step the Life Map offers next.
- * Getting Started comes first: the earliest of those five steps that is not done.
+ * Getting Started comes first: the earliest of those steps that is not done.
  * Once all five are done, the next unfinished workbook step, in live workbook order.
  * Nothing left, or Getting Started not fully loaded, means there is no next step.
  */

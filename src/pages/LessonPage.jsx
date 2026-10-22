@@ -116,7 +116,7 @@ export default function LessonPage() {
     );
   }
 
-  // Workbook steps wait until Getting Started is done. The five steps themselves stay open.
+  // Workbook steps wait until Getting Started is done. The Getting Started steps themselves stay open.
   if (!gsLesson && !gate.finished) {
     return <Navigate to={gate.resumePath} replace />;
   }

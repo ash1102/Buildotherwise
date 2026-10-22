@@ -8,7 +8,7 @@ import useBackClose from "@/lib/useBackClose";
 /**
  * The workbook gate is the Getting Started page, not this popup.
  * This opens only when something asks for it. It does not open on its own,
- * and closing it does not count as finishing the five steps.
+ * and closing it does not count as finishing the steps.
  */
 export default function GettingStartedHost() {
   const { isAuthenticated } = useAuth();
