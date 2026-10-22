@@ -45,7 +45,7 @@ export default function AspectIndex() {
       <section className="rounded-lg border border-dashed border-teal-deep/40 bg-card/60 p-6">
         <p className="workbook-label">What stays the same</p>
         <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-ink-soft">
-          The demonstrations on these pages save nothing to your account. Pausing and stopping are complete
+          Most demonstrations here are practice and stay on this device. The one-line journal is real: what you save there goes into your journal, in your account. Pausing and stopping are complete
           answers here too.
         </p>
       </section>
