@@ -34,10 +34,10 @@ const PUBLIC_LINKS = [
 
 /** Bottom tab bar on screens below 1024px, signed-in only. Each entry points at an existing route. */
 const TAB_LINKS = [
-  { to: "/", label: "Workbook", end: true, icon: BookOpen },
-  { to: "/journal", label: "Journal", icon: PenLine },
-  { to: "/map", label: "Life Map", icon: MapIcon },
-  { to: "/my-records", label: "Records", icon: ClipboardList },
+  { to: "/", label: "Workbook", icon: BookOpen, prefixes: ["/", "/module", "/lesson", "/getting-started"] },
+  { to: "/journal", label: "Journal", icon: PenLine, prefixes: ["/journal"] },
+  { to: "/map", label: "Life Map", icon: MapIcon, prefixes: ["/map"] },
+  { to: "/my-records", label: "Records", icon: ClipboardList, prefixes: ["/my-records", "/record"] },
 ];
 
 const linkClass = ({ isActive }) =>
@@ -216,22 +216,29 @@ export default function SiteHeader() {
           className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur lg:hidden"
         >
           <ul className="mx-auto grid max-w-md grid-cols-4 px-2 pt-1 pb-[env(safe-area-inset-bottom)]">
-            {TAB_LINKS.map(({ to, label, icon: Icon, end }) => (
-              <li key={to}>
-                <NavLink
-                  to={to}
-                  end={end}
-                  className={({ isActive }) =>
-                    `flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-md text-[12px] transition ${
-                      isActive ? "font-semibold text-primary" : "text-muted-foreground hover:text-foreground"
-                    }`
-                  }
-                >
-                  <Icon className="h-5 w-5" aria-hidden="true" />
-                  {label}
-                </NavLink>
-              </li>
-            ))}
+            {TAB_LINKS.map(({ to, label, icon: Icon, prefixes }) => {
+              // Nested pages (a module, a lesson, a record) keep their parent tab highlighted.
+              const active = prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+              return (
+                <li key={to}>
+                  <Link
+                    to={to}
+                    replace
+                    aria-current={active ? "page" : undefined}
+                    onClick={() => {
+                      // Tapping the tab you are already on returns it to the top, as native tab bars do.
+                      if (active) window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className={`flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-md text-[12px] transition ${
+                      active ? "font-semibold text-primary" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                    {label}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
       ) : null}
