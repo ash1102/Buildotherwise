@@ -57,4 +57,12 @@ export default [
       "react-hooks/rules-of-hooks": "error",
     },
   },
+  {
+    files: ["src/lib/**/*.{js,jsx}"],
+    plugins: { "react-hooks": pluginReactHooks },
+    rules: {
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+    },
+  },
 ];

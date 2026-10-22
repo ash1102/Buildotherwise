@@ -458,7 +458,7 @@ test("the Life Map's next button never sends anyone back into Getting Started", 
   const lessons = [...gettingStarted, opener, first, second];
   assert.equal(nextStepAfterLifeMap({ lessons, workbookLessons: lessons, answers: {}, states: {} }).code, "M1-L1");
   assert.equal(
-    nextStepAfterLifeMap({ lessons, workbookLessons: lessons, answers: { "M1-L1#0": "noticed" }, states: {} }).code,
+    nextStepAfterLifeMap({ lessons, workbookLessons: lessons, answers: { "M1-L1#own-caught": "noticed" }, states: {} }).code,
     "M1-L2"
   );
 });
