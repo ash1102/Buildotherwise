@@ -1,3 +1,4 @@
+import MobileSelect from "@/components/ui/MobileSelect";
 import React, { useMemo, useRef, useState } from "react";
 import { Download, Plus, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -239,7 +240,7 @@ export default function LifeMapPage() {
       <section className="rounded-lg border border-border bg-card p-5">
         <p className="workbook-label">Start a branch</p>
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-          <select
+          <MobileSelect
             aria-label="What kind of starting entry?"
             className="w-full rounded-md border border-border bg-background px-3 py-2 text-[13.5px] sm:w-56"
             value={draftSection}
@@ -250,7 +251,7 @@ export default function LifeMapPage() {
                 {{ places: "A place I spent time", placeless: "An activity from that time", groups: "A person or group", barriers: "Something missing", threads: "A possible thread", energy: "An energy observation" }[section.key]}
               </option>
             ))}
-          </select>
+          </MobileSelect>
           <Input
             aria-label="A starting entry for your map"
             value={draft}
