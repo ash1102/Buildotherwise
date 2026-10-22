@@ -34,7 +34,7 @@ export default function Layout() {
 
   return (
     <JournalProvider>
-      <div className="flex min-h-screen flex-col">
+      <div className="flex min-h-screen flex-col pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
         <SiteHeader />
 
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-16 sm:px-6 sm:pt-8 sm:pb-20 lg:px-8">
