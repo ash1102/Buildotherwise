@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { JournalProvider } from "@/components/journal/JournalContext";
 import JournalWidget from "@/components/journal/JournalWidget";
@@ -6,7 +6,7 @@ import SiteHeader from "@/components/SiteHeader";
 import TabPanels from "@/components/TabPanels";
 import PullToRefresh from "@/components/PullToRefresh";
 import { useAuth } from "@/lib/AuthContext";
-import { isTabPath } from "@/lib/tabs";
+import { isTabPath, rememberTabPath } from "@/lib/tabs";
 import GettingStartedHost from "@/components/gettingStarted/GettingStartedHost";
 import { useApplyDisplay } from "@/lib/display";
 
@@ -19,6 +19,9 @@ export default function Layout() {
   const visitedTabs = useRef(new Set());
   const onTab = isAuthenticated && isTabPath(pathname);
   if (onTab) visitedTabs.current.add(pathname);
+  useEffect(() => {
+    rememberTabPath(pathname);
+  }, [pathname]);
 
   return (
     <JournalProvider>
