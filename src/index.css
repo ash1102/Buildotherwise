@@ -325,6 +325,7 @@ a,
 @media (prefers-reduced-motion: reduce) {
   .animate-page-in,
   .animate-journal-slide,
+  .animate-journal-slide-out,
   .animate-journal-rise {
     animation: none;
   }
@@ -353,6 +354,26 @@ a,
 
 :where(select):disabled {
   opacity: 0.6;
+}
+
+/* No rubber-band bounce at the page edges, which reads as a web page inside a WebView.
+   Scroll areas inside the page keep their own behaviour. */
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
+@keyframes journal-slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.animate-journal-slide-out {
+  animation: journal-slide-out 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
 @media print {
