@@ -292,6 +292,20 @@
   animation: journal-slide 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Mobile webviews: controls and labels are not text to select; workbook prose stays selectable. */
+button,
+a,
+.workbook-label {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.workbook-prose,
+.workbook-prose * {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
 @media print {
   .no-print {
     display: none !important;
