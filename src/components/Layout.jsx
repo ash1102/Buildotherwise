@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { JournalProvider } from "@/components/journal/JournalContext";
 import JournalWidget from "@/components/journal/JournalWidget";
 import SiteHeader from "@/components/SiteHeader";
+import TabPanels from "@/components/TabPanels";
+import PullToRefresh from "@/components/PullToRefresh";
+import { useAuth } from "@/lib/AuthContext";
+import { isTabPath } from "@/lib/tabs";
 import GettingStartedHost from "@/components/gettingStarted/GettingStartedHost";
 import { useApplyDisplay } from "@/lib/display";
 
@@ -10,6 +14,11 @@ export default function Layout() {
   const { pathname } = useLocation();
   const preview = pathname.startsWith("/preview");
   useApplyDisplay();
+  const { isAuthenticated } = useAuth();
+  // Tab pages that have been opened this session. They stay mounted, so their state survives tab switches.
+  const visitedTabs = useRef(new Set());
+  const onTab = isAuthenticated && isTabPath(pathname);
+  if (onTab) visitedTabs.current.add(pathname);
 
   return (
     <JournalProvider>
@@ -17,7 +26,12 @@ export default function Layout() {
         <SiteHeader />
 
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-16 sm:px-6 sm:pt-8 sm:pb-20 lg:px-8">
-          <Outlet />
+          {isAuthenticated ? <TabPanels pathname={pathname} visited={visitedTabs.current} /> : null}
+          {onTab ? null : (
+            <div key={pathname} className="animate-page-in">
+              <Outlet />
+            </div>
+          )}
         </main>
 
         <footer className="no-print border-t border-border bg-card">
@@ -54,6 +68,7 @@ export default function Layout() {
           </div>
         </footer>
 
+        <PullToRefresh />
         <JournalWidget />
         <GettingStartedHost />
       </div>
