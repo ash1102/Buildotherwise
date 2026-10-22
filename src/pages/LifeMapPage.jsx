@@ -269,7 +269,7 @@ export default function LifeMapPage() {
         </div>
       </section>
 
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
+      <div className="grid items-start gap-6 grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_400px]">
         <div ref={mapRef} className="scroll-mt-4 min-w-0">
           {asList ? (
             <LifeMapList
