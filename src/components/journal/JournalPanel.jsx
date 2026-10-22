@@ -160,7 +160,7 @@ export default function JournalPanel({ open, onClose, lesson }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="journal-panel-title"
-        className={`${leaving ? "animate-journal-slide-out" : "animate-journal-slide"} relative ml-auto flex h-full w-full max-w-full flex-col border-l border-border bg-card shadow-xl sm:max-w-[26rem]`}
+        className={`${leaving ? "animate-journal-slide-out" : "animate-journal-slide"} relative ml-auto flex h-full w-full max-w-full flex-col border-l border-border bg-card pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] shadow-xl sm:max-w-[26rem]`}
       >
         <header className="flex items-start justify-between gap-3 border-b border-border px-5 pt-[calc(1rem+env(safe-area-inset-top))] pb-4">
           <div className="min-w-0">
