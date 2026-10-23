@@ -5,6 +5,9 @@
  * - O.2 is retired from the app. Its record stays in the database, unused.
  * - O.4 is a few optional lines, private to the participant. Nothing is sent. The whole step is optional.
  * - O.5 is only the choice to join. The decision words move to the lessons that use them.
+ *   (Oct 23, 2026) O.5 is now "Make this experience yours": a learning agreement
+ *   (why I'm here, my approach, an optional note, a permission line, a copy button).
+ *   The old join-choice slot (1) is retired and left blank.
  *
  * These fields replace the Lesson records' fields for these codes wherever the
  * curriculum is loaded, so the change can be reviewed on a branch before it
@@ -53,12 +56,15 @@ export const GETTING_STARTED_CONTENT = {
     duration_min: 3,
   },
   "O.5": {
-    title: "Your choice to join",
-    purpose: "Decide freely whether and how to take part.",
+    title: "Make this experience yours",
+    purpose:
+      "Entrepalooza isn’t about following someone else’s plan. It’s about exploring what matters to you, trying new things, and deciding what to do with what you discover.",
     teach:
-      "Pick what fits right now. It can change later. To change it, pause, or leave, email Start@buildotherwise.org. No reason needed.",
+      "You don’t need to know your destination yet.\n\n" +
+      "This is yours. You can change your answers, pause, or leave anytime. No reason needed. Just email Start@buildotherwise.org.",
     show: null,
-    try_prompts: ["", "Your choice to join."],
+    // Slot 1 was the old join choice (retired). Slots 2–4 are the learning agreement, drawn by LearningAgreement.
+    try_prompts: ["", "", "What brings you here?", "How do you want to approach this?", "Anything else you want to remember about why you’re starting? (Optional)"],
     reflect_prompts: [],
     what_comes_out: null,
     duration_min: 2,
