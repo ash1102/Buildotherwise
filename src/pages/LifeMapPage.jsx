@@ -202,21 +202,7 @@ export default function LifeMapPage() {
 
   if (view !== "full") {
     return (
-      <div className="space-y-8">
-        <header className="border-b border-border pb-6">
-          <div className="flex items-start gap-4">
-            <DashedMotif size="lg" />
-            <div>
-              <p className="workbook-label">Your Life Map</p>
-              <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-                This step comes after Getting Started and before Module 1. Module 1 stays open whether or not you fill this in.
-              </p>
-            </div>
-          </div>
-          <div className="mt-4">
-            <PrivacyNote />
-          </div>
-        </header>
+      <div className="mx-auto max-w-3xl space-y-8">
         <LifeSnapshot
           map={map}
           onOpenFullMap={() => {
@@ -224,6 +210,8 @@ export default function LifeMapPage() {
             window.scrollTo({ top: 0, behavior: "smooth" });
           }}
         />
+        <PrivacyNote />
+        <p className="text-[14px] text-muted-faint">Module 1 stays open whether or not you fill this in.</p>
         <StepNav prev={null} next={nextStep} workbookLink="/" endNote="" />
       </div>
     );
