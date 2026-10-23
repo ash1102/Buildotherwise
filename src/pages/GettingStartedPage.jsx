@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
 import StepList from "@/components/workbook/StepList";
