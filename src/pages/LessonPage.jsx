@@ -159,7 +159,7 @@ export default function LessonPage() {
       title: openGsStep.title,
     };
   } else if (lastGs) {
-    endNote = "Answer or skip this step, and your Life Map opens next.";
+    endNote = "Make your choice, or skip it, and your Life Map opens next.";
   }
 
   // A live-only module has no self-paced steps in the app.
