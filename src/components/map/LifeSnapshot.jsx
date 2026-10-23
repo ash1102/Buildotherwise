@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,7 +113,6 @@ function EnergyTag({ map, line }) {
 
 function SnapshotBox({ box, map }) {
   const [draft, setDraft] = useState("");
-  const inputRef = useRef(null);
   const lines = linesFor(box, map);
   const taken = new Set(lines.map((line) => String(line.text).trim().toLowerCase()));
 
@@ -184,7 +183,6 @@ function SnapshotBox({ box, map }) {
 
       <div className="mt-3 flex gap-2">
         <Input
-          ref={inputRef}
           aria-label={box.placeholder}
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
