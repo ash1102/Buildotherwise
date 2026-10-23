@@ -313,8 +313,8 @@ export default function Settings() {
             My Records
           </Link>{" "}
           are saved the same way. Everything is kept in the app’s database, hosted by Base44. In the app, only your
-          account can open, change or delete it. Build Otherwise runs the app and can technically access the stored
-          data, but does not read it unless you choose to share it.
+          account can open, change or delete it. Ashley runs the app, so she can see what’s stored, but she doesn’t
+          read your entries unless you share them.
         </p>
         <button type="button" onClick={download} className={primaryButton}>
           <Download className="h-4 w-4" aria-hidden="true" />
