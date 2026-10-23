@@ -61,7 +61,7 @@ export const GETTING_STARTED_CONTENT = {
       "Entrepalooza isn’t about following someone else’s plan. It’s about exploring what matters to you, trying new things, and deciding what to do with what you discover.",
     teach:
       "You don’t need to know your destination yet.\n\n" +
-      "This is yours. You can change your answers, pause, or leave anytime. No reason needed. Just email Start@buildotherwise.org.",
+      "This is yours. You can change your answers anytime. To pause or leave, email Start@buildotherwise.org. No reason needed.",
     show: null,
     // Slot 1 was the old join choice (retired). Slots 2–4 are the learning agreement, drawn by LearningAgreement.
     try_prompts: ["", "", "What brings you here?", "How do you want to approach this?", "Anything else you want to remember about why you’re starting? (Optional)"],
