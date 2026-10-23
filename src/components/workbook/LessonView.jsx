@@ -19,6 +19,7 @@ import DiscoveryFollowThrough from "./DiscoveryFollowThrough";
 import TryPlanner from "./TryPlanner";
 import TryCheckIn from "./TryCheckIn";
 import NoticeFlow from "./NoticeFlow";
+import LetMeIn from "./LetMeIn";
 import ComeBackAfterTry from "./ComeBackAfterTry";
 import { isAfterTryStep } from "@/lib/afterTry";
 import { interactionsFor } from "@/lib/interactions";
@@ -32,6 +33,8 @@ import { JOIN_CHOICES, joinChoiceText, splitChoice } from "@/lib/gettingStarted"
 /** O.5's second box holds the join choice. On the step page it is a set of buttons, not a writing box. */
 const JOIN_CHOICE_CODE = "O.5";
 const JOIN_CHOICE_INDEX = 1;
+/** The step that ends with a "Let me in" tap. */
+const LET_ME_IN_CODE = "O.1";
 
 function JoinChoicePicker({ lessonCode, lessonTitle, index, label }) {
   const answers = useAnswers();
@@ -263,7 +266,9 @@ export default function LessonView({
   const reflectPrompts = rawReflect
     .map((prompt, index) => ({ prompt, index: rawTry.length + index, fieldKey: `reflect-${index}` }))
     .filter((item) => notAnOption(item.prompt) && promptForRoute(lesson, item.prompt, route));
-  const routes = participationRoutesFor(lesson);
+  // O.1 ends with a single "Let me in" tap instead of a box or a skip link.
+  const letMeIn = lesson.code === LET_ME_IN_CODE;
+  const routes = letMeIn ? [] : participationRoutesFor(lesson);
   const guidance = routeGuidanceFor(route);
   const hasRoutes = routes.length > 0;
   const oneLine = guidance ? guidance.field === "line" : false;
@@ -424,6 +429,19 @@ export default function LessonView({
           Open the Life Map
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
+      ),
+    });
+  }
+
+  if (letMeIn) {
+    beats.push({
+      key: "let-me-in",
+      label: "Ready?",
+      content: (
+        <LetMeIn
+          ready={/^ready$/i.test(String(route || "").trim())}
+          onChange={(on) => onRouteChange(on ? "Ready" : "")}
+        />
       ),
     });
   }
