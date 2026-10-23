@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
 import StepList from "@/components/workbook/StepList";
@@ -35,10 +35,9 @@ export default function GettingStartedPage() {
     return <p className="py-10 text-[16px] text-muted-faint">Opening Getting Started…</p>;
   }
 
-  if (!admin && stepsDone) {
-    if (!isAuthenticated) return <LoginRedirect />;
-    return <Navigate to="/map" replace />;
-  }
+  // Finished people can still come back here (the Back link on every step points here).
+  // They see a way forward instead of being bounced to the Life Map.
+  if (!admin && stepsDone && !isAuthenticated) return <LoginRedirect />;
 
   return (
     <div className="space-y-8">
@@ -64,8 +63,17 @@ export default function GettingStartedPage() {
         </p>
       ) : null}
 
-      {admin && stepsDone ? (
-        <p className="text-[16px] text-muted-foreground">Getting Started is done. The workbook is open.</p>
+      {stepsDone ? (
+        <div className="space-y-3">
+          <p className="text-[16px] text-muted-foreground">You’re through Getting Started. You can reread any step below.</p>
+          <Link
+            to="/map"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[16px] font-medium text-primary-foreground"
+          >
+            Next: your Life Map
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </div>
       ) : null}
 
       {open ? (

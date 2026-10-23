@@ -28,7 +28,9 @@ export const GETTING_STARTED_CONTENT = {
       "Type in any box, or tap Dictate and talk like you’re telling a friend. Questions or concerns: Start@buildotherwise.org.",
     show: null,
     try_prompts: ["", "", ""],
-    reflect_prompts: ["Anything you want to ask before you start? “Nothing” counts."],
+    // Slot 3 held "Anything you want to ask before you start?" (retired Oct 23: nobody reads it). O.1 ends with a Let me in tap.
+    reflect_prompts: [""],
+    what_comes_out: null,
     duration_min: 5,
   },
   "O.4": {
@@ -47,6 +49,7 @@ export const GETTING_STARTED_CONTENT = {
       "Support you’d want, or “none for now”",
     ],
     reflect_prompts: [],
+    what_comes_out: null,
     duration_min: 3,
   },
   "O.5": {
@@ -57,6 +60,7 @@ export const GETTING_STARTED_CONTENT = {
     show: null,
     try_prompts: ["", "Your choice to join."],
     reflect_prompts: [],
+    what_comes_out: null,
     duration_min: 2,
   },
 };

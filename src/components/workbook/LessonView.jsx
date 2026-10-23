@@ -19,6 +19,7 @@ import DiscoveryFollowThrough from "./DiscoveryFollowThrough";
 import TryPlanner from "./TryPlanner";
 import TryCheckIn from "./TryCheckIn";
 import NoticeFlow from "./NoticeFlow";
+import LetMeIn from "./LetMeIn";
 import ComeBackAfterTry from "./ComeBackAfterTry";
 import { isAfterTryStep } from "@/lib/afterTry";
 import { interactionsFor } from "@/lib/interactions";
@@ -27,11 +28,13 @@ import DecisionFollowUp from "./DecisionFollowUp";
 import { BridgeIn, BridgeOut } from "./ModuleBridge";
 import { bridgeIn, bridgeOut } from "@/lib/moduleBridges";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor, setAnswer, useAnswers, answerKey } from "@/lib/workbook";
-import { JOIN_CHOICES, joinChoiceText, splitChoice } from "@/lib/gettingStarted";
+import { JOIN_CHOICES, isGettingStartedLesson, joinChoiceText, splitChoice } from "@/lib/gettingStarted";
 
 /** O.5's second box holds the join choice. On the step page it is a set of buttons, not a writing box. */
 const JOIN_CHOICE_CODE = "O.5";
 const JOIN_CHOICE_INDEX = 1;
+/** The step that ends with a "Let me in" tap. */
+const LET_ME_IN_CODE = "O.1";
 
 function JoinChoicePicker({ lessonCode, lessonTitle, index, label }) {
   const answers = useAnswers();
@@ -263,7 +266,9 @@ export default function LessonView({
   const reflectPrompts = rawReflect
     .map((prompt, index) => ({ prompt, index: rawTry.length + index, fieldKey: `reflect-${index}` }))
     .filter((item) => notAnOption(item.prompt) && promptForRoute(lesson, item.prompt, route));
-  const routes = participationRoutesFor(lesson);
+  // O.1 ends with a single "Let me in" tap instead of a box or a skip link.
+  const letMeIn = lesson.code === LET_ME_IN_CODE;
+  const routes = letMeIn ? [] : participationRoutesFor(lesson);
   const guidance = routeGuidanceFor(route);
   const hasRoutes = routes.length > 0;
   const oneLine = guidance ? guidance.field === "line" : false;
@@ -428,6 +433,19 @@ export default function LessonView({
     });
   }
 
+  if (letMeIn) {
+    beats.push({
+      key: "let-me-in",
+      label: "Ready?",
+      content: (
+        <LetMeIn
+          ready={/^ready$/i.test(String(route || "").trim())}
+          onChange={(on) => onRouteChange(on ? "Ready" : "")}
+        />
+      ),
+    });
+  }
+
   if (tryPrompts.length) {
     beats.push({
       key: "try",
@@ -527,7 +545,9 @@ export default function LessonView({
   const lastOfModule = !next || nextIsModule;
   const showTribe = moduleOrder === 1 && lastOfModule;
   // Journal sits beside Next for these modules, so the footer link stays off.
-  const closingJournalHref = focusModule || lesson.what_comes_out || !savesToJournal ? "" : journalHref;
+  // Getting Started never points to the journal: it isn't part of the workbook yet.
+  const closingJournalHref =
+    isGettingStartedLesson(lesson) || focusModule || lesson.what_comes_out || !savesToJournal ? "" : journalHref;
   const returnLink = lesson.code === "M5-L3" ? `${workbookLink}#continue` : workbookLink;
 
   // Last step of a module: a short bridge built from the participant's own earlier answers.
