@@ -192,6 +192,7 @@ export function describeStep(code, answers, decisions, states) {
   const route = states && states[code];
   if (route && /^pass$/i.test(String(route).trim())) return "passed";
   if (route && /^watch$/i.test(String(route).trim())) return "watched";
+  if (route && /^ready$/i.test(String(route).trim())) return "ready";
   if (route === PAUSE_ROUTE) return "paused";
   const saved = Object.keys(answers || {}).some(
     (key) => key.startsWith(`${code}#`) && String(answers[key] || "").trim()
@@ -205,6 +206,7 @@ export function stepStatusLabel(status) {
     paused: "Paused",
     passed: "Passed",
     watched: "Watched",
+    ready: "You’re in",
     answered: "Answered",
     "not answered": "Not answered yet",
   }[status];
