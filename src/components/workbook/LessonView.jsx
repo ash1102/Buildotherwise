@@ -28,7 +28,7 @@ import DecisionFollowUp from "./DecisionFollowUp";
 import { BridgeIn, BridgeOut } from "./ModuleBridge";
 import { bridgeIn, bridgeOut } from "@/lib/moduleBridges";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor, setAnswer, useAnswers, answerKey } from "@/lib/workbook";
-import { JOIN_CHOICES, joinChoiceText, splitChoice } from "@/lib/gettingStarted";
+import { JOIN_CHOICES, isGettingStartedLesson, joinChoiceText, splitChoice } from "@/lib/gettingStarted";
 
 /** O.5's second box holds the join choice. On the step page it is a set of buttons, not a writing box. */
 const JOIN_CHOICE_CODE = "O.5";
@@ -545,7 +545,9 @@ export default function LessonView({
   const lastOfModule = !next || nextIsModule;
   const showTribe = moduleOrder === 1 && lastOfModule;
   // Journal sits beside Next for these modules, so the footer link stays off.
-  const closingJournalHref = focusModule || lesson.what_comes_out || !savesToJournal ? "" : journalHref;
+  // Getting Started never points to the journal: it isn't part of the workbook yet.
+  const closingJournalHref =
+    isGettingStartedLesson(lesson) || focusModule || lesson.what_comes_out || !savesToJournal ? "" : journalHref;
   const returnLink = lesson.code === "M5-L3" ? `${workbookLink}#continue` : workbookLink;
 
   // Last step of a module: a short bridge built from the participant's own earlier answers.
