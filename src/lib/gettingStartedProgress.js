@@ -43,11 +43,11 @@ function savedAnswer(lesson, answers) {
   return Object.keys(answers || {}).some((key) => key.startsWith(prefix) && String(answers[key] || "").trim());
 }
 
-/** Pass counts. A saved line counts. Watch counts, same as the rest of the book. */
+/** Pass counts. A saved line counts. Watch counts, same as the rest of the book. "Ready" is O.1's Let me in tap. */
 export function gettingStartedStepDone(lesson, answers, states) {
   if (!lesson) return false;
   const route = String((states && states[lesson.code]) || "").trim();
-  if (/^(pass|watch)$/i.test(route)) return true;
+  if (/^(pass|watch|ready)$/i.test(route)) return true;
   return savedAnswer(lesson, answers);
 }
 
