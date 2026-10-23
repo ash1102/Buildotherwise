@@ -7,18 +7,25 @@ import Prose from "@/components/workbook/Prose";
 import { base44 } from "@/api/base44Client";
 import { answerKey, setAnswer as setWorkbookAnswer, useAnswers } from "@/lib/workbook";
 import { saveAnswer } from "@/lib/journal";
-import { GS_CODES, JOIN_CHOICES, joinChoiceText, markSubmitted, splitChoice } from "@/lib/gettingStarted";
-
-const CHOICE_CODE = "O.5";
-const CHOICE_INDEX = 1;
+import {
+  AGREEMENT_APPROACH,
+  AGREEMENT_CODE,
+  AGREEMENT_NOTE,
+  AGREEMENT_WHY,
+  GS_CODES,
+  markSubmitted,
+  readAgreement,
+} from "@/lib/gettingStarted";
+import LearningAgreement from "@/components/gettingStarted/LearningAgreement";
 
 /**
- * What Submit sends: the join choice and its note, nothing else.
- * "What makes it work for you" (O.4) promises to stay private, so it is never sent.
+ * What Submit sends: why they're here and how they want to approach it, nothing else.
+ * (Stored in the existing join_choice / choice_note fields.)
+ * The optional note and "What makes it work for you" (O.4) stay private, so they are never sent.
  */
 function buildSending(lessonsByCode, answers) {
-  const { choice, note } = splitChoice((answers || {})[answerKey(CHOICE_CODE, CHOICE_INDEX)]);
-  return { join_choice: choice, choice_note: note, change_help: "", support_plan: [] };
+  const { why, approach } = readAgreement(answers);
+  return { join_choice: why, choice_note: approach, change_help: "", support_plan: [] };
 }
 
 /**
@@ -102,40 +109,11 @@ export default function GettingStartedPopup({ lessons, onClose }) {
     const value = (answers || {})[key] || "";
     const id = `gs-${step.code}-${promptIndex}`;
 
-    if (step.code === CHOICE_CODE && promptIndex === CHOICE_INDEX) {
-      const { choice, note } = splitChoice(value);
-      return (
-        <fieldset key={key}>
-          <legend className="text-[15px] font-medium text-foreground">Your choice</legend>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {JOIN_CHOICES.map((option) => (
-              <button
-                key={option}
-                type="button"
-                aria-pressed={choice === option}
-                onClick={() => setAnswer(step.code, promptIndex, joinChoiceText(choice === option ? "" : option, note))}
-                className={`rounded-full border px-4 py-2 text-[15px] transition ${
-                  choice === option
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-input bg-card text-foreground hover:bg-secondary"
-                }`}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
-          <label htmlFor={id} className="mt-3 block text-[13.5px] text-muted-foreground">
-            Add a note if you want
-          </label>
-          <Textarea
-            id={id}
-            rows={2}
-            value={note}
-            onChange={(event) => setAnswer(step.code, promptIndex, joinChoiceText(choice, event.target.value))}
-            className="mt-1 min-h-[56px]"
-          />
-        </fieldset>
-      );
+    if (step.code === AGREEMENT_CODE && promptIndex === AGREEMENT_WHY) {
+      return <LearningAgreement key={key} lessonTitle={step.title} />;
+    }
+    if (step.code === AGREEMENT_CODE && (promptIndex === AGREEMENT_APPROACH || promptIndex === AGREEMENT_NOTE)) {
+      return null;
     }
 
     return (
@@ -206,7 +184,8 @@ export default function GettingStartedPopup({ lessons, onClose }) {
                 <li>Nothing here is scored. You can skip any question.</li>
                 <li>“Not now” closes this. You can open it again from the home page.</li>
                 <li>
-                  At the end you’ll see exactly what gets sent to Ashley before you submit: only your choice to join.
+                  At the end you’ll see exactly what gets sent to Ashley before you submit: only why you’re here and how you
+                  want to approach it.
                   Everything else stays private in your workbook.
                 </li>
               </ul>
@@ -249,16 +228,17 @@ export default function GettingStartedPopup({ lessons, onClose }) {
               </p>
               <dl className="mt-5 space-y-4 rounded-xl border border-border bg-card px-4 py-4 text-[15px]">
                 <div>
-                  <dt className="text-[13px] font-semibold text-accent-ink">Your choice to join</dt>
+                  <dt className="text-[13px] font-semibold text-accent-ink">Why I'm here</dt>
                   <dd className="mt-0.5 text-foreground">{sendingPreview.join_choice || "Not chosen (that's okay)"}</dd>
-                  {sendingPreview.choice_note ? (
-                    <dd className="mt-0.5 text-muted-foreground">{sendingPreview.choice_note}</dd>
-                  ) : null}
+                </div>
+                <div>
+                  <dt className="text-[13px] font-semibold text-accent-ink">My approach</dt>
+                  <dd className="mt-0.5 text-foreground">{sendingPreview.choice_note || "Not chosen (that's okay)"}</dd>
                 </div>
               </dl>
               <p className="mt-3 text-[13px] leading-relaxed text-muted-faint">
-                After you submit, Getting Started won’t pop up again. Your answers stay readable in Settings. To change
-                your choice later, email Start@buildotherwise.org.
+                After you submit, Getting Started won’t pop up again. Your answers stay readable in Settings. To pause
+                or leave, email Start@buildotherwise.org. No reason needed.
               </p>
               {error ? (
                 <p role="alert" className="mt-3 text-[14px] text-destructive">
