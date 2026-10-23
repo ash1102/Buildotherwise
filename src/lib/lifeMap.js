@@ -354,6 +354,7 @@ export const MAP_PICK_FIELDS = [
     id: "more-room",
     label: "Is there anything here you would like more room for, or would like to keep as it is?",
   },
+  { id: "more-less", label: "Something here I'd want more of, or less of:" },
   {
     id: "connection-now",
     label: "Do you want to do anything with a former connection right now, leave it as it is, or leave the question open?",
