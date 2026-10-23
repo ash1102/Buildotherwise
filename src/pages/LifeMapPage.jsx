@@ -34,12 +34,15 @@ import LifeMapList from "@/components/map/LifeMapList";
 import BringInSavedAnswer from "@/components/map/BringInSavedAnswer";
 import MapQuestions from "@/components/map/MapQuestions";
 import StepNav from "@/components/workbook/StepNav";
+import LifeSnapshot from "@/components/map/LifeSnapshot";
 
 export default function LifeMapPage() {
   const map = useLifeMap();
   const [pick] = useStore(MAP_PICK_KEY, {});
   // Remember the part someone was on, so coming back picks up where they left off.
   const [step, setStep] = useStore("lifeMapGuideStep", 0);
+  // The short snapshot is the default. The full guided map stays one tap away.
+  const [view, setView] = useStore("lifeMapView", "snapshot");
   const mapRef = useRef(null);
   const guideRef = useRef(null);
   const editorRef = useRef(null);
@@ -197,8 +200,47 @@ export default function LifeMapPage() {
     downloadText("entrepalooza-life-map.md", "# Map the Life You're Actually Living\n\n" + body + pickBlock + exampleBlock);
   };
 
+  if (view !== "full") {
+    return (
+      <div className="space-y-8">
+        <header className="border-b border-border pb-6">
+          <div className="flex items-start gap-4">
+            <DashedMotif size="lg" />
+            <div>
+              <p className="workbook-label">Your Life Map</p>
+              <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
+                This step comes after Getting Started and before Module 1. Module 1 stays open whether or not you fill this in.
+              </p>
+            </div>
+          </div>
+          <div className="mt-4">
+            <PrivacyNote />
+          </div>
+        </header>
+        <LifeSnapshot
+          map={map}
+          onOpenFullMap={() => {
+            setView("full");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        />
+        <StepNav prev={null} next={nextStep} workbookLink="/" endNote="" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
+      <button
+        type="button"
+        onClick={() => {
+          setView("snapshot");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+        className="text-[15px] text-accent-ink underline underline-offset-2"
+      >
+        Back to the snapshot
+      </button>
       <header className="border-b border-border pb-6">
         <div className="flex items-start gap-4">
           <DashedMotif size="lg" />
