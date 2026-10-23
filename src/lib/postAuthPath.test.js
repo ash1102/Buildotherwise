@@ -51,7 +51,7 @@ test("an unfinished non-admin leaves returnTo for the first open Getting Started
       answers: { "O.1#0": "one thing" },
       states: {},
     }),
-    "/lesson/O.2"
+    "/lesson/O.5"
   );
   assert.equal(
     postAuthDestination({ user, returnTo: "/lesson/M1-L1", lessons, answers: {}, states: {} }),
@@ -91,8 +91,8 @@ test("admins and finished participants keep returnTo, and other flows are left a
     "/oauth/consent?ctx=abc"
   );
   assert.equal(
-    postAuthDestination({ user: { id: "p", role: "user" }, returnTo: "/lesson/O.2", lessons, answers: {}, states: {} }),
-    "/lesson/O.2"
+    postAuthDestination({ user: { id: "p", role: "user" }, returnTo: "/lesson/O.4", lessons, answers: {}, states: {} }),
+    "/lesson/O.4"
   );
 });
 
@@ -148,4 +148,14 @@ test("Getting Started progress is stored per account, not per browser", async ()
   assert.deepEqual(readStore("lifeMap", {}), {});
   assert.equal(listEntries().some((entry) => entry.body === "a note from this browser"), false);
   assert.deepEqual(readStore("lifeMap::user::participant-new", null), { places: ["the gym"] });
+});
+
+test("O.4 is optional: leaving it blank never holds the workbook shut", () => {
+  const user = { id: "participant-o4", role: "user" };
+  const answers = { "O.1#3": "nothing", "O.5#1": "Join" };
+  assert.equal(gettingStartedFinished(lessons, answers, {}), true);
+  assert.equal(
+    postAuthDestination({ user, returnTo: "/", lessons, answers: { "O.1#3": "nothing" }, states: {} }),
+    "/lesson/O.5"
+  );
 });

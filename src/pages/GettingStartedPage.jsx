@@ -8,6 +8,7 @@ import LoginRedirect from "@/components/LoginRedirect";
 import {
   GS_CODES,
   OPTIONAL_GS_CODES,
+  firstOpenGettingStartedStep,
   gettingStartedFinished,
   gettingStartedStepDone,
   gettingStartedSteps,
@@ -25,8 +26,7 @@ export default function GettingStartedPage() {
   const admin = Boolean(isAuthenticated && user?.role === "admin");
   const steps = gettingStartedSteps(lessons);
   const stepsDone = gettingStartedFinished(lessons, answers, states);
-  const open = steps.find((lesson) => !gettingStartedStepDone(lesson, answers, states)) || null;
-  const openIndex = open ? steps.findIndex((lesson) => lesson.code === open.code) : -1;
+  const open = firstOpenGettingStartedStep(lessons, answers, states);
   const anyDone = steps.some((lesson) => gettingStartedStepDone(lesson, answers, states));
   const missing = GS_CODES.filter((code) => !steps.some((lesson) => lesson.code === code));
   const optional = OPTIONAL_GS_CODES.map((code) => (lessons || []).find((lesson) => lesson.code === code)).filter(Boolean);
@@ -44,9 +44,13 @@ export default function GettingStartedPage() {
     <div className="space-y-8">
       <header className="border-b border-border pb-5">
         <p className="workbook-label">Getting Started</p>
-        <h1 className="mt-2">Four steps, then your Life Map</h1>
+        <h1 className="mt-2">Start here. You can decide as you go.</h1>
         <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-          These steps come first. Your Life Map comes next, before Module 1. Pass counts. A saved answer counts too.
+          This pilot helps you notice what matters, try small things, and choose what comes next. You can pass, pause,
+          or change your mind.
+        </p>
+        <p className="mt-2 max-w-[68ch] text-[15px] leading-relaxed text-muted-faint">
+          Two short steps and one optional one, about ten minutes. Your Life Map comes next, before Module 1.
         </p>
       </header>
 
@@ -69,7 +73,7 @@ export default function GettingStartedPage() {
           to={`/lesson/${open.code}`}
           className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[16px] font-medium text-primary-foreground"
         >
-          {anyDone ? `Continue step ${openIndex + 1}` : "Start step 1"}
+          {anyDone ? `Continue: ${open.title}` : "Start"}
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       ) : null}
@@ -96,7 +100,7 @@ export default function GettingStartedPage() {
               <li key={lesson.code} className="text-[16px] text-foreground">
                 {lesson.title}
                 {lesson.duration_min ? <span className="text-muted-faint"> · About {lesson.duration_min} min</span> : null}
-                <span className="block text-[14px] text-muted-faint">Opens once the four steps above are done.</span>
+                <span className="block text-[14px] text-muted-faint">Opens once the steps above are done.</span>
               </li>
             ))}
           </ul>

@@ -3,7 +3,11 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { describeStep, stepStatusLabel, useWorkbook } from "@/lib/workbook";
 import { stepComplete } from "@/lib/progress";
-import { gettingStartedStepDone, isGettingStartedLesson } from "@/lib/gettingStarted";
+import {
+  gettingStartedStepDone,
+  isGettingStartedLesson,
+  isOptionalInFlowGettingStartedLesson,
+} from "@/lib/gettingStarted";
 
 /** The steps of one container: a module, or Getting Started on its own page. */
 export default function StepList({ lessons, scopeLabel, numberByIndex = false }) {
@@ -43,6 +47,7 @@ export default function StepList({ lessons, scopeLabel, numberByIndex = false })
                     ) : null}
                     <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[14px] text-muted-faint">
                       <span>{lesson.duration_min ? `About ${lesson.duration_min} min` : lesson.type}</span>
+                      {isOptionalInFlowGettingStartedLesson(lesson) && !done ? <span>Optional</span> : null}
                       <span className={done ? "font-medium text-accent-ink" : undefined}>{stepStatusLabel(status)}</span>
                     </span>
                   </span>

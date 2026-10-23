@@ -11,19 +11,14 @@ import { GS_CODES, JOIN_CHOICES, joinChoiceText, markSubmitted, splitChoice } fr
 
 const CHOICE_CODE = "O.5";
 const CHOICE_INDEX = 1;
-const CHANGE_INDEX = 2;
-const PLAN_CODE = "O.4";
 
-/** What Submit sends: the join choice and the support plan, only boxes that hold something. */
+/**
+ * What Submit sends: the join choice and its note, nothing else.
+ * "What makes it work for you" (O.4) promises to stay private, so it is never sent.
+ */
 function buildSending(lessonsByCode, answers) {
   const { choice, note } = splitChoice((answers || {})[answerKey(CHOICE_CODE, CHOICE_INDEX)]);
-  const changeHelp = String((answers || {})[answerKey(CHOICE_CODE, CHANGE_INDEX)] || "").trim();
-  const plan = lessonsByCode[PLAN_CODE];
-  const planPrompts = plan ? [...(plan.try_prompts || []), ...(plan.reflect_prompts || [])] : [];
-  const supportPlan = planPrompts
-    .map((question, index) => ({ question, answer: String((answers || {})[answerKey(PLAN_CODE, index)] || "").trim() }))
-    .filter((row) => row.answer);
-  return { join_choice: choice, choice_note: note, change_help: changeHelp, support_plan: supportPlan };
+  return { join_choice: choice, choice_note: note, change_help: "", support_plan: [] };
 }
 
 /**
@@ -211,8 +206,8 @@ export default function GettingStartedPopup({ lessons, onClose }) {
                 <li>Nothing here is scored. You can skip any question.</li>
                 <li>“Not now” closes this. You can open it again from the home page.</li>
                 <li>
-                  At the end you’ll see exactly what gets sent to Ashley before you submit: your choice to join and your
-                  “What makes it work for you” answers. Everything else stays private in your workbook.
+                  At the end you’ll see exactly what gets sent to Ashley before you submit: only your choice to join.
+                  Everything else stays private in your workbook.
                 </li>
               </ul>
             </div>
@@ -238,7 +233,7 @@ export default function GettingStartedPopup({ lessons, onClose }) {
               {prompts.length ? (
                 <div className="mt-6 space-y-5 border-t border-border pt-5">
                   <p className="text-[13px] text-muted-faint">Answer what fits. Saved as you type.</p>
-                  {prompts.map((label, promptIndex) => renderPrompt(label, promptIndex))}
+                  {prompts.map((label, promptIndex) => (String(label || "").trim() ? renderPrompt(label, promptIndex) : null))}
                 </div>
               ) : null}
             </div>
@@ -259,25 +254,6 @@ export default function GettingStartedPopup({ lessons, onClose }) {
                   {sendingPreview.choice_note ? (
                     <dd className="mt-0.5 text-muted-foreground">{sendingPreview.choice_note}</dd>
                   ) : null}
-                </div>
-                {sendingPreview.change_help ? (
-                  <div>
-                    <dt className="text-[13px] font-semibold text-accent-ink">If you want to change your choice later</dt>
-                    <dd className="mt-0.5 text-foreground">{sendingPreview.change_help}</dd>
-                  </div>
-                ) : null}
-                <div>
-                  <dt className="text-[13px] font-semibold text-accent-ink">What makes it work for you</dt>
-                  {sendingPreview.support_plan.length ? (
-                    sendingPreview.support_plan.map((row) => (
-                      <dd key={row.question} className="mt-1.5">
-                        <span className="block text-[13px] text-muted-faint">{row.question}</span>
-                        <span className="text-foreground">{row.answer}</span>
-                      </dd>
-                    ))
-                  ) : (
-                    <dd className="mt-0.5 text-muted-foreground">Nothing added (that's okay)</dd>
-                  )}
                 </div>
               </dl>
               <p className="mt-3 text-[13px] leading-relaxed text-muted-faint">

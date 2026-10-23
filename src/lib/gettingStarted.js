@@ -2,16 +2,20 @@ import { useEffect } from "react";
 import { readStore, useStore, writeStore } from "./store";
 
 /**
- * Getting Started is the gate before the workbook: steps O.1 to O.5.
+ * Getting Started is the gate before the workbook: steps O.1, O.4 and O.5 (O.3 optional).
  * Whether those steps are done is decided from the answers saved in the browser.
  * The popup below is an older way to fill the same boxes. Submitting it does not
- * open the workbook. The five steps do.
+ * open the workbook. The steps do.
  */
 
 export {
   GS_CODES,
   OPTIONAL_GS_CODES,
+  OPTIONAL_IN_FLOW_GS_CODES,
   isOptionalGettingStartedLesson,
+  isOptionalInFlowGettingStartedLesson,
+  gettingStartedStepSettled,
+  firstOpenGettingStartedStep,
   isGettingStartedLesson,
   gettingStartedSteps,
   gettingStartedStepDone,
