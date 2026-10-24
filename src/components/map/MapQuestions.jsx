@@ -8,6 +8,7 @@ import EnergyMarks from "./EnergyMarks";
 import {
   MAP_PAUSE_TEXT,
   MAP_PICK_FIELDS,
+  reflectionFormFields,
   MAP_PICK_KEY,
   MAP_QUESTION_PARTS,
   QUESTIONS_BY_ID,
@@ -421,7 +422,7 @@ export default function MapQuestions({ graph, step, onStep, onShowMap, onPlaced,
             saved and is hidden on the map.
           </p>
           <div className="mt-4 space-y-4">
-            {MAP_PICK_FIELDS.map((field) => (
+            {reflectionFormFields(pick).map((field) => (
               <div key={field.id}>
                 <label htmlFor={`mappick-${field.id}`} className="block text-[15px] font-medium text-foreground">
                   {field.label}
