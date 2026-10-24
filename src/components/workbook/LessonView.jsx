@@ -27,9 +27,6 @@ import { interactionsFor, lessonOwner } from "@/lib/interactions";
 import NoticeLesson from "./moduleOne/NoticeLesson";
 import AttentionLesson from "./moduleOne/AttentionLesson";
 import AgreementLesson from "./moduleOne/AgreementLesson";
-
-/** Steps drawn entirely by one interactive piece (see src/lib/interactions.js). */
-const OWNED_LESSONS = { m1Notice: NoticeLesson, m1Attention: AttentionLesson, m1Agreement: AgreementLesson };
 import { journalStepHref, saveAnswer } from "@/lib/journal";
 import DecisionFollowUp from "./DecisionFollowUp";
 import { BridgeIn, BridgeOut } from "./ModuleBridge";
@@ -37,6 +34,9 @@ import { bridgeIn, bridgeOut } from "@/lib/moduleBridges";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor, setAnswer, useAnswers, answerKey } from "@/lib/workbook";
 import { AGREEMENT_APPROACH, AGREEMENT_CODE, AGREEMENT_NOTE, AGREEMENT_WHY, JOIN_CHOICES, isGettingStartedLesson, joinChoiceText, splitChoice } from "@/lib/gettingStarted";
 import LearningAgreement from "@/components/gettingStarted/LearningAgreement";
+
+/** Steps drawn entirely by one interactive piece (see src/lib/interactions.js). */
+const OWNED_LESSONS = { m1Notice: NoticeLesson, m1Attention: AttentionLesson, m1Agreement: AgreementLesson };
 
 /** O.5's second box holds the join choice. On the step page it is a set of buttons, not a writing box. */
 const JOIN_CHOICE_CODE = "O.5";
