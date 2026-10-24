@@ -4,6 +4,7 @@ import PromptField from "./PromptField";
 import { Chip, ChipGroup } from "./TryChips";
 import { setAnswer, useAnswers, answerKey } from "@/lib/workbook";
 import { saveAnswer } from "@/lib/journal";
+import { layoutFor } from "@/lib/lessonLayouts";
 
 /**
  * "Notice without forcing an answer" (M1-L1).
@@ -13,6 +14,7 @@ import { saveAnswer } from "@/lib/journal";
  */
 
 const OWN_ROUTES = ["Something that caught my attention", "A thread from my Life Map", "Use something I noticed", "Bring a Life Map thread"];
+const MAP_ROUTES = ["A thread from my Life Map", "Bring a Life Map thread"];
 const EXAMPLE_ROUTES = ["The garden example", "I’m not sure yet", "I'm not sure yet", "Explore something unfamiliar", "Nothing draws me in yet"];
 
 const SORT_CATEGORIES = [
@@ -196,16 +198,31 @@ export default function NoticeFlow({ lesson, route }) {
   const own = OWN_ROUTES.includes(current);
   const example = EXAMPLE_ROUTES.includes(current);
   const passed = /^pass$/i.test(current);
-
-  return (
-    <div className="space-y-8">
-      <section className="space-y-3 rounded-xl border border-border bg-card p-4 sm:p-5" aria-label="From your Life Map to exploration">
-        <h3 className="text-[20px] font-semibold text-foreground">What can you do with your Life Map?</h3>
+  const collapseIntro = Boolean(layoutFor(lesson.code)?.collapseMapIntro);
+  const fromMap = MAP_ROUTES.includes(current);
+  const mapIntroBody = (
+    <>
         <p className="text-[16px] leading-relaxed text-foreground">Your map shows where your time and energy go right now. Time spent on something may reflect interest, responsibility, necessity, habit, or a mixture. You decide what your answers mean.</p>
         <p className="text-[16px] leading-relaxed text-foreground">Look for parts that draw you in, things you mostly need to get through, and experiences you have not had access to. Something can matter to you and still take effort.</p>
         <p className="text-[16px] leading-relaxed text-foreground">If nothing draws you in yet, that is a real finding. Module 2 offers possibilities to encounter. Here, you are reflecting and gathering questions; you do not need to choose or try an activity yet.</p>
         <LinkToMap />
+    </>
+  );
+
+  return (
+    <div className="space-y-8">
+      {collapseIntro ? (
+        // Prototype: the explainer waits behind a tap, and opens for people starting from their map.
+        <details key={fromMap ? "map-open" : "map-closed"} open={fromMap} className="space-y-3 rounded-xl border border-border bg-card p-4 sm:p-5" aria-label="From your Life Map to exploration">
+          <summary className="cursor-pointer text-[16px] font-medium text-foreground">What can you do with your Life Map?</summary>
+          <div className="mt-3 space-y-3">{mapIntroBody}</div>
+        </details>
+      ) : (
+      <section className="space-y-3 rounded-xl border border-border bg-card p-4 sm:p-5" aria-label="From your Life Map to exploration">
+        <h3 className="text-[20px] font-semibold text-foreground">What can you do with your Life Map?</h3>
+        {mapIntroBody}
       </section>
+      )}
       {!current ? (
         // SUGGESTED wording (Claude), not from the build spec.
         <p className="text-[15px] leading-relaxed text-muted-foreground">
