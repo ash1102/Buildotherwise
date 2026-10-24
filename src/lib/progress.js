@@ -1,6 +1,7 @@
 import { firstOpenGettingStartedStep, gettingStartedFinished } from "./gettingStartedProgress";
 import { isWorkbookLesson } from "./lessonKind";
 import { answerKey, routeSkipsWriting } from "./workbook";
+import { isModuleOneInteractive, moduleOneStepComplete } from "./moduleOne";
 
 /**
  * Completion follows the curriculum's own shape: a step counts once one Try or
@@ -36,9 +37,10 @@ function hasNoticeResponse(answers) {
 
 /** The Try and Reflect boxes with nothing saved in them yet. */
 export function missingPrompts(lesson, answers) {
-  if (lesson?.code === "M1-L1") {
-    if (hasNoticeResponse(answers)) return [];
-    return [{ index: "own-caught", label: "What caught your attention (or what you are unsure about)", kind: "Try" }];
+  // Module 1 lessons are interactive: any saved answer, or "I'm done with this lesson", counts.
+  if (isModuleOneInteractive(lesson?.code)) {
+    if (moduleOneStepComplete(lesson.code, answers)) return [];
+    return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
   }
   if (hasInteractionLine(lesson, answers)) return [];
   return requiredPrompts(lesson).filter((prompt) => isBlank((answers || {})[answerKey(lesson.code, prompt.index)]));
@@ -48,7 +50,7 @@ export function missingPrompts(lesson, answers) {
 export function stepComplete(lesson, answers, states) {
   const route = states && lesson ? states[lesson.code] : "";
   if (routeSkipsWriting(route)) return true;
-  if (lesson?.code === "M1-L1") return hasNoticeResponse(answers);
+  if (isModuleOneInteractive(lesson?.code)) return moduleOneStepComplete(lesson.code, answers);
   const prompts = requiredPrompts(lesson);
   if (!prompts.length) return true;
   if (hasInteractionLine(lesson, answers)) return true;
