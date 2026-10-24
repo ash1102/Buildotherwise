@@ -51,23 +51,23 @@ export default function Layout() {
 
         <footer className="no-print border-t border-border bg-card">
           <div className="mx-auto w-full max-w-6xl px-4 pt-6 pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-24 text-[14px] leading-relaxed text-muted-faint sm:px-6 lg:px-8">
-            <div className="mb-3 flex flex-wrap gap-x-5 gap-y-2">
-              <Link to="/about" className="font-medium text-accent-ink underline underline-offset-2">
+            <nav aria-label="About Build Otherwise" className="mb-3 flex flex-wrap gap-x-5 gap-y-1">
+              <Link to="/about" className="inline-block py-1.5 font-medium text-accent-ink underline underline-offset-2">
                 About Entrepalooza
               </Link>
-              <Link to="/mission" className="font-medium text-accent-ink underline underline-offset-2">
+              <Link to="/mission" className="inline-block py-1.5 font-medium text-accent-ink underline underline-offset-2">
                 Mission
               </Link>
-              <Link to="/programs" className="font-medium text-accent-ink underline underline-offset-2">
+              <Link to="/programs" className="inline-block py-1.5 font-medium text-accent-ink underline underline-offset-2">
                 Programs
               </Link>
-              <Link to="/get-involved" className="font-medium text-accent-ink underline underline-offset-2">
+              <Link to="/get-involved" className="inline-block py-1.5 font-medium text-accent-ink underline underline-offset-2">
                 Get involved
               </Link>
-              <Link to="/contact" className="font-medium text-accent-ink underline underline-offset-2">
+              <Link to="/contact" className="inline-block py-1.5 font-medium text-accent-ink underline underline-offset-2">
                 Contact Ashley
               </Link>
-            </div>
+            </nav>
             <p className="font-medium text-foreground/80">Entrepalooza is an educational workbook, not therapy or treatment.</p>
             <p className="mt-2">
               {preview
