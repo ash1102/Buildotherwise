@@ -23,7 +23,13 @@ import LetMeIn from "./LetMeIn";
 import SelfSketch from "./SelfSketch";
 import ComeBackAfterTry from "./ComeBackAfterTry";
 import { isAfterTryStep } from "@/lib/afterTry";
-import { interactionsFor } from "@/lib/interactions";
+import { interactionsFor, lessonOwner } from "@/lib/interactions";
+import NoticeLesson from "./moduleOne/NoticeLesson";
+import AttentionLesson from "./moduleOne/AttentionLesson";
+import AgreementLesson from "./moduleOne/AgreementLesson";
+
+/** Steps drawn entirely by one interactive piece (see src/lib/interactions.js). */
+const OWNED_LESSONS = { m1Notice: NoticeLesson, m1Attention: AttentionLesson, m1Agreement: AgreementLesson };
 import { journalStepHref, saveAnswer } from "@/lib/journal";
 import DecisionFollowUp from "./DecisionFollowUp";
 import { BridgeIn, BridgeOut } from "./ModuleBridge";
@@ -289,6 +295,54 @@ export default function LessonView({
   const detailRef = useRef(null);
   // Bumped when a carried-over answer is copied in, so the boxes below re-read it.
   const [bridgeRev, setBridgeRev] = useState(0);
+
+  // A lesson drawn by its own interactive piece keeps the shared header, feedback and
+  // step navigation, and skips the generic sections built from the Lesson record.
+  const owner = lessonOwner(lesson.code);
+  const OwnedLesson = owner ? OWNED_LESSONS[owner.type] : null;
+  if (OwnedLesson) {
+    const ownedOrder = Number(lesson.module_order);
+    const ownedLast = !next || nextIsModule;
+    return (
+      <article className="space-y-6">
+        <StepHeader
+          moduleTitle={moduleTitle}
+          stepNumber={stepNumber}
+          stepCount={stepCount}
+          title={lesson.title}
+          duration={lesson.duration_min}
+          purpose={lesson.purpose}
+          status={status}
+        />
+        <OwnedLesson lesson={lesson} />
+        {ownedOrder === 1 && ownedLast ? (
+          <div className="space-y-1">
+            <Link
+              to={`/tribe-threads?lesson=${encodeURIComponent(lesson.code)}#lesson-thread`}
+              className="inline-block text-[15px] font-medium text-accent-ink underline underline-offset-2"
+            >
+              Explore the related Tribe Thread (optional)
+            </Link>
+            <p className="text-[14px] text-muted-faint">
+              Tribe replies are shared with other participants. Your journal stays private unless you choose to share.
+            </p>
+          </div>
+        ) : null}
+        <FeedbackForm moduleOrder={lesson.module_order} lessonCode={lesson.code} />
+        <StepNav
+          prev={prev}
+          next={next}
+          nextIsModule={nextIsModule}
+          workbookLink={workbookLink}
+          backLabel={backLabel}
+          forward={forward}
+          endNote={endNote}
+          nameNext
+          journalHref={journalStepHref(lesson.code)}
+        />
+      </article>
+    );
+  }
 
   // Reflection or reading questions do not implicitly require a decision.
   // Preserve explicit next-decision steps and deliberately configured decision choices.
