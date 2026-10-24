@@ -3,6 +3,8 @@ import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { answerKey } from "@/lib/workbook";
 import { EARLIER_ANSWERS, FINISHED, markFinished, plainValue } from "@/lib/moduleOne";
+import GoDeeperJournal from "../GoDeeperJournal";
+import { hasGoDeeper } from "@/lib/journalPrompts";
 
 /**
  * Module 1 lessons are a short sequence of parts. Every part can be opened from the
@@ -75,6 +77,8 @@ export function PartFlow({ lessonCode, parts }) {
           </h2>
         </div>
         {part.content}
+        {/* Conversation Journal: Go Deeper sits on the last part, after the lesson's main activity. */}
+        {index === parts.length - 1 && hasGoDeeper(lessonCode) ? <GoDeeperJournal lessonCode={lessonCode} /> : null}
       </section>
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
