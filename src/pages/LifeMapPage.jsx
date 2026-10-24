@@ -1,28 +1,23 @@
 import MobileSelect from "@/components/ui/MobileSelect";
 import React, { useMemo, useRef, useState } from "react";
-import { Download, Plus, Printer } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLifeMap, useWorkbook } from "@/lib/workbook";
 import { useJournalEntries } from "@/lib/journal";
 import useCurriculum from "@/hooks/useCurriculum";
 import { nextStepAfterLifeMap } from "@/lib/progress";
-import { downloadText } from "@/lib/download";
-import { readStore, useStore } from "@/lib/store";
-import { branchMarkdown, buildBranches, descendantsOf, freezePlacement } from "@/lib/lifeMapBranches";
+import { useStore } from "@/lib/store";
+import { buildBranches, descendantsOf, freezePlacement } from "@/lib/lifeMapBranches";
 import {
-  MAP_PAUSE_TEXT,
-  MAP_PICK_FIELDS,
   MAP_PICK_KEY,
   MAP_SECTIONS,
-  QUESTIONS_BY_ID,
   setLineParent,
   setNodePosition,
   addLine,
   buildGraph,
   exploreLines,
   removeLine,
-  savedAnswerOptions,
   updateLine,
 } from "@/lib/lifeMap";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
@@ -31,7 +26,6 @@ import HybridMap from "@/components/map/HybridMap";
 import MapPickCard from "@/components/map/MapPickCard";
 import LifeMapNodePanel from "@/components/map/LifeMapNodePanel";
 import LifeMapList from "@/components/map/LifeMapList";
-import BringInSavedAnswer from "@/components/map/BringInSavedAnswer";
 import MapQuestions from "@/components/map/MapQuestions";
 import StepNav from "@/components/workbook/StepNav";
 import LifeSnapshot from "@/components/map/LifeSnapshot";
@@ -63,11 +57,6 @@ export default function LifeMapPage() {
   const graph = useMemo(() => buildGraph(map), [map]);
   const tree = useMemo(() => buildBranches(graph), [graph]);
   const explore = useMemo(() => exploreLines(pick), [pick]);
-  const options = useMemo(() => savedAnswerOptions(lessons, answers), [lessons, answers]);
-  const nodesById = useMemo(
-    () => Object.fromEntries(graph.nodes.map((node) => [node.id, node])),
-    [graph.nodes]
-  );
 
   const sectionOf = (id) => graph.sections.find((section) => section.nodes.some((node) => node.id === id)) || null;
   const selected = selectedId ? nodesById[selectedId] || null : null;
@@ -98,16 +87,6 @@ export default function LifeMapPage() {
     setDraft("");
   };
 
-  const bringIn = (option, sectionKey) => {
-    const item = addLine(sectionKey, {
-      text: option.value,
-      source_code: option.code,
-      source_index: option.index,
-      source_label: `${option.lessonTitle} · ${option.stepLabel}`,
-    });
-    setSelectedId(item.id);
-    setAsList(false);
-  };
 
   const saveSelected = (patch) => {
     if (!selected || !selectedSection) return;
@@ -185,19 +164,6 @@ export default function LifeMapPage() {
   const selectEntry = (id) => {
     setSelectedId(id);
     requestAnimationFrame(() => editorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
-  };
-  const download = () => {
-    const body = branchMarkdown(graph, QUESTIONS_BY_ID, entries);
-    const values = readStore(MAP_PICK_KEY, {}) || {};
-    const fields = MAP_PICK_FIELDS.map((field) => ({ ...field, value: String(values[field.id] || "").trim() })).filter((field) => field.value);
-    const actual = fields.filter((field) => !/^Fictional:/i.test(field.value));
-    const examples = fields.filter((field) => /^Fictional:/i.test(field.value));
-    const kept = actual.length ? actual.map((field) => field.label + " " + field.value).join("\n") + "\n" : "";
-    const pickBlock = values.nothing_yet
-      ? "\n## Look over your map\n" + MAP_PAUSE_TEXT + "\n" + (kept ? "\nEarlier reflection text is still saved:\n" + kept : "")
-      : kept ? "\n## Look over your map\n" + kept : "";
-    const exampleBlock = examples.length ? "\n## Saved example text to review\nThese fields are explicitly labelled fictional examples.\n" + examples.map((field) => field.label + " " + field.value).join("\n") + "\n" : "";
-    downloadText("entrepalooza-life-map.md", "# Map the Life You're Actually Living\n\n" + body + pickBlock + exampleBlock);
   };
 
   if (view !== "full") {
