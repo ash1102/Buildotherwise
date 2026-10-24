@@ -63,9 +63,9 @@ export const MAP_QUESTION_PARTS = [
         text: "Think about the past seven days, or another recent stretch you remember. Where did you spend time? Home counts.",
         list: true,
       },
-      { id: "p1-do", branch: "What I do there", text: "What do you do at this place?", aboutPlace: "at" },
+      { id: "p1-do", retired: true, branch: "What I do there", text: "What do you do at this place?", aboutPlace: "at" },
       {
-        id: "p1-how",
+        id: "p1-how", retired: true,
         branch: "Getting there",
         text: "How do you get to and from this place?",
         aboutPlace: "to",
@@ -115,7 +115,7 @@ export const MAP_QUESTION_PARTS = [
         legacyStarters: ["People seem to come to me for"],
       },
       {
-        id: "g-close",
+        id: "g-close", retired: true,
         branch: "How connected it feels",
         text: "If you want to mark it, how connected do you feel to this person or group right now?",
         helper: "Optional. Contact and closeness are different, and you can leave this unmarked.",
@@ -124,7 +124,7 @@ export const MAP_QUESTION_PARTS = [
         chips: ["Close", "In the middle", "At the edge", "Not sure"],
         optional: true,
       },
-      { id: "g-before", branch: "Groups from before", text: "Are there groups you used to be part of?", list: true, optional: true },
+      { id: "g-before", retired: true, branch: "Groups from before", text: "Are there groups you used to be part of?", list: true, optional: true },
       {
         id: "g-left",
         branch: "What's left of it",
@@ -143,7 +143,7 @@ export const MAP_QUESTION_PARTS = [
         optional: true,
       },
       {
-        id: "g-take",
+        id: "g-take", retired: true,
         branch: "What I would need to know",
         text: "If you wanted to find out more, what would you need to know first? Is there any support or access you already know you would need?",
         section: "barriers",
@@ -164,14 +164,14 @@ export const MAP_QUESTION_PARTS = [
       { id: "p3-plus", branch: "Gives me energy", text: "What gives you energy?", retired: true },
       { id: "p3-minus", branch: "Drains me", text: "What drains you?", retired: true },
       {
-        id: "p3-star",
+        id: "p3-star", retired: true,
         branch: "What matters to me",
         text: "What, if anything, matters to you about this entry?",
         context: "entry",
         optional: true,
       },
       {
-        id: "p3-question",
+        id: "p3-question", retired: true,
         branch: "Curiosity",
         text: "Is there anything about this entry you would like to understand better?",
         helper: "“Nothing comes to mind” is an answer.",
@@ -179,7 +179,7 @@ export const MAP_QUESTION_PARTS = [
         optional: true,
       },
       {
-        id: "p3-dollar",
+        id: "p3-dollar", retired: true,
         branch: "Money or resources",
         text: "What role, if any, do money or resources play in doing this?",
         context: "entry",
@@ -203,13 +203,13 @@ export const MAP_QUESTION_PARTS = [
       "Something can be absent without being missed, and a difficulty does not prove you want to pursue the activity. Add only what you want to add.",
     questions: [
       {
-        id: "p4-used-to",
+        id: "p4-used-to", retired: true,
         branch: "Used to be part of my life",
         text: "Is there an activity or place you remember spending time on before that isn't part of your life now? Add it only if you want to.",
         optional: true,
       },
       {
-        id: "p5-miss",
+        id: "p5-miss", retired: true,
         branch: "Something I miss",
         text: "Something I miss is…",
         starter: true,
@@ -233,7 +233,7 @@ export const MAP_QUESTION_PARTS = [
         aboutLabel: "Which desired activity?",
       },
       {
-        id: "p4-else",
+        id: "p4-else", retired: true,
         branch: "Something else missing",
         text: "Is there something else missing from this map that you want to add?",
         optional: true,
@@ -262,21 +262,21 @@ export const MAP_QUESTION_PARTS = [
     note: "Choose one prompt if you want to. You do not need a discovery for every prompt.",
     questions: [
       {
-        id: "p5-ending-up",
+        id: "p5-ending-up", retired: true,
         branch: "Shows up more than once",
         text: "Looking across your entries, does any activity, place, or kind of situation appear more than once? Which entries?",
         legacyStarters: ["I keep ending up around"],
         multi: true,
       },
       {
-        id: "p5-more-time",
+        id: "p5-more-time", retired: true,
         branch: "Took a lot of time",
         text: "Which activities took up a lot of your time during the period you mapped, if any?",
         legacyStarters: ["I spend more time than I realized doing"],
         multi: true,
       },
       {
-        id: "p5-lose-track",
+        id: "p5-lose-track", retired: true,
         branch: "Longer than intended",
         text: "Can you remember a recent time you did something longer than you intended? What were you doing?",
         helper: "This does not by itself mean you enjoyed it.",
@@ -291,21 +291,21 @@ export const MAP_QUESTION_PARTS = [
         multi: true,
       },
       {
-        id: "p5-weird-amount",
+        id: "p5-weird-amount", retired: true,
         branch: "Spent time learning",
         text: "Is there something you have spent time learning about or doing that you want to add?",
         legacyStarters: ["I seem to know a weird amount about"],
         multi: true,
       },
       {
-        id: "p5-improve",
+        id: "p5-improve", retired: true,
         branch: "Tried to change or improve",
         text: "Have you recently tried to change, fix, practise, or improve something? What did you do?",
         legacyStarters: ["I keep trying to improve"],
         multi: true,
       },
       {
-        id: "p5-frustrated",
+        id: "p5-frustrated", retired: true,
         branch: "Didn't work as wanted",
         text: "Was there a moment in one of these activities when something didn't work as you wanted? What happened?",
         legacyStarters: ["I get frustrated when"],
@@ -343,11 +343,11 @@ export const MAP_PAUSE_TEXT = "I'm not choosing something to explore right now."
 
 export const MAP_PICK_FIELDS = [
   { id: "one-thing", label: "One thing I might want to understand better is:" },
-  { id: "noticed-because", label: "The entry or experience that brought this to my attention was:" },
+  { id: "noticed-because", retired: true, label: "The entry or experience that brought this to my attention was:" },
   // Retired from the form (Oct 2026). Saved text still shows on the map and in downloads.
   { id: "do-not-know", label: "I do NOT know yet:", retired: true },
   {
-    id: "small-way",
+    id: "small-way", retired: true,
     label: "One small way I could learn more about it:",
     hint: "For example: observing, asking a question, or looking up one practical detail. A plan is not a commitment.",
   },
@@ -359,7 +359,7 @@ export const MAP_PICK_FIELDS = [
   },
   { id: "more-less", label: "Something here I'd want more of, or less of:" },
   {
-    id: "connection-now",
+    id: "connection-now", retired: true,
     label: "Do you want to do anything with a former connection right now, leave it as it is, or leave the question open?",
   },
 ];
