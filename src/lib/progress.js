@@ -2,6 +2,7 @@ import { firstOpenGettingStartedStep, gettingStartedFinished } from "./gettingSt
 import { isWorkbookLesson } from "./lessonKind";
 import { answerKey, routeSkipsWriting } from "./workbook";
 import { isModuleOneInteractive, moduleOneStepComplete } from "./moduleOne";
+import { isModuleThreeInteractive, moduleThreeStepComplete } from "./moduleThree";
 
 /**
  * Completion follows the curriculum's own shape: a step counts once one Try or
@@ -38,6 +39,11 @@ export function missingPrompts(lesson, answers) {
     if (moduleOneStepComplete(lesson.code, answers)) return [];
     return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
   }
+  // Module 3 lessons follow the same pattern: see src/lib/moduleThree.js.
+  if (isModuleThreeInteractive(lesson?.code)) {
+    if (moduleThreeStepComplete(lesson.code, answers)) return [];
+    return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
+  }
   if (hasInteractionLine(lesson, answers)) return [];
   return requiredPrompts(lesson).filter((prompt) => isBlank((answers || {})[answerKey(lesson.code, prompt.index)]));
 }
@@ -47,6 +53,7 @@ export function stepComplete(lesson, answers, states) {
   const route = states && lesson ? states[lesson.code] : "";
   if (routeSkipsWriting(route)) return true;
   if (isModuleOneInteractive(lesson?.code)) return moduleOneStepComplete(lesson.code, answers);
+  if (isModuleThreeInteractive(lesson?.code)) return moduleThreeStepComplete(lesson.code, answers);
   const prompts = requiredPrompts(lesson);
   if (!prompts.length) return true;
   if (hasInteractionLine(lesson, answers)) return true;
