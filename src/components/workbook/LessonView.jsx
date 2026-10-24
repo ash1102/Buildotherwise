@@ -30,6 +30,9 @@ import AgreementLesson from "./moduleOne/AgreementLesson";
 import PlanLesson from "./moduleTwo/PlanLesson";
 import TryLesson from "./moduleTwo/TryLesson";
 import DiscoverLesson from "./moduleTwo/DiscoverLesson";
+import SeparateLesson from "./moduleFour/SeparateLesson";
+import ActionLesson from "./moduleFour/ActionLesson";
+import ReviewLesson from "./moduleFour/ReviewLesson";
 import { journalStepHref, saveAnswer } from "@/lib/journal";
 import DecisionFollowUp from "./DecisionFollowUp";
 import { BridgeIn, BridgeOut } from "./ModuleBridge";
@@ -46,6 +49,9 @@ const OWNED_LESSONS = {
   m2Plan: PlanLesson,
   m2Try: TryLesson,
   m2Discover: DiscoverLesson,
+  m4Separate: SeparateLesson,
+  m4Action: ActionLesson,
+  m4Review: ReviewLesson,
 };
 
 /** O.5's second box holds the join choice. On the step page it is a set of buttons, not a writing box. */
