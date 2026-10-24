@@ -236,23 +236,11 @@ export default function LifeMapPage() {
             <p className="workbook-label">Your Life Map</p>
             <h1 className="mt-2 font-heading text-3xl sm:text-4xl">Map the life you’re actually living</h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-              This step comes after Getting Started and before Module 1. Start with places and activities from a recent stretch you remember, then people you were in contact with.
-              Observations and possible threads come after those entries are on the map. You choose what each connection means.
-            </p>
-            <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-muted-faint">
-              The map is the picture. Areas organize it, and a line between entries appears only when you connect them. The list shows the same answers without the picture.
+              Optional. A few more questions, and a picture of your answers. Everything from your snapshot is already here. You choose what connects to what.
             </p>
           </div>
         </div>
         <div className="mt-5 flex flex-wrap items-center gap-3">
-          <Button type="button" variant="outline" onClick={download} className="rounded-full">
-            <Download className="mr-2 h-4 w-4" aria-hidden="true" />
-            Download
-          </Button>
-          <Button type="button" variant="outline" onClick={() => window.print()} className="rounded-full">
-            <Printer className="mr-2 h-4 w-4" aria-hidden="true" />
-            Print
-          </Button>
           <Button
             type="button"
             variant="outline"
@@ -343,7 +331,6 @@ export default function LifeMapPage() {
           others={graph.nodes}
           connections={connections}
           onSave={saveSelected}
-          onLinkEntry={(entryId) => saveSelected({ entry_id: entryId })}
           onConnect={connect}
           onDisconnect={disconnect}
           onRemove={removeSelected}
@@ -359,13 +346,7 @@ export default function LifeMapPage() {
         </p>
       )}
       </div>
-      <BringInSavedAnswer options={options} onAdd={bringIn} />
 
-      <div>
-        <PrivacyNote>
-          The map is saved on this device and copied to your account. In the app, only your account can open it. A Markdown download includes the full text of any journal entry linked to a line, not only that journal entry’s title. Downloading or printing is yours to do.
-        </PrivacyNote>
-      </div>
 
       <StepNav prev={null} next={nextStep} workbookLink="/" endNote="" />
     </div>
