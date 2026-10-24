@@ -8,7 +8,20 @@
  * Answers and the Pass choice live in the same browser storage as the rest of the book.
  */
 
-export const GS_CODES = ["O.1", "O.4", "O.5"];
+/**
+ * Oct 24, 2026 (review branch module-1-interactive): the long Getting Started sequence is
+ * no longer a gate. Only the welcome (O.1, with its privacy notice and the "Let me in" tap)
+ * stands before Module 1. O.4 and O.5 leave the active flow. Their records and every saved
+ * answer stay where they were and can still be opened (see EARLIER_GS_CODES).
+ * Anyone who already finished the old sequence has O.1 done, so nobody is locked out.
+ */
+export const GS_CODES = ["O.1"];
+
+/** Former Getting Started steps, kept readable for people who answered them. */
+export const EARLIER_GS_CODES = ["O.4", "O.5"];
+
+/** Every code that has ever been part of Getting Started, for read-only views of saved answers. */
+export const ALL_GS_CODES = ["O.1", "O.4", "O.5"];
 
 /**
  * Optional Getting Started steps. They do not hold the workbook shut.
@@ -18,7 +31,7 @@ export const GS_CODES = ["O.1", "O.4", "O.5"];
 export const OPTIONAL_GS_CODES = ["O.3"];
 
 /** Steps shown in the Getting Started flow that can be left blank without blocking anything. */
-export const OPTIONAL_IN_FLOW_GS_CODES = ["O.4"];
+export const OPTIONAL_IN_FLOW_GS_CODES = [];
 
 export function isOptionalInFlowGettingStartedLesson(lesson) {
   return Boolean(lesson) && OPTIONAL_IN_FLOW_GS_CODES.includes(lesson.code);
