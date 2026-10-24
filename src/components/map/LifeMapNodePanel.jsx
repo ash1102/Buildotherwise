@@ -82,7 +82,8 @@ export default function LifeMapNodePanel({
         </div>
       </div>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+      <div className={`mt-4 grid gap-4 ${node.label ? "sm:grid-cols-2" : ""}`}>
+        {node.label ? (
         <div>
           <label className="workbook-label block" htmlFor="map-node-label">
             Short label on the map
@@ -95,6 +96,7 @@ export default function LifeMapNodePanel({
             className="mt-2 border-border bg-background text-[14px]"
           />
         </div>
+        ) : null}
         <div>
           <label className="workbook-label block" htmlFor="map-node-text">
             The line itself
@@ -190,7 +192,8 @@ export default function LifeMapNodePanel({
         </div>
       ) : null}
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+      <div className={`mt-5 grid gap-4 ${onLinkEntry ? "sm:grid-cols-2" : ""}`}>
+        {onLinkEntry ? (
         <div>
           <label className="workbook-label block" htmlFor="map-node-journal">
             A journal line behind this
@@ -218,6 +221,7 @@ export default function LifeMapNodePanel({
             </p>
           ) : null}
         </div>
+        ) : null}
 
         <div>
           <label className="workbook-label block" htmlFor="map-node-connect">
