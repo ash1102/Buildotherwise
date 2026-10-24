@@ -47,9 +47,10 @@ export function PartFlow({ lessonCode, parts }) {
                   className={`block h-1.5 rounded-full ${i === index ? "bg-primary" : i < index ? "bg-primary/45" : "bg-border"}`}
                 />
                 <span
-                  className={`mt-1.5 block truncate text-[12px] font-semibold uppercase tracking-wide ${
-                    i === index ? "text-accent-ink" : "text-muted-faint group-hover:text-muted-foreground"
-                  }`}
+                  aria-hidden="true"
+                  className={`mt-1.5 truncate text-[12px] font-semibold uppercase tracking-wide ${
+                    parts.length > 5 ? "hidden sm:block" : "block"
+                  } ${i === index ? "text-accent-ink" : "text-muted-faint group-hover:text-muted-foreground"}`}
                 >
                   {item.short}
                 </span>
