@@ -1,13 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { stepComplete } from "./progress.js";
 import {
   CLOSING_PARAGRAPHS,
   JOURNAL_INTRO,
   JOURNAL_PROMPTS,
-  MODULE_FIVE_TITLE,
-  applyModuleFiveContent,
-  applyModuleFiveModules,
   journeyGroups,
   moduleFiveStepComplete,
   patternTitle,
@@ -22,23 +20,30 @@ const lesson = (code) => ({
   reflect_prompts: ["two"],
 });
 
-test("display overlay renames Module 5 only", () => {
-  const modules = applyModuleFiveModules([
-    { order: 4, title: "Check the Story, Build Evidence", purpose: "Keep it" },
-    { order: 5, title: "Tuning Your Instrument", purpose: "Listen" },
-  ]);
-  assert.equal(modules[0].title, "Check the Story, Build Evidence");
-  assert.equal(modules[1].title, MODULE_FIVE_TITLE);
-  assert.match(modules[1].purpose, /patterns do I recognize/);
-
-  const lessons = applyModuleFiveContent([
-    { code: "M4-L3", title: "Review the evidence and revise your statement" },
-    { code: "M5-L1", title: "Listen before you tune", purpose: "old" },
-    { code: "M5-L3", title: "Check an impression and take stock" },
-  ]);
-  assert.equal(lessons[0].title, "Review the evidence and revise your statement");
-  assert.equal(lessons[1].title, "Understand the Sequence Before You Map It");
-  assert.equal(lessons[2].title, "Check an Impression and Close Pilot 1");
+test("Module 5 titles stay on the records, not in this code", () => {
+  const files = [
+    "./moduleFive.js",
+    "./curriculum.js",
+    "./preview/steps/otherModules.js",
+    "../hooks/useCurriculum.js",
+    "../components/workbook/moduleFive/common.jsx",
+    "../components/workbook/moduleFive/SequenceLesson.jsx",
+    "../components/workbook/moduleFive/ResponseLesson.jsx",
+    "../components/workbook/moduleFive/CloseLesson.jsx",
+    "../pages/ModulePage.jsx",
+  ];
+  const dropped = [
+    "Protect What Works and Navigate Intensity",
+    "Understand the Sequence Before You Map It",
+    "Protect What Works or Try One Small Response",
+    "Check an Impression and Close Pilot 1",
+  ];
+  for (const file of files) {
+    const source = readFileSync(new URL(file, import.meta.url), "utf8");
+    for (const phrase of dropped) {
+      assert.equal(source.includes(phrase), false, `${file} still contains ${phrase}`);
+    }
+  }
 });
 
 test("pattern title reads the card, the participant's words, or nothing", () => {

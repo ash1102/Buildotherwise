@@ -249,7 +249,7 @@ function PartClose({ lesson, answers }) {
   );
 }
 
-/** M5-L3 · Check an Impression and Close Pilot 1. */
+/** M5-L3. The lesson title comes from the Lesson record. */
 export default function CloseLesson({ lesson }) {
   const answers = useAnswers();
   const parts = [

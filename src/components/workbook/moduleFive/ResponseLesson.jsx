@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import PromptField from "../PromptField";
+import useCurriculum from "@/hooks/useCurriculum";
 import { useAnswers } from "@/lib/workbook";
 import { FinishControl, MultiChoice, P, Panel, PartFlow } from "../moduleOne/parts";
 import {
@@ -17,6 +18,8 @@ import {
 import { EarlierM5, JournalStage, LongerReading, PatternPicker, SavedPattern } from "./common";
 
 function PartReturn({ answers }) {
+  const { lessonsByCode } = useCurriculum();
+  const patternLessonTitle = lessonsByCode["M5-L1"]?.title || "";
   const [open, setOpen] = useState(!patternTitle(answers));
   return (
     <div className="space-y-5">
@@ -39,7 +42,8 @@ function PartReturn({ answers }) {
         {open ? (
           <PatternPicker
             answers={answers}
-            onChange={savePatternChoice}
+            lessonTitle={patternLessonTitle}
+            onChange={(id) => savePatternChoice(id, patternLessonTitle)}
           />
         ) : null}
       </div>
@@ -149,7 +153,7 @@ function PartJournal({ lesson, answers }) {
   );
 }
 
-/** M5-L2 · Protect What Works or Try One Small Response. */
+/** M5-L2. The lesson title comes from the Lesson record. */
 export default function ResponseLesson({ lesson, readings = [] }) {
   const answers = useAnswers();
   const parts = [

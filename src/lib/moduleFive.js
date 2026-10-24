@@ -7,8 +7,8 @@ import { FINISHED, joinMulti, plainValue, recordAnswer, splitMulti } from "./mod
  * Ashley's "Module 5 Interactive Redesign" is the source for the stages, the
  * journal prompts, the closing, and the journal introduction. Short readings
  * are shortened from the published Module 5 library readings and lesson text.
- * Nothing here writes to Lesson or Module records. Titles and purposes below
- * are a display overlay until Ashley approves those record edits.
+ * Nothing here writes to Lesson or Module records. Titles and purposes stay
+ * on those records. Module 5 is "Tuning Your Instrument."
  *
  * SAVED-ANSWER KEYS stay in the workbook answers store and are copied to the
  * Conversation Journal by prompt key. Older numbered answers (M5-L1#0 and so
@@ -44,44 +44,6 @@ import { FINISHED, joinMulti, plainValue, recordAnswer, splitMulti } from "./mod
  */
 
 export const M5_CODES = ["M5-L1", "M5-L2", "M5-L3"];
-
-export const MODULE_FIVE_TITLE = "Protect What Works and Navigate Intensity";
-export const MODULE_FIVE_PURPOSE =
-  "What patterns do I recognize in myself, and what might I want to keep, change, or understand better?";
-
-export const MODULE_FIVE_LESSONS = {
-  "M5-L1": {
-    title: "Understand the Sequence Before You Map It",
-    purpose: "Name a pattern you recognize, and look at what happens before, during, and after it.",
-  },
-  "M5-L2": {
-    title: "Protect What Works or Try One Small Response",
-    purpose: "Decide what you might want to keep, adjust, protect, or understand better.",
-  },
-  "M5-L3": {
-    title: "Check an Impression and Close Pilot 1",
-    purpose: "Look back across the pilot and choose what, if anything, you want to carry forward.",
-  },
-};
-
-/** Display titles and purposes for this review branch. Stored records are left as they are. */
-export function applyModuleFiveContent(rows) {
-  return (rows || []).map((lesson) => applyModuleFiveContentOne(lesson));
-}
-
-export function applyModuleFiveContentOne(lesson) {
-  if (!lesson) return lesson;
-  const patch = MODULE_FIVE_LESSONS[lesson.code];
-  return patch ? { ...lesson, ...patch } : lesson;
-}
-
-export function applyModuleFiveModules(modules) {
-  return (modules || []).map((module) =>
-    Number(module && module.order) === 5
-      ? { ...module, title: MODULE_FIVE_TITLE, purpose: MODULE_FIVE_PURPOSE }
-      : module
-  );
-}
 
 export const JOURNAL_INTRO =
   "You don't have to answer every question. Start wherever something catches your attention. You can explore a memory, question an assumption, disagree with an idea, or follow a thought somewhere unexpected.";
@@ -309,12 +271,11 @@ export function recordM5(code, title, key, value, label) {
 }
 
 /** Card id for the picker. The readable name is what the journal and the discovery record keep. */
-export function savePatternChoice(id) {
-  const title = MODULE_FIVE_LESSONS["M5-L1"].title;
+export function savePatternChoice(id, lessonTitle = "") {
   const card = patternCard(id);
   const label = !id ? "" : id === PATTERN_OTHER ? "Something else I've noticed" : card ? card.title : String(id);
   setAnswer("M5-L1", "pattern", id);
-  recordM5("M5-L1", title, "pattern-label", label, "A pattern I recognize");
+  recordM5("M5-L1", lessonTitle, "pattern-label", label, "A pattern I recognize");
 }
 
 export function patternCard(id) {

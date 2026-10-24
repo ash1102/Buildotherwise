@@ -37,21 +37,22 @@ export const otherModules = [
     key: "module-5",
     slug: "protect-what-works",
     order: 5,
-    title: "Protect What Works and Navigate Intensity",
+    title: "Tuning Your Instrument",
     pilot: "pilot_one",
     kind: "module",
-    purpose: "Keep what holds you steady, and handle intensity without a verdict.",
+    purpose:
+      "Listen to how an activity is going, then protect what already works or make one small reversible adjustment. The instrument is how you are engaging right now, not you. Useful does not have to mean calm.",
     readings: [
       shortReading("M5-R1", "Intensity Is Not Automatically the Problem"),
       shortReading("M5-R2", "Protect What Works or Change What Needs Changing"),
       shortReading("M5-R3", "A Hunch Can Start a Question. It Cannot Finish One."),
     ],
     steps: [
-      { code: "M5-L1", title: "Understand the Sequence Before You Map It", sourceLesson: "M5-L1", readings: ["M5-R1"], blocks: [], closesPilot: false },
-      { code: "M5-L2", title: "Protect What Works or Try One Small Response", sourceLesson: "M5-L2", readings: ["M5-R2"], blocks: [] },
+      { code: "M5-L1", title: "Listen before you tune", sourceLesson: "M5-L1", readings: ["M5-R1"], blocks: [], closesPilot: false },
+      { code: "M5-L2", title: "Keep what is in tune, or change one thing", sourceLesson: "M5-L2", readings: ["M5-R2"], blocks: [] },
       {
         code: "M5-L3",
-        title: "Check an Impression and Close Pilot 1",
+        title: "Check an impression and take stock",
         sourceLesson: "M5-L3",
         readings: ["M5-R3"],
         blocks: [],

@@ -17,10 +17,7 @@ import {
   readM5,
 } from "@/lib/moduleFive";
 
-const PATTERN_LESSON = {
-  code: "M5-L1",
-  title: "Understand the Sequence Before You Map It",
-};
+const PATTERN_LESSON_CODE = "M5-L1";
 
 /** One Conversation Journal box. Follow-ups stay in the prompt list, not separate fields. */
 export function JournalStage({ lesson, kicker, prompt, followUps }) {
@@ -53,7 +50,7 @@ export function JournalStage({ lesson, kicker, prompt, followUps }) {
 }
 
 /** Selectable pattern cards. Choosing again clears the selection. */
-export function PatternPicker({ answers, onChange }) {
+export function PatternPicker({ answers, lessonTitle = "", onChange }) {
   const selected = readM5(answers, "M5-L1", "pattern");
   return (
     <fieldset className="min-w-0">
@@ -86,8 +83,8 @@ export function PatternPicker({ answers, onChange }) {
       {selected === PATTERN_OTHER ? (
         <div className="mt-4">
           <PromptField
-            lessonCode={PATTERN_LESSON.code}
-            lessonTitle={PATTERN_LESSON.title}
+            lessonCode={PATTERN_LESSON_CODE}
+            lessonTitle={lessonTitle}
             index="pattern-other"
             label="What pattern have you noticed?"
             variant="inline"

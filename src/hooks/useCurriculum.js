@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { applyGettingStartedContent } from "@/lib/gettingStartedContent";
-import { applyModuleFiveContent, applyModuleFiveModules } from "@/lib/moduleFive";
 
 /** Modules and lessons are content records, so a new module is data, not a redesign. */
 /** The curriculum is content, so it is fetched once per session and reused by every page. */
@@ -22,8 +21,8 @@ export default function useCurriculum() {
           base44.entities.Lesson.list("module_order", 200),
         ]);
         if (!active) return;
-        const sortedModules = applyModuleFiveModules([...moduleRows].sort((a, b) => a.order - b.order));
-        const sortedLessons = applyModuleFiveContent(applyGettingStartedContent(lessonRows)).sort((a, b) =>
+        const sortedModules = [...moduleRows].sort((a, b) => a.order - b.order);
+        const sortedLessons = applyGettingStartedContent(lessonRows).sort((a, b) =>
           a.module_order === b.module_order ? a.order - b.order : a.module_order - b.module_order
         );
         curriculumCache = { modules: sortedModules, lessons: sortedLessons };

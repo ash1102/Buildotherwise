@@ -39,11 +39,15 @@ function PartIntro({ lesson, readings }) {
   );
 }
 
-function PartChoose({ answers }) {
+function PartChoose({ lesson, answers }) {
   return (
     <div className="space-y-4">
       <P>Choose a pattern you already recognize. You can use one of the examples, or write your own.</P>
-      <PatternPicker answers={answers} onChange={savePatternChoice} />
+      <PatternPicker
+        answers={answers}
+        lessonTitle={lesson.title}
+        onChange={(id) => savePatternChoice(id, lesson.title)}
+      />
     </div>
   );
 }
@@ -99,12 +103,12 @@ function PartJournal({ lesson, answers }) {
   );
 }
 
-/** M5-L1 · Understand the Sequence Before You Map It. */
+/** M5-L1. The lesson title comes from the Lesson record. */
 export default function SequenceLesson({ lesson, readings = [] }) {
   const answers = useAnswers();
   const parts = [
     { id: "intro", short: "Read", title: "A pattern is a sequence", content: <PartIntro lesson={lesson} readings={readings} /> },
-    { id: "choose", short: "Choose", title: "Choose a pattern", content: <PartChoose answers={answers} /> },
+    { id: "choose", short: "Choose", title: "Choose a pattern", content: <PartChoose lesson={lesson} answers={answers} /> },
     { id: "map", short: "Map", title: "Map what happens", content: <PartMap lesson={lesson} /> },
     { id: "whole", short: "Whole", title: "Look at the whole pattern", content: <PartWhole lesson={lesson} answers={answers} /> },
     { id: "journal", short: "Journal", title: "Go deeper", content: <PartJournal lesson={lesson} answers={answers} /> },
