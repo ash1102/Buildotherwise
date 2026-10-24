@@ -247,7 +247,7 @@ export default function LifeSnapshot({ map, onOpenFullMap }) {
     return true;
   };
   const saveAll = () => {
-    const kept = REFLECT_FIELDS.map(keepInJournal).some(Boolean);
+    const kept = paused ? false : REFLECT_FIELDS.map(keepInJournal).some(Boolean);
     setSaved(kept || paused ? "saved" : "empty");
   };
 
