@@ -65,6 +65,7 @@ export const BRIDGES = {
       { code: "M3-L1", index: 2, label: "What you observed about starting, continuing, or stopping" },
       { code: "M3-L3", index: 1, label: "What changed" },
       { code: "M3-L3", index: 5, label: "What you wanted to carry into Module 4" },
+      { code: "M1-L3", index: 4, label: "Something you believed about yourself and hadn’t tested yet (Module 1)" },
     ],
     question:
       "What did you assume at the start (about the activity, the setup, or yourself) that these observations now question? Or do they back it up?",
