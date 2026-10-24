@@ -29,7 +29,8 @@ import DecisionFollowUp from "./DecisionFollowUp";
 import { BridgeIn, BridgeOut } from "./ModuleBridge";
 import { bridgeIn, bridgeOut } from "@/lib/moduleBridges";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor, setAnswer, useAnswers, answerKey } from "@/lib/workbook";
-import { JOIN_CHOICES, isGettingStartedLesson, joinChoiceText, splitChoice } from "@/lib/gettingStarted";
+import { AGREEMENT_APPROACH, AGREEMENT_CODE, AGREEMENT_NOTE, AGREEMENT_WHY, JOIN_CHOICES, isGettingStartedLesson, joinChoiceText, splitChoice } from "@/lib/gettingStarted";
+import LearningAgreement from "@/components/gettingStarted/LearningAgreement";
 
 /** O.5's second box holds the join choice. On the step page it is a set of buttons, not a writing box. */
 const JOIN_CHOICE_CODE = "O.5";
@@ -298,7 +299,10 @@ export default function LessonView({
       (lesson.type !== "reading" && (rawTry.length > 0 || rawReflect.length > 0)));
 
   const promptField = (prompt, index, key) =>
-    lesson.code === JOIN_CHOICE_CODE && index === JOIN_CHOICE_INDEX ? (
+    lesson.code === AGREEMENT_CODE && index === AGREEMENT_WHY ? (
+      <LearningAgreement key={key} lessonTitle={lesson.title} />
+    ) : lesson.code === AGREEMENT_CODE && (index === AGREEMENT_APPROACH || index === AGREEMENT_NOTE) ? null
+    : lesson.code === JOIN_CHOICE_CODE && index === JOIN_CHOICE_INDEX ? (
       <JoinChoicePicker key={key} lessonCode={lesson.code} lessonTitle={lesson.title} index={index} label={prompt} />
     ) : (
     <PromptField
