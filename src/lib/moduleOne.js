@@ -15,7 +15,11 @@ import { saveAnswer } from "./journal";
  *   M1-L1#notice-route    which kind of noticing they picked (one of NOTICE_OPTIONS labels)
  *   M1-L1#notice-text     their own optional words for it
  *   M1-L1#map-context     a Life Map line they chose to bring in, copied as written
- *   M1-L1#encounter       a possibility card they SELECTED. Not an interest, not a plan.
+ *   M1-L1#encounter       possibility cards they SELECTED (multi, "; "-joined titles). Selecting only
+ *                         means it caught their attention: not an interest, not a plan.
+ *                         Oct 24, 2026: the gallery grew from 3 cards to 12 and became multi-select.
+ *                         A value saved under an earlier card title (single title) still reads
+ *                         as that card; it is only rewritten if the participant changes it.
  *   M1-L1#stood-out       optional: what, if anything, stood out
  *   M1-L1#carry-choice    what they want to carry into Module 2 (one of CARRY_OPTIONS)
  *   M1-L2#compare         their answer to the Alex/Sam question
@@ -53,29 +57,35 @@ export const NOTICE_OPTIONS = [
   { id: "nothing-yet", label: "Nothing comes to mind yet", prompt: "That's okay. Think of something you saw, heard, or came across recently. What could you learn more about?" },
 ];
 
+/**
+ * Discovery gallery cards (Ashley's list, Oct 24, 2026). `legacyTitles` are the earlier
+ * card titles, so a selection saved before the gallery grew still shows as selected.
+ */
 export const ENCOUNTER_CARDS = [
-  {
-    id: "repair",
-    title: "Repairing what others throw away",
-    question: "What if you could find out why something stopped working—and bring it back to life?",
-    icon: "wrench",
-    alt: "Illustration: a wrench, for repair work",
-  },
-  {
-    id: "design",
-    title: "Designing experiences",
-    question: "How could you build an experience that helps somebody understand something differently?",
-    icon: "sparkles",
-    alt: "Illustration: sparkles, for designing an experience",
-  },
-  {
-    id: "community",
-    title: "Solving a community problem",
-    question: "How do people turn something that bothers them into a practical local project?",
-    icon: "users",
-    alt: "Illustration: a group of people, for a community project",
-  },
+  { id: "repair", title: "Repair & Restore", description: "Figure out why things stop working and how to bring them back to life.", icon: "wrench", alt: "Illustration: a wrench", legacyTitles: ["Repairing what others throw away"] },
+  { id: "design", title: "Design Experiences", description: "Create environments and experiences that change how people learn or interact.", icon: "sparkles", alt: "Illustration: sparkles", legacyTitles: ["Designing experiences"] },
+  { id: "community", title: "Community Projects", description: "Explore how people work together to solve local problems.", icon: "users", alt: "Illustration: a group of people", legacyTitles: ["Solving a community problem"] },
+  { id: "nature", title: "Nature & Discovery", description: "Investigate plants, animals, ecosystems, and the natural world.", icon: "leaf", alt: "Illustration: a leaf" },
+  { id: "sound", title: "Sound & Music", description: "Explore how sounds are created, recorded, combined, and experienced.", icon: "music", alt: "Illustration: musical notes" },
+  { id: "making", title: "Making Things", description: "Experiment with materials, tools, and hands-on creativity.", icon: "hammer", alt: "Illustration: a hammer" },
+  { id: "behavior", title: "Human Behavior", description: "Explore why people think, feel, decide, and behave as they do.", icon: "brain", alt: "Illustration: a brain" },
+  { id: "food", title: "Food & Experimentation", description: "Discover how ingredients, cultures, and techniques shape food.", icon: "chef", alt: "Illustration: a chef's hat" },
+  { id: "tech", title: "Technology & Invention", description: "Explore how technology works and what new things it makes possible.", icon: "cpu", alt: "Illustration: a computer chip" },
+  { id: "stories", title: "Stories & Media", description: "Discover how stories are created and communicated through different media.", icon: "book", alt: "Illustration: an open book" },
+  { id: "systems", title: "Systems & Problem-Solving", description: "Investigate how complicated systems work and how they might be improved.", icon: "network", alt: "Illustration: connected nodes in a network" },
+  { id: "movement", title: "Movement & Performance", description: "Explore movement, dance, physical expression, and performance.", icon: "person", alt: "Illustration: a standing figure" },
 ];
+
+/** Selected card ids, from the saved text. Earlier single-title values still match their card. */
+export function selectedEncounterIds(value) {
+  const titles = splitMulti(value);
+  return ENCOUNTER_CARDS.filter((card) => titles.some((title) => title === card.title || (card.legacyTitles || []).includes(title))).map((card) => card.id);
+}
+
+/** Saved text for a set of card ids, in gallery order, using the current titles. */
+export function encounterValue(ids) {
+  return joinMulti(ENCOUNTER_CARDS.filter((card) => ids.includes(card.id)).map((card) => card.title));
+}
 
 export const CARRY_OPTIONS = [
   "Something from my own experience",
