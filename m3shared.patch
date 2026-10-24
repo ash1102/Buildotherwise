@@ -1,0 +1,166 @@
+diff --git a/package.json b/package.json
+index e1dae8d..a0b221e 100644
+--- a/package.json
++++ b/package.json
+@@ -9,6 +9,7 @@
+     "test:life-map": "node --import ./scripts/register-js-extension.mjs --test src/lib/lifeMap.placement.test.js src/lib/lifeMapBranching.test.js src/lib/lifeMapHybrid.test.js src/lib/moduleBridges.test.js src/lib/discoveryWays.test.js",
+     "test:gate": "node --import ./scripts/register-js-extension.mjs --test src/lib/postAuthPath.test.js",
+     "test:module-one": "node --import ./scripts/register-js-extension.mjs --test src/lib/moduleOne.test.js",
++    "test:module-three": "node --import ./scripts/register-js-extension.mjs --test src/lib/moduleThree.test.js",
+     "lint": "eslint . --quiet",
+     "lint:fix": "eslint . --fix",
+     "typecheck": "tsc -p ./jsconfig.json",
+diff --git a/src/components/workbook/LessonView.jsx b/src/components/workbook/LessonView.jsx
+index 0bf998e..2355038 100644
+--- a/src/components/workbook/LessonView.jsx
++++ b/src/components/workbook/LessonView.jsx
+@@ -27,6 +27,9 @@ import { interactionsFor, lessonOwner } from "@/lib/interactions";
+ import NoticeLesson from "./moduleOne/NoticeLesson";
+ import AttentionLesson from "./moduleOne/AttentionLesson";
+ import AgreementLesson from "./moduleOne/AgreementLesson";
++import SetupLesson from "./moduleThree/SetupLesson";
++import ChangeLesson from "./moduleThree/ChangeLesson";
++import ReviewLesson from "./moduleThree/ReviewLesson";
+ import { journalStepHref, saveAnswer } from "@/lib/journal";
+ import DecisionFollowUp from "./DecisionFollowUp";
+ import { BridgeIn, BridgeOut } from "./ModuleBridge";
+@@ -36,7 +39,14 @@ import { AGREEMENT_APPROACH, AGREEMENT_CODE, AGREEMENT_NOTE, AGREEMENT_WHY, JOIN
+ import LearningAgreement from "@/components/gettingStarted/LearningAgreement";
+ 
+ /** Steps drawn entirely by one interactive piece (see src/lib/interactions.js). */
+-const OWNED_LESSONS = { m1Notice: NoticeLesson, m1Attention: AttentionLesson, m1Agreement: AgreementLesson };
++const OWNED_LESSONS = {
++  m1Notice: NoticeLesson,
++  m1Attention: AttentionLesson,
++  m1Agreement: AgreementLesson,
++  m3Setup: SetupLesson,
++  m3Change: ChangeLesson,
++  m3Review: ReviewLesson,
++};
+ 
+ /** O.5's second box holds the join choice. On the step page it is a set of buttons, not a writing box. */
+ const JOIN_CHOICE_CODE = "O.5";
+@@ -314,7 +324,7 @@ export default function LessonView({
+           purpose={lesson.purpose}
+           status={status}
+         />
+-        <OwnedLesson lesson={lesson} />
++        <OwnedLesson lesson={lesson} readings={readings} />
+         {ownedOrder === 1 && ownedLast ? (
+           <div className="space-y-1">
+             <Link
+diff --git a/src/lib/interactions.js b/src/lib/interactions.js
+index de3e40c..7241188 100644
+--- a/src/lib/interactions.js
++++ b/src/lib/interactions.js
+@@ -14,11 +14,17 @@
+  *               Module 1 interactive lessons (src/components/workbook/moduleOne). `ownsLesson`
+  *               means the piece draws the whole step: no generic teach, reading, Try or Reflect
+  *               sections. The Lesson record is still loaded for title, purpose, duration and code.
++ *   m3Setup, m3Change, m3Review
++ *               Module 3 interactive lessons (src/components/workbook/moduleThree), same pattern.
+  */
+ export const INTERACTIONS = {
+   "M1-L1": [{ type: "m1Notice", ownsLesson: true }],
+   "M1-L2": [{ type: "m1Attention", ownsLesson: true }],
+   "M1-L3": [{ type: "m1Agreement", ownsLesson: true }],
++  // Module 3 interactive lessons (review branch module-3-interactive): src/components/workbook/moduleThree.
++  "M3-L1": [{ type: "m3Setup", ownsLesson: true }],
++  "M3-L2": [{ type: "m3Change", ownsLesson: true }],
++  "M3-L3": [{ type: "m3Review", ownsLesson: true }],
+   // Module 2 now uses the concise workbook prompts. The former interactive
+   // planner/check-in code remains available, but is not rendered twice.
+ };
+diff --git a/src/lib/learnerRecords.js b/src/lib/learnerRecords.js
+index 0879a0b..23b6432 100644
+--- a/src/lib/learnerRecords.js
++++ b/src/lib/learnerRecords.js
+@@ -64,6 +64,7 @@ export const RECORD_TYPES = [
+     sources: [
+       { code: "M2-L1", slot: "plan" },
+       { code: "M2-L1", match: /^(\*\*)?Smallest real action:/ },
++      { code: "M3-L2", slot: "plan" },
+       { code: "M3-L2", match: /What single part of the setup would you change/ },
+     ],
+   },
+@@ -76,6 +77,7 @@ export const RECORD_TYPES = [
+     sources: [
+       { code: "M2-L2", slot: "checkin" },
+       { code: "M2-L3", match: /^what changed from (expectation|what you expected)/i },
++      { code: "M3-L2", slot: "checkin" },
+       { code: "M3-L3", match: /What changed, and what else was different/ },
+     ],
+   },
+diff --git a/src/lib/moduleBridges.js b/src/lib/moduleBridges.js
+index ceaf6af..bdaacad 100644
+--- a/src/lib/moduleBridges.js
++++ b/src/lib/moduleBridges.js
+@@ -71,9 +71,12 @@ export const BRIDGES = {
+     sources: [
+       { code: "M1-L1", index: 0, label: "Where you started (Module 1)" },
+       { code: "M2-L3", index: 0, label: "What was different from what you expected (Module 2)" },
++      // Interactive Module 3 (review branch module-3-interactive): M3-L3#5 is chosen in its last part,
++      // so the bridge question isn't asked again here. Named keys, see src/lib/moduleThree.js.
++      { code: "M3-L3", index: 5, label: "What you chose to carry into Module 4" },
++      { code: "M3-L2", index: "checkin", label: "What happened when you changed the setup (Module 3)" },
++      { code: "M3-L3", index: 1, label: "What seemed to help or change" },
+       { code: "M3-L1", index: 2, label: "What you observed about starting, continuing, or stopping" },
+-      { code: "M3-L3", index: 1, label: "What changed" },
+-      { code: "M3-L3", index: 5, label: "What you wanted to carry into Module 4" },
+       { code: "M1-L3", index: 4, label: "Something you believed about yourself and hadn’t tested yet (Module 1)" },
+     ],
+     question:
+@@ -89,6 +92,7 @@ export const BRIDGES = {
+     intro: "Here’s what you’ve worked out so far. Module 5 is about protecting what works or making one small adjustment.",
+     sources: [
+       { code: "M2-L3", index: 9, label: "What your first encounter left you with (Module 2)" },
++      { code: "M3-L3", index: "next", label: "What you wanted to do next with your Module 3 experiment" },
+       { code: "M3-L3", index: 4, label: "Whether you’d choose that condition again (Module 3)" },
+       { code: "M4-L3", index: 4, label: "Your more accurate wording" },
+       { code: "M4-L3", index: 5, label: "A cue or protective limit you wanted to carry forward" },
+diff --git a/src/lib/moduleBridges.test.js b/src/lib/moduleBridges.test.js
+index 214f5ae..df750d0 100644
+--- a/src/lib/moduleBridges.test.js
++++ b/src/lib/moduleBridges.test.js
+@@ -23,6 +23,9 @@ const EXTRA = { "M2-L2": [30, 31, 32], "M4-L1": [20, 21] };
+ const NAMED = {
+   "M1-L1": ["notice-route", "notice-text", "map-context", "encounter", "stood-out", "carry-choice"],
+   "M1-L3": ["carry-mode", "willing", "approach", "support", "support-other", "revisit"],
++  // Interactive Module 3 (src/lib/moduleThree.js).
++  "M3-L2": ["checkin", "outcome", "plan"],
++  "M3-L3": ["next", "helped", "costs", "uncertain"],
+ };
+ 
+ test("every bridge source and target points at a real answer slot", () => {
+diff --git a/src/lib/progress.js b/src/lib/progress.js
+index 42179d3..9c78f92 100644
+--- a/src/lib/progress.js
++++ b/src/lib/progress.js
+@@ -2,6 +2,7 @@ import { firstOpenGettingStartedStep, gettingStartedFinished } from "./gettingSt
+ import { isWorkbookLesson } from "./lessonKind";
+ import { answerKey, routeSkipsWriting } from "./workbook";
+ import { isModuleOneInteractive, moduleOneStepComplete } from "./moduleOne";
++import { isModuleThreeInteractive, moduleThreeStepComplete } from "./moduleThree";
+ 
+ /**
+  * Completion follows the curriculum's own shape: a step counts once one Try or
+@@ -38,6 +39,11 @@ export function missingPrompts(lesson, answers) {
+     if (moduleOneStepComplete(lesson.code, answers)) return [];
+     return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
+   }
++  // Module 3 lessons follow the same pattern: see src/lib/moduleThree.js.
++  if (isModuleThreeInteractive(lesson?.code)) {
++    if (moduleThreeStepComplete(lesson.code, answers)) return [];
++    return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
++  }
+   if (hasInteractionLine(lesson, answers)) return [];
+   return requiredPrompts(lesson).filter((prompt) => isBlank((answers || {})[answerKey(lesson.code, prompt.index)]));
+ }
+@@ -47,6 +53,7 @@ export function stepComplete(lesson, answers, states) {
+   const route = states && lesson ? states[lesson.code] : "";
+   if (routeSkipsWriting(route)) return true;
+   if (isModuleOneInteractive(lesson?.code)) return moduleOneStepComplete(lesson.code, answers);
++  if (isModuleThreeInteractive(lesson?.code)) return moduleThreeStepComplete(lesson.code, answers);
+   const prompts = requiredPrompts(lesson);
+   if (!prompts.length) return true;
+   if (hasInteractionLine(lesson, answers)) return true;
