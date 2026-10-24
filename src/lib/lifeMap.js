@@ -344,7 +344,8 @@ export const MAP_PAUSE_TEXT = "I'm not choosing something to explore right now."
 export const MAP_PICK_FIELDS = [
   { id: "one-thing", label: "One thing I might want to understand better is:" },
   { id: "noticed-because", label: "The entry or experience that brought this to my attention was:" },
-  { id: "do-not-know", label: "I do NOT know yet:" },
+  // Retired from the form (Oct 2026). Saved text still shows on the map and in downloads.
+  { id: "do-not-know", label: "I do NOT know yet:", retired: true },
   {
     id: "small-way",
     label: "One small way I could learn more about it:",
@@ -353,6 +354,8 @@ export const MAP_PICK_FIELDS = [
   {
     id: "more-room",
     label: "Is there anything here you would like more room for, or would like to keep as it is?",
+    // Replaced in the form by "more-less", which asks nearly the same thing.
+    retired: true,
   },
   { id: "more-less", label: "Something here I'd want more of, or less of:" },
   {
@@ -362,6 +365,11 @@ export const MAP_PICK_FIELDS = [
 ];
 
 export const MAP_PICK_KEY = "lifeMapPick";
+
+/** Fields the reflection form shows: current ones, plus a retired one only if it already holds someone's words. */
+export function reflectionFormFields(pick) {
+  return MAP_PICK_FIELDS.filter((field) => !field.retired || String((pick || {})[field.id] || "").trim());
+}
 
 /** A line on the map, or an explicit pause, means this step has been used. An empty map has not. */
 export function lifeMapHasEntries(map, pick) {
