@@ -20,8 +20,10 @@ export const BRIDGES = {
     heading: "From noticing to exploring",
     intro: "Here’s what you noticed in Module 1, in your own words. Module 2 starts from one of these, not from a blank page.",
     sources: [
-      { code: "M1-L1", index: 0, label: "Something you might want to understand better" },
-      { code: "M1-L1", index: 1, label: "What you’d need to encounter, ask, or try" },
+      // M1-L1 saves named answers from NoticeFlow, not its old numbered boxes.
+      { code: "M1-L1", index: "own-caught", label: "What caught your attention" },
+      { code: "M1-L1", index: "own-dont-know", label: "What you don’t know yet" },
+      { code: "M1-L1", index: "possibility", label: "What might help you learn a little more" },
       { code: "M1-L3", index: 1, label: "What you wanted to bring into Module 2" },
       { lifeMapPick: "one-thing", label: "From your Life Map" },
     ],
@@ -60,7 +62,7 @@ export const BRIDGES = {
     intro:
       "Here’s what you observed in Module 3, next to what you expected earlier. Module 4 checks the story against what happened.",
     sources: [
-      { code: "M1-L1", index: 0, label: "Where you started (Module 1)" },
+      { code: "M1-L1", index: "own-caught", label: "Where you started (Module 1)" },
       { code: "M2-L3", index: 0, label: "What was different from what you expected (Module 2)" },
       { code: "M3-L1", index: 2, label: "What you observed about starting, continuing, or stopping" },
       { code: "M3-L3", index: 1, label: "What changed" },
