@@ -269,7 +269,7 @@ function MemberHome() {
 
   const progress = usePacedProgress({ modules, lessonsByOrder, answers, states });
 
-  /** Getting Started is already finished. The Life Map is the step before Module 1, and Module 1 stays open either way. */
+  /** The welcome is done. Module 1 comes next. The Life Map is optional and never holds anything shut. */
   const next = useMemo(() => {
     return orderedLessons.find((lesson) => isWorkbookLesson(lesson) && !stepComplete(lesson, answers, states)) || null;
   }, [orderedLessons, answers, states]);
@@ -289,20 +289,6 @@ function MemberHome() {
         <p className="workbook-label">{started ? "Welcome back" : "Welcome"}</p>
         {loading ? (
           <div aria-busy="true" className="mt-3 h-[140px] animate-pulse rounded-2xl bg-border/60" />
-        ) : !mapPlaced ? (
-          <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
-            <p className="text-[13px] font-semibold text-primary-soft">Before Module 1</p>
-            <h1 className="mt-1.5 text-[clamp(1.5rem,1.1rem+1.6vw,2.1rem)] text-primary-foreground">
-              Map the life you’re actually living
-            </h1>
-            <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">
-              Getting Started is done. The Life Map comes next. Module 1 stays open if you want to look ahead.
-            </p>
-            <Link to="/map" className={`mt-5 ${marigoldButton}`}>
-              Open your Life Map
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
         ) : next && waitingWeek ? (
           <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
             <p className="text-[13px] font-semibold text-primary-soft">
@@ -361,7 +347,11 @@ function MemberHome() {
           <Link to="/map" className="rounded-xl border border-border bg-card p-4 transition hover:bg-secondary">
             <Map className="h-5 w-5 text-accent-ink" aria-hidden="true" />
             <span className="mt-2 block font-semibold">Your Life Map</span>
-            <span className="block text-[15px] text-muted-foreground">Recent places, activities, people, observations, and possible threads.</span>
+            <span className="block text-[15px] text-muted-foreground">
+              {mapPlaced
+                ? "Recent places, activities, people, observations, and possible threads."
+                : "Optional. A way to look at where your time and energy go, whenever it’s useful."}
+            </span>
           </Link>
           <Link to="/aspects" className="rounded-xl border border-border bg-card p-4 transition hover:bg-secondary">
             <Compass className="h-5 w-5 text-accent-ink" aria-hidden="true" />
@@ -374,7 +364,7 @@ function MemberHome() {
       <section>
         <p className="workbook-label">Your progress · Pilot 1</p>
         <Link to="/map" className="mt-3 block rounded-xl border border-border bg-card px-4 py-3 transition hover:bg-secondary">
-          <span className="block text-[13px] font-semibold text-accent-ink">Before Module 1</span>
+          <span className="block text-[13px] font-semibold text-accent-ink">Optional companion</span>
           <span className="block text-[16px] leading-snug text-foreground">Life Map</span>
         </Link>
         <ol className="mt-2 grid gap-2">
