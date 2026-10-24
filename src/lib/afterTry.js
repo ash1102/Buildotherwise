@@ -9,7 +9,9 @@
  * This is a nudge, not a lock: the next step can always be opened, and "I didn't
  * get to it" is a result the next step accepts.
  */
-export const AFTER_TRY_STEPS = ["M2-L1", "M3-L2"];
+// Oct 24, 2026 (module-2-interactive): M2-L1 removed. The pause and reminder now live
+// inside M2-L2 ("Try it in the real world"), so the plan step ends normally.
+export const AFTER_TRY_STEPS = ["M3-L2"];
 
 export function isAfterTryStep(code) {
   return AFTER_TRY_STEPS.includes(code);
