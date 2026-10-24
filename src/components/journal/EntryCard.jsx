@@ -35,7 +35,7 @@ export default function EntryCard({
           {entry.lesson_code ? (
             <Link
               className="font-medium text-accent-ink underline underline-offset-2"
-              to={`/lesson/${entry.lesson_code}`}
+              to={String(entry.prompt || "").startsWith("lifeMapPick#") ? "/map" : `/lesson/${entry.lesson_code}`}
             >
               {from}
             </Link>
