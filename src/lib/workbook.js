@@ -221,6 +221,11 @@ export function buildCarrySources(codes, lessonsByCode) {
     // M1-L1 uses interactive named answers, not its obsolete numbered prompt fields.
     const prompts = code === "M1-L1"
       ? [
+          { index: "notice-text", label: "Something I noticed" },
+          { index: "map-context", label: "From my Life Map" },
+          { index: "encounter", label: "A possibility I selected (an encounter, not a decision)" },
+          { index: "stood-out", label: "What stood out to me" },
+          { index: "carry-choice", label: "What I chose to carry into Module 2" },
           { index: "time-energy", label: "Where my time and energy go" },
           { index: "activity-parts", label: "Parts I pay more attention to" },
           { index: "missing-experience", label: "An experience missing from my week" },
@@ -228,6 +233,19 @@ export function buildCarrySources(codes, lessonsByCode) {
           { index: "own-dont-know", label: "What I don't know yet" },
           { index: "possibility", label: "What might help you learn a little more?" },
         ]
+      : code === "M1-L3"
+        ? [
+            { index: 1, label: "What I want to bring into Module 2" },
+            { index: "willing", label: "What I'm willing to try" },
+            { index: "approach", label: "How I'll approach the experience" },
+            { index: "support", label: "What makes exploring workable" },
+            { index: "support-other", label: "Support, in my words" },
+            { index: "revisit", label: "When I'll revisit my agreement" },
+            // Earlier version of this lesson
+            { index: 0, label: "What I was willing to try, in my words" },
+            { index: 2, label: "Support or adjustment that would help" },
+            { index: 3, label: "When to revisit the agreement" },
+          ]
       : code === "M2-L1"
         ? [{ index: "plan", label: "My saved experiment plan" }]
         : code === "M2-L2"
