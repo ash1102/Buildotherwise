@@ -1,15 +1,22 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Map as MapIcon, Sparkles, Users, Wrench } from "lucide-react";
+import { ArrowRight, Map as MapIcon } from "lucide-react";
 import PromptField from "../PromptField";
 import PrivacyNote from "../PrivacyNote";
 import { useAnswers } from "@/lib/workbook";
 import { useStore } from "@/lib/store";
 import { MAP_PICK_KEY, exploreLines } from "@/lib/lifeMap";
-import { CARRY_OPTIONS, ENCOUNTER_CARDS, NOTICE_OPTIONS, readAnswer, recordAnswer } from "@/lib/moduleOne";
+import {
+  CARRY_OPTIONS,
+  ENCOUNTER_CARDS,
+  NOTICE_OPTIONS,
+  encounterValue,
+  readAnswer,
+  recordAnswer,
+  selectedEncounterIds,
+} from "@/lib/moduleOne";
 import { EarlierAnswers, FinishControl, P, Panel, PartFlow, Quote, SingleChoice } from "./parts";
-
-const ICONS = { wrench: Wrench, sparkles: Sparkles, users: Users };
+import DiscoveryGallery from "./DiscoveryGallery";
 
 /** Where the Life Map's "back to your lesson" link should return to. */
 const MAP_LINK = `/map?from=${encodeURIComponent("/lesson/M1-L1")}`;
