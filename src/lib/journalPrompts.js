@@ -154,6 +154,31 @@ export function partFlowAddsGoDeeper(code) {
   return hasGoDeeper(code) && !PLACED_BY_LESSON.includes(code);
 }
 
+/**
+ * Tappable follow-ups (review branch "go-deeper-tap-followups", Oct 24, 2026).
+ * Tapping a follow-up adds it to the writing box as a plain starter line the participant
+ * can edit or delete. Nothing records which one was tapped: the text is the only record.
+ */
+export const STARTER_MARK = "→ ";
+
+export function starterLine(question) {
+  return `${STARTER_MARK}${question}`;
+}
+
+/** Whether this follow-up's starter line is already in the text. */
+export function hasStarter(text, question) {
+  return String(text || "").includes(starterLine(question));
+}
+
+/** The text with the follow-up added at the end (once), ready to write under. */
+export function addStarter(text, question) {
+  const current = String(text || "");
+  if (hasStarter(current, question)) return current;
+  const trimmed = current.replace(/\s+$/, "");
+  const gap = trimmed ? "\n\n" : "";
+  return `${trimmed}${gap}${starterLine(question)}\n`;
+}
+
 /** The prompt set for this lesson, adapted to what the participant recorded when that matters. */
 export function goDeeperFor(code, answers) {
   const base = GO_DEEPER[code];
