@@ -14,6 +14,8 @@
  *               Module 1 interactive lessons (src/components/workbook/moduleOne). `ownsLesson`
  *               means the piece draws the whole step: no generic teach, reading, Try or Reflect
  *               sections. The Lesson record is still loaded for title, purpose, duration and code.
+ *   m3Setup, m3Change, m3Review
+ *               Module 3 interactive lessons (src/components/workbook/moduleThree), same pattern.
  */
 export const INTERACTIONS = {
   "M1-L1": [{ type: "m1Notice", ownsLesson: true }],
@@ -27,6 +29,14 @@ export const INTERACTIONS = {
   "M5-L1": [{ type: "m5Sequence", ownsLesson: true }],
   "M5-L2": [{ type: "m5Response", ownsLesson: true }],
   "M5-L3": [{ type: "m5Close", ownsLesson: true }],
+  // Module 3 interactive lessons (review branch module-3-interactive): src/components/workbook/moduleThree.
+  "M3-L1": [{ type: "m3Setup", ownsLesson: true }],
+  "M3-L2": [{ type: "m3Change", ownsLesson: true }],
+  "M3-L3": [{ type: "m3Review", ownsLesson: true }],
+  // Module 4 interactive lessons (src/components/workbook/moduleFour), Oct 24, 2026.
+  "M4-L1": [{ type: "m4Separate", ownsLesson: true }],
+  "M4-L2": [{ type: "m4Action", ownsLesson: true }],
+  "M4-L3": [{ type: "m4Review", ownsLesson: true }],
   // Module 2 now uses the concise workbook prompts. The former interactive
   // planner/check-in code remains available, but is not rendered twice.
 };

@@ -18,7 +18,7 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
           </Link>
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 text-[14px] font-medium text-primary-foreground/85 hover:text-primary-foreground"
+            className="inline-flex min-h-[44px] items-center gap-1.5 text-[14px] font-medium text-primary-foreground/85 hover:text-primary-foreground"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Home

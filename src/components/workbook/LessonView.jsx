@@ -33,6 +33,12 @@ import DiscoverLesson from "./moduleTwo/DiscoverLesson";
 import SequenceLesson from "./moduleFive/SequenceLesson";
 import ResponseLesson from "./moduleFive/ResponseLesson";
 import CloseLesson from "./moduleFive/CloseLesson";
+import SetupLesson from "./moduleThree/SetupLesson";
+import ChangeLesson from "./moduleThree/ChangeLesson";
+import M3ReviewLesson from "./moduleThree/ReviewLesson";
+import SeparateLesson from "./moduleFour/SeparateLesson";
+import ActionLesson from "./moduleFour/ActionLesson";
+import ReviewLesson from "./moduleFour/ReviewLesson";
 import { journalStepHref, saveAnswer } from "@/lib/journal";
 import DecisionFollowUp from "./DecisionFollowUp";
 import { BridgeIn, BridgeOut } from "./ModuleBridge";
@@ -40,6 +46,8 @@ import { bridgeIn, bridgeOut } from "@/lib/moduleBridges";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor, setAnswer, useAnswers, answerKey } from "@/lib/workbook";
 import { AGREEMENT_APPROACH, AGREEMENT_CODE, AGREEMENT_NOTE, AGREEMENT_WHY, JOIN_CHOICES, isGettingStartedLesson, joinChoiceText, splitChoice } from "@/lib/gettingStarted";
 import LearningAgreement from "@/components/gettingStarted/LearningAgreement";
+import GoDeeperJournal, { JournalLessonTitle } from "./GoDeeperJournal";
+import { hasGoDeeper } from "@/lib/journalPrompts";
 
 /** Steps drawn entirely by one interactive piece (see src/lib/interactions.js). */
 const OWNED_LESSONS = {
@@ -52,6 +60,12 @@ const OWNED_LESSONS = {
   m5Sequence: SequenceLesson,
   m5Response: ResponseLesson,
   m5Close: CloseLesson,
+  m3Setup: SetupLesson,
+  m3Change: ChangeLesson,
+  m3Review: M3ReviewLesson,
+  m4Separate: SeparateLesson,
+  m4Action: ActionLesson,
+  m4Review: ReviewLesson,
 };
 
 /** O.5's second box holds the join choice. On the step page it is a set of buttons, not a writing box. */
@@ -596,6 +610,12 @@ export default function LessonView({
         </div>
       ),
     });
+  }
+
+  // Conversation Journal: Go Deeper, after the lesson's own questions and before the Next Decision.
+  // Interactive lessons draw it on their last part instead (see moduleOne/parts.jsx).
+  if (hasGoDeeper(lesson.code)) {
+    beats.push({ key: "go-deeper", label: "Conversation Journal — Go Deeper", bare: true, content: <GoDeeperJournal lessonCode={lesson.code} lessonTitle={lesson.title} /> });
   }
 
   if (asksForDecision) {

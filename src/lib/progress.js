@@ -4,6 +4,8 @@ import { answerKey, routeSkipsWriting } from "./workbook";
 import { isModuleOneInteractive, moduleOneStepComplete } from "./moduleOne";
 import { isModuleTwoInteractive, moduleTwoStepComplete } from "./moduleTwo";
 import { isModuleFiveInteractive, moduleFiveStepComplete } from "./moduleFive";
+import { isModuleThreeInteractive, moduleThreeStepComplete } from "./moduleThree";
+import { isModuleFourInteractive, moduleFourStepComplete } from "./moduleFour";
 
 /**
  * Completion follows the curriculum's own shape: a step counts once one Try or
@@ -46,6 +48,13 @@ export function missingPrompts(lesson, answers) {
   }
   if (isModuleFiveInteractive(lesson?.code)) {
     if (moduleFiveStepComplete(lesson.code, answers)) return [];
+  // Module 3 lessons follow the same pattern: see src/lib/moduleThree.js.
+  if (isModuleThreeInteractive(lesson?.code)) {
+    if (moduleThreeStepComplete(lesson.code, answers)) return [];
+    return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
+  }
+  if (isModuleFourInteractive(lesson?.code)) {
+    if (moduleFourStepComplete(lesson.code, answers)) return [];
     return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
   }
   if (hasInteractionLine(lesson, answers)) return [];
@@ -59,6 +68,8 @@ export function stepComplete(lesson, answers, states) {
   if (isModuleOneInteractive(lesson?.code)) return moduleOneStepComplete(lesson.code, answers);
   if (isModuleTwoInteractive(lesson?.code)) return moduleTwoStepComplete(lesson.code, answers);
   if (isModuleFiveInteractive(lesson?.code)) return moduleFiveStepComplete(lesson.code, answers);
+  if (isModuleThreeInteractive(lesson?.code)) return moduleThreeStepComplete(lesson.code, answers);
+  if (isModuleFourInteractive(lesson?.code)) return moduleFourStepComplete(lesson.code, answers);
   const prompts = requiredPrompts(lesson);
   if (!prompts.length) return true;
   if (hasInteractionLine(lesson, answers)) return true;
