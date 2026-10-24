@@ -17,7 +17,8 @@ const PROMPTS = {
 };
 
 // Slots written by app pieces rather than lesson prompt boxes.
-const EXTRA = { "M2-L2": [30, 31, 32], "M4-L1": [20, 21] };
+// M1-L1's NoticeFlow saves named answers; its two numbered boxes are never shown.
+const EXTRA = { "M1-L1": ["own-caught", "own-dont-know", "possibility"], "M2-L2": [30, 31, 32], "M4-L1": [20, 21] };
 
 test("every bridge source and target points at a real answer slot", () => {
   Object.values(BRIDGES).forEach((bridge) => {
@@ -29,6 +30,12 @@ test("every bridge source and target points at a real answer slot", () => {
   });
 });
 
+test("Module 1 bridge reads NoticeFlow's named answers, not the hidden numbered boxes", () => {
+  const keys = BRIDGES[1].sources.filter((s) => s.code === "M1-L1").map((s) => s.index);
+  assert.ok(keys.every((k) => typeof k === "string"), "no numbered M1-L1 slots");
+  assert.equal(BRIDGES[3].sources[0].index, "own-caught");
+});
+
 test("bridges run 1→2→3→4→5 and nothing closes Module 5", () => {
   assert.deepEqual([1, 2, 3, 4].map((m) => bridgeOut(m).to), [2, 3, 4, 5]);
   assert.equal(bridgeIn(2).from, 1);
@@ -37,7 +44,7 @@ test("bridges run 1→2→3→4→5 and nothing closes Module 5", () => {
 });
 
 test("only saved, non-example answers are quoted back", () => {
-  const answers = { "M1-L1#0": "Fixing bikes", "M1-L1#1": "  ", "M1-L3#1": JSON.stringify("How repair shops work") };
+  const answers = { "M1-L1#own-caught": "Fixing bikes", "M1-L1#own-dont-know": "  ", "M1-L3#1": JSON.stringify("How repair shops work") };
   const items = bridgeSources(BRIDGES[1], answers, { "one-thing": "Fictional: example" });
   assert.deepEqual(items.map((i) => i.value), ["Fixing bikes", "How repair shops work"]);
 });
