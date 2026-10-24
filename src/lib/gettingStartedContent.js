@@ -46,6 +46,11 @@ export const PENDING_LESSON_CONTENT = {
       "Type in any box, or tap Dictate and talk like you’re telling a friend. Questions or concerns: Start@buildotherwise.org.",
     ].join("\n\n"),
   },
+  // Oct 24, 2026, module-2-interactive: time estimates for the interactive Module 2 lessons
+  // (screen time only; the real-world try in M2-L2 happens outside the workbook).
+  "M2-L1": { duration_min: 20 },
+  "M2-L2": { duration_min: 10 },
+  "M2-L3": { duration_min: 10 },
 };
 
 /** Apply pending lesson text and drop retired steps. Other lessons pass through untouched. */
