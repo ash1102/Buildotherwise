@@ -183,7 +183,7 @@ function PartEncounter({ lesson, answers }) {
 function PartReading() {
   return (
     <div className="space-y-4">
-      <Panel tone="reading" title="How interests begin">
+      <Panel tone="reading">
         {/* DRAFT (Claude): the spec's opening and points, joined to sentences kept from the
             published reading "How Interests Begin". The original stays unchanged in the Library. */}
         <P>A few minutes ago, you encountered possibilities you may never have thought about. That’s one way interests can begin.</P>
