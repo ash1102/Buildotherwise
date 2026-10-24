@@ -53,15 +53,27 @@ export default function GoDeeperJournal({ lessonCode, lessonTitle: titleProp = "
     });
   };
 
-  // Leaving the lesson mid-pause still saves what was typed.
-  useEffect(
-    () => () => {
+  const writeRef = useRef(write);
+  writeRef.current = write;
+
+  // Leaving the lesson, or closing the tab, mid-pause still saves what was typed.
+  useEffect(() => {
+    const flush = () => {
       if (timer.current) clearTimeout(timer.current);
-      if (pending.current !== null) write(pending.current);
-    },
+      timer.current = null;
+      if (pending.current !== null) {
+        const text = pending.current;
+        pending.current = null;
+        writeRef.current(text);
+      }
+    };
+    window.addEventListener("pagehide", flush);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      flush();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [lessonCode]
-  );
+  }, [lessonCode]);
 
   if (!set) return null;
 
@@ -121,7 +133,6 @@ export default function GoDeeperJournal({ lessonCode, lessonTitle: titleProp = "
           value={value}
           onChange={onChange}
           rows={9}
-          aria-label="Your Go Deeper journal entry"
           placeholder="Write as much or as little as you like."
           className="min-h-[14rem] resize-y text-[17px]"
         />
