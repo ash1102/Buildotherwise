@@ -3,7 +3,7 @@
  * Inputs arrive from the activities themselves, so nothing is entered twice.
  */
 export const DISCOVERY_SOURCES = {
-  "M1-L1#0": { section: "curiosity", label: "What my attention returned to" },
+  "M1-L1#own-caught": { section: "curiosity", label: "What my attention returned to" },
   "M1-L2#0": { section: "curiosity", label: "The sign I said I would watch" },
   "M1-L2#1": { section: "conditions", label: "Conditions that might shape the pattern" },
   "M2-L1#0": { section: "try_plan", label: "The question this try is for" },
