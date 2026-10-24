@@ -49,7 +49,6 @@ export default function GoDeeperJournal({ lesson, prompt, followUps = [], intro 
       timer.current = null;
       write(latest.current);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
