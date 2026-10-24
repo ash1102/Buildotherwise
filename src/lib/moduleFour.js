@@ -194,9 +194,16 @@ export function readSort(answers) {
   }
 }
 
-/** The statement carried from L1 to L2 and L3: L2's version first, then L1's. */
+/**
+ * The statement carried from L1 to L2 and L3: L2's version first. L1's is used only while
+ * the participant hasn't chosen a different statement or the example in L2.
+ */
 export function currentStatement(answers) {
-  return readKey(answers, "M4-L2", "statement") || readKey(answers, "M4-L1", "statement");
+  const own = readKey(answers, "M4-L2", "statement");
+  if (own) return own;
+  const mode = readKey(answers, "M4-L2", "statement-mode");
+  if (mode === STATEMENT_MODES[2] || mode === STATEMENT_MODES[3]) return "";
+  return readKey(answers, "M4-L1", "statement");
 }
 
 export { splitMulti, joinMulti, FINISHED };
