@@ -29,6 +29,7 @@ const LABELS = {
   3: "What remains unknown?",
 };
 const OWN_WORDS = "Something else, in my own words";
+const AS_PHRASE = { Event: "an event", Story: "a story", Verdict: "a verdict", Uncertain: "uncertain" };
 
 function earlierObservations(answers, pick) {
   const bridgeAnswer = readable((answers || {})[answerKey("BRIDGE-3-4", 0)]).trim();
@@ -193,7 +194,7 @@ function SortItem({ item, choice, onChoose }) {
       <div aria-live="polite">
         {choice ? (
           <p className="mt-3 text-[15px] leading-relaxed text-foreground">
-            <strong>{matched ? "That’s how we’d sort it too." : `We’d call this ${item.answer === "Uncertain" ? "uncertain" : `a ${item.answer.toLowerCase()}`}.`}</strong>{" "}
+            <strong>{matched ? "That’s how we’d sort it too." : `We’d call this ${AS_PHRASE[item.answer]}.`}</strong>{" "}
             {item.explain}
             {matched ? "" : " You can change your answer anytime."}
           </p>
