@@ -103,7 +103,7 @@ export default function Login() {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Password</Label>
-            <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+            <Link to="/forgot-password" className="inline-flex min-h-[24px] items-center py-1 text-xs text-primary hover:underline">
               Forgot password?
             </Link>
           </div>
