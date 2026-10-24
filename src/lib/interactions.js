@@ -19,6 +19,10 @@ export const INTERACTIONS = {
   "M1-L1": [{ type: "m1Notice", ownsLesson: true }],
   "M1-L2": [{ type: "m1Attention", ownsLesson: true }],
   "M1-L3": [{ type: "m1Agreement", ownsLesson: true }],
+  // Module 2 interactive lessons (src/components/workbook/moduleTwo), Oct 24, 2026.
+  "M2-L1": [{ type: "m2Plan", ownsLesson: true }],
+  "M2-L2": [{ type: "m2Try", ownsLesson: true }],
+  "M2-L3": [{ type: "m2Discover", ownsLesson: true }],
   // Module 2 now uses the concise workbook prompts. The former interactive
   // planner/check-in code remains available, but is not rendered twice.
 };
