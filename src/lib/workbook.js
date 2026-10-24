@@ -248,9 +248,17 @@ export function buildCarrySources(codes, lessonsByCode) {
             { index: 4, label: "Something I believe about myself and haven't tested" },
           ]
       : code === "M2-L1"
-        ? [{ index: "plan", label: "My saved experiment plan" }]
+        ? [
+            { index: "plan", label: "My saved experiment plan" },
+            { index: 0, label: "What I set out to explore" },
+            { index: 1, label: "One manageable step" },
+          ]
         : code === "M2-L2"
-          ? [{ index: "checkin", label: "What happened during my try" }]
+          ? [
+              { index: "checkin", label: "What happened during my try" },
+              { index: 1, label: "What I actually did or observed" },
+              { index: 2, label: "What I noticed, in my words" },
+            ]
           : [...(lesson.try_prompts || []), ...(lesson.reflect_prompts || [])]
               .map((label, index) => ({ label, index }));
     prompts.forEach(({ label, index }) => {
