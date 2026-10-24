@@ -98,7 +98,7 @@ export default function GoDeeperJournal({ lessonCode, lessonTitle: titleProp = "
     <section aria-labelledby={headingId} className="rounded-2xl border-2 border-primary/30 bg-card p-5 sm:p-7">
       <p className="flex items-center gap-2 workbook-label">
         <BookOpen className="h-4 w-4" aria-hidden="true" />
-        Conversation Journal
+        Private reflection
       </p>
       <h2 id={headingId} className="mt-1 text-[clamp(1.35rem,1.1rem+1vw,1.75rem)] leading-tight">
         Conversation Journal — Go Deeper
