@@ -48,6 +48,8 @@ export function missingPrompts(lesson, answers) {
   }
   if (isModuleFiveInteractive(lesson?.code)) {
     if (moduleFiveStepComplete(lesson.code, answers)) return [];
+    return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
+  }
   // Module 3 lessons follow the same pattern: see src/lib/moduleThree.js.
   if (isModuleThreeInteractive(lesson?.code)) {
     if (moduleThreeStepComplete(lesson.code, answers)) return [];
