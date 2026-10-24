@@ -98,9 +98,10 @@ const AuthenticatedApp = () => {
     <Suspense fallback={<RouteFallback />}>
       <Routes>
         <Route element={<Layout />}>
+          {/* The home page is public: signed-out visitors see the front door, signed-in people see their workbook (CurriculumHome decides). */}
+          <Route path="/" element={<CurriculumHome />} />
           {/* Lessons and modules are readable only when signed in, so every workbook page needs an account. */}
           <Route element={<ProtectedRoute unauthenticatedElement={<LoginRedirect />} />}>
-            <Route path="/" element={<CurriculumHome />} />
             <Route path="/getting-started" element={<GettingStartedPage />} />
             <Route path="/module/getting-started" element={<Navigate to="/getting-started" replace />} />
             <Route path="/module/:slug" element={<ModulePage />} />
