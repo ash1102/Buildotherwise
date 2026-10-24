@@ -2,7 +2,11 @@ import { firstOpenGettingStartedStep, gettingStartedFinished } from "./gettingSt
 import { isWorkbookLesson } from "./lessonKind";
 import { answerKey, routeSkipsWriting } from "./workbook";
 import { isModuleOneInteractive, moduleOneStepComplete } from "./moduleOne";
+<<<<<<< HEAD
 import { isModuleTwoInteractive, moduleTwoStepComplete } from "./moduleTwo";
+=======
+import { isModuleThreeInteractive, moduleThreeStepComplete } from "./moduleThree";
+>>>>>>> origin/b44/6adc5c2dd86919093f62e8fe
 
 /**
  * Completion follows the curriculum's own shape: a step counts once one Try or
@@ -39,8 +43,14 @@ export function missingPrompts(lesson, answers) {
     if (moduleOneStepComplete(lesson.code, answers)) return [];
     return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
   }
+<<<<<<< HEAD
   if (isModuleTwoInteractive(lesson?.code)) {
     if (moduleTwoStepComplete(lesson.code, answers)) return [];
+=======
+  // Module 3 lessons follow the same pattern: see src/lib/moduleThree.js.
+  if (isModuleThreeInteractive(lesson?.code)) {
+    if (moduleThreeStepComplete(lesson.code, answers)) return [];
+>>>>>>> origin/b44/6adc5c2dd86919093f62e8fe
     return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
   }
   if (hasInteractionLine(lesson, answers)) return [];
@@ -52,7 +62,11 @@ export function stepComplete(lesson, answers, states) {
   const route = states && lesson ? states[lesson.code] : "";
   if (routeSkipsWriting(route)) return true;
   if (isModuleOneInteractive(lesson?.code)) return moduleOneStepComplete(lesson.code, answers);
+<<<<<<< HEAD
   if (isModuleTwoInteractive(lesson?.code)) return moduleTwoStepComplete(lesson.code, answers);
+=======
+  if (isModuleThreeInteractive(lesson?.code)) return moduleThreeStepComplete(lesson.code, answers);
+>>>>>>> origin/b44/6adc5c2dd86919093f62e8fe
   const prompts = requiredPrompts(lesson);
   if (!prompts.length) return true;
   if (hasInteractionLine(lesson, answers)) return true;

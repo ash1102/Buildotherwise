@@ -64,6 +64,7 @@ export const RECORD_TYPES = [
     sources: [
       { code: "M2-L1", slot: "plan" },
       { code: "M2-L1", match: /^(\*\*)?Smallest real action:/ },
+      { code: "M3-L2", slot: "plan" },
       { code: "M3-L2", match: /What single part of the setup would you change/ },
     ],
   },
@@ -76,6 +77,7 @@ export const RECORD_TYPES = [
     sources: [
       { code: "M2-L2", slot: "checkin" },
       { code: "M2-L3", match: /^what changed from (expectation|what you expected)/i },
+      { code: "M3-L2", slot: "checkin" },
       { code: "M3-L3", match: /What changed, and what else was different/ },
     ],
   },

@@ -23,7 +23,13 @@ const EXTRA = { "M2-L2": [30, 31, 32], "M4-L1": [20, 21] };
 const NAMED = {
   "M1-L1": ["notice-route", "notice-text", "map-context", "encounter", "stood-out", "carry-choice"],
   "M1-L3": ["carry-mode", "willing", "approach", "support", "support-other", "revisit"],
+<<<<<<< HEAD
   "M2-L2": ["outcome"],
+=======
+  // Interactive Module 3 (src/lib/moduleThree.js).
+  "M3-L2": ["checkin", "outcome", "plan"],
+  "M3-L3": ["next", "helped", "costs", "uncertain"],
+>>>>>>> origin/b44/6adc5c2dd86919093f62e8fe
 };
 
 test("every bridge source and target points at a real answer slot", () => {
