@@ -146,6 +146,14 @@ export function hasGoDeeper(code) {
   return Boolean(GO_DEEPER[code]);
 }
 
+/** Lessons that draw the journal on a part of their own (Module 4's "Go deeper" part). */
+const PLACED_BY_LESSON = ["M4-L1", "M4-L2", "M4-L3"];
+
+/** Whether the shared lesson layout should add the journal on the last part. */
+export function partFlowAddsGoDeeper(code) {
+  return hasGoDeeper(code) && !PLACED_BY_LESSON.includes(code);
+}
+
 /** The prompt set for this lesson, adapted to what the participant recorded when that matters. */
 export function goDeeperFor(code, answers) {
   const base = GO_DEEPER[code];
