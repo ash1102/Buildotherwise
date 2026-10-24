@@ -1,6 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { moduleOneStepComplete, splitMulti, joinMulti, readAnswer } from "./moduleOne.js";
+import {
+  ENCOUNTER_CARDS,
+  encounterValue,
+  moduleOneStepComplete,
+  readAnswer,
+  joinMulti,
+  selectedEncounterIds,
+  splitMulti,
+} from "./moduleOne.js";
 import { stepComplete, buildProgress } from "./progress.js";
 import { BRIDGES, bridgeSources } from "./moduleBridges.js";
 
@@ -57,6 +65,20 @@ test("the Module 1→2 bridge quotes new and old answers exactly, and invents no
     ["Why the bus is always late", "Repairing what others throw away", "A question I want answered", "older answer"]
   );
   assert.deepEqual(bridgeSources(BRIDGES[1], {}, {}), []);
+});
+
+test("discovery gallery: 12 cards, any number selected, older saves still match", () => {
+  assert.equal(ENCOUNTER_CARDS.length, 12);
+  assert.equal(new Set(ENCOUNTER_CARDS.map((card) => card.id)).size, 12);
+  // Saved before the gallery grew (one card, older title)
+  assert.deepEqual(selectedEncounterIds("Repairing what others throw away"), ["repair"]);
+  assert.deepEqual(selectedEncounterIds("Solving a community problem"), ["community"]);
+  // Several, none
+  assert.deepEqual(selectedEncounterIds(encounterValue(["sound", "food"])), ["sound", "food"]);
+  assert.equal(encounterValue([]), "");
+  assert.deepEqual(selectedEncounterIds(""), []);
+  // Saving uses current titles in gallery order
+  assert.equal(encounterValue(["movement", "repair"]), "Repair & Restore; Movement & Performance");
 });
 
 test("multi-select answers read back as the same list", () => {
