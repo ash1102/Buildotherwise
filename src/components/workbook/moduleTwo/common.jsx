@@ -1,6 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { plainValue } from "@/lib/moduleOne";
-import { EARLIER_M2, METHOD_BY_ID, planHasContent } from "@/lib/moduleTwo";
+import { EARLIER_M2, METHOD_BY_ID, planHasContent, planSentences, readKey, readPlan, syncSummary } from "@/lib/moduleTwo";
+
+/** Keeps M2-L1's plain-sentence plan in step, wherever the plan was edited from. */
+export function usePlanSync(answers) {
+  useEffect(() => {
+    const plan = readPlan(answers);
+    if (!planHasContent(plan) && !readKey(answers, "M2-L1", "plan")) return;
+    syncSummary("M2-L1", "Find Something to Try", "plan", "My saved experiment plan", planSentences(plan), answers);
+  }, [answers]);
+}
 import { OPTIONS as OLD_SAMPLER } from "../DiscoverySampler";
 import { Quote } from "../moduleOne/parts";
 
