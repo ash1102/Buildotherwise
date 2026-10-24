@@ -251,7 +251,11 @@ function PublicHome() {
             </a>
           </div>
           <small>
-            Researcher, educator or community partner? Use the same list form and pick the partner or advisor option.
+            Researcher, educator or community partner?{" "}
+            <Link to="/get-involved" className="font-semibold underline underline-offset-2">
+              Help shape the first pilot
+            </Link>
+            .
           </small>
         </div>
       </section>
