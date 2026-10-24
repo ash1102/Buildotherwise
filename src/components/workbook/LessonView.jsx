@@ -27,15 +27,12 @@ import { interactionsFor, lessonOwner } from "@/lib/interactions";
 import NoticeLesson from "./moduleOne/NoticeLesson";
 import AttentionLesson from "./moduleOne/AttentionLesson";
 import AgreementLesson from "./moduleOne/AgreementLesson";
-<<<<<<< HEAD
 import PlanLesson from "./moduleTwo/PlanLesson";
 import TryLesson from "./moduleTwo/TryLesson";
 import DiscoverLesson from "./moduleTwo/DiscoverLesson";
-=======
 import SetupLesson from "./moduleThree/SetupLesson";
 import ChangeLesson from "./moduleThree/ChangeLesson";
 import ReviewLesson from "./moduleThree/ReviewLesson";
->>>>>>> origin/b44/6adc5c2dd86919093f62e8fe
 import { journalStepHref, saveAnswer } from "@/lib/journal";
 import DecisionFollowUp from "./DecisionFollowUp";
 import { BridgeIn, BridgeOut } from "./ModuleBridge";
@@ -49,15 +46,12 @@ const OWNED_LESSONS = {
   m1Notice: NoticeLesson,
   m1Attention: AttentionLesson,
   m1Agreement: AgreementLesson,
-<<<<<<< HEAD
   m2Plan: PlanLesson,
   m2Try: TryLesson,
   m2Discover: DiscoverLesson,
-=======
   m3Setup: SetupLesson,
   m3Change: ChangeLesson,
   m3Review: ReviewLesson,
->>>>>>> origin/b44/6adc5c2dd86919093f62e8fe
 };
 
 /** O.5's second box holds the join choice. On the step page it is a set of buttons, not a writing box. */
