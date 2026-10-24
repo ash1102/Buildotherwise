@@ -10,6 +10,7 @@
     "test:gate": "node --import ./scripts/register-js-extension.mjs --test src/lib/postAuthPath.test.js",
     "test:module-one": "node --import ./scripts/register-js-extension.mjs --test src/lib/moduleOne.test.js",
     "test:module-three": "node --import ./scripts/register-js-extension.mjs --test src/lib/moduleThree.test.js",
+    "test:journal": "node --import ./scripts/register-js-extension.mjs --test src/lib/journalPrompts.test.js",
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
