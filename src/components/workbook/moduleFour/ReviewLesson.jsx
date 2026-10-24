@@ -23,7 +23,7 @@ import { PartGoDeeper } from "./common";
 
 const CODE = "M4-L3";
 const PLAN_CODE = "M4-L2";
-const PLAN_TITLE = "Use One Small Action as Evidence";
+const PLAN_TITLE = "Use one small action as evidence";
 const REVISED_LABEL = "Your revised statement";
 /** The planner part of M4-L2 (0-based), so "Change my plan" opens it directly. */
 const PLAN_PART_INDEX = 2;

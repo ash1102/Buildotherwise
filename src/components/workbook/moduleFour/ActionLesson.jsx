@@ -142,7 +142,7 @@ function Reminder() {
     const date = reminderDate(when);
     if (!date) return;
     const url = typeof window !== "undefined" ? `${window.location.origin}/lesson/M4-L3` : "";
-    downloadIcs("come-back-M4-L3.ics", buildReminderIcs({ when: date, stepTitle: "Review the Evidence and Revise Your Statement", url }));
+    downloadIcs("come-back-M4-L3.ics", buildReminderIcs({ when: date, stepTitle: "Review the evidence and revise your statement", url }));
     setAdded(date.toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }));
   };
   return (
