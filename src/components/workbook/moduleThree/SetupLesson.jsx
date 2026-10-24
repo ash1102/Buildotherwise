@@ -175,7 +175,7 @@ function ConditionCard({ condition, open, onToggle }) {
           <span className="block text-[17px] font-medium text-foreground">{condition.card}</span>
           <span className="block text-[14px] leading-snug text-muted-foreground">{condition.explain}</span>
         </span>
-        <ChevronDown aria-hidden="true" className={`h-5 w-5 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown aria-hidden="true" className={`h-5 w-5 shrink-0 text-muted-foreground ${open ? "rotate-180" : ""}`} />
       </button>
       {open ? (
         <div id={panelId} className="space-y-3 border-t border-border px-4 pb-4 pt-3">
@@ -262,7 +262,7 @@ export default function SetupLesson({ lesson, readings }) {
   const answers = useAnswers();
   const parts = [
     { id: "start", short: "Start", title: "Start with an experience", content: <PartStart lesson={lesson} answers={answers} /> },
-    { id: "read", short: "Read", title: "Look at the setup", content: <PartReading readings={readings} /> },
+    { id: "read", short: "Read", title: "Why the setup matters", content: <PartReading readings={readings} /> },
     { id: "explore", short: "Explore", title: "Explore five conditions", content: <PartExplore /> },
     { id: "identify", short: "Identify", title: "Name a condition worth testing", content: <PartIdentify answers={answers} /> },
   ];

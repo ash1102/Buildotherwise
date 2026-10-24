@@ -70,6 +70,7 @@ export const SOURCE_EXAMPLE = SOURCES[2];
 export const CONDITIONS = [
   {
     id: "time",
+    noun: "the time or pace",
     card: "Time pressure",
     option: "Time and pace",
     explain: "Deadlines, available time, and pace can influence an experience.",
@@ -80,6 +81,7 @@ export const CONDITIONS = [
   },
   {
     id: "environment",
+    noun: "the environment",
     card: "Environment",
     option: "Environment",
     explain: "Noise, interruptions, comfort, and physical setting may matter.",
@@ -90,6 +92,7 @@ export const CONDITIONS = [
   },
   {
     id: "instructions",
+    noun: "the instructions",
     card: "Instructions",
     option: "Clearer instructions",
     explain: "Clear expectations, demonstrations, and examples can affect how someone approaches a task.",
@@ -99,6 +102,7 @@ export const CONDITIONS = [
   },
   {
     id: "support",
+    noun: "the support",
     card: "Support",
     option: "Support",
     explain: "Guidance, feedback, collaboration, or the opportunity to work independently may affect engagement.",
@@ -109,6 +113,7 @@ export const CONDITIONS = [
   },
   {
     id: "choice",
+    noun: "the amount of choice and structure",
     card: "Choice and structure",
     option: "Choice and structure",
     explain: "The degree of flexibility or structure can change how a task feels.",
@@ -349,9 +354,9 @@ export function carrySuggestions(answers) {
   const x = readExperiment(answers);
   const out = [];
   if (x.observation) out.push(x.observation);
-  const condition = x.condition ? CONDITION_BY_ID[x.condition].option.toLowerCase() : "";
-  if (hasResult(x) && condition) out.push(`Was it the ${condition} that made the difference, or something else?`);
-  if (condition && !hasResult(x)) out.push(`What would I notice if I changed the ${condition}?`);
+  const condition = x.condition ? CONDITION_BY_ID[x.condition].noun : "";
+  if (hasResult(x) && condition) out.push(`Was it ${condition} that made the difference, or something else?`);
+  if (condition && !hasResult(x)) out.push(`What would I notice if I changed ${condition}?`);
   out.push("Would the same setup help with a different task?");
   out.push("What would I need to see before I became more certain?");
   return [...new Set(out)].slice(0, 4);
