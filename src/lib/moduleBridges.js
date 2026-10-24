@@ -46,6 +46,10 @@ export const BRIDGES = {
     heading: "From one try to what shaped it",
     intro: "Here’s what you recorded from your Module 2 encounter. Module 3 looks at the conditions around it.",
     sources: [
+      // Interactive Module 2 (review branch module-2-interactive): what happened, in the participant's words.
+      { code: "M2-L2", index: "outcome", label: "What happened" },
+      { code: "M2-L2", index: 2, label: "What you noticed, in your words" },
+      { code: "M2-L3", index: 9, label: "What you chose to take forward" },
       { code: "M2-L2", index: 1, label: "What you actually did or observed" },
       { code: "M2-L2", index: 3, label: "What helped or made it difficult" },
       { code: "M2-L2", index: 13, label: "How the people, setting, or support affected it" },
