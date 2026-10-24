@@ -24,6 +24,7 @@ import SelfSketch from "./SelfSketch";
 import ComeBackAfterTry from "./ComeBackAfterTry";
 import { isAfterTryStep } from "@/lib/afterTry";
 import { interactionsFor } from "@/lib/interactions";
+import { arrangeBeats } from "@/lib/lessonLayouts";
 import { journalStepHref, saveAnswer } from "@/lib/journal";
 import DecisionFollowUp from "./DecisionFollowUp";
 import { BridgeIn, BridgeOut } from "./ModuleBridge";
@@ -619,7 +620,7 @@ export default function LessonView({
       />
 
       {beats.length ? (
-        <LessonBeats key={lesson.code} beats={beats} journalHref={closingJournalHref} />
+        <LessonBeats key={lesson.code} beats={arrangeBeats(beats, lesson.code)} journalHref={closingJournalHref} />
       ) : null}
 
       <FeedbackForm moduleOrder={lesson.module_order} lessonCode={lesson.code} />
