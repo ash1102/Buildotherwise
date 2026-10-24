@@ -75,9 +75,12 @@ export const BRIDGES = {
     sources: [
       { code: "M1-L1", index: 0, label: "Where you started (Module 1)" },
       { code: "M2-L3", index: 0, label: "What was different from what you expected (Module 2)" },
+      // Interactive Module 3 (review branch module-3-interactive): M3-L3#5 is chosen in its last part,
+      // so the bridge question isn't asked again here. Named keys, see src/lib/moduleThree.js.
+      { code: "M3-L3", index: 5, label: "What you chose to carry into Module 4" },
+      { code: "M3-L2", index: "checkin", label: "What happened when you changed the setup (Module 3)" },
+      { code: "M3-L3", index: 1, label: "What seemed to help or change" },
       { code: "M3-L1", index: 2, label: "What you observed about starting, continuing, or stopping" },
-      { code: "M3-L3", index: 1, label: "What changed" },
-      { code: "M3-L3", index: 5, label: "What you wanted to carry into Module 4" },
       { code: "M1-L3", index: 4, label: "Something you believed about yourself and hadn’t tested yet (Module 1)" },
     ],
     question:
@@ -93,6 +96,7 @@ export const BRIDGES = {
     intro: "Here’s what you’ve worked out so far. Module 5 is about protecting what works or making one small adjustment.",
     sources: [
       { code: "M2-L3", index: 9, label: "What your first encounter left you with (Module 2)" },
+      { code: "M3-L3", index: "next", label: "What you wanted to do next with your Module 3 experiment" },
       { code: "M3-L3", index: 4, label: "Whether you’d choose that condition again (Module 3)" },
       { code: "M4-L3", index: 4, label: "Your more accurate wording" },
       { code: "M4-L3", index: 5, label: "A cue or protective limit you wanted to carry forward" },
