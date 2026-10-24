@@ -245,6 +245,7 @@ export function buildCarrySources(codes, lessonsByCode) {
             { index: 0, label: "What I was willing to try, in my words" },
             { index: 2, label: "Support or adjustment that would help" },
             { index: 3, label: "When to revisit the agreement" },
+            { index: 4, label: "Something I believe about myself and haven't tested" },
           ]
       : code === "M2-L1"
         ? [{ index: "plan", label: "My saved experiment plan" }]
