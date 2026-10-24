@@ -59,7 +59,7 @@ function PartCompare({ lesson, answers }) {
 function PartReading() {
   return (
     <div className="space-y-4">
-      <Panel tone="reading" title="What attention can—and can’t—tell us">
+      <Panel tone="reading">
         {/* DRAFT (Claude): the spec's points joined to sentences kept from the published
             reading "Attention is not a passion". The original stays unchanged in the Library. */}
         <P>People give their attention to activities for many reasons:</P>
@@ -70,7 +70,7 @@ function PartReading() {
           <li>necessity</li>
           <li>responsibility</li>
           <li>financial circumstances</li>
-          <li>other people’s expectations</li>
+          <li>external expectations</li>
           <li>pressure</li>
         </ul>
         <P>
