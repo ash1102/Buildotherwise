@@ -196,11 +196,11 @@ export default function ReviewLesson({ lesson }) {
     setRev((value) => value + 1);
   };
   const parts = [
-    { id: "back", short: "Look back", title: "Bring forward your statement and plan", content: <PartLookBack answers={answers} /> },
-    { id: "happened", short: "What happened", title: "What happened?", content: <PartHappened lesson={lesson} answers={answers} /> },
-    { id: "examine", short: "Examine", title: "Examine the evidence", content: <PartExamine lesson={lesson} answers={answers} /> },
+    { id: "back", short: "Start", title: "Bring forward your statement and plan", content: <PartLookBack answers={answers} /> },
+    { id: "happened", short: "Result", title: "What happened?", content: <PartHappened lesson={lesson} answers={answers} /> },
+    { id: "examine", short: "Check", title: "Examine the evidence", content: <PartExamine lesson={lesson} answers={answers} /> },
     { id: "revise", short: "Revise", title: "Revise your statement", content: <PartRevise lesson={lesson} answers={answers} rev={rev} onSetRevised={setRevised} /> },
-    { id: "deeper", short: "Go deeper", title: "Go deeper", content: <PartGoDeeper lesson={lesson} answers={answers} /> },
+    { id: "deeper", short: "Deeper", title: "Go deeper", content: <PartGoDeeper lesson={lesson} answers={answers} /> },
   ];
   return <PartFlow lessonCode={lesson.code} parts={parts} />;
 }

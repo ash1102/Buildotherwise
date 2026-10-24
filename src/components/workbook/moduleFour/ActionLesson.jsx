@@ -250,11 +250,11 @@ export default function ActionLesson({ lesson }) {
     setRev((value) => value + 1);
   };
   const parts = [
-    { id: "statement", short: "Statement", title: "Return to your statement", content: <PartStatement lesson={lesson} answers={answers} rev={rev} onSetStatement={setStatement} /> },
+    { id: "statement", short: "Start", title: "Return to your statement", content: <PartStatement lesson={lesson} answers={answers} rev={rev} onSetStatement={setStatement} /> },
     { id: "read", short: "Read", title: "What counts as evidence", content: <PartReading /> },
     { id: "plan", short: "Plan", title: "Plan one small action", content: <PartPlanner lesson={lesson} answers={answers} rev={rev} onUseAction={useAction} /> },
     { id: "save", short: "Save", title: "Save it and come back", content: <PartSave lesson={lesson} answers={answers} /> },
-    { id: "deeper", short: "Go deeper", title: "Go deeper", content: <PartGoDeeper lesson={lesson} answers={answers} /> },
+    { id: "deeper", short: "Deeper", title: "Go deeper", content: <PartGoDeeper lesson={lesson} answers={answers} /> },
   ];
   return <PartFlow lessonCode={lesson.code} parts={parts} />;
 }

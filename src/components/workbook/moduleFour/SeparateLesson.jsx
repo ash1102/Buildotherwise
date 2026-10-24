@@ -319,9 +319,9 @@ export default function SeparateLesson({ lesson }) {
   const parts = [
     { id: "start", short: "Start", title: "Bring forward an experience", content: <PartStart lesson={lesson} answers={answers} rev={rev} onUseEvent={useEvent} /> },
     { id: "read", short: "Read", title: "Event, story, verdict, uncertain", content: <PartReading /> },
-    { id: "practice", short: "Practice", title: "Sort the example", content: <PartPractice answers={answers} /> },
+    { id: "practice", short: "Sort", title: "Sort the example", content: <PartPractice answers={answers} /> },
     { id: "apply", short: "Apply", title: "Apply it", content: <PartApply lesson={lesson} answers={answers} rev={rev} onChooseStatement={chooseStatement} /> },
-    { id: "deeper", short: "Go deeper", title: "Go deeper", content: <PartGoDeeper lesson={lesson} answers={answers} /> },
+    { id: "deeper", short: "Deeper", title: "Go deeper", content: <PartGoDeeper lesson={lesson} answers={answers} /> },
   ];
   return <PartFlow lessonCode={lesson.code} parts={parts} />;
 }
