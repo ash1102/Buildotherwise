@@ -120,63 +120,46 @@ function PartNotice({ lesson, answers }) {
   );
 }
 
-function EncounterCard({ card, active, onToggle }) {
-  const Icon = ICONS[card.icon] || Sparkles;
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onToggle}
-      className={`flex h-full w-full flex-col rounded-xl border p-4 text-left transition-colors sm:p-5 ${
-        active ? "border-accent-ink bg-accent-ink text-primary-foreground" : "border-border bg-card text-foreground hover:bg-secondary"
-      }`}
-    >
-      <span
-        role="img"
-        aria-label={card.alt}
-        className={`flex h-12 w-12 items-center justify-center rounded-full ${active ? "bg-primary-foreground/15" : "bg-secondary"}`}
-      >
-        <Icon className="h-6 w-6" aria-hidden="true" />
-      </span>
-      <span className="mt-3 block font-heading text-[18px] font-semibold leading-snug">{card.title}</span>
-      <span className={`mt-2 block text-[15px] leading-relaxed ${active ? "text-primary-foreground/90" : "text-muted-foreground"}`}>
-        {card.question}
-      </span>
-      <span className="mt-3 block text-[13px] font-medium">{active ? "Selected · tap again to clear" : "Tap to select"}</span>
-    </button>
-  );
-}
-
 function PartEncounter({ lesson, answers }) {
-  const selected = readAnswer(answers, lesson.code, "encounter");
+  const selectedIds = selectedEncounterIds(readAnswer(answers, lesson.code, "encounter"));
+  const several = selectedIds.length > 1;
+  // Same journal prompt key as before, so the existing journal entry is updated, never duplicated.
+  const toggle = (id) => {
+    const next = selectedIds.includes(id) ? selectedIds.filter((item) => item !== id) : [...selectedIds, id];
+    recordAnswer(lesson, "encounter", encounterValue(next), "Possibilities that caught my attention (not established interests)");
+  };
   return (
     <div className="space-y-5">
       <div className="space-y-3">
         <P>Sometimes you don’t know whether something interests you until you encounter it.</P>
         <P>Take a look at these possibilities. You don’t have to choose one for your future. Just notice your reaction.</P>
+        <p className="text-[15px] leading-relaxed text-muted-foreground">
+          Look at as many or as few as you like. Tap any that catch your attention: one, several, or none.
+        </p>
       </div>
-      <ul className="grid gap-3 sm:grid-cols-3" role="list">
-        {ENCOUNTER_CARDS.map((card) => (
-          <li key={card.id}>
-            <EncounterCard
-              card={card}
-              active={selected === card.title}
-              onToggle={() =>
-                recordAnswer(lesson, "encounter", selected === card.title ? "" : card.title, "A possibility I selected (an encounter, not a decision)")
-              }
-            />
-          </li>
-        ))}
-      </ul>
-      {selected ? (
+      <DiscoveryGallery selectedIds={selectedIds} onToggle={toggle} />
+      {selectedIds.length ? (
         <div aria-live="polite">
           <Panel tone="note">
-            <P>A moment ago, this was just one possibility among many.</P>
-            <P>
-              Did you select it because it seemed interesting, because you already knew something about it, because it
-              raised a question—or for another reason?
-            </P>
-            <P>You don’t need to decide whether you like it. You’ve encountered something you can now investigate.</P>
+            {several ? (
+              <>
+                <P>A moment ago, these were just possibilities among many.</P>
+                <P>
+                  Did you select them because they seemed interesting, because you already knew something about them,
+                  because they raised a question—or for another reason?
+                </P>
+                <P>You don’t need to decide whether you like them. You’ve encountered something you can now investigate.</P>
+              </>
+            ) : (
+              <>
+                <P>A moment ago, this was just one possibility among many.</P>
+                <P>
+                  Did you select it because it seemed interesting, because you already knew something about it, because it
+                  raised a question—or for another reason?
+                </P>
+                <P>You don’t need to decide whether you like it. You’ve encountered something you can now investigate.</P>
+              </>
+            )}
           </Panel>
         </div>
       ) : (
@@ -248,8 +231,9 @@ function PartLook({ lesson, answers }) {
   const route = readAnswer(answers, lesson.code, "notice-route");
   const text = readAnswer(answers, lesson.code, "notice-text");
   const map = readAnswer(answers, lesson.code, "map-context");
-  const encounter = readAnswer(answers, lesson.code, "encounter");
-  const anything = text || map || encounter || route;
+  const encounterIds = selectedEncounterIds(readAnswer(answers, lesson.code, "encounter"));
+  const encounterCards = ENCOUNTER_CARDS.filter((card) => encounterIds.includes(card.id));
+  const anything = text || map || encounterCards.length || route;
   return (
     <div className="space-y-5">
       {anything ? (
@@ -265,10 +249,16 @@ function PartLook({ lesson, answers }) {
               <Quote>{map}</Quote>
             </Panel>
           ) : null}
-          {encounter ? (
-            <Panel tone="yours" label="A possibility you selected">
-              <p className="text-[16px] font-medium text-foreground">{encounter}</p>
-              <p className="text-[14px] text-muted-foreground">Selecting it isn’t the same as being interested in it. Only you decide what it means.</p>
+          {encounterCards.length ? (
+            <Panel tone="yours" label={encounterCards.length > 1 ? "Possibilities you selected" : "A possibility you selected"}>
+              <ul className="space-y-1">
+                {encounterCards.map((card) => (
+                  <li key={card.id} className="text-[16px] font-medium text-foreground">{card.title}</li>
+                ))}
+              </ul>
+              <p className="text-[14px] text-muted-foreground">
+                Selecting something isn’t the same as being interested in it. Only you decide what it means.
+              </p>
             </Panel>
           ) : null}
         </div>
