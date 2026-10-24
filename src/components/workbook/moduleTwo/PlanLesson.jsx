@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import PromptField from "../PromptField";
@@ -17,17 +17,14 @@ import {
   START_MODES,
   WHEN_OPTIONS,
   joinMulti,
-  planHasContent,
-  planSentences,
   readKey,
   readPlan,
   recordM2,
   splitMulti,
-  syncSummary,
 } from "@/lib/moduleTwo";
 import { FinishControl, MultiChoice, P, Panel, PartFlow, Quote, SingleChoice } from "../moduleOne/parts";
 import ExplorationGallery from "./ExplorationGallery";
-import { EarlierM2, PlanCard } from "./common";
+import { EarlierM2, PlanCard, usePlanSync } from "./common";
 
 const CODE = "M2-L1";
 const EXPLORE_LABEL = "What will you explore?";
@@ -334,13 +331,8 @@ function PartSummary({ lesson, answers }) {
 export default function PlanLesson({ lesson }) {
   const answers = useAnswers();
   const [rev, setRev] = useState(0);
-  const plan = readPlan(answers);
-
   // Keep the plain-sentence plan (used by the journal and the records page) in step with the choices.
-  useEffect(() => {
-    if (!planHasContent(plan) && !readKey(answers, CODE, "plan")) return;
-    syncSummary(CODE, lesson.title, "plan", "My saved experiment plan", planSentences(plan), answers);
-  }, [answers, lesson.title]); // eslint-disable-line react-hooks/exhaustive-deps
+  usePlanSync(answers);
 
   const setExplore = (text) => {
     recordM2(CODE, lesson.title, 0, text, EXPLORE_LABEL);
