@@ -182,7 +182,7 @@ const RESPONSE_KEYS = {
     // older interactive keys still count
     "time-energy", "activity-parts", "missing-experience", "own-caught", "own-dont-know", "possibility", "garden-picks"],
   "M1-L2": ["compare", "lens", "reasons", "surprise", FINISHED],
-  "M1-L3": ["carry-mode", "willing", "approach", "support", "support-other", "revisit", FINISHED],
+  "M1-L3": ["carry-mode", "willing", "approach", "support", "support-other", "revisit", FINISHED, "1", "4"],
 };
 
 export function isModuleOneInteractive(code) {
