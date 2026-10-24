@@ -19,7 +19,7 @@ function installMemoryStorage() {
 
 installMemoryStorage();
 const { readStore, writeStore } = await import("./store.js");
-const { MAP_PICK_KEY, MAP_PICK_FIELDS, exploreLines } = await import("./lifeMap.js");
+const { MAP_PICK_KEY, MAP_PICK_FIELDS, exploreLines, reflectionFormFields } = await import("./lifeMap.js");
 const { BRIDGES, bridgeSources } = await import("./moduleBridges.js");
 const { saveAnswer, listEntries } = await import("./journal.js");
 
@@ -59,6 +59,15 @@ test("choosing not to explore right now keeps the words but leaves the bridge em
   assert.equal(pick["one-thing"], "Why I keep fixing cars, and whether I'd want to do it for pay");
   setField("nothing_yet", false);
   assert.equal(bridgeSources(BRIDGES[1], {}, readStore(MAP_PICK_KEY, {})).length, 1);
+});
+
+test("the full map's form no longer asks 'I do NOT know yet', but keeps anyone's earlier answer", () => {
+  const ids = (pick) => reflectionFormFields(pick).map((field) => field.id);
+  assert.ok(!ids({}).includes("do-not-know"));
+  assert.ok(!ids({}).includes("more-room"));
+  assert.ok(ids({}).includes("more-less"));
+  assert.ok(ids({ "do-not-know": "whether I'd want it as a job" }).includes("do-not-know"));
+  assert.ok(exploreLines({ "do-not-know": "whether I'd want it as a job" }).some((line) => line.fieldId === "do-not-know"));
 });
 
 test("both the reflection and the journal are kept in the account, not just on the device", async () => {
