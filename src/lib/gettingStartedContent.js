@@ -12,6 +12,8 @@
  * - Oct 22-23, 2026: Getting Started trimmed (O.1, O.4, O.5). Synced to the database; overrides removed.
  * - Oct 23, 2026: O.5 became "Make this experience yours" (learning agreement, drawn by LearningAgreement.jsx).
  *   Slot 1 (old join choice) is retired and blank. Synced to the database Oct 24; override removed.
+ * - Oct 24, 2026: M1-L3 optional baseline question (answer slot M1-L3#4, shown again in the bridge into
+ *   Module 4 and in M4-L1's optional sketch). Synced to the database; override removed.
  * - O.2 is retired from the app (folded into O.1). Its record stays in the database, unused.
  *
  * Blank "" prompts keep old answer slots in place. A blank prompt is never shown.
@@ -21,16 +23,7 @@
 
 export const RETIRED_GS_CODES = ["O.2"];
 
-export const PENDING_LESSON_CONTENT = {
-  // Oct 24, 2026 (review branch kelly-sketch-m4): optional baseline question, answer slot M1-L3#4.
-  // Shown again in the bridge into Module 4.
-  "M1-L3": {
-    reflect_prompts: [
-      "When would it be useful to revisit this agreement—for example, after your first experience or if your circumstances change?",
-      "Optional: What’s one thing you believe about yourself that you haven’t had the opportunity to test? You’ll see it again in Module 4.",
-    ],
-  },
-};
+export const PENDING_LESSON_CONTENT = {};
 
 /** Apply pending lesson text and drop retired steps. Other lessons pass through untouched. */
 export function applyGettingStartedContent(rows) {
