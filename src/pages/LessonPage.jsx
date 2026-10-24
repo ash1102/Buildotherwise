@@ -46,7 +46,10 @@ export default function LessonPage() {
 
   const lesson = lessonsByCode[code];
   const module = lesson ? modules.find((item) => item.order === lesson.module_order) : null;
-  /** Getting Started is the orientation gate. The Life Map lesson is the step before Module 1. */
+  /**
+   * Getting Started is now just the welcome (O.1). It opens Module 1 directly.
+   * The Life Map is an optional companion in its own tab, not a step before Module 1.
+   */
   const gsLesson = isGettingStartedLesson(lesson);
   const opener = isOpenerLesson(lesson);
   const gsSteps = gettingStartedSteps(lessons);
@@ -137,19 +140,21 @@ export default function LessonPage() {
   const stepsDone = gettingStartedFinished(lessons, answers, states);
   /**
    * The last Getting Started step never dead-ends.
-   * All steps done (or an admin previewing): go straight to the Life Map.
+   * Done (or an admin previewing): go straight into Module 1.
    * An earlier step still open: go to that step.
    * Only this step open: say what opens it.
    */
   const openGsStep = firstOpenGettingStartedStep(lessons, answers, states);
   const lastGs = gsLesson && !next;
+  const firstBookLesson = bookLessons[0] || null;
+  const firstPath = firstBookLesson ? `/lesson/${firstBookLesson.code}` : "/";
   let forward = null;
   let endNote;
   if (lastGs && (stepsDone || admin)) {
     forward = {
-      to: isAuthenticated ? "/map" : "/login?returnTo=%2Fmap",
-      kicker: "Next",
-      title: "Map the life you’re actually living",
+      to: isAuthenticated ? firstPath : `/login?returnTo=${encodeURIComponent(firstPath)}`,
+      kicker: "Next: Module 1",
+      title: firstBookLesson ? firstBookLesson.title : "Module 1",
     };
   } else if (lastGs && openGsStep && openGsStep.code !== lesson.code) {
     const openNumber = gsSteps.findIndex((item) => item.code === openGsStep.code) + 1;
@@ -159,7 +164,7 @@ export default function LessonPage() {
       title: openGsStep.title,
     };
   } else if (lastGs) {
-    endNote = "Make your choice, or skip it, and your Life Map opens next.";
+    endNote = "Tap “Let me in” and Module 1 opens next.";
   }
 
   // A live-only module has no self-paced steps in the app.
