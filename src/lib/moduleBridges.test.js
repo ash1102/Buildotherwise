@@ -19,9 +19,20 @@ const PROMPTS = {
 // Slots written by app pieces rather than lesson prompt boxes.
 const EXTRA = { "M2-L2": [30, 31, 32], "M4-L1": [20, 21] };
 
+// Named slots written by the interactive Module 1 lessons (src/lib/moduleOne.js).
+const NAMED = {
+  "M1-L1": ["notice-route", "notice-text", "map-context", "encounter", "stood-out", "carry-choice"],
+  "M1-L3": ["carry-mode", "willing", "approach", "support", "support-other", "revisit"],
+  "M2-L2": ["outcome"],
+};
+
 test("every bridge source and target points at a real answer slot", () => {
   Object.values(BRIDGES).forEach((bridge) => {
     [...bridge.sources.filter((s) => s.code), ...(bridge.target ? [bridge.target] : [])].forEach((slot) => {
+      if (typeof slot.index === "string") {
+        assert.ok((NAMED[slot.code] || []).includes(slot.index), `${slot.code}#${slot.index} is a named slot`);
+        return;
+      }
       const shape = PROMPTS[slot.code];
       assert.ok(shape, `${slot.code} is known`);
       assert.ok(slot.index < shape.tries + shape.reflects || (EXTRA[slot.code] || []).includes(slot.index), `${slot.code}#${slot.index} exists`);

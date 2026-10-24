@@ -6,6 +6,7 @@ import StepList from "@/components/workbook/StepList";
 import { useAuth } from "@/lib/AuthContext";
 import LoginRedirect from "@/components/LoginRedirect";
 import {
+  EARLIER_GS_CODES,
   GS_CODES,
   OPTIONAL_GS_CODES,
   firstOpenGettingStartedStep,
@@ -14,13 +15,15 @@ import {
   gettingStartedSteps,
 } from "@/lib/gettingStarted";
 import { useWorkbook } from "@/lib/workbook";
+import { isWorkbookLesson } from "@/lib/lessonKind";
 
 /**
- * Getting Started stands on its own, before the workbook.
- * It is not a section of Module 1. The Life Map is the next step, still before Module 1.
+ * Getting Started is now a brief welcome (O.1) before Module 1.
+ * The Life Map is an optional companion in its own tab.
+ * Earlier Getting Started steps stay readable for anyone who answered them.
  */
 export default function GettingStartedPage() {
-  const { lessons, loading, error } = useCurriculum();
+  const { lessons, orderedLessons, loading, error } = useCurriculum();
   const { answers, states } = useWorkbook();
   const { user, isAuthenticated, isLoadingAuth } = useAuth();
   const admin = Boolean(isAuthenticated && user?.role === "admin");
@@ -30,6 +33,11 @@ export default function GettingStartedPage() {
   const anyDone = steps.some((lesson) => gettingStartedStepDone(lesson, answers, states));
   const missing = GS_CODES.filter((code) => !steps.some((lesson) => lesson.code === code));
   const optional = OPTIONAL_GS_CODES.map((code) => (lessons || []).find((lesson) => lesson.code === code)).filter(Boolean);
+  /** Former Getting Started steps, listed only when this person saved something there. */
+  const earlier = EARLIER_GS_CODES.map((code) => (lessons || []).find((lesson) => lesson.code === code))
+    .filter(Boolean)
+    .filter((lesson) => Object.keys(answers || {}).some((key) => key.startsWith(`${lesson.code}#`) && String(answers[key] || "").trim()));
+  const firstLesson = (orderedLessons || []).find(isWorkbookLesson) || null;
 
   if (isLoadingAuth || loading) {
     return <p className="py-10 text-[16px] text-muted-faint">Opening Getting Started…</p>;
@@ -45,11 +53,12 @@ export default function GettingStartedPage() {
         <p className="workbook-label">Getting Started</p>
         <h1 className="mt-2">Start here. You can decide as you go.</h1>
         <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-          This pilot helps you notice what matters, try small things, and choose what comes next. You can pass, pause,
-          or change your mind.
+          Entrepalooza helps you explore interests and possibilities through learning, conversation, and small
+          real-world experiences. You can pass, pause, or change your mind.
         </p>
         <p className="mt-2 max-w-[68ch] text-[15px] leading-relaxed text-muted-faint">
-          Two short steps and one optional one, about ten minutes. Your Life Map comes next, before Module 1.
+          One short welcome, about five minutes. Then Module 1 opens. Your Life Map is always there in its own tab if
+          you want it.
         </p>
       </header>
 
@@ -65,12 +74,12 @@ export default function GettingStartedPage() {
 
       {stepsDone ? (
         <div className="space-y-3">
-          <p className="text-[16px] text-muted-foreground">You’re through Getting Started. You can reread any step below.</p>
+          <p className="text-[16px] text-muted-foreground">You’re through the welcome. You can reread it below.</p>
           <Link
-            to="/map"
+            to={firstLesson ? `/lesson/${firstLesson.code}` : "/"}
             className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[16px] font-medium text-primary-foreground"
           >
-            Next: your Life Map
+            Next: Module 1
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
@@ -96,6 +105,25 @@ export default function GettingStartedPage() {
       ) : null}
 
       <StepList lessons={steps} scopeLabel="in Getting Started" numberByIndex />
+
+      {earlier.length ? (
+        <section className="rounded-xl border border-border bg-card p-5 sm:p-6">
+          <p className="workbook-label">Your earlier answers</p>
+          <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
+            These steps used to be part of Getting Started. They aren’t needed anymore, but what you saved is still
+            here. Your learning agreement now lives in Module 1, Lesson 3.
+          </p>
+          <ul className="mt-3 space-y-2">
+            {earlier.map((lesson) => (
+              <li key={lesson.code}>
+                <Link to={`/lesson/${lesson.code}`} className="text-[16px] font-medium text-accent-ink underline underline-offset-2">
+                  {lesson.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {optional.length ? (
         <section className="rounded-xl border border-dashed border-input bg-card p-5 sm:p-6">

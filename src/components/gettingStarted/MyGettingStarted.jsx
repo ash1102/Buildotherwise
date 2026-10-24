@@ -1,7 +1,7 @@
 import React from "react";
 import useCurriculum from "@/hooks/useCurriculum";
 import { answerKey, useAnswers } from "@/lib/workbook";
-import { GS_CODES, useGettingStartedSubmitted } from "@/lib/gettingStarted";
+import { ALL_GS_CODES, useGettingStartedSubmitted } from "@/lib/gettingStarted";
 
 /** Read-only: what someone wrote in Getting Started, and what was sent when they submitted. */
 export default function MyGettingStarted() {
@@ -10,7 +10,8 @@ export default function MyGettingStarted() {
   const { lessons } = useCurriculum();
   if (!submitted) return null;
 
-  const steps = GS_CODES.map((code) => (lessons || []).find((lesson) => lesson.code === code)).filter(Boolean);
+  // Every former Getting Started step, so answers saved before the flow was shortened still show.
+  const steps = ALL_GS_CODES.map((code) => (lessons || []).find((lesson) => lesson.code === code)).filter(Boolean);
   const sent = submitted.sent || {};
   const when = submitted.at ? new Date(submitted.at).toLocaleDateString() : "";
 

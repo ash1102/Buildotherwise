@@ -1,6 +1,7 @@
 import MobileSelect from "@/components/ui/MobileSelect";
 import React, { useMemo, useRef, useState } from "react";
-import { Download, Plus, Printer } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { ArrowLeft, Download, Plus, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLifeMap, useWorkbook } from "@/lib/workbook";
@@ -51,6 +52,10 @@ export default function LifeMapPage() {
   const [draftSection, setDraftSection] = useState(MAP_SECTIONS[0].key);
   const [selectedId, setSelectedId] = useState(null);
   const [asList, setAsList] = useState(false);
+  /** Opened from a lesson: offer the way back. Only lesson paths are followed. */
+  const [params] = useSearchParams();
+  const from = params.get("from") || "";
+  const returnTo = /^\/lesson\/[A-Za-z0-9.-]+$/.test(from) ? from : "";
 
   /** The Life Map comes after Getting Started, so next is the first unfinished workbook step (Module 1 onward). */
   const nextStep = useMemo(
@@ -199,6 +204,12 @@ export default function LifeMapPage() {
 
   return (
     <div className="space-y-8">
+      {returnTo ? (
+        <Link to={returnTo} className="no-print inline-flex min-h-[44px] items-center gap-1.5 text-[15px] font-medium text-accent-ink underline underline-offset-2">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Back to your lesson
+        </Link>
+      ) : null}
       <header className="border-b border-border pb-6">
         <div className="flex items-start gap-4">
           <DashedMotif size="lg" />
@@ -206,7 +217,7 @@ export default function LifeMapPage() {
             <p className="workbook-label">Your Life Map</p>
             <h1 className="mt-2 font-heading text-3xl sm:text-4xl">Map the life you’re actually living</h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-              This step comes after Getting Started and before Module 1. Start with places and activities from a recent stretch you remember, then people you were in contact with.
+              Use it whenever it’s useful. You don’t have to complete it to continue the workbook. Start with places and activities from a recent stretch you remember, then people you were in contact with.
               Observations and possible threads come after those entries are on the map. You choose what each connection means.
             </p>
             <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-muted-faint">
