@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { plainValue } from "@/lib/moduleOne";
 import { EARLIER_M2, METHOD_BY_ID, planHasContent, planSentences, readKey, readPlan, syncSummary } from "@/lib/moduleTwo";
+import { OPTIONS as OLD_SAMPLER } from "../DiscoverySampler";
+import { Quote } from "../moduleOne/parts";
 
 /** Keeps M2-L1's plain-sentence plan in step, wherever the plan was edited from. */
 export function usePlanSync(answers) {
@@ -10,8 +12,6 @@ export function usePlanSync(answers) {
     syncSummary("M2-L1", "Find Something to Try", "plan", "My saved experiment plan", planSentences(plan), answers);
   }, [answers]);
 }
-import { OPTIONS as OLD_SAMPLER } from "../DiscoverySampler";
-import { Quote } from "../moduleOne/parts";
 
 /** Answers saved in the earlier version of a Module 2 lesson. Read-only. */
 export function EarlierM2({ code, answers }) {
