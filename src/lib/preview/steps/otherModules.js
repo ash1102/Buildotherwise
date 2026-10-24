@@ -47,11 +47,11 @@ export const otherModules = [
       shortReading("M5-R3", "A Hunch Can Start a Question. It Cannot Finish One."),
     ],
     steps: [
-      { code: "M5-L1", title: "Understand the sequence before you map it", sourceLesson: "M5-L1", readings: ["M5-R1"], blocks: [], closesPilot: false },
-      { code: "M5-L2", title: "Protect what works or try one small response", sourceLesson: "M5-L2", readings: ["M5-R2"], blocks: [] },
+      { code: "M5-L1", title: "Understand the Sequence Before You Map It", sourceLesson: "M5-L1", readings: ["M5-R1"], blocks: [], closesPilot: false },
+      { code: "M5-L2", title: "Protect What Works or Try One Small Response", sourceLesson: "M5-L2", readings: ["M5-R2"], blocks: [] },
       {
         code: "M5-L3",
-        title: "Check an impression and close Pilot 1",
+        title: "Check an Impression and Close Pilot 1",
         sourceLesson: "M5-L3",
         readings: ["M5-R3"],
         blocks: [],

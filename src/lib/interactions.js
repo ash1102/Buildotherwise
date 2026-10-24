@@ -23,6 +23,10 @@ export const INTERACTIONS = {
   "M2-L1": [{ type: "m2Plan", ownsLesson: true }],
   "M2-L2": [{ type: "m2Try", ownsLesson: true }],
   "M2-L3": [{ type: "m2Discover", ownsLesson: true }],
+  // Module 5 interactive lessons (src/components/workbook/moduleFive).
+  "M5-L1": [{ type: "m5Sequence", ownsLesson: true }],
+  "M5-L2": [{ type: "m5Response", ownsLesson: true }],
+  "M5-L3": [{ type: "m5Close", ownsLesson: true }],
   // Module 2 now uses the concise workbook prompts. The former interactive
   // planner/check-in code remains available, but is not rendered twice.
 };

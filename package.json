@@ -13,7 +13,8 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview",
-    "test:module-two": "node --import ./scripts/register-js-extension.mjs --test src/lib/moduleTwo.test.js"
+    "test:module-two": "node --import ./scripts/register-js-extension.mjs --test src/lib/moduleTwo.test.js",
+    "test:module-five": "node --import ./scripts/register-js-extension.mjs --test src/lib/moduleFive.test.js"
   },
   "dependencies": {
     "@base44/sdk": "^0.8.57",

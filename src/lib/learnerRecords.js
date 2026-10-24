@@ -42,6 +42,7 @@ export const RECORD_TYPES = [
     module: 4,
     prompt: "What did you actually see or check? What does it support, complicate, or leave unknown?",
     sources: [
+      { code: "M5-L3", slot: "support" },
       { code: "M5-L3", match: /one piece of evidence you gathered/i },
       { code: "M4-L3", match: /What wording is more accurate now/ },
       { code: "M4-L1", match: /What more accurate statement fits/ },
