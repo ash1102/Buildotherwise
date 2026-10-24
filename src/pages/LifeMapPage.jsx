@@ -1,8 +1,7 @@
 import MobileSelect from "@/components/ui/MobileSelect";
 import React, { useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-import { Download, Plus, Printer } from "lucide-react";
+import { ArrowLeft, Download, Plus, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLifeMap, useWorkbook } from "@/lib/workbook";
