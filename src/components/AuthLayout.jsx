@@ -13,15 +13,16 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
     <div className="flex min-h-screen flex-col bg-background lg:flex-row">
       <aside className="bg-primary px-5 py-6 text-primary-foreground sm:px-8 lg:flex lg:w-[44%] lg:flex-col lg:justify-between lg:px-12 lg:py-12">
         <div className="flex items-center justify-between gap-4">
-          <Link to="/" className="text-[18px] font-bold tracking-tight text-primary-foreground">
+          {/* Signed-out visitors: "/" sends them straight back to log in, so point to the public About page. */}
+          <Link to="/about" className="text-[18px] font-bold tracking-tight text-primary-foreground">
             Entrepalooza
           </Link>
           <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 text-[14px] font-medium text-primary-foreground/85 hover:text-primary-foreground"
+            to="/about"
+            className="inline-flex min-h-[44px] items-center gap-1.5 text-[14px] font-medium text-primary-foreground/85 hover:text-primary-foreground"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-            Home
+            About
           </Link>
         </div>
 
