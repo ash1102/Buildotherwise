@@ -247,8 +247,8 @@ export default function LifeSnapshot({ map, onOpenFullMap }) {
     return true;
   };
   const saveAll = () => {
-    REFLECT_FIELDS.forEach(keepInJournal);
-    setSaved(true);
+    const kept = REFLECT_FIELDS.map(keepInJournal).some(Boolean);
+    setSaved(kept || paused ? "saved" : "empty");
   };
 
   return (
@@ -323,10 +323,18 @@ export default function LifeSnapshot({ map, onOpenFullMap }) {
           onClick={saveAll}
           className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-[17px] font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
         >
-          {saved ? <Check className="h-5 w-5" aria-hidden="true" /> : null}
-          {saved ? "Saved to your account and journal" : "Save my snapshot"}
+          {saved === "saved" ? <Check className="h-5 w-5" aria-hidden="true" /> : null}
+          {saved === "saved" ? "Saved" : "Save my snapshot"}
         </button>
-        <p className="text-center text-[13px] text-muted-faint">Your snapshot also saves as you go.</p>
+        <p className="text-center text-[13px] text-muted-faint" aria-live="polite">
+          {saved === "saved"
+            ? paused
+              ? "Saved to your account. Your choice not to explore right now is kept."
+              : "Saved to your account. Your reflection is in your journal too."
+            : saved === "empty"
+              ? "Your snapshot is saved. The reflection questions are empty, so nothing went to your journal. That’s fine."
+              : "Your snapshot also saves as you go."}
+        </p>
       </section>
 
       <div className="rounded-2xl border border-dashed border-border p-5">
