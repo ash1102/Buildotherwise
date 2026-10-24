@@ -20,6 +20,8 @@
  *
  * History:
  * - Oct 22-23, 2026: Getting Started trimmed (O.1, O.4, O.5). Synced to the database; overrides removed.
+ * - Oct 23, 2026: O.5 became "Make this experience yours" (learning agreement, drawn by LearningAgreement.jsx).
+ *   Slot 1 (old join choice) is retired and blank. Synced to the database Oct 24; override removed.
  * - O.2 is retired from the app (folded into O.1). Its record stays in the database, unused.
  *
  * Blank "" prompts keep old answer slots in place. A blank prompt is never shown.
