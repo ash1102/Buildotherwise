@@ -20,6 +20,7 @@ import TryPlanner from "./TryPlanner";
 import TryCheckIn from "./TryCheckIn";
 import NoticeFlow from "./NoticeFlow";
 import LetMeIn from "./LetMeIn";
+import SelfSketch from "./SelfSketch";
 import ComeBackAfterTry from "./ComeBackAfterTry";
 import { isAfterTryStep } from "@/lib/afterTry";
 import { interactionsFor } from "@/lib/interactions";
@@ -378,6 +379,15 @@ export default function LessonView({
 
   if (lesson.code === "M3-L3") {
     beats.push({ key: "module-3-review", label: "Review what actually happened", content: <Module3ReviewBridge /> });
+  }
+
+  if (lesson.code === "M4-L1") {
+    beats.push({
+      key: "self-sketch",
+      label: "Another way to begin (optional)",
+      hasInput: true,
+      content: <SelfSketch lesson={lesson} route={route} />,
+    });
   }
 
   if (lesson.code === "M3-L1" || lesson.code === "M3-L2") {
