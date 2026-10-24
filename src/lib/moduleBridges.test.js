@@ -6,7 +6,7 @@ import { BRIDGES, bridgeIn, bridgeOut, bridgeSources } from "./moduleBridges.js"
 // If a lesson's prompts change, re-check the bridge indexes against this.
 const PROMPTS = {
   "M1-L1": { tries: 2, reflects: 0 },
-  "M1-L3": { tries: 3, reflects: 1 },
+  "M1-L3": { tries: 3, reflects: 2 }, // Oct 24: optional baseline question added at #4
   "M2-L2": { tries: 10, reflects: 4 },
   "M2-L3": { tries: 5, reflects: 6 },
   "M3-L1": { tries: 2, reflects: 2 },
@@ -17,7 +17,7 @@ const PROMPTS = {
 };
 
 // Slots written by app pieces rather than lesson prompt boxes.
-const EXTRA = { "M2-L2": [30, 31, 32] };
+const EXTRA = { "M2-L2": [30, 31, 32], "M4-L1": [20, 21] };
 
 test("every bridge source and target points at a real answer slot", () => {
   Object.values(BRIDGES).forEach((bridge) => {
