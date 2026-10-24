@@ -158,7 +158,7 @@ export const MAP_QUESTION_PARTS = [
     title: "Observations",
     section: "energy",
     intro:
-      "Optional. Choose one entry and describe one recent time, or one thing you notice about that entry. Nothing here is a score, and one answer does not become a permanent description.",
+      "Optional. Pick one entry and think of one recent time. Nothing here is a score.",
     questions: [
       { id: "p3-energy", branch: "Energy observation", text: ENERGY_QUESTION, energyControl: true },
       { id: "p3-plus", branch: "Gives me energy", text: "What gives you energy?", retired: true },
@@ -256,10 +256,8 @@ export const MAP_QUESTION_PARTS = [
     key: "part-5",
     title: "Possible threads",
     section: "threads",
-    menu: true,
     intro:
-      "Optional. Look across the entries you can already see. A repeated detail might be worth noticing. It does not tell you yet why it repeats, whether you like it, or whether you want more of it.",
-    note: "Choose one prompt if you want to. You do not need a discovery for every prompt.",
+      "Optional. Something you keep coming back to might be worth noticing. It doesn't tell you yet why, or whether you want more of it.",
     questions: [
       {
         id: "p5-ending-up", retired: true,
