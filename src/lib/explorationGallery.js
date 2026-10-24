@@ -834,7 +834,7 @@ const RAW = {
       tryIt: [
         ["observe", "Notice where sidewalks, bus stops, and stores are, or aren’t, along a route you already travel."],
         ["investigate", "Look up your city’s planning department or zoning map."],
-        ["do", "Watch a recording of a public planning meeting and note who speaks and what they ask for."],
+        ["do", "Sketch a simple map of your block and mark one thing you would add or change."],
       ],
       lead: ["Urban planning", "Transportation", "Community advocacy", "Local government"],
     },
