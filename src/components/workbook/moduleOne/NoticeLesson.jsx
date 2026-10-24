@@ -224,8 +224,7 @@ function PartReading() {
           </P>
           <P>
             In the model, other people, the setting, and chances to come back to something can all help an interest
-            develop. Without that kind of support, an interest can fade. Not having an interest yet often says more about
-            what you’ve had access to than about you.
+            develop. Without that kind of support, an interest can fade.
           </P>
           <P>The phases describe a possible path. They don’t mean everyone follows the same one, or that every early curiosity becomes a passion.</P>
           <Link to="/program-library" className="inline-flex items-center gap-1.5 text-[15px] font-medium text-accent-ink underline underline-offset-2">
