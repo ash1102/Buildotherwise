@@ -30,6 +30,9 @@ import AgreementLesson from "./moduleOne/AgreementLesson";
 import PlanLesson from "./moduleTwo/PlanLesson";
 import TryLesson from "./moduleTwo/TryLesson";
 import DiscoverLesson from "./moduleTwo/DiscoverLesson";
+import SequenceLesson from "./moduleFive/SequenceLesson";
+import ResponseLesson from "./moduleFive/ResponseLesson";
+import CloseLesson from "./moduleFive/CloseLesson";
 import SetupLesson from "./moduleThree/SetupLesson";
 import ChangeLesson from "./moduleThree/ChangeLesson";
 import M3ReviewLesson from "./moduleThree/ReviewLesson";
@@ -54,6 +57,9 @@ const OWNED_LESSONS = {
   m2Plan: PlanLesson,
   m2Try: TryLesson,
   m2Discover: DiscoverLesson,
+  m5Sequence: SequenceLesson,
+  m5Response: ResponseLesson,
+  m5Close: CloseLesson,
   m3Setup: SetupLesson,
   m3Change: ChangeLesson,
   m3Review: M3ReviewLesson,
@@ -338,9 +344,7 @@ export default function LessonView({
           purpose={lesson.purpose}
           status={status}
         />
-        <JournalLessonTitle.Provider value={lesson.title || ""}>
-          <OwnedLesson lesson={lesson} readings={readings} />
-        </JournalLessonTitle.Provider>
+        <OwnedLesson lesson={lesson} readings={readings} />
         {ownedOrder === 1 && ownedLast ? (
           <div className="space-y-1">
             <Link
@@ -359,12 +363,13 @@ export default function LessonView({
           prev={prev}
           next={next}
           nextIsModule={nextIsModule}
-          workbookLink={workbookLink}
+          workbookLink={lesson.code === "M5-L3" ? `${workbookLink}#continue` : workbookLink}
           backLabel={backLabel}
           forward={forward}
           endNote={endNote}
           nameNext
           journalHref={journalStepHref(lesson.code)}
+          backEqual={lesson.code === "M5-L3"}
         />
       </article>
     );

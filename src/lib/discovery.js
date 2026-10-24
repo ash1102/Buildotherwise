@@ -30,6 +30,14 @@ export const DISCOVERY_SOURCES = {
   "M5-L3#6": { section: "close", label: "One thing worth keeping" },
   "M5-L3#7": { section: "close", label: "One support that mattered" },
   "M5-L3#8": { section: "close", label: "One question for later" },
+  "M5-L1#pattern-label": { section: "close", label: "A pattern you recognized" },
+  "M5-L1#pattern-other": { section: "close", label: "A pattern you described" },
+  "M5-L2#stance": { section: "close", label: "What you considered keeping, adjusting, or protecting" },
+  "M5-L3#support": { section: "close", label: "What supports this impression" },
+  "M5-L3#complicate": { section: "close", label: "What might complicate it" },
+  "M5-L3#uncertain": { section: "close", label: "What remains uncertain" },
+  "M5-L3#thinking-now": { section: "close", label: "What you're thinking now" },
+  "M5-L3#next": { section: "close", label: "What you chose to do next" },
 };
 
 /**

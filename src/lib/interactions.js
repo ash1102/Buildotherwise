@@ -25,6 +25,10 @@ export const INTERACTIONS = {
   "M2-L1": [{ type: "m2Plan", ownsLesson: true }],
   "M2-L2": [{ type: "m2Try", ownsLesson: true }],
   "M2-L3": [{ type: "m2Discover", ownsLesson: true }],
+  // Module 5 interactive lessons (src/components/workbook/moduleFive).
+  "M5-L1": [{ type: "m5Sequence", ownsLesson: true }],
+  "M5-L2": [{ type: "m5Response", ownsLesson: true }],
+  "M5-L3": [{ type: "m5Close", ownsLesson: true }],
   // Module 3 interactive lessons (review branch module-3-interactive): src/components/workbook/moduleThree.
   "M3-L1": [{ type: "m3Setup", ownsLesson: true }],
   "M3-L2": [{ type: "m3Change", ownsLesson: true }],

@@ -5,8 +5,7 @@ export { OPENER_LESSON_CODE, isOpenerLesson, isWorkbookLesson } from "./lessonKi
 
 /** Modules and lessons are content records, so later modules can be added as data only. */
 export async function loadModules() {
-  const modules = await base44.entities.Module.list("order", 20);
-  return modules;
+  return base44.entities.Module.list("order", 20);
 }
 
 export async function loadLessons(moduleOrder) {
