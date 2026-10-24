@@ -29,11 +29,7 @@ function hasInteractionLine(lesson, answers) {
   return INTERACTION_ANSWERS.some((key) => !isBlank((answers || {})[`${lesson.code}#${key}`]));
 }
 
-/** Module 1 uses interactive question keys rather than the old numbered Try inputs. */
-function hasNoticeResponse(answers) {
-  return ["time-energy", "activity-parts", "missing-experience", "own-caught", "own-dont-know", "possibility", "garden-picks"]
-    .some((key) => !isBlank((answers || {})[`M1-L1#${key}`]));
-}
+/** Module 1 (all three lessons) uses named interactive keys: see src/lib/moduleOne.js. */
 
 /** The Try and Reflect boxes with nothing saved in them yet. */
 export function missingPrompts(lesson, answers) {
