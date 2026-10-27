@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 
 const pillClass = (active) =>
   `rounded-full border px-3 py-1.5 text-[12.5px] transition ${
-    active ? "border-primary bg-primary text-primary-foreground" : "border-natural bg-white text-ink-soft hover:border-teal-deep/50"
+    active ? "border-primary bg-primary text-primary-foreground" : "border-natural bg-card text-ink-soft hover:border-teal-deep/50"
   }`;
 
 function FilterPill({ active, onClick, children }) {
@@ -42,7 +42,7 @@ export default function LibraryFilters({
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder="Search the readings"
           aria-label="Search the readings"
-          className="rounded-full border-natural bg-white pl-9"
+          className="rounded-full border-natural bg-card pl-9"
         />
       </div>
 

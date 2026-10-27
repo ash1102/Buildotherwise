@@ -16,7 +16,7 @@ export default function DecisionChips({ value, onChange, className = "" }) {
             className={`rounded-full border px-3.5 py-1.5 text-[12.5px] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper ${
               active
                 ? "border-copper bg-copper text-ivory"
-                : "border-natural bg-white text-ink-soft hover:border-copper/60 hover:text-copper"
+                : "border-natural bg-card text-ink-soft hover:border-copper/60 hover:text-copper"
             }`}
           >
             {decision}

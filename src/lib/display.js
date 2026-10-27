@@ -3,7 +3,8 @@ import { useStore } from "./store";
 
 /** Display choices live on this device only, like the rest of the workbook. */
 export const DISPLAY_KEY = "display";
-export const DEFAULT_DISPLAY = { textSize: "normal", theme: "light" };
+// New users follow their device's light or dark setting. A saved choice always wins.
+export const DEFAULT_DISPLAY = { textSize: "normal", theme: "system" };
 
 export const TEXT_SIZES = [
   { value: "normal", label: "Normal", zoom: 1 },

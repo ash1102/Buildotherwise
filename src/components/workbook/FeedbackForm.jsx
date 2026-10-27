@@ -65,7 +65,7 @@ export default function FeedbackForm({ moduleOrder, lessonCode }) {
                 onClick={() => setKind(option.value)}
                 className={`rounded-md border px-3.5 py-2 text-[15px] transition ${
                   kind === option.value
-                    ? "border-accent-ink bg-accent-ink text-white"
+                    ? "border-accent-ink bg-accent-ink text-primary-foreground"
                     : "border-input bg-card text-foreground hover:bg-secondary"
                 }`}
               >

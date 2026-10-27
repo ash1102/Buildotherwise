@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { buildBranches, branchMarkdown, wouldCycle } from "./lifeMapBranches.js";
-import { nextOpenStep } from "./progress.js";
+import { nextOpenStep, nextStepAfterLifeMap } from "./progress.js";
 import { LIFEMAP_KEY } from "./workbook.js";
 import {
   MAP_PAUSE_TEXT,
@@ -162,14 +162,18 @@ test("the map offers the next unfinished step, or nothing when the book is done"
 
   assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, answers: {}, states: {} }).code, "O.1");
 
+  // Oct 24, 2026: only the welcome (O.1) stands before Module 1. O.4 and O.5 no longer gate.
   const throughFour = {
     answers: { "O.1#0": "here", "O.2#0": "pace", "O.3#0": "note" },
     states: { "O.4": "Pass" },
   };
-  assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, ...throughFour }).code, "O.5");
+  assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, ...throughFour }).code, "M1-L1");
 
   const started = { answers: { ...throughFour.answers, "O.5#0": "done" }, states: throughFour.states };
   assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, ...started }).code, "M1-L1");
+
+  const welcomeOnly = { answers: {}, states: { "O.1": "Ready" } };
+  assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, ...welcomeOnly }).code, "M1-L1");
 
   const midBook = { answers: { ...started.answers, "M1-L1#own-caught": "noticed" }, states: started.states };
   assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, ...midBook }).code, "M1-L2");
@@ -177,7 +181,8 @@ test("the map offers the next unfinished step, or nothing when the book is done"
   const finished = { answers: { ...midBook.answers, "M1-L2#0": "again" }, states: midBook.states };
   assert.equal(nextOpenStep({ lessons, workbookLessons: lessons, ...finished }), null);
 
-  const missingLast = gettingStarted.slice(0, 4);
+  // The welcome step not loaded yet: no next step is offered.
+  const missingLast = gettingStarted.slice(1);
   assert.equal(
     nextOpenStep({
       lessons: missingLast,
@@ -448,6 +453,19 @@ test("an existing answer can move into What's missing, survive reload and export
     globalThis.window = oldWindow;
     globalThis.CustomEvent = oldEvent;
   }
+});
+
+test("the Life Map's next button never sends anyone back into Getting Started", () => {
+  const gettingStarted = ["O.1", "O.2", "O.3", "O.4", "O.5"].map((code, index) => step(code, 0, { order: index }));
+  const opener = step("O.6", 0, { order: 6, try_prompts: ["map"] });
+  const first = step("M1-L1", 1, { order: 1 });
+  const second = step("M1-L2", 1, { order: 2 });
+  const lessons = [...gettingStarted, opener, first, second];
+  assert.equal(nextStepAfterLifeMap({ lessons, workbookLessons: lessons, answers: {}, states: {} }).code, "M1-L1");
+  assert.equal(
+    nextStepAfterLifeMap({ lessons, workbookLessons: lessons, answers: { "M1-L1#own-caught": "noticed" }, states: {} }).code,
+    "M1-L2"
+  );
 });
 
 test("an empty Life Map is still the step before Module 1", () => {

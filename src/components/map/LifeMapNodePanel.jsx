@@ -1,3 +1,4 @@
+import MobileSelect from "@/components/ui/MobileSelect";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Trash2, X } from "lucide-react";
@@ -27,6 +28,9 @@ export default function LifeMapNodePanel({
   onRemove,
   onClose,
   onSplit,
+  placement = "",
+  parentOptions = [],
+  onPlace,
 }) {
   const [label, setLabel] = useState(node.label || "");
   const [text, setText] = useState(node.text || "");
@@ -154,13 +158,45 @@ export default function LifeMapNodePanel({
         </p>
       ) : null}
 
+      {onPlace ? (
+        <div className="mt-5 rounded-md border border-border bg-secondary/40 p-3">
+          <label className="workbook-label block" htmlFor="map-node-parent">
+            Where this sits on the map
+          </label>
+          <p className="mt-1 text-[12.5px] text-muted-faint">
+            {placement === "__unplaced"
+              ? "Not placed in a branch yet. Choose the entry it belongs under, or make it its own starting entry."
+              : "Move it under a different entry, or make it its own starting entry. Its own answers move with it."}
+          </p>
+          <MobileSelect
+            id="map-node-parent"
+            className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-[13px]"
+            value={placement === "__unplaced" ? "__unplaced" : placement}
+            onChange={(event) => {
+              const next = event.target.value;
+              if (next === "__unplaced") return;
+              onPlace(next);
+            }}
+          >
+            {placement === "__unplaced" ? <option value="__unplaced">Not placed yet — choose…</option> : null}
+            <option value="">Its own starting entry</option>
+            {node.section === "barriers" ? <option value="__missing">In “What’s missing”</option> : null}
+            {parentOptions.map((item) => (
+              <option key={item.id} value={item.id}>
+                Under: {item.label || item.text}
+              </option>
+            ))}
+          </MobileSelect>
+        </div>
+      ) : null}
+
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <div>
           <label className="workbook-label block" htmlFor="map-node-journal">
             A journal line behind this
           </label>
           {entries.length ? (
-            <select
+            <MobileSelect
               id="map-node-journal"
               className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-[13px]"
               value={node.entry_id || ""}
@@ -172,7 +208,7 @@ export default function LifeMapNodePanel({
                   {(entry.lesson_title || "Written freely") + ": " + entry.body.slice(0, 50)}
                 </option>
               ))}
-            </select>
+            </MobileSelect>
           ) : (
             <p className="mt-2 text-[13px] text-muted-faint">Your journal is empty, so there is nothing to link yet.</p>
           )}
@@ -189,7 +225,7 @@ export default function LifeMapNodePanel({
           </label>
           <p className="mt-1 text-[12.5px] text-muted-faint">You can connect this to more than one entry. A connection shows an association you chose.</p>
           {others.length > 1 ? (
-            <select
+            <MobileSelect
               id="map-node-connect"
               className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-[13px]"
               value=""
@@ -205,7 +241,7 @@ export default function LifeMapNodePanel({
                     {item.label || item.text}
                   </option>
                 ))}
-            </select>
+            </MobileSelect>
           ) : (
             <p className="mt-2 text-[13px] text-muted-faint">One line so far. Connections appear once there are two.</p>
           )}

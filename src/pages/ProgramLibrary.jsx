@@ -174,7 +174,7 @@ export default function ProgramLibrary() {
         {busy ? (
           <p className="py-8 text-[14px] text-ink-faint">Opening the library…</p>
         ) : resources.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-natural-deep bg-white/60 p-6 text-[14px] leading-relaxed text-ink-soft">
+          <p className="rounded-lg border border-dashed border-natural-deep bg-card/60 p-6 text-[14px] leading-relaxed text-ink-soft">
             {narrowed
               ? "No readings match that yet. Try fewer words, or choose Everything to see the whole library."
               : "No readings have been imported yet. When they are, each one appears here under the step it belongs to."}
@@ -275,7 +275,7 @@ export default function ProgramLibrary() {
       ) : null}
 
       {research.length ? (
-        <section className="rounded-lg border border-dashed border-natural-deep bg-white/60 p-6">
+        <section className="rounded-lg border border-dashed border-natural-deep bg-card/60 p-6">
           <h3 className="workbook-label">Build Otherwise's own research notes</h3>
           <h4 className="mt-1.5 font-heading text-[19px]">How the curriculum was checked against research</h4>
           <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-ink-soft">

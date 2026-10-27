@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useLocation, useNavigationType } from "react-router-dom";
+import { isTabPath } from "@/lib/tabs";
 
 const getHashId = (hash) => {
   const rawId = hash.slice(1);
@@ -17,6 +18,8 @@ export default function ScrollToTop() {
 
   useEffect(() => {
     if (navigationType === "POP") return;
+    // Tab pages restore their own scroll position when they are shown again.
+    if (!hash && isTabPath(pathname)) return;
 
     if (hash) {
       const id = getHashId(hash);

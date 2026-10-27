@@ -98,7 +98,7 @@ export default function OnboardingSteps() {
             className={`rounded-full border px-4 py-2 text-[13.5px] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper ${
               answers[question.key] === choice
                 ? "border-teal-deep bg-teal-deep-wash text-teal-deep"
-                : "border-natural bg-white text-ink-soft hover:border-teal-deep/50 hover:text-teal-deep"
+                : "border-natural bg-card text-ink-soft hover:border-teal-deep/50 hover:text-teal-deep"
             }`}
           >
             {choice}

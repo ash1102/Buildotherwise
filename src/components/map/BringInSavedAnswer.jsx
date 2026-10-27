@@ -1,3 +1,4 @@
+import MobileSelect from "@/components/ui/MobileSelect";
 import React, { useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,7 @@ export default function BringInSavedAnswer({ options, onAdd }) {
             back into the step.
           </p>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-            <select
+            <MobileSelect
               aria-label="Saved answer to bring in"
               className="w-full rounded-md border border-border bg-background px-3 py-2 text-[13.5px] sm:flex-1"
               value={answerKey}
@@ -46,8 +47,8 @@ export default function BringInSavedAnswer({ options, onAdd }) {
                   {option.lessonTitle}, {option.stepLabel}: {option.value.slice(0, 50)}
                 </option>
               ))}
-            </select>
-            <select
+            </MobileSelect>
+            <MobileSelect
               aria-label="Which question this line answers"
               className="w-full rounded-md border border-border bg-background px-3 py-2 text-[13.5px] sm:w-56"
               value={section}
@@ -58,7 +59,7 @@ export default function BringInSavedAnswer({ options, onAdd }) {
                   {item.label}
                 </option>
               ))}
-            </select>
+            </MobileSelect>
             <Button type="button" onClick={add} disabled={!answerKey} className="rounded-full">
               <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
               Bring it in

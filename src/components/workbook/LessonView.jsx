@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -19,17 +19,60 @@ import DiscoveryFollowThrough from "./DiscoveryFollowThrough";
 import TryPlanner from "./TryPlanner";
 import TryCheckIn from "./TryCheckIn";
 import NoticeFlow from "./NoticeFlow";
+import LetMeIn from "./LetMeIn";
+import SelfSketch from "./SelfSketch";
 import ComeBackAfterTry from "./ComeBackAfterTry";
 import { isAfterTryStep } from "@/lib/afterTry";
-import { interactionsFor } from "@/lib/interactions";
+import { interactionsFor, lessonOwner } from "@/lib/interactions";
+import NoticeLesson from "./moduleOne/NoticeLesson";
+import AttentionLesson from "./moduleOne/AttentionLesson";
+import AgreementLesson from "./moduleOne/AgreementLesson";
+import PlanLesson from "./moduleTwo/PlanLesson";
+import TryLesson from "./moduleTwo/TryLesson";
+import DiscoverLesson from "./moduleTwo/DiscoverLesson";
+import SequenceLesson from "./moduleFive/SequenceLesson";
+import ResponseLesson from "./moduleFive/ResponseLesson";
+import CloseLesson from "./moduleFive/CloseLesson";
+import SetupLesson from "./moduleThree/SetupLesson";
+import ChangeLesson from "./moduleThree/ChangeLesson";
+import M3ReviewLesson from "./moduleThree/ReviewLesson";
+import SeparateLesson from "./moduleFour/SeparateLesson";
+import ActionLesson from "./moduleFour/ActionLesson";
+import ReviewLesson from "./moduleFour/ReviewLesson";
 import { journalStepHref, saveAnswer } from "@/lib/journal";
 import DecisionFollowUp from "./DecisionFollowUp";
+import { BridgeIn, BridgeOut } from "./ModuleBridge";
+import { bridgeIn, bridgeOut } from "@/lib/moduleBridges";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor, setAnswer, useAnswers, answerKey } from "@/lib/workbook";
-import { JOIN_CHOICES, joinChoiceText, splitChoice } from "@/lib/gettingStarted";
+import { AGREEMENT_APPROACH, AGREEMENT_CODE, AGREEMENT_NOTE, AGREEMENT_WHY, JOIN_CHOICES, isGettingStartedLesson, joinChoiceText, splitChoice } from "@/lib/gettingStarted";
+import LearningAgreement from "@/components/gettingStarted/LearningAgreement";
+import GoDeeperJournal, { JournalLessonTitle } from "./GoDeeperJournal";
+import { hasGoDeeper } from "@/lib/journalPrompts";
+
+/** Steps drawn entirely by one interactive piece (see src/lib/interactions.js). */
+const OWNED_LESSONS = {
+  m1Notice: NoticeLesson,
+  m1Attention: AttentionLesson,
+  m1Agreement: AgreementLesson,
+  m2Plan: PlanLesson,
+  m2Try: TryLesson,
+  m2Discover: DiscoverLesson,
+  m5Sequence: SequenceLesson,
+  m5Response: ResponseLesson,
+  m5Close: CloseLesson,
+  m3Setup: SetupLesson,
+  m3Change: ChangeLesson,
+  m3Review: M3ReviewLesson,
+  m4Separate: SeparateLesson,
+  m4Action: ActionLesson,
+  m4Review: ReviewLesson,
+};
 
 /** O.5's second box holds the join choice. On the step page it is a set of buttons, not a writing box. */
 const JOIN_CHOICE_CODE = "O.5";
 const JOIN_CHOICE_INDEX = 1;
+/** The step that ends with a "Let me in" tap. */
+const LET_ME_IN_CODE = "O.1";
 
 function JoinChoicePicker({ lessonCode, lessonTitle, index, label }) {
   const answers = useAnswers();
@@ -60,7 +103,7 @@ function JoinChoicePicker({ lessonCode, lessonTitle, index, label }) {
               aria-pressed={active}
               onClick={() => record(joinChoiceText(active ? "" : option, note))}
               className={`rounded-md border px-3.5 py-2 text-[15px] transition ${
-                active ? "border-accent-ink bg-accent-ink text-white" : "border-input bg-card text-foreground hover:bg-secondary"
+                active ? "border-accent-ink bg-accent-ink text-primary-foreground" : "border-input bg-card text-foreground hover:bg-secondary"
               }`}
             >
               {option}
@@ -101,6 +144,11 @@ function promptForRoute(lesson, prompt, route) {
     if (/^Navigation:/i.test(text)) return navigation;
     return continuation || navigation;
   }
+  // Couldn't get to it yet: questions about an encounter that didn't happen are left out;
+  // the access questions above take their place.
+  if (lesson.code === "M2-L2" && /couldn.?t access/i.test(selected)) {
+    return !/actually do or observe|surprised, frustrated|helped or made participation|take in time, money|attention change|people, setting, instructions/i.test(text);
+  }
   if (lesson.code === "M3-L2" && /what actually happened|effort or discomfort|might you try again/i.test(text)) {
     return /^attempt it\b/i.test(selected);
   }
@@ -128,13 +176,14 @@ function Module3ExperienceBridge({ lessonCode }) {
       <p className="text-[16px] leading-relaxed text-foreground">
         Module 3 examines the <strong>conditions around a task</strong>—instructions, time, noise, help, and choice. Start with your Module 2 encounter when you have one. Otherwise use an ordinary task from this week, or the reply example below.
       </p>
-      {choice ? <div className="rounded-lg bg-secondary p-3">
+      {/* On M3-L1 the Module 2 recap lives in "Picking up from Module 2" above, so it isn't repeated here. */}
+      {lessonCode !== "M3-L1" && choice ? <div className="rounded-lg bg-secondary p-3">
         <p className="text-[14px] text-muted-foreground">A possibility you explored in Module 2</p>
         <p className="mt-1 font-medium text-foreground">{choice.field}</p>
         <p className="mt-1 text-[15px] text-foreground">{choice.task}</p>
         <p className="mt-2 text-[14px] text-muted-foreground">This suggests a subject to investigate, not proof you completed the task.</p>
       </div> : null}
-      {firstNote ? <div className="rounded-lg border border-border p-3">
+      {lessonCode === "M3-L1" ? null : firstNote ? <div className="rounded-lg border border-border p-3">
         <p className="text-[14px] text-muted-foreground">What you recorded doing or observing</p>
         <p className="mt-1 whitespace-pre-wrap text-[15px] text-foreground">{firstNote}</p>
       </div> : notes.length ? <p className="text-[14px] text-muted-foreground">You saved other observations in Module 2, but did not describe a completed activity.</p> : <p className="text-[14px] text-muted-foreground">No Module 2 observations are recorded. You can still complete this lesson without inventing a past experience.</p>}
@@ -187,7 +236,10 @@ function DiscoveryReviewNotes() {
   ];
   const notes = [
     ...questions.map((label, index) => ({ label, value: answers[answerKey("M2-L2", index)] })),
-    ...["What kind of encounter did you actually have: reading, watching, a conversation, a visit, doing an activity yourself, or a combination? If you did not have an opportunity, record that.","At what point did your attention change? Was there a particular part you wanted to understand better?","How did the people, setting, instructions, or available support affect the experience? What remains uncertain?"].map((label, index) => ({ label, value: answers[answerKey("M2-L2", 11 + index)] }))
+    ...["What kind of encounter did you actually have: reading, watching, a conversation, a visit, doing an activity yourself, or a combination? If you did not have an opportunity, record that.","At what point did your attention change? Was there a particular part you wanted to understand better?","How did the people, setting, instructions, or available support affect the experience? What remains uncertain?"].map((label, index) => ({ label, value: answers[answerKey("M2-L2", 11 + index)] })),
+    { label: "What got in the way", value: answers[answerKey("M2-L2", 30)] },
+    { label: "The smallest version that doesn't need it", value: answers[answerKey("M2-L2", 31)] },
+    { label: "Who or what might know a way around it", value: answers[answerKey("M2-L2", 32)] },
   ]
     .filter((item) => String(item.value || "").trim());
   return (
@@ -200,7 +252,7 @@ function DiscoveryReviewNotes() {
         <p className="mt-2 text-[14px] text-muted-foreground">Selecting this card does not establish that you completed the activity. Review what you actually recorded below.</p>
       </div> : <p className="text-[15px] text-muted-foreground">No sampler selection was saved. You may have explored something else.</p>}
       {notes.length ? <div className="space-y-3">
-        <p className="text-[15px] font-medium">Your actual Lesson 2 observations</p>
+        <p className="text-[15px] font-medium">What you recorded in Lesson 2</p>
         {notes.map((note) => <div key={note.label} className="border-l-2 border-border pl-3">
           <p className="text-[13px] text-muted-foreground">{note.label}</p>
           <p className="mt-1 whitespace-pre-wrap text-[15px]">{note.value}</p>
@@ -252,7 +304,9 @@ export default function LessonView({
   const reflectPrompts = rawReflect
     .map((prompt, index) => ({ prompt, index: rawTry.length + index, fieldKey: `reflect-${index}` }))
     .filter((item) => notAnOption(item.prompt) && promptForRoute(lesson, item.prompt, route));
-  const routes = participationRoutesFor(lesson);
+  // O.1 ends with a single "Let me in" tap instead of a box or a skip link.
+  const letMeIn = lesson.code === LET_ME_IN_CODE;
+  const routes = letMeIn ? [] : participationRoutesFor(lesson);
   const guidance = routeGuidanceFor(route);
   const hasRoutes = routes.length > 0;
   const oneLine = guidance ? guidance.field === "line" : false;
@@ -269,6 +323,57 @@ export default function LessonView({
   };
 
   const detailRef = useRef(null);
+  // Bumped when a carried-over answer is copied in, so the boxes below re-read it.
+  const [bridgeRev, setBridgeRev] = useState(0);
+
+  // A lesson drawn by its own interactive piece keeps the shared header, feedback and
+  // step navigation, and skips the generic sections built from the Lesson record.
+  const owner = lessonOwner(lesson.code);
+  const OwnedLesson = owner ? OWNED_LESSONS[owner.type] : null;
+  if (OwnedLesson) {
+    const ownedOrder = Number(lesson.module_order);
+    const ownedLast = !next || nextIsModule;
+    return (
+      <article className="space-y-6">
+        <StepHeader
+          moduleTitle={moduleTitle}
+          stepNumber={stepNumber}
+          stepCount={stepCount}
+          title={lesson.title}
+          duration={lesson.duration_min}
+          purpose={lesson.purpose}
+          status={status}
+        />
+        <OwnedLesson lesson={lesson} readings={readings} />
+        {ownedOrder === 1 && ownedLast ? (
+          <div className="space-y-1">
+            <Link
+              to={`/tribe-threads?lesson=${encodeURIComponent(lesson.code)}#lesson-thread`}
+              className="inline-block text-[15px] font-medium text-accent-ink underline underline-offset-2"
+            >
+              Explore the related Tribe Thread (optional)
+            </Link>
+            <p className="text-[14px] text-muted-faint">
+              Tribe replies are shared with other participants. Your journal stays private unless you choose to share.
+            </p>
+          </div>
+        ) : null}
+        <FeedbackForm moduleOrder={lesson.module_order} lessonCode={lesson.code} />
+        <StepNav
+          prev={prev}
+          next={next}
+          nextIsModule={nextIsModule}
+          workbookLink={lesson.code === "M5-L3" ? `${workbookLink}#continue` : workbookLink}
+          backLabel={backLabel}
+          forward={forward}
+          endNote={endNote}
+          nameNext
+          journalHref={journalStepHref(lesson.code)}
+          backEqual={lesson.code === "M5-L3"}
+        />
+      </article>
+    );
+  }
 
   // Reflection or reading questions do not implicitly require a decision.
   // Preserve explicit next-decision steps and deliberately configured decision choices.
@@ -279,11 +384,14 @@ export default function LessonView({
       (lesson.type !== "reading" && (rawTry.length > 0 || rawReflect.length > 0)));
 
   const promptField = (prompt, index, key) =>
-    lesson.code === JOIN_CHOICE_CODE && index === JOIN_CHOICE_INDEX ? (
+    lesson.code === AGREEMENT_CODE && index === AGREEMENT_WHY ? (
+      <LearningAgreement key={key} lessonTitle={lesson.title} />
+    ) : lesson.code === AGREEMENT_CODE && (index === AGREEMENT_APPROACH || index === AGREEMENT_NOTE) ? null
+    : lesson.code === JOIN_CHOICE_CODE && index === JOIN_CHOICE_INDEX ? (
       <JoinChoicePicker key={key} lessonCode={lesson.code} lessonTitle={lesson.title} index={index} label={prompt} />
     ) : (
     <PromptField
-      key={key}
+      key={`${key}-${bridgeRev}`}
       lessonCode={lesson.code}
       lessonTitle={lesson.title}
       index={index}
@@ -314,6 +422,16 @@ export default function LessonView({
   ) : null;
 
   const beats = [];
+
+  // First step of a module: pick up where the last module left off.
+  const incoming = stepNumber === 1 ? bridgeIn(lesson.module_order) : null;
+  if (incoming) {
+    beats.push({
+      key: "bridge-in",
+      label: `Picking up from Module ${incoming.from}`,
+      content: <BridgeIn bridge={incoming} lesson={lesson} onUsed={() => setBridgeRev((value) => value + 1)} />,
+    });
+  }
 
   if (lesson.readings_note) {
     beats.push({
@@ -352,6 +470,15 @@ export default function LessonView({
     beats.push({ key: "module-3-review", label: "Review what actually happened", content: <Module3ReviewBridge /> });
   }
 
+  if (lesson.code === "M4-L1") {
+    beats.push({
+      key: "self-sketch",
+      label: "Another way to begin (optional)",
+      hasInput: true,
+      content: <SelfSketch lesson={lesson} route={route} />,
+    });
+  }
+
   if (lesson.code === "M3-L1" || lesson.code === "M3-L2") {
     beats.push({
       key: "module-3-experience",
@@ -369,14 +496,14 @@ export default function LessonView({
   }
 
   if (lesson.code === "M2-L2") {
-    beats.push({ key: "guided-follow-through", label: "Explore what you encountered", content: <DiscoveryFollowThrough /> });
+    beats.push({ key: "guided-follow-through", label: "Explore what you encountered", content: <DiscoveryFollowThrough lesson={lesson} route={route} /> });
   }
 
   if (lesson.code === "M2-L1") {
     beats.push({
       key: "discovery-sampler",
       label: "Explore real possibilities",
-      content: <DiscoverySampler />,
+      content: <DiscoverySampler route={route} />,
     });
   }
 
@@ -401,6 +528,19 @@ export default function LessonView({
           Open the Life Map
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
+      ),
+    });
+  }
+
+  if (letMeIn) {
+    beats.push({
+      key: "let-me-in",
+      label: "Ready?",
+      content: (
+        <LetMeIn
+          ready={/^ready$/i.test(String(route || "").trim())}
+          onChange={(on) => onRouteChange(on ? "Ready" : "")}
+        />
       ),
     });
   }
@@ -472,6 +612,12 @@ export default function LessonView({
     });
   }
 
+  // Conversation Journal: Go Deeper, after the lesson's own questions and before the Next Decision.
+  // Interactive lessons draw it on their last part instead (see moduleOne/parts.jsx).
+  if (hasGoDeeper(lesson.code)) {
+    beats.push({ key: "go-deeper", label: "Conversation Journal — Go Deeper", bare: true, content: <GoDeeperJournal lessonCode={lesson.code} lessonTitle={lesson.title} /> });
+  }
+
   if (asksForDecision) {
     beats.push({
       key: "decision",
@@ -504,8 +650,21 @@ export default function LessonView({
   const lastOfModule = !next || nextIsModule;
   const showTribe = moduleOrder === 1 && lastOfModule;
   // Journal sits beside Next for these modules, so the footer link stays off.
-  const closingJournalHref = focusModule || lesson.what_comes_out || !savesToJournal ? "" : journalHref;
+  // Getting Started never points to the journal: it isn't part of the workbook yet.
+  const closingJournalHref =
+    isGettingStartedLesson(lesson) || focusModule || lesson.what_comes_out || !savesToJournal ? "" : journalHref;
   const returnLink = lesson.code === "M5-L3" ? `${workbookLink}#continue` : workbookLink;
+
+  // Last step of a module: a short bridge built from the participant's own earlier answers.
+  const outgoing = lastOfModule && stepNumber > 0 ? bridgeOut(moduleOrder) : null;
+  if (outgoing) {
+    beats.push({
+      key: "bridge-out",
+      label: `Bridge to Module ${outgoing.to}`,
+      hasInput: true,
+      content: <BridgeOut bridge={outgoing} lesson={lesson} />,
+    });
+  }
 
   if (lesson.what_comes_out) {
     beats.push({

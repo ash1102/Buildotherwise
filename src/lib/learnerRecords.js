@@ -42,8 +42,10 @@ export const RECORD_TYPES = [
     module: 4,
     prompt: "What did you actually see or check? What does it support, complicate, or leave unknown?",
     sources: [
+      { code: "M5-L3", slot: "support" },
       { code: "M5-L3", match: /one piece of evidence you gathered/i },
-      { code: "M4-L3", match: /What wording is more accurate now/ },
+      // Module 4 is interactive (Oct 24, 2026): the revised statement stays in slot 4.
+      { code: "M4-L3", slot: 4 },
       { code: "M4-L1", match: /What more accurate statement fits/ },
       { code: "M2-L3", match: /what evidence supports or complicates/i },
     ],
@@ -64,6 +66,7 @@ export const RECORD_TYPES = [
     sources: [
       { code: "M2-L1", slot: "plan" },
       { code: "M2-L1", match: /^(\*\*)?Smallest real action:/ },
+      { code: "M3-L2", slot: "plan" },
       { code: "M3-L2", match: /What single part of the setup would you change/ },
     ],
   },
@@ -76,6 +79,7 @@ export const RECORD_TYPES = [
     sources: [
       { code: "M2-L2", slot: "checkin" },
       { code: "M2-L3", match: /^what changed from (expectation|what you expected)/i },
+      { code: "M3-L2", slot: "checkin" },
       { code: "M3-L3", match: /What changed, and what else was different/ },
     ],
   },

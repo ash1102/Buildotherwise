@@ -1,3 +1,4 @@
+import MobileSelect from "@/components/ui/MobileSelect";
 import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -35,11 +36,11 @@ export default function EnergyMarks({ graph, onEarlierPart }) {
       </div>
       {targets.length ? <>
         <label htmlFor="energy-entry" className="block text-[15px] font-medium">Entry from your map</label>
-        <select id="energy-entry" value={selectedId} onChange={(event) => { setSelectedId(event.target.value); setSaved(""); }}
+        <MobileSelect id="energy-entry" value={selectedId} onChange={(event) => { setSelectedId(event.target.value); setSaved(""); }}
           className="w-full rounded-md border border-input bg-card px-3 py-3 text-[16px]">
           <option value="">Choose an entry…</option>
           {targets.map((node) => <option key={node.id} value={node.id}>{node.label || node.text}{node.question_id === "p1-places" ? " (place)" : ""}</option>)}
-        </select>
+        </MobileSelect>
         {source ? <div className="space-y-4">
           <div className="rounded-lg border border-primary/30 bg-secondary p-4">
             <p className="text-[14px] text-muted-foreground">You are answering about:</p>

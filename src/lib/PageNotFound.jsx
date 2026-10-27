@@ -1,75 +1,50 @@
-import { useLocation } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '@/lib/AuthContext';
 
-
-export default function PageNotFound({}) {
+export default function PageNotFound() {
     const location = useLocation();
     const pageName = location.pathname.substring(1);
+    const { user, isAuthenticated } = useAuth();
 
-    const { data: authData, isFetched } = useQuery({
-        queryKey: ['user'],
-        queryFn: async () => {
-            try {
-                const user = await base44.auth.me();
-                return { user, isAuthenticated: true };
-            } catch (error) {
-                return { user: null, isAuthenticated: false };
-            }
-        }
-    });
-    
     return (
-        <div className="min-h-screen flex items-center justify-center p-6 bg-background">
+        <main className="min-h-screen flex items-center justify-center p-6 bg-background">
             <div className="max-w-md w-full">
                 <div className="text-center space-y-6">
-                    {/* 404 Error Code */}
-                    <div className="space-y-2">
-                        <h1 className="text-7xl font-light text-muted-faint/30">404</h1>
-                        <div className="h-0.5 w-16 bg-border mx-auto"></div>
-                    </div>
-                    
-                    {/* Main Message */}
                     <div className="space-y-3">
-                        <h2 className="text-2xl font-medium text-foreground">
-                            Page Not Found
-                        </h2>
+                        <p className="text-sm font-medium tracking-wide text-muted-foreground">Error 404</p>
+                        <h1 className="text-2xl font-medium text-foreground">
+                            This page isn’t here
+                        </h1>
                         <p className="text-muted-foreground leading-relaxed">
-                            The page <span className="font-medium text-foreground">"{pageName}"</span> could not be found in this application.
+                            We couldn’t find <span className="font-medium text-foreground">“{pageName}”</span>. The link may be old or have a typo.
                         </p>
                     </div>
-                    
-                    {/* Admin Note */}
-                    {isFetched && authData.isAuthenticated && authData.user?.role === 'admin' && (
-                        <div className="mt-8 p-4 bg-secondary rounded-lg border border-border">
-                            <div className="flex items-start space-x-3">
-                                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-primary-wash flex items-center justify-center mt-0.5">
-                                    <div className="w-2 h-2 rounded-full bg-primary"></div>
-                                </div>
-                                <div className="text-left space-y-1">
-                                    <p className="text-sm font-medium text-foreground">Admin Note</p>
-                                    <p className="text-sm text-muted-foreground leading-relaxed">
-                                        This could mean that the AI hasn't implemented this page yet. Ask it to implement it in the chat.
-                                    </p>
-                                </div>
-                            </div>
+
+                    {isAuthenticated && user?.role === 'admin' && (
+                        <div className="mt-8 p-4 bg-secondary rounded-lg border border-border text-left">
+                            <p className="text-sm font-medium text-foreground">Admin note</p>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                No route matches this address. Check the link, or add the page to the app’s routes.
+                            </p>
                         </div>
                     )}
-                    
-                    {/* Action Button */}
-                    <div className="pt-6">
-                        <button 
-                            onClick={() => window.location.href = '/'} 
-                            className="inline-flex items-center px-4 py-2 text-sm font-medium text-foreground bg-card border border-border rounded-lg hover:bg-secondary hover:border-input transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+
+                    <div className="pt-4 flex flex-wrap justify-center gap-3">
+                        <Link
+                            to="/"
+                            className="inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-medium text-foreground bg-card border border-border rounded-lg hover:bg-secondary hover:border-input transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring"
                         >
-                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                            Go Home
-                        </button>
+                            Go to the workbook
+                        </Link>
+                        <Link
+                            to="/about"
+                            className="inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-medium text-accent-ink underline underline-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring rounded-lg"
+                        >
+                            About Entrepalooza
+                        </Link>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     )
 }

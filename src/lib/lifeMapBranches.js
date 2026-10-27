@@ -23,6 +23,32 @@ export function wouldCycle(childId, parentId, parents) {
   return false;
 }
 
+/**
+ * Before a manual connection is saved, write down where a line sits now, so a
+ * new connection never moves it to a different branch by itself. Only lines
+ * whose place was never chosen (older saves) need this.
+ */
+export function freezePlacement(node, tree) {
+  if (!node || node.parent_choice) return null;
+  const parent = tree.parentById[node.id];
+  if (parent) return { parent_id: parent, parent_choice: "chosen" };
+  if (tree.roots.includes(node.id)) return isAnchor(node) ? null : { parent_choice: "standalone" };
+  if (tree.missing.includes(node.id)) return null;
+  return { parent_id: "", parent_choice: "chosen" };
+}
+
+/** Ids under a line, so a line can't be moved under its own branch. */
+export function descendantsOf(id, tree) {
+  const out = new Set();
+  const walk = (current) => (tree.childrenById[current] || []).forEach((child) => {
+    if (out.has(child)) return;
+    out.add(child);
+    walk(child);
+  });
+  walk(id);
+  return out;
+}
+
 export function buildBranches(graph) {
   const nodesById = Object.fromEntries(graph.nodes.map((node) => [node.id, node]));
   const parentById = {};
@@ -32,7 +58,7 @@ export function buildBranches(graph) {
     }
   }
   for (const node of graph.nodes) {
-    if (Object.prototype.hasOwnProperty.call(parentById, node.id) || node.parent_choice === "standalone" || node.branch_group === "barriers") continue;
+    if (Object.prototype.hasOwnProperty.call(parentById, node.id) || node.parent_choice === "standalone" || node.parent_choice === "chosen" || node.branch_group === "barriers") continue;
     const candidates = candidatesFor(node, nodesById);
     if (candidates.length === 1 && !wouldCycle(node.id, candidates[0].id, parentById)) parentById[node.id] = candidates[0].id;
   }

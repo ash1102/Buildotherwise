@@ -1,6 +1,11 @@
-import { gettingStartedFinished, gettingStartedStepDone, gettingStartedSteps } from "./gettingStartedProgress";
+import { firstOpenGettingStartedStep, gettingStartedFinished } from "./gettingStartedProgress";
 import { isWorkbookLesson } from "./lessonKind";
 import { answerKey, routeSkipsWriting } from "./workbook";
+import { isModuleOneInteractive, moduleOneStepComplete } from "./moduleOne";
+import { isModuleTwoInteractive, moduleTwoStepComplete } from "./moduleTwo";
+import { isModuleFiveInteractive, moduleFiveStepComplete } from "./moduleFive";
+import { isModuleThreeInteractive, moduleThreeStepComplete } from "./moduleThree";
+import { isModuleFourInteractive, moduleFourStepComplete } from "./moduleFour";
 
 /**
  * Completion follows the curriculum's own shape: a step counts once one Try or
@@ -28,17 +33,31 @@ function hasInteractionLine(lesson, answers) {
   return INTERACTION_ANSWERS.some((key) => !isBlank((answers || {})[`${lesson.code}#${key}`]));
 }
 
-/** Module 1 uses interactive question keys rather than the old numbered Try inputs. */
-function hasNoticeResponse(answers) {
-  return ["time-energy", "activity-parts", "missing-experience", "own-caught", "own-dont-know", "possibility", "garden-picks"]
-    .some((key) => !isBlank((answers || {})[`M1-L1#${key}`]));
-}
+/** Module 1 (all three lessons) uses named interactive keys: see src/lib/moduleOne.js. */
 
 /** The Try and Reflect boxes with nothing saved in them yet. */
 export function missingPrompts(lesson, answers) {
-  if (lesson?.code === "M1-L1") {
-    if (hasNoticeResponse(answers)) return [];
-    return [{ index: "own-caught", label: "What caught your attention (or what you are unsure about)", kind: "Try" }];
+  // Module 1 lessons are interactive: any saved answer, or "I'm done with this lesson", counts.
+  if (isModuleOneInteractive(lesson?.code)) {
+    if (moduleOneStepComplete(lesson.code, answers)) return [];
+    return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
+  }
+  if (isModuleTwoInteractive(lesson?.code)) {
+    if (moduleTwoStepComplete(lesson.code, answers)) return [];
+    return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
+  }
+  if (isModuleFiveInteractive(lesson?.code)) {
+    if (moduleFiveStepComplete(lesson.code, answers)) return [];
+    return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
+  }
+  // Module 3 lessons follow the same pattern: see src/lib/moduleThree.js.
+  if (isModuleThreeInteractive(lesson?.code)) {
+    if (moduleThreeStepComplete(lesson.code, answers)) return [];
+    return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
+  }
+  if (isModuleFourInteractive(lesson?.code)) {
+    if (moduleFourStepComplete(lesson.code, answers)) return [];
+    return [{ index: "finished", label: "Open the lesson. Answer anything, or tap “I’m done with this lesson for now.”", kind: "Try" }];
   }
   if (hasInteractionLine(lesson, answers)) return [];
   return requiredPrompts(lesson).filter((prompt) => isBlank((answers || {})[answerKey(lesson.code, prompt.index)]));
@@ -48,7 +67,11 @@ export function missingPrompts(lesson, answers) {
 export function stepComplete(lesson, answers, states) {
   const route = states && lesson ? states[lesson.code] : "";
   if (routeSkipsWriting(route)) return true;
-  if (lesson?.code === "M1-L1") return hasNoticeResponse(answers);
+  if (isModuleOneInteractive(lesson?.code)) return moduleOneStepComplete(lesson.code, answers);
+  if (isModuleTwoInteractive(lesson?.code)) return moduleTwoStepComplete(lesson.code, answers);
+  if (isModuleFiveInteractive(lesson?.code)) return moduleFiveStepComplete(lesson.code, answers);
+  if (isModuleThreeInteractive(lesson?.code)) return moduleThreeStepComplete(lesson.code, answers);
+  if (isModuleFourInteractive(lesson?.code)) return moduleFourStepComplete(lesson.code, answers);
   const prompts = requiredPrompts(lesson);
   if (!prompts.length) return true;
   if (hasInteractionLine(lesson, answers)) return true;
@@ -153,16 +176,24 @@ export function buildProgress({ modules, lessonsByOrder, answers, states, pacing
 
 /**
  * The step the Life Map offers next.
- * Getting Started comes first: the earliest of those five steps that is not done.
- * Once all five are done, the next unfinished workbook step, in live workbook order.
+ * Getting Started comes first: the earliest of those steps that is not done.
+ * Once the required ones are done, the next unfinished workbook step, in live workbook order.
  * Nothing left, or Getting Started not fully loaded, means there is no next step.
  */
 export function nextOpenStep({ lessons, workbookLessons, answers, states }) {
-  const openGettingStarted = gettingStartedSteps(lessons).find(
-    (lesson) => !gettingStartedStepDone(lesson, answers, states)
-  );
+  const openGettingStarted = firstOpenGettingStartedStep(lessons, answers, states);
   if (openGettingStarted) return openGettingStarted;
   if (!gettingStartedFinished(lessons, answers, states)) return null;
+  const book = workbookLessons || lessons || [];
+  return book.find((lesson) => isWorkbookLesson(lesson) && !stepComplete(lesson, answers, states)) || null;
+}
+
+/**
+ * The step the Life Map's "next" button opens.
+ * The Life Map comes after Getting Started, so its next step never points back into
+ * Getting Started. It is the next unfinished workbook step, starting at Module 1.
+ */
+export function nextStepAfterLifeMap({ lessons, workbookLessons, answers, states }) {
   const book = workbookLessons || lessons || [];
   return book.find((lesson) => isWorkbookLesson(lesson) && !stepComplete(lesson, answers, states)) || null;
 }

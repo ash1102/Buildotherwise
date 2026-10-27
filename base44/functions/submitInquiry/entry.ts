@@ -14,6 +14,20 @@ function clean(value, max) {
   return String(value ?? '').trim().slice(0, max);
 }
 
+// One line, no control characters: for anything placed in an email subject or header-like line.
+function oneLine(value) {
+  return String(value ?? '').replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+const HOUR_MS = 60 * 60 * 1000;
+const MAX_PER_EMAIL_PER_HOUR = 3; // the same address can send a few messages an hour
+const MAX_EMAILS_PER_HOUR = 20; // past this, messages are still saved but no notification email goes out
+
+function recentCount(records) {
+  const cutoff = Date.now() - HOUR_MS;
+  return (records || []).filter((r) => r?.created_date && new Date(r.created_date).getTime() > cutoff).length;
+}
+
 /**
  * Saves a Get Involved inquiry and emails Start@buildotherwise.org about it.
  * Open to visitors who are not signed in. The record is saved even if the email fails.
@@ -41,6 +55,17 @@ export default async function (req) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return Response.json({ error: 'Add a valid email address.' }, { status: 400 });
     if (!message) return Response.json({ error: 'Add a short message.' }, { status: 400 });
 
+    // Simple flood protection. Over the per-address limit, the message is accepted quietly but not saved again.
+    let sendNotification = true;
+    try {
+      const fromSameEmail = await base44.asServiceRole.entities.Inquiry.filter({ email }, '-created_date', MAX_PER_EMAIL_PER_HOUR);
+      if (recentCount(fromSameEmail) >= MAX_PER_EMAIL_PER_HOUR) return Response.json({ ok: true, emailed: false });
+      const latest = await base44.asServiceRole.entities.Inquiry.list('-created_date', MAX_EMAILS_PER_HOUR);
+      if (recentCount(latest) >= MAX_EMAILS_PER_HOUR) sendNotification = false;
+    } catch (error) {
+      console.error('Inquiry rate check failed', error?.message);
+    }
+
     const record = await base44.asServiceRole.entities.Inquiry.create({
       reaching_out_as: reachingOutAs,
       name,
@@ -53,21 +78,21 @@ export default async function (req) {
     });
 
     let emailed = false;
-    try {
+    if (sendNotification) try {
       const lines = [
         `New Get Involved message from the Build Otherwise site.`,
         ``,
         `Reaching out as: ${LABELS[reachingOutAs]}`,
-        `Name: ${name}`,
+        `Name: ${oneLine(name)}`,
         `Email: ${email}`,
-        organization ? `Organization: ${organization}` : null,
+        organization ? `Organization: ${oneLine(organization)}` : null,
         interests.length ? `Would like to help with: ${interests.join(', ')}` : null,
         ``,
         message,
       ].filter((line) => line !== null);
       await base44.asServiceRole.integrations.Core.SendEmail({
         to: NOTIFY_TO,
-        subject: `Get Involved: ${LABELS[reachingOutAs]}, ${name}`,
+        subject: `Get Involved: ${LABELS[reachingOutAs]}, ${oneLine(name).slice(0, 80)}`,
         body: lines.join('\n'),
         from_name: 'Build Otherwise site',
       });

@@ -17,6 +17,8 @@ import { buildProgress } from "./progress";
  * Admins skip pacing so the whole pilot can be reviewed.
  */
 export const PACE_DAYS = 7;
+/** Set to true to bring the weekly pass back for everyone. Off = each module opens as soon as the one before it is done. */
+export const PACE_ENABLED = false;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const OPENED_KEY = "moduleOpenedAt";
 
@@ -42,7 +44,7 @@ export function formatOpenDate(iso) {
  */
 export function usePacedProgress({ modules, lessonsByOrder, answers, states }) {
   const { user, isAuthenticated } = useAuth();
-  const skip = Boolean(isAuthenticated && user?.role === "admin");
+  const skip = PACE_ENABLED ? Boolean(isAuthenticated && user?.role === "admin") : true;
   const [openedAt, setOpenedAt] = useStore(progressStorageKey(OPENED_KEY), {});
   // Rounded to the minute so the memo is not rebuilt on every render.
   const minute = Math.floor(Date.now() / 60000);

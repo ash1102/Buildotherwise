@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { addEntry, addFollowUp, getEntry, useJournalEntries } from "@/lib/journal";
 import { readStore, writeStore } from "@/lib/store";
 import { downloadText } from "@/lib/download";
+import useBackClose from "@/lib/useBackClose";
 import EntryCard from "./EntryCard";
 import PanelFollowUp from "./PanelFollowUp";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
@@ -42,6 +43,25 @@ export default function JournalPanel({ open, onClose, lesson }) {
   const panelRef = useRef(null);
   const closeRef = useRef(null);
   const openerRef = useRef(null);
+  // Stays mounted for a moment after closing, so the panel can slide out.
+  const [shown, setShown] = useState(open);
+  const [leaving, setLeaving] = useState(false);
+  useBackClose(open, onClose, "journal");
+
+  useEffect(() => {
+    if (open) {
+      setShown(true);
+      setLeaving(false);
+      return undefined;
+    }
+    if (!shown) return undefined;
+    setLeaving(true);
+    const timer = window.setTimeout(() => {
+      setShown(false);
+      setLeaving(false);
+    }, 220);
+    return () => window.clearTimeout(timer);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -125,7 +145,7 @@ export default function JournalPanel({ open, onClose, lesson }) {
   };
 
   // Nothing is left in the page while the journal is closed.
-  if (!open) return null;
+  if (!open && !shown) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end" onKeyDown={onKeyDown}>
@@ -140,9 +160,9 @@ export default function JournalPanel({ open, onClose, lesson }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="journal-panel-title"
-        className="animate-journal-slide relative ml-auto flex h-full w-full max-w-full flex-col border-l border-border bg-card shadow-xl sm:max-w-[26rem]"
+        className={`${leaving ? "animate-journal-slide-out" : "animate-journal-slide"} relative ml-auto flex h-full w-full max-w-full flex-col border-l border-border bg-card pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] shadow-xl sm:max-w-[26rem]`}
       >
-        <header className="flex items-start justify-between gap-3 border-b border-border px-5 py-4">
+        <header className="flex items-start justify-between gap-3 border-b border-border px-5 pt-[calc(1rem+env(safe-area-inset-top))] pb-4">
           <div className="min-w-0">
             <h2 id="journal-panel-title" className="text-[20px]">
               Add a note
@@ -167,7 +187,7 @@ export default function JournalPanel({ open, onClose, lesson }) {
           </button>
         </header>
 
-        <div className="flex-1 overscroll-contain overflow-y-auto px-5 py-4">
+        <div className="flex-1 overscroll-contain overflow-y-auto px-5 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           <label htmlFor="journal-note" className="block text-[15px] font-medium text-foreground">
             What’s on your mind?
           </label>

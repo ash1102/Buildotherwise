@@ -1,21 +1,23 @@
+import MobileSelect from "@/components/ui/MobileSelect";
 import React, { useMemo, useRef, useState } from "react";
-import { Download, Plus, Printer } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { ArrowLeft, Download, Plus, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLifeMap, useWorkbook } from "@/lib/workbook";
 import { useJournalEntries } from "@/lib/journal";
 import useCurriculum from "@/hooks/useCurriculum";
-import { nextOpenStep } from "@/lib/progress";
+import { nextStepAfterLifeMap } from "@/lib/progress";
 import { downloadText } from "@/lib/download";
 import { readStore, useStore } from "@/lib/store";
-import { branchMarkdown } from "@/lib/lifeMapBranches";
+import { branchMarkdown, buildBranches, descendantsOf, freezePlacement } from "@/lib/lifeMapBranches";
 import {
   MAP_PAUSE_TEXT,
   MAP_PICK_FIELDS,
   MAP_PICK_KEY,
-  MAP_QUESTION_PARTS,
   MAP_SECTIONS,
   QUESTIONS_BY_ID,
+  setLineParent,
   setNodePosition,
   addLine,
   buildGraph,
@@ -26,11 +28,10 @@ import {
 } from "@/lib/lifeMap";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import DashedMotif from "@/components/workbook/DashedMotif";
-import LifeMapTree from "@/components/map/LifeMapTree";
+import HybridMap from "@/components/map/HybridMap";
 import MapPickCard from "@/components/map/MapPickCard";
 import LifeMapNodePanel from "@/components/map/LifeMapNodePanel";
 import LifeMapList from "@/components/map/LifeMapList";
-import LifeMapVisual from "@/components/map/LifeMapVisual";
 import BringInSavedAnswer from "@/components/map/BringInSavedAnswer";
 import MapQuestions from "@/components/map/MapQuestions";
 import StepNav from "@/components/workbook/StepNav";
@@ -38,7 +39,8 @@ import StepNav from "@/components/workbook/StepNav";
 export default function LifeMapPage() {
   const map = useLifeMap();
   const [pick] = useStore(MAP_PICK_KEY, {});
-  const [step, setStep] = useState(0);
+  // Remember the part someone was on, so coming back picks up where they left off.
+  const [step, setStep] = useStore("lifeMapGuideStep", 0);
   const mapRef = useRef(null);
   const guideRef = useRef(null);
   const editorRef = useRef(null);
@@ -50,14 +52,18 @@ export default function LifeMapPage() {
   const [draftSection, setDraftSection] = useState(MAP_SECTIONS[0].key);
   const [selectedId, setSelectedId] = useState(null);
   const [asList, setAsList] = useState(false);
-  const [asMap, setAsMap] = useState(false);
+  /** Opened from a lesson: offer the way back. Only lesson paths are followed. */
+  const [params] = useSearchParams();
+  const from = params.get("from") || "";
+  const returnTo = /^\/lesson\/[A-Za-z0-9.-]+$/.test(from) ? from : "";
 
-  /** First unfinished Getting Started step, then the next unfinished workbook step. */
+  /** The Life Map comes after Getting Started, so next is the first unfinished workbook step (Module 1 onward). */
   const nextStep = useMemo(
-    () => nextOpenStep({ lessons, workbookLessons: orderedLessons, answers, states }),
+    () => nextStepAfterLifeMap({ lessons, workbookLessons: orderedLessons, answers, states }),
     [lessons, orderedLessons, answers, states]
   );
   const graph = useMemo(() => buildGraph(map), [map]);
+  const tree = useMemo(() => buildBranches(graph), [graph]);
   const explore = useMemo(() => exploreLines(pick), [pick]);
   const options = useMemo(() => savedAnswerOptions(lessons, answers), [lessons, answers]);
   const nodesById = useMemo(
@@ -69,6 +75,21 @@ export default function LifeMapPage() {
   const selected = selectedId ? nodesById[selectedId] || null : null;
   const selectedSection = selected ? sectionOf(selected.id) : null;
   const connections = selected ? graph.links.filter((pair) => pair.includes(selected.id)) : [];
+  const parentOptions = selected
+    ? (() => {
+        const below = descendantsOf(selected.id, tree);
+        return graph.nodes.filter((node) => node.id !== selected.id && !below.has(node.id));
+      })()
+    : [];
+  const placement = selected
+    ? tree.parentById[selected.id]
+      ? tree.parentById[selected.id]
+      : tree.missing.includes(selected.id)
+        ? "__missing"
+        : tree.unlinked.includes(selected.id)
+          ? "__unplaced"
+          : ""
+    : "";
   const total = graph.nodes.length;
 
   const quickAdd = () => {
@@ -95,9 +116,18 @@ export default function LifeMapPage() {
     updateLine(selectedSection.key, selected.id, patch);
   };
 
-  /** Connections are made by hand, in both directions, so either line shows the link. */
+  /**
+   * Connections are made by hand, in both directions, so either line shows the link.
+   * A connection never moves a line to another branch: where each line sits is
+   * written down first, and only "Where this sits" changes it.
+   */
   const connect = (otherId) => {
     if (!selected) return;
+    [selected.id, otherId].forEach((id) => {
+      const freeze = freezePlacement(nodesById[id], tree);
+      const section = sectionOf(id);
+      if (freeze && section) updateLine(section.key, id, freeze);
+    });
     [
       [selected.id, otherId],
       [otherId, selected.id],
@@ -174,6 +204,12 @@ export default function LifeMapPage() {
 
   return (
     <div className="space-y-8">
+      {returnTo ? (
+        <Link to={returnTo} className="no-print inline-flex min-h-[44px] items-center gap-1.5 text-[15px] font-medium text-accent-ink underline underline-offset-2">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Back to your lesson
+        </Link>
+      ) : null}
       <header className="border-b border-border pb-6">
         <div className="flex items-start gap-4">
           <DashedMotif size="lg" />
@@ -181,7 +217,7 @@ export default function LifeMapPage() {
             <p className="workbook-label">Your Life Map</p>
             <h1 className="mt-2 font-heading text-3xl sm:text-4xl">Map the life you’re actually living</h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
-              This step comes after Getting Started and before Module 1. Start with places and activities from a recent stretch you remember, then people you were in contact with.
+              Use it whenever it’s useful. You don’t have to complete it to continue the workbook. Start with places and activities from a recent stretch you remember, then people you were in contact with.
               Observations and possible threads come after those entries are on the map. You choose what each connection means.
             </p>
             <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-muted-faint">
@@ -201,23 +237,8 @@ export default function LifeMapPage() {
           <Button
             type="button"
             variant="outline"
-            aria-pressed={asMap}
-            onClick={() => {
-              setAsList(false);
-              setAsMap((value) => !value);
-            }}
-            className="rounded-full"
-          >
-            {asMap ? "Show branches" : "Show as map"}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
             aria-pressed={asList}
-            onClick={() => {
-              setAsMap(false);
-              setAsList((value) => !value);
-            }}
+            onClick={() => setAsList((value) => !value)}
             className="rounded-full"
           >
             {asList ? "Show the map" : "Show as a list"}
@@ -231,7 +252,7 @@ export default function LifeMapPage() {
       <section className="rounded-lg border border-border bg-card p-5">
         <p className="workbook-label">Start a branch</p>
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-          <select
+          <MobileSelect
             aria-label="What kind of starting entry?"
             className="w-full rounded-md border border-border bg-background px-3 py-2 text-[13.5px] sm:w-56"
             value={draftSection}
@@ -242,7 +263,7 @@ export default function LifeMapPage() {
                 {{ places: "A place I spent time", placeless: "An activity from that time", groups: "A person or group", barriers: "Something missing", threads: "A possible thread", energy: "An energy observation" }[section.key]}
               </option>
             ))}
-          </select>
+          </MobileSelect>
           <Input
             aria-label="A starting entry for your map"
             value={draft}
@@ -260,7 +281,7 @@ export default function LifeMapPage() {
         </div>
       </section>
 
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
+      <div className="grid items-start gap-6 grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_400px]">
         <div ref={mapRef} className="scroll-mt-4 min-w-0">
           {asList ? (
             <LifeMapList
@@ -274,7 +295,12 @@ export default function LifeMapPage() {
               }}
             />
           ) : (
-            <LifeMapTree graph={graph} selectedId={selectedId} onSelect={selectEntry} />
+            <HybridMap
+              graph={graph}
+              selectedId={selectedId}
+              onSelect={selectEntry}
+              onMove={(id, position) => setNodePosition(id, position)}
+            />
           )}
           <MapPickCard pick={pick} onJumpToPart={openGuide} />
         </div>
@@ -284,7 +310,7 @@ export default function LifeMapPage() {
             The question you are answering stays here. The map beside it shows where the answer lands, and it updates when you add the answer.
           </p>
           <div className="mt-4">
-            <MapQuestions graph={graph} step={step} onStep={setStep} onShowMap={showMap} onPlaced={(id) => { setSelectedId(id); setAsList(false); showMap(); }} />
+            <MapQuestions graph={graph} step={step} onStep={setStep} onShowMap={showMap} onPlaced={(id) => { setSelectedId(id); setAsList(false); showMap(); }} onOpen={selectEntry} />
           </div>
         </div>
       </div>
@@ -303,6 +329,9 @@ export default function LifeMapPage() {
           onDisconnect={disconnect}
           onRemove={removeSelected}
           onSplit={splitSelected}
+          placement={placement}
+          parentOptions={parentOptions}
+          onPlace={(parentId) => setLineParent(selected.id, parentId)}
           onClose={() => setSelectedId(null)}
         />
       ) : (

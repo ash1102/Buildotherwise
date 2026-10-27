@@ -1,45 +1,56 @@
+import { lazy, Suspense } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Navigate, Outlet, Route, Routes } from 'react-router-dom';
-import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import Layout from '@/components/Layout';
-import CurriculumHome from '@/pages/CurriculumHome';
-import GettingStartedPage from '@/pages/GettingStartedPage';
-import ModulePage from '@/pages/ModulePage';
-import LessonPage from '@/pages/LessonPage';
-import JournalPage from '@/pages/JournalPage';
-import JournalReflection from '@/pages/JournalReflection';
-import LifeMapPage from '@/pages/LifeMapPage';
-import DiscoveryRecordPage from '@/pages/DiscoveryRecordPage';
-import MyRecordsPage from '@/pages/MyRecordsPage';
-import ProgramLibrary from '@/pages/ProgramLibrary';
-import TribeThreads from '@/pages/TribeThreads';
-import AspectIndex from '@/pages/AspectIndex';
-import AspectPage from '@/pages/AspectPage';
-import Settings from '@/pages/Settings';
-import DiscoveryMapPage from '@/pages/DiscoveryMapPage';
-import Login from '@/pages/Login';
-import Register from '@/pages/Register';
-import ForgotPassword from '@/pages/ForgotPassword';
-import ResetPassword from '@/pages/ResetPassword';
-import OAuthConsent from '@/pages/OAuthConsent';
-import About from '@/pages/About';
-import Contact from '@/pages/Contact';
-import Connect from '@/pages/Connect';
-import Mission from '@/pages/Mission';
-import Programs from '@/pages/Programs';
-import GetInvolved from '@/pages/GetInvolved';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import LoginRedirect from '@/components/LoginRedirect';
-import PreviewHome from '@/pages/preview/PreviewHome';
-import PreviewModulePage from '@/pages/preview/PreviewModulePage';
-import PreviewStepPage from '@/pages/preview/PreviewStepPage';
-import PreviewNotes from '@/pages/preview/PreviewNotes';
-import PreviewReview from '@/pages/preview/PreviewReview';
+
+// Every route loads its own code on first visit, so the first screen starts faster in the WebView.
+const PageNotFound = lazy(() => import('./lib/PageNotFound'));
+const CurriculumHome = lazy(() => import('@/pages/CurriculumHome'));
+const GettingStartedPage = lazy(() => import('@/pages/GettingStartedPage'));
+const ModulePage = lazy(() => import('@/pages/ModulePage'));
+const LessonPage = lazy(() => import('@/pages/LessonPage'));
+const JournalPage = lazy(() => import('@/pages/JournalPage'));
+const JournalReflection = lazy(() => import('@/pages/JournalReflection'));
+const LifeMapPage = lazy(() => import('@/pages/LifeMapPage'));
+const DiscoveryRecordPage = lazy(() => import('@/pages/DiscoveryRecordPage'));
+const MyRecordsPage = lazy(() => import('@/pages/MyRecordsPage'));
+const ProgramLibrary = lazy(() => import('@/pages/ProgramLibrary'));
+const TribeThreads = lazy(() => import('@/pages/TribeThreads'));
+const AspectIndex = lazy(() => import('@/pages/AspectIndex'));
+const AspectPage = lazy(() => import('@/pages/AspectPage'));
+const Settings = lazy(() => import('@/pages/Settings'));
+const DiscoveryMapPage = lazy(() => import('@/pages/DiscoveryMapPage'));
+const Login = lazy(() => import('@/pages/Login'));
+const Register = lazy(() => import('@/pages/Register'));
+const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
+const OAuthConsent = lazy(() => import('@/pages/OAuthConsent'));
+const About = lazy(() => import('@/pages/About'));
+const Contact = lazy(() => import('@/pages/Contact'));
+const Connect = lazy(() => import('@/pages/Connect'));
+const Mission = lazy(() => import('@/pages/Mission'));
+const Programs = lazy(() => import('@/pages/Programs'));
+const GetInvolved = lazy(() => import('@/pages/GetInvolved'));
+const PreviewHome = lazy(() => import('@/pages/preview/PreviewHome'));
+const PreviewModulePage = lazy(() => import('@/pages/preview/PreviewModulePage'));
+const PreviewStepPage = lazy(() => import('@/pages/preview/PreviewStepPage'));
+const PreviewNotes = lazy(() => import('@/pages/preview/PreviewNotes'));
+const PreviewReview = lazy(() => import('@/pages/preview/PreviewReview'));
+
+function RouteFallback() {
+  return (
+    <div className="flex justify-center py-16" role="status" aria-label="Loading">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+    </div>
+  );
+}
 
 function AdminOnly() {
   const { user, isAuthenticated, isLoadingAuth, isLoadingPublicSettings } = useAuth();
@@ -84,48 +95,51 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        {/* Lessons and modules are readable only when signed in, so every workbook page needs an account. */}
-        <Route element={<ProtectedRoute unauthenticatedElement={<LoginRedirect />} />}>
+    <Suspense fallback={<RouteFallback />}>
+      <Routes>
+        <Route element={<Layout />}>
+          {/* The home page is public: signed-out visitors see the front door, signed-in people see their workbook (CurriculumHome decides). */}
           <Route path="/" element={<CurriculumHome />} />
-          <Route path="/getting-started" element={<GettingStartedPage />} />
-          <Route path="/module/getting-started" element={<Navigate to="/getting-started" replace />} />
-          <Route path="/module/:slug" element={<ModulePage />} />
-          <Route path="/lesson/:code" element={<LessonPage />} />
-          <Route path="/journal" element={<JournalPage />} />
-          <Route path="/journal/reflect" element={<JournalReflection />} />
-          <Route path="/map" element={<LifeMapPage />} />
-          <Route path="/discovery-map" element={<DiscoveryMapPage />} />
-          <Route path="/record" element={<DiscoveryRecordPage />} />
-          <Route path="/my-records" element={<MyRecordsPage />} />
-          <Route path="/program-library" element={<ProgramLibrary />} />
-          <Route path="/tribe-threads" element={<TribeThreads />} />
-        <Route path="/aspects" element={<AspectIndex />} />
-          <Route path="/aspect/:slug" element={<AspectPage />} />
-          <Route path="/settings" element={<Settings />} />
+          {/* Lessons and modules are readable only when signed in, so every workbook page needs an account. */}
+          <Route element={<ProtectedRoute unauthenticatedElement={<LoginRedirect />} />}>
+            <Route path="/getting-started" element={<GettingStartedPage />} />
+            <Route path="/module/getting-started" element={<Navigate to="/getting-started" replace />} />
+            <Route path="/module/:slug" element={<ModulePage />} />
+            <Route path="/lesson/:code" element={<LessonPage />} />
+            <Route path="/journal" element={<JournalPage />} />
+            <Route path="/journal/reflect" element={<JournalReflection />} />
+            <Route path="/map" element={<LifeMapPage />} />
+            <Route path="/discovery-map" element={<DiscoveryMapPage />} />
+            <Route path="/record" element={<DiscoveryRecordPage />} />
+            <Route path="/my-records" element={<MyRecordsPage />} />
+            <Route path="/program-library" element={<ProgramLibrary />} />
+            <Route path="/tribe-threads" element={<TribeThreads />} />
+            <Route path="/aspects" element={<AspectIndex />} />
+            <Route path="/aspect/:slug" element={<AspectPage />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/connect" element={<Connect />} />
+          <Route path="/mission" element={<Mission />} />
+          <Route path="/programs" element={<Programs />} />
+          <Route path="/get-involved" element={<GetInvolved />} />
+          <Route element={<AdminOnly />}>
+            <Route path="/preview" element={<PreviewHome />} />
+            <Route path="/preview/module/:slug" element={<PreviewModulePage />} />
+            <Route path="/preview/step/:code" element={<PreviewStepPage />} />
+            <Route path="/preview/notes" element={<PreviewNotes />} />
+            <Route path="/preview/review" element={<PreviewReview />} />
+          </Route>
         </Route>
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/connect" element={<Connect />} />
-        <Route path="/mission" element={<Mission />} />
-        <Route path="/programs" element={<Programs />} />
-        <Route path="/get-involved" element={<GetInvolved />} />
-        <Route element={<AdminOnly />}>
-          <Route path="/preview" element={<PreviewHome />} />
-          <Route path="/preview/module/:slug" element={<PreviewModulePage />} />
-          <Route path="/preview/step/:code" element={<PreviewStepPage />} />
-          <Route path="/preview/notes" element={<PreviewNotes />} />
-          <Route path="/preview/review" element={<PreviewReview />} />
-        </Route>
-      </Route>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/oauth/consent" element={<OAuthConsent />} />
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/oauth/consent" element={<OAuthConsent />} />
+        <Route path="*" element={<PageNotFound />} />
+      </Routes>
+    </Suspense>
   );
 };
 

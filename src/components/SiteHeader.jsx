@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { LogOut, Menu, PenLine, Settings as SettingsIcon, X } from "lucide-react";
+import { BookOpen, ClipboardList, LogOut, Map as MapIcon, Menu, MoreHorizontal, PenLine, Settings as SettingsIcon, X } from "lucide-react";
 import { useJournalContext } from "@/components/journal/JournalContext";
 import { useAuth } from "@/lib/AuthContext";
+import { resumePath } from "@/lib/tabs";
 
 const LINKS = [
   { to: "/", label: "Workbook", end: true },
@@ -32,6 +33,14 @@ const PUBLIC_LINKS = [
   { to: "/contact", label: "Contact" },
 ];
 
+/** Bottom tab bar on screens below 1024px, signed-in only. Each entry points at an existing route. */
+const TAB_LINKS = [
+  { to: "/", label: "Workbook", icon: BookOpen, prefixes: ["/", "/module", "/lesson", "/getting-started"] },
+  { to: "/journal", label: "Journal", icon: PenLine, prefixes: ["/journal"] },
+  { to: "/map", label: "Life Map", icon: MapIcon, prefixes: ["/map"] },
+  { to: "/my-records", label: "Records", icon: ClipboardList, prefixes: ["/my-records", "/record"] },
+];
+
 const linkClass = ({ isActive }) =>
   `rounded-md px-3 py-2 text-[15px] transition ${
     isActive ? "bg-secondary font-semibold text-foreground" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
@@ -59,7 +68,8 @@ export default function SiteHeader() {
   }, [menuOpen]);
 
   return (
-    <header className="no-print sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
+    <>
+    <header className="no-print sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur pt-[env(safe-area-inset-top)]">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
         <Link to="/" className="flex min-w-0 items-center gap-2.5">
           <span
@@ -85,20 +95,20 @@ export default function SiteHeader() {
             ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           {isAuthenticated ? (
             <>
               {user?.role === "admin" ? (
                 <Link
                   to="/preview"
-                  className="rounded-md px-2 py-2 text-[14px] font-medium text-accent-ink transition hover:bg-secondary"
+                  className="hidden rounded-md px-2 py-2 text-[14px] font-medium text-accent-ink transition hover:bg-secondary sm:inline-flex"
                 >
                   Preview
                 </Link>
               ) : null}
               <Link
                 to="/journal"
-                className="inline-flex items-center rounded-md px-2.5 py-2 text-[14px] font-medium text-foreground transition hover:bg-secondary"
+                className="hidden lg:inline-flex items-center rounded-md px-2.5 py-2 text-[14px] font-medium text-foreground transition hover:bg-secondary"
               >
                 Journal
               </Link>
@@ -121,6 +131,27 @@ export default function SiteHeader() {
               Log in
             </Link>
           )}
+          {isAuthenticated ? (
+            <>
+              <Link
+                to="/settings"
+                aria-label="Settings"
+                className="hidden items-center justify-center rounded-md border border-input bg-card p-2 text-foreground transition hover:bg-secondary sm:inline-flex lg:hidden"
+              >
+                <SettingsIcon className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setMenuOpen((value) => !value)}
+                aria-expanded={menuOpen}
+                aria-controls="site-menu"
+                className="inline-flex items-center gap-1 rounded-md border border-input bg-card px-2.5 py-2 text-[14px] font-medium text-foreground transition hover:bg-secondary lg:hidden"
+              >
+                <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
+                <span>More</span>
+              </button>
+            </>
+          ) : null}
           <button
             type="button"
             onClick={() => setMenuOpen((value) => !value)}
@@ -128,7 +159,7 @@ export default function SiteHeader() {
             aria-controls="site-menu"
             aria-label={menuOpen ? "Close the menu" : "Open the menu"}
             className={`inline-flex items-center justify-center rounded-md border border-input bg-card p-2 text-foreground transition hover:bg-secondary ${
-              isAuthenticated ? "" : "lg:hidden"
+              isAuthenticated ? "hidden lg:inline-flex" : "lg:hidden"
             }`}
           >
             {menuOpen ? <X className="h-4 w-4" aria-hidden="true" /> : <Menu className="h-4 w-4" aria-hidden="true" />}
@@ -154,6 +185,13 @@ export default function SiteHeader() {
             ))}
             {isAuthenticated ? (
               <>
+                {user?.role === "admin" ? (
+                  <li className="mt-1 border-t border-border pt-1 sm:hidden">
+                    <NavLink to="/preview" className={({ isActive }) => `block ${linkClass({ isActive })}`}>
+                      Preview
+                    </NavLink>
+                  </li>
+                ) : null}
                 <li className="mt-1 border-t border-border pt-1">
                   <NavLink to="/settings" className={({ isActive }) => `flex items-center gap-2 ${linkClass({ isActive })}`}>
                     <SettingsIcon className="h-4 w-4" aria-hidden="true" />
@@ -179,5 +217,39 @@ export default function SiteHeader() {
         </nav>
       ) : null}
     </header>
+
+      {isAuthenticated ? (
+        <nav
+          aria-label="Main tabs"
+          className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur lg:hidden"
+        >
+          <ul className="mx-auto grid max-w-md grid-cols-4 pt-1 pb-[env(safe-area-inset-bottom)] pl-[calc(0.5rem+env(safe-area-inset-left))] pr-[calc(0.5rem+env(safe-area-inset-right))]">
+            {TAB_LINKS.map(({ to, label, icon: Icon, prefixes }) => {
+              // Nested pages (a module, a lesson, a record) keep their parent tab highlighted.
+              const active = prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+              return (
+                <li key={to}>
+                  <Link
+                    to={active ? to : resumePath(to)}
+                    replace
+                    aria-current={active ? "page" : undefined}
+                    onClick={() => {
+                      // Tapping the tab you are already on returns it to the top, as native tab bars do.
+                      if (active) window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className={`flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-md text-[12px] transition ${
+                      active ? "font-semibold text-primary" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                    {label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      ) : null}
+    </>
   );
 }

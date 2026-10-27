@@ -15,7 +15,12 @@ import {
 import { saveAnswer } from "@/lib/journal";
 import { isComingLater, isLiveOnlyModule, isOpenerLesson, isWorkbookLesson } from "@/lib/curriculum";
 import CarryForwardScreen from "@/components/records/CarryForwardScreen";
-import { gettingStartedFinished, gettingStartedSteps, isGettingStartedLesson } from "@/lib/gettingStarted";
+import {
+  firstOpenGettingStartedStep,
+  gettingStartedFinished,
+  gettingStartedSteps,
+  isGettingStartedLesson,
+} from "@/lib/gettingStarted";
 import { usePacedProgress } from "@/lib/pacing";
 import LockedNotice from "@/components/workbook/LockedNotice";
 import ComingLaterNotice from "@/components/workbook/ComingLaterNotice";
@@ -34,13 +39,17 @@ export default function LessonPage() {
   const carriedMap = useCarried();
   const decisionsMap = useDecisions();
   const { setLesson } = useJournalContext();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const admin = Boolean(isAuthenticated && user?.role === "admin");
   const [readingState, setReadingState] = useState({ code: "", items: [], ready: false });
   const gate = useWorkbookGate();
 
   const lesson = lessonsByCode[code];
   const module = lesson ? modules.find((item) => item.order === lesson.module_order) : null;
-  /** Getting Started is the orientation gate. The Life Map lesson is the step before Module 1. */
+  /**
+   * Getting Started is now just the welcome (O.1). It opens Module 1 directly.
+   * The Life Map is an optional companion in its own tab, not a step before Module 1.
+   */
   const gsLesson = isGettingStartedLesson(lesson);
   const opener = isOpenerLesson(lesson);
   const gsSteps = gettingStartedSteps(lessons);
@@ -110,7 +119,7 @@ export default function LessonPage() {
     );
   }
 
-  // Workbook steps wait until Getting Started is done. The five steps themselves stay open.
+  // Workbook steps wait until Getting Started is done. The Getting Started steps themselves stay open.
   if (!gsLesson && !gate.finished) {
     return <Navigate to={gate.resumePath} replace />;
   }
@@ -129,15 +138,34 @@ export default function LessonPage() {
   const workbookLink = gsLesson || (module && module.kind === "orientation") ? "/getting-started" : opener ? "/" : `/module/${module.slug}`;
   const backLabel = gsLesson ? "Back to Getting Started" : "Back to the workbook";
   const stepsDone = gettingStartedFinished(lessons, answers, states);
-  const forward =
-    gsLesson && !next && stepsDone
-      ? {
-          to: isAuthenticated ? "/map" : "/login?returnTo=%2Fmap",
-          kicker: "Next",
-          title: "Map the life you’re actually living",
-        }
-      : null;
-  const endNote = gsLesson && !next && !stepsDone ? "Finish this step to open the workbook." : undefined;
+  /**
+   * The last Getting Started step never dead-ends.
+   * Done (or an admin previewing): go straight into Module 1.
+   * An earlier step still open: go to that step.
+   * Only this step open: say what opens it.
+   */
+  const openGsStep = firstOpenGettingStartedStep(lessons, answers, states);
+  const lastGs = gsLesson && !next;
+  const firstBookLesson = bookLessons[0] || null;
+  const firstPath = firstBookLesson ? `/lesson/${firstBookLesson.code}` : "/";
+  let forward = null;
+  let endNote;
+  if (lastGs && (stepsDone || admin)) {
+    forward = {
+      to: isAuthenticated ? firstPath : `/login?returnTo=${encodeURIComponent(firstPath)}`,
+      kicker: "Next: Module 1",
+      title: firstBookLesson ? firstBookLesson.title : "Module 1",
+    };
+  } else if (lastGs && openGsStep && openGsStep.code !== lesson.code) {
+    const openNumber = gsSteps.findIndex((item) => item.code === openGsStep.code) + 1;
+    forward = {
+      to: `/lesson/${openGsStep.code}`,
+      kicker: `Step ${openNumber} is still open`,
+      title: openGsStep.title,
+    };
+  } else if (lastGs) {
+    endNote = "Tap “Let me in” and Module 1 opens next.";
+  }
 
   // A live-only module has no self-paced steps in the app.
   if (!gsLesson && module && isLiveOnlyModule(module)) {

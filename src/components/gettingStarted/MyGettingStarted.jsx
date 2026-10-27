@@ -1,7 +1,7 @@
 import React from "react";
 import useCurriculum from "@/hooks/useCurriculum";
 import { answerKey, useAnswers } from "@/lib/workbook";
-import { GS_CODES, useGettingStartedSubmitted } from "@/lib/gettingStarted";
+import { ALL_GS_CODES, useGettingStartedSubmitted } from "@/lib/gettingStarted";
 
 /** Read-only: what someone wrote in Getting Started, and what was sent when they submitted. */
 export default function MyGettingStarted() {
@@ -10,7 +10,8 @@ export default function MyGettingStarted() {
   const { lessons } = useCurriculum();
   if (!submitted) return null;
 
-  const steps = GS_CODES.map((code) => (lessons || []).find((lesson) => lesson.code === code)).filter(Boolean);
+  // Every former Getting Started step, so answers saved before the flow was shortened still show.
+  const steps = ALL_GS_CODES.map((code) => (lessons || []).find((lesson) => lesson.code === code)).filter(Boolean);
   const sent = submitted.sent || {};
   const when = submitted.at ? new Date(submitted.at).toLocaleDateString() : "";
 
@@ -18,17 +19,22 @@ export default function MyGettingStarted() {
     <section className="workbook-section">
       <h2 className="text-[19px]">My Getting Started</h2>
       <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
-        Submitted{when ? ` on ${when}` : ""}. This is read-only. To change your choice to join, email
-        Start@buildotherwise.org.
+        Submitted{when ? ` on ${when}` : ""}. This is read-only. To pause or leave, email
+        Start@buildotherwise.org. No reason needed.
       </p>
 
       <div className="mt-4 rounded-xl border border-border bg-card px-4 py-3">
         <p className="text-[13px] font-semibold text-accent-ink">Sent to Ashley</p>
         <p className="mt-1 text-[15px]">
-          <span className="text-muted-foreground">Choice to join: </span>
+          <span className="text-muted-foreground">Why I'm here: </span>
           {sent.join_choice || "Not chosen"}
-          {sent.choice_note ? ` (${sent.choice_note})` : ""}
         </p>
+        {sent.choice_note ? (
+          <p className="mt-1 text-[15px]">
+            <span className="text-muted-foreground">My approach: </span>
+            {sent.choice_note}
+          </p>
+        ) : null}
         {sent.change_help ? (
           <p className="mt-1 text-[15px]">
             <span className="text-muted-foreground">If I want to change it later: </span>

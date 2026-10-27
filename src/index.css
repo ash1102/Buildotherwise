@@ -292,6 +292,90 @@
   animation: journal-slide 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Mobile webviews: controls and labels are not text to select; workbook prose stays selectable. */
+button,
+a,
+.workbook-label {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.workbook-prose,
+.workbook-prose * {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* No fill-mode, so the transform is dropped once the animation ends and fixed children are not affected. */
+.animate-page-in {
+  animation: page-in 0.22s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-page-in,
+  .animate-journal-slide,
+  .animate-journal-slide-out,
+  .animate-journal-rise {
+    animation: none;
+  }
+}
+
+/* One native-style dropdown look for every <select>, with a chevron in both themes.
+   :where() keeps the base at zero specificity, so any utility class on a select still wins. */
+:where(select) {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 44px;
+  padding: 0.5rem 2.25rem 0.5rem 0.75rem;
+  border: 1px solid hsl(var(--input));
+  border-radius: calc(var(--radius) - 4px);
+  background-color: hsl(var(--card));
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%235C5563' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 12px 8px;
+  color: hsl(var(--foreground));
+}
+
+.dark :where(select) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23BDB4C4' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+:where(select):disabled {
+  opacity: 0.6;
+}
+
+/* No rubber-band bounce at the page edges, which reads as a web page inside a WebView.
+   Scroll areas inside the page keep their own behaviour. */
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
+@keyframes journal-slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.animate-journal-slide-out {
+  animation: journal-slide-out 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
 @media print {
   .no-print {
     display: none !important;

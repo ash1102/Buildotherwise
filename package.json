@@ -6,16 +6,21 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "test:life-map": "node --import ./scripts/register-js-extension.mjs --test src/lib/lifeMap.placement.test.js",
+    "test:life-map": "node --import ./scripts/register-js-extension.mjs --test src/lib/lifeMap.placement.test.js src/lib/lifeMapBranching.test.js src/lib/lifeMapHybrid.test.js src/lib/moduleBridges.test.js src/lib/discoveryWays.test.js",
     "test:gate": "node --import ./scripts/register-js-extension.mjs --test src/lib/postAuthPath.test.js",
+    "test:module-one": "node --import ./scripts/register-js-extension.mjs --test src/lib/moduleOne.test.js",
+    "test:module-three": "node --import ./scripts/register-js-extension.mjs --test src/lib/moduleThree.test.js",
+    "test:journal": "node --import ./scripts/register-js-extension.mjs --test src/lib/journalPrompts.test.js",
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:module-two": "node --import ./scripts/register-js-extension.mjs --test src/lib/moduleTwo.test.js",
+    "test:module-five": "node --import ./scripts/register-js-extension.mjs --test src/lib/moduleFive.test.js"
   },
   "dependencies": {
-    "@base44/sdk": "^0.8.54",
-    "@base44/vite-plugin": "^1.0.47",
+    "@base44/sdk": "^0.8.57",
+    "@base44/vite-plugin": "^1.0.48",
     "@hello-pangea/dnd": "^17.0.0",
     "@hookform/resolvers": "^4.1.2",
     "@radix-ui/react-accordion": "^1.2.3",

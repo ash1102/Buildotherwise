@@ -10,7 +10,7 @@ export default function StarterPrompts({ prompts, onPick }) {
             key={prompt}
             type="button"
             onClick={() => onPick(prompt)}
-            className="rounded-full border border-natural-deep bg-white px-3.5 py-2 text-left text-[13px] leading-snug text-ink-soft transition hover:border-teal-deep/40 hover:text-teal-deep"
+            className="rounded-full border border-natural-deep bg-card px-3.5 py-2 text-left text-[13px] leading-snug text-ink-soft transition hover:border-teal-deep/40 hover:text-teal-deep"
           >
             {prompt}
           </button>

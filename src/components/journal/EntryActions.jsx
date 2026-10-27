@@ -25,7 +25,7 @@ export default function EntryActions({ entry, onFollowUp, onEdit, onExport, onSh
           key={item.label}
           type="button"
           aria-label={`${item.label}, entry from ${when}`}
-          className={`${item.tone} underline decoration-natural underline-offset-2 transition hover:decoration-copper`}
+          className={`${item.tone} inline-flex min-h-[44px] items-center underline decoration-natural underline-offset-2 transition hover:decoration-copper`}
           onClick={() => item.run(entry)}
         >
           {item.label}

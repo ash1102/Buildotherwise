@@ -57,4 +57,19 @@ export default [
       "react-hooks/rules-of-hooks": "error",
     },
   },
+  {
+    files: ["src/lib/**/*.{js,jsx}"],
+    languageOptions: {
+      parserOptions: {
+        ecmaVersion: 2022,
+        sourceType: "module",
+        ecmaFeatures: { jsx: true },
+      },
+    },
+    plugins: { "react-hooks": pluginReactHooks },
+    rules: {
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+    },
+  },
 ];
