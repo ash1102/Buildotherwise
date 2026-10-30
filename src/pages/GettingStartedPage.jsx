@@ -15,7 +15,6 @@ import {
   gettingStartedSteps,
 } from "@/lib/gettingStarted";
 import { useWorkbook } from "@/lib/workbook";
-import { isWorkbookLesson } from "@/lib/lessonKind";
 
 /**
  * Getting Started is now a brief welcome (O.1) before Module 1.
