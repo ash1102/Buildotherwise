@@ -22,7 +22,7 @@ import { useWorkbook } from "@/lib/workbook";
  * Earlier Getting Started steps stay readable for anyone who answered them.
  */
 export default function GettingStartedPage() {
-  const { lessons, orderedLessons, loading, error } = useCurriculum();
+  const { lessons, loading, error } = useCurriculum();
   const { answers, states } = useWorkbook();
   const { user, isAuthenticated, isLoadingAuth } = useAuth();
   const admin = Boolean(isAuthenticated && user?.role === "admin");

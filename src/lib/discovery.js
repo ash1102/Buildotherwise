@@ -1,110 +1,195 @@
 /**
- * Which saved answer feeds which part of the Builder Discovery Record.
- * Inputs arrive from the activities themselves, so nothing is entered twice.
+ * Dashboard discovery (Phase 2A prototype). Pure content and ordering only.
+ * Nothing here reads or writes any store: what a participant picks lives in component state
+ * and is gone when they leave the page.
+ *
+ * Writing rules: no verdicts. Nothing is called a strength, talent, passion or business
+ * opportunity. Observations describe what a choice can mean, never what it does mean.
  */
-export const DISCOVERY_SOURCES = {
-  "M1-L1#0": { section: "curiosity", label: "What my attention returned to" },
-  "M1-L2#0": { section: "curiosity", label: "The sign I said I would watch" },
-  "M1-L2#1": { section: "conditions", label: "Conditions that might shape the pattern" },
-  "M2-L1#0": { section: "try_plan", label: "The question this try is for" },
-  "M2-L1#1": { section: "try_plan", label: "Smallest real action" },
-  "M2-L1#2": { section: "try_plan", label: "Balance condition" },
-  "M2-L1#3": { section: "try_plan", label: "Boundary" },
-  "M2-L1#4": { section: "try_plan", label: "Support" },
-  "M2-L1#5": { section: "try_plan", label: "Stop or pause rule" },
-  "M2-L2#1": { section: "observed", label: "What I actually did, or did not do" },
-  "M2-L2#2": { section: "observed", label: "What frustrated or bored me" },
-  "M2-L2#3": { section: "conditions", label: "What helped" },
-  "M2-L2#4": { section: "cost", label: "What it cost" },
-  "M2-L2#6": { section: "unknown", label: "Still unknown, or what contradicts my first impression" },
-  "M2-L3#0": { section: "observed", label: "What changed from expectation" },
-  "M2-L3#1": { section: "observed", label: "Evidence that supports or complicates" },
-  "M2-L3#2": { section: "observed", label: "Conditions and after-effects" },
-  "M2-L3#3": { section: "unknown", label: "Still unknown" },
-  "M2-L3#4": { section: "decide_next", label: "Next action and review point" },
-  "M3-L2#0": { section: "conditions", label: "Condition changed" },
-  "M3-L2#1": { section: "conditions", label: "What stayed similar" },
-  "M3-L3#3": { section: "cost", label: "What it cost" },
-  "M4-L3#4": { section: "revised", label: "More accurate wording now" },
-  "M5-L3#5": { section: "close", label: "One piece of evidence kept" },
-  "M5-L3#6": { section: "close", label: "One thing worth keeping" },
-  "M5-L3#7": { section: "close", label: "One support that mattered" },
-  "M5-L3#8": { section: "close", label: "One question for later" },
-  "M5-L1#pattern-label": { section: "close", label: "A pattern you recognized" },
-  "M5-L1#pattern-other": { section: "close", label: "A pattern you described" },
-  "M5-L2#stance": { section: "close", label: "What you considered keeping, adjusting, or protecting" },
-  "M5-L3#support": { section: "close", label: "What supports this impression" },
-  "M5-L3#complicate": { section: "close", label: "What might complicate it" },
-  "M5-L3#uncertain": { section: "close", label: "What remains uncertain" },
-  "M5-L3#thinking-now": { section: "close", label: "What you're thinking now" },
-  "M5-L3#next": { section: "close", label: "What you chose to do next" },
-};
 
-/**
- * The record's section labels, shared by the record page's export and the
- * folded view of what the steps already saved.
- */
-export const GROUP_LABELS = {
-  curiosity: "Where your attention went",
-  try_plan: "The try plan and its stop rule",
-  observed: "What you observed, and what you made of it",
-  unknown: "Still unknown",
-  conditions: "Conditions worth keeping or changing",
-  cost: "What it cost",
-  revised: "Revised statements",
-  decide_next: "Next action and review point",
-  close: "What you are keeping from Modules 1–5",
-};
-
-/** The named try-log fields the curriculum's own build notes specify. */
-export const TRY_LOG_FIELDS = [
-  { key: "disc_try_question", source: "M2-L1#0", label: "What it should teach" },
-  // Enjoyment and goal ratings were pointed at M2-L3 boxes that ask other questions.
-  // No step asks for those ratings right now, so they are left out until one does.
+/** The three ways in. Each starts with a different question. */
+export const STARTING_POINTS = [
+  {
+    id: "attention",
+    label: "Something keeps catching my attention.",
+    order: ["lost-track", "mild-curiosity", "self-taught", "overlooked"],
+  },
+  {
+    id: "different",
+    label: "I want something different, but I don’t know what.",
+    order: ["overlooked", "self-taught", "mild-curiosity", "lost-track"],
+  },
+  {
+    id: "looking",
+    label: "I’m just looking around.",
+    order: ["mild-curiosity", "self-taught", "lost-track", "overlooked"],
+  },
 ];
 
-export function entriesFromAnswers(answers = {}) {
-  return Object.entries(DISCOVERY_SOURCES)
-    .map(([key, meta]) => ({ ...meta, key, value: (answers[key] || "").trim() }))
-    .filter((item) => item.value);
+export const QUESTIONS = {
+  "self-taught": {
+    id: "self-taught",
+    text: "What’s something you’ve figured out how to do that nobody actually taught you?",
+    followUp: "What got you started?",
+    options: [
+      {
+        id: "needed",
+        label: "I needed it to work.",
+        thought:
+          "A lot of what people can do began as a workaround for something that had to get done. Starting out of need is a common way in.",
+      },
+      {
+        id: "curious",
+        label: "I got curious and kept going.",
+        thought:
+          "Curiosity can carry someone a long way without anyone noticing. It doesn’t have to turn into anything to be worth noticing.",
+      },
+      {
+        id: "around",
+        label: "Someone around me did it.",
+        thought:
+          "Picking something up by watching is real learning, even when it never felt like learning. The people around us shape more than we usually count.",
+      },
+      {
+        id: "unsure",
+        label: "I’m not sure. It just happened.",
+        thought:
+          "That’s a very normal answer. Plenty of what we know arrives that way, and it’s easy to miss until someone asks.",
+      },
+    ],
+    experiment:
+      "Ask one person how they would do it. Notice where their way differs from yours. That’s the whole experiment.",
+  },
+  overlooked: {
+    id: "overlooked",
+    text: "What’s a problem you notice that other people seem to overlook?",
+    followUp: "What do you usually do when you notice it?",
+    options: [
+      {
+        id: "nothing",
+        label: "Nothing. I move on.",
+        thought:
+          "Moving on is a reasonable choice. Noticing something and leaving it alone doesn’t mean it doesn’t matter to you, or that it has to.",
+      },
+      {
+        id: "fix",
+        label: "I fix it myself.",
+        thought:
+          "Fixing things quietly is easy to take for granted, partly because it often goes unseen. It’s also worth asking whether you want to be the one who does it.",
+      },
+      {
+        id: "mention",
+        label: "I mention it to someone.",
+        thought:
+          "Saying it out loud is one way a noticed problem becomes a shared one. What happens next is often the more interesting part.",
+      },
+      {
+        id: "think",
+        label: "I think about it for a while.",
+        thought:
+          "Turning something over in your mind is a way of paying attention. It can be a good sign that something is worth a closer look, or it can just be how you think.",
+      },
+    ],
+    experiment:
+      "The next time you notice one, ask one person nearby whether they’ve noticed it too. You’re only finding out how common it is.",
+  },
+  "lost-track": {
+    id: "lost-track",
+    text: "Have you ever gotten so caught up figuring something out that you completely lost track of time?",
+    followUp: "How did you feel afterward?",
+    options: [
+      {
+        id: "energized",
+        label: "Energized.",
+        thought:
+          "Feeling energized afterward is worth noticing. It’s one clue about what the activity does for you, and it’s only one.",
+      },
+      {
+        id: "calm",
+        label: "Calm.",
+        thought:
+          "Some activities settle us rather than wind us up. That can matter as much as how good we are at them.",
+      },
+      {
+        id: "tired",
+        label: "Tired, but in a good way.",
+        thought:
+          "Good tired often means the effort was yours and it was worth it. That’s useful to know, whatever you decide to do with it.",
+      },
+      {
+        id: "drained",
+        label: "Honestly, kind of drained.",
+        thought:
+          "Losing track of time doesn’t always mean something is good for you. Noticing the cost counts as much as noticing the pull.",
+      },
+    ],
+    experiment:
+      "The next time you lose track of time, write down what you were doing in one line. Don’t decide what it means.",
+  },
+  "mild-curiosity": {
+    id: "mild-curiosity",
+    text: "What’s something you’re mildly curious about—not passionate about, not talented at, just curious about?",
+    followUp: "What would you like to do with that curiosity?",
+    options: [
+      {
+        id: "lookup",
+        label: "Look it up.",
+        thought:
+          "Looking something up is the smallest way to follow a curiosity. It costs almost nothing, and you can stop whenever you like.",
+      },
+      {
+        id: "once",
+        label: "Try it once.",
+        thought:
+          "One try tells you more than a lot of thinking. It also gives you something real to compare against what you imagined.",
+      },
+      {
+        id: "ask",
+        label: "Ask someone who knows.",
+        thought:
+          "People who do a thing usually have a different view of it than people who only read about it. Asking is often the quickest way to find that out.",
+      },
+      {
+        id: "nothing",
+        label: "Nothing. It’s fine as a passing interest.",
+        thought:
+          "Not every curiosity needs a next step. Leaving it alone is allowed, and it can still be a good thing to have noticed.",
+      },
+    ],
+    experiment:
+      "Spend fifteen minutes with it: read one thing, watch one video, or ask one person. Then notice whether you want more or you’re done. Either answer is fine.",
+  },
+};
+
+/** What a visitor sees after skipping the follow-up, or when no option fits. */
+export const NO_CHOICE_THOUGHT =
+  "There’s no right answer here, and leaving it open is a fine answer too.";
+
+export function startingPoint(id) {
+  return STARTING_POINTS.find((point) => point.id === id) || null;
+}
+
+/** The first question in this starting point's order. */
+export function firstQuestionFor(pointId) {
+  const point = startingPoint(pointId);
+  return point ? QUESTIONS[point.order[0]] : null;
 }
 
 /**
- * The answer key a record source comes from, e.g. "M1-L1#0" → step code and prompt
- * position. Kept so every saved answer can name and link to the step it came from.
+ * The next question in this starting point's order that has not been shown yet, or null once
+ * all four have been seen. `fromId` is the one on screen now, so "another question" never repeats it.
  */
-export function parseSourceKey(key) {
-  const [code, index] = String(key || "").split("#");
-  return { code: code || "", index: Number(index) };
+export function nextQuestionFor(pointId, seenIds = [], fromId = null) {
+  const point = startingPoint(pointId);
+  if (!point) return null;
+  const seen = new Set([...(seenIds || []), fromId].filter(Boolean));
+  const id = point.order.find((candidate) => !seen.has(candidate));
+  return id ? QUESTIONS[id] : null;
 }
 
-/** The same saved answers, each carrying the step and question it came from. */
-export function sourcesFromAnswers(answers = {}, lessonsByCode = {}) {
-  return entriesFromAnswers(answers).map((item) => {
-    const { code, index } = parseSourceKey(item.key);
-    const lesson = lessonsByCode[code];
-    const prompts = [...((lesson && lesson.try_prompts) || []), ...((lesson && lesson.reflect_prompts) || [])];
-    return {
-      ...item,
-      lesson_code: code,
-      lesson_title: (lesson && lesson.title) || code,
-      question: prompts[index] || item.label,
-    };
-  });
-}
-
-/**
- * Lines saved in the steps that are not part of the Discovery Record's own
- * questions. Counted separately so "saved in a step" and "feeds your record" are
- * never read as the same thing.
- */
-export function savedLineCount(answers = {}) {
-  return Object.values(answers || {}).filter((value) => String(value || "").trim()).length;
-}
-
-export function tryLogValues(answers) {
-  return TRY_LOG_FIELDS.map((field) => ({
-    ...field,
-    value: (answers[field.source] || "").trim(),
-  }));
+/** What to say back for a chosen option. Never personal, never a verdict. */
+export function thoughtFor(questionId, optionId) {
+  const question = QUESTIONS[questionId];
+  const option = question && question.options.find((item) => item.id === optionId);
+  return option ? option.thought : NO_CHOICE_THOUGHT;
 }
