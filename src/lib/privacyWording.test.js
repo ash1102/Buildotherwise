@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import test from "node:test";
+import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const FILES = [
@@ -15,19 +16,17 @@ const FILES = [
   "src/pages/preview/PreviewNotes.jsx",
 ];
 
-describe("privacy wording", () => {
-  it("makes no cross-device promise and no 'only you' claim", () => {
-    for (const file of FILES) {
-      const text = readFileSync(file, "utf8").replace(/\s+/g, " ");
-      expect(text, file).not.toMatch(/any device|another device|follow you to/i);
-      expect(text, file).not.toMatch(/only you can (open|see)|only your account can/i);
-    }
-  });
+const flat = (file) => readFileSync(file, "utf8").replace(/\s+/g, " ");
 
-  it("keeps the explanation that Ashley can see what is stored", () => {
-    const settings = readFileSync("src/pages/Settings.jsx", "utf8").replace(/\s+/g, " ");
-    expect(settings).toMatch(/Ashley runs the app, so she can see what’s stored/);
-    const records = readFileSync("src/components/records/RecordsPrivacyNotice.jsx", "utf8");
-    expect(records).toMatch(/technical access to that database/);
-  });
+test("no cross-device promise and no 'only you' claim in participant-facing copy", () => {
+  for (const file of FILES) {
+    const text = flat(file);
+    assert.doesNotMatch(text, /any device|another device|follow you to/i, file);
+    assert.doesNotMatch(text, /only you can (open|see)|only your account can/i, file);
+  }
+});
+
+test("administrative access is still explained", () => {
+  assert.match(flat("src/pages/Settings.jsx"), /Ashley runs the app, so she can see what’s stored/);
+  assert.match(flat("src/components/records/RecordsPrivacyNotice.jsx"), /technical access to that database/);
 });
