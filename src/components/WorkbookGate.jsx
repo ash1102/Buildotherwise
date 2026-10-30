@@ -21,7 +21,8 @@ export function useWorkbookGate() {
     pending,
     error,
     hasLessons: (lessons || []).length > 0,
-    finished: admin || stepsDone,
+    // Phase 1: Getting Started no longer holds the workbook shut. The welcome stays available at /getting-started.
+    finished: true,
     stepsDone,
     resumePath: gettingStartedResumePath(lessons, answers, states),
   };
