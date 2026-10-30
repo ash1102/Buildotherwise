@@ -146,8 +146,6 @@ export default function LessonPage() {
    */
   const openGsStep = firstOpenGettingStartedStep(lessons, answers, states);
   const lastGs = gsLesson && !next;
-  const firstBookLesson = bookLessons[0] || null;
-  const firstPath = firstBookLesson ? `/lesson/${firstBookLesson.code}` : "/";
   let forward = null;
   let endNote;
   if (lastGs && (stepsDone || admin)) {

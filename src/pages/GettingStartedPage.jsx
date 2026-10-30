@@ -37,7 +37,6 @@ export default function GettingStartedPage() {
   const earlier = EARLIER_GS_CODES.map((code) => (lessons || []).find((lesson) => lesson.code === code))
     .filter(Boolean)
     .filter((lesson) => Object.keys(answers || {}).some((key) => key.startsWith(`${lesson.code}#`) && String(answers[key] || "").trim()));
-  const firstLesson = (orderedLessons || []).find(isWorkbookLesson) || null;
 
   if (isLoadingAuth || loading) {
     return <p className="py-10 text-[16px] text-muted-faint">Opening Getting Started…</p>;
@@ -76,10 +75,10 @@ export default function GettingStartedPage() {
         <div className="space-y-3">
           <p className="text-[16px] text-muted-foreground">You’re through the welcome. You can reread it below.</p>
           <Link
-            to={firstLesson ? `/lesson/${firstLesson.code}` : "/"}
+            to="/"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[16px] font-medium text-primary-foreground"
           >
-            Next: Module 1
+            Next: your dashboard
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
