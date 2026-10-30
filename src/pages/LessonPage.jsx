@@ -25,7 +25,7 @@ import { usePacedProgress } from "@/lib/pacing";
 import LockedNotice from "@/components/workbook/LockedNotice";
 import ComingLaterNotice from "@/components/workbook/ComingLaterNotice";
 import LessonView from "@/components/workbook/LessonView";
-import { useWorkbookGate } from "@/components/WorkbookGate";
+import { GettingStartedRedirect, useWorkbookGate } from "@/components/WorkbookGate";
 import { useJournalContext } from "@/components/journal/JournalContext";
 import { useAuth } from "@/lib/AuthContext";
 import LoginRedirect from "@/components/LoginRedirect";
@@ -121,7 +121,7 @@ export default function LessonPage() {
 
   // Workbook steps wait until Getting Started is done. The Getting Started steps themselves stay open.
   if (!gsLesson && !gate.finished) {
-    return <Navigate to={gate.resumePath} replace />;
+    return <GettingStartedRedirect to={gate.resumePath} />;
   }
 
   if (!gsLesson && (!module || module.kind !== "orientation") && !isAuthenticated) {
@@ -164,7 +164,7 @@ export default function LessonPage() {
       title: openGsStep.title,
     };
   } else if (lastGs) {
-    endNote = "Tap “Let me in” and Module 1 opens next.";
+    endNote = "Tap “Let me in” and your dashboard opens next.";
   }
 
   // A live-only module has no self-paced steps in the app.

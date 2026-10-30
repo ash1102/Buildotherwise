@@ -1,5 +1,6 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
+import { rememberWelcomeReturn } from "@/lib/welcomeReturn";
 import useCurriculum from "@/hooks/useCurriculum";
 import { useAuth } from "@/lib/AuthContext";
 import { gettingStartedFinished, gettingStartedResumePath } from "@/lib/gettingStartedProgress";
@@ -27,6 +28,13 @@ export function useWorkbookGate() {
   };
 }
 
+/** Sends someone to the welcome and remembers the module or step they asked for, so they can be returned to it. */
+export function GettingStartedRedirect({ to }) {
+  const location = useLocation();
+  rememberWelcomeReturn(location.pathname + location.search);
+  return <Navigate to={to} replace />;
+}
+
 /**
  * Stands in front of the workbook and the module pages.
  * Sends someone to the Getting Started step they have not finished.
@@ -43,7 +51,7 @@ export default function WorkbookGate({ children }) {
   }
 
   if (!gate.finished) {
-    return <Navigate to={gate.resumePath} replace />;
+    return <GettingStartedRedirect to={gate.resumePath} />;
   }
 
   return children;

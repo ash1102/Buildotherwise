@@ -4,6 +4,7 @@ import { postAuthDestination, pathRequiresGettingStarted } from "./postAuthPath"
 import { readStore } from "./store";
 import { ANSWER_KEY, STATE_KEY } from "./workbook";
 import { startAccountSync } from "./accountSync";
+import { rememberWelcomeReturn } from "./welcomeReturn";
 
 /** After email login or sign-up. Provider login lands on returnTo, and the gate there uses the same account key. */
 export async function destinationAfterAuth(user, returnTo) {
@@ -38,5 +39,8 @@ export async function destinationAfterAuth(user, returnTo) {
 
   const answers = person?.id ? readStore(progressStorageKey(ANSWER_KEY), {}) : {};
   const states = person?.id ? readStore(progressStorageKey(STATE_KEY), {}) : {};
-  return postAuthDestination({ user: person, returnTo: dest, lessons, answers, states });
+  const destination = postAuthDestination({ user: person, returnTo: dest, lessons, answers, states });
+  // Sent to the welcome instead: remember the module or step they asked for.
+  if (destination !== dest) rememberWelcomeReturn(dest);
+  return destination;
 }

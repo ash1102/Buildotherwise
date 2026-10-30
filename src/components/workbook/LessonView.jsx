@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { takeWelcomeDestination } from "@/lib/welcomeReturn";
 import { ArrowRight } from "lucide-react";
 import Prose from "./Prose";
 import PrivacyNote from "./PrivacyNote";
@@ -285,6 +286,7 @@ export default function LessonView({
   status,
   readings = [],
 }) {
+  const navigate = useNavigate();
   const decisionOptions = decisionOptionsFor(lesson);
   const optionNames = new Set(decisionOptions.map((option) => option.trim().toLowerCase()));
   const decisionStep = lesson.type === "next_decision";
@@ -539,7 +541,11 @@ export default function LessonView({
       content: (
         <LetMeIn
           ready={/^ready$/i.test(String(route || "").trim())}
-          onChange={(on) => onRouteChange(on ? "Ready" : "")}
+          onChange={(on) => {
+            onRouteChange(on ? "Ready" : "");
+            // Only a fresh tap moves on. The saved acknowledgement is the same one the gate reads.
+            if (on) navigate(takeWelcomeDestination());
+          }}
         />
       ),
     });
