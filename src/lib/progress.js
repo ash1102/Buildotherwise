@@ -115,7 +115,7 @@ export function buildProgress({ modules, lessonsByOrder, answers, states, pacing
      */
     const lessons = ((lessonsByOrder || {})[module.order] || []).filter(isWorkbookLesson);
     const incomplete = lessons.filter((lesson) => !stepComplete(lesson, answers, states));
-    const stepsOpen = coming ? false : gates.every((entry) => entry.complete);
+    // Phase 1: no module waits on earlier saved steps. Only modules that are not built yet stay shut.
 
     // Weekly pacing. The first numbered module has nothing to wait a week on.
     let opensAt = null;
@@ -141,8 +141,8 @@ export function buildProgress({ modules, lessonsByOrder, answers, states, pacing
       coming,
       complete: lessons.length > 0 && incomplete.length === 0,
       unlocked: stepsOpen && weekOpen,
-      /** Why a built module is shut: "steps" (earlier steps need a line) or "week" (weekly pacing). */
-      lockReason: coming ? null : !stepsOpen ? "steps" : !weekOpen ? "week" : null,
+      /** Why a built module is shut. Phase 1 removed the step gate, so only weekly pacing (off) could set this. */
+      lockReason: coming ? null : !weekOpen ? "week" : null,
       opensAt: !weekOpen ? opensAt : null,
       previousLabel: previous ? `Module ${previous.order}` : "",
       stepCount: lessons.length,
