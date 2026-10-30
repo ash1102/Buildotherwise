@@ -1,0 +1,6 @@
+{
+  "type": "google_classroom",
+  "scopes": [
+    "email"
+  ]
+}
