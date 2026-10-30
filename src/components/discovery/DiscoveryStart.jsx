@@ -8,7 +8,7 @@ import {
   firstQuestionFor,
   nextQuestionFor,
   thoughtFor,
-} from "@/lib/discovery";
+} from "@/lib/dashboardDiscovery";
 
 /**
  * Discovery on the dashboard (Phase 2A prototype).
