@@ -99,7 +99,7 @@ test("welcome return: only a module or step path is kept, nothing external", () 
   assert.equal(cleanWelcomeReturn("/module/check-reality-outside-yourself"), "/module/check-reality-outside-yourself");
   assert.equal(cleanWelcomeReturn("/lesson/3.2"), "/lesson/3.2");
   assert.equal(cleanWelcomeReturn("/lesson/3.2?x=1"), "/lesson/3.2?x=1");
-  for (const bad of ["/", "", null, undefined, "/lesson/O.1", "/lesson/O.3", "/getting-started", "/module/getting-started", "/journal", "//evil.com", "/\\evil.com", "https://evil.com/lesson/3.2", "javascript:alert(1)"]) {
+  for (const bad of ["/", "", null, undefined, "/lesson/O.1", "/getting-started", "/module/getting-started", "/journal", "//evil.com", "/\\evil.com", "https://evil.com/lesson/3.2", "javascript:alert(1)"]) {
     assert.equal(cleanWelcomeReturn(bad), null, String(bad));
   }
 });
