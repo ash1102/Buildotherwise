@@ -193,3 +193,14 @@ export function thoughtFor(questionId, optionId) {
   const option = question && question.options.find((item) => item.id === optionId);
   return option ? option.thought : NO_CHOICE_THOUGHT;
 }
+
+/** "Show me another": the next unseen question, else the next one in order, wrapping. Never the one on screen. */
+export function anotherQuestionFor(pointId, currentId, seenIds = []) {
+  const point = startingPoint(pointId);
+  if (!point) return null;
+  const unseen = nextQuestionFor(pointId, seenIds, currentId);
+  if (unseen) return unseen;
+  const at = point.order.indexOf(currentId);
+  const nextId = point.order[(at + 1) % point.order.length];
+  return nextId === currentId ? null : QUESTIONS[nextId];
+}
