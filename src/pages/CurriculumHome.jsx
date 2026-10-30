@@ -10,7 +10,7 @@ import PrivacyNote from "@/components/workbook/PrivacyNote";
 import { isWorkbookLesson } from "@/lib/curriculum";
 import WorkbookGate from "@/components/WorkbookGate";
 import { stepComplete } from "@/lib/progress";
-import { formatOpenDate, usePacedProgress } from "@/lib/pacing";
+import { usePacedProgress } from "@/lib/pacing";
 
 const INTEREST_FORM = "https://link.jotform.com/EhQXbmRwbk";
 
@@ -62,8 +62,9 @@ const PILOT_QUESTIONS = [
   "Which parts help, and which get in the way?",
 ];
 
+/** Dark plum text on marigold reads clearly in both light and dark mode. */
 const marigoldButton =
-  "inline-flex items-center gap-2 rounded-lg bg-primary-soft px-5 py-3 text-[15px] font-semibold text-foreground transition hover:brightness-95";
+  "inline-flex items-center gap-2 rounded-lg bg-primary-soft px-5 py-3 text-[15px] font-semibold text-[hsl(277_34%_16%)] transition hover:brightness-95";
 
 function StartButton() {
   return (
@@ -217,10 +218,6 @@ function MemberHome() {
   const liveModules = modules.filter((module) => module.status === "live" && module.kind !== "orientation");
   const nextModule = next ? modules.find((module) => module.order === next.module_order) : null;
   const nextLabel = nextModule ? `Module ${nextModule.order}` : "";
-  /** The next step sits in a module that opens later this week. */
-  const nextRow = nextModule ? progress.byOrder[nextModule.order] : null;
-  const waitingWeek = Boolean(nextRow && nextRow.lockReason === "week");
-  const waitingDate = waitingWeek ? formatOpenDate(nextRow.opensAt) : "";
 
   return (
     <div className="space-y-10">
@@ -228,27 +225,9 @@ function MemberHome() {
         <p className="workbook-label">{started ? "Welcome back" : "Welcome"}</p>
         {loading ? (
           <div aria-busy="true" className="mt-3 h-[140px] animate-pulse rounded-2xl bg-border/60" />
-        ) : next && waitingWeek ? (
-          <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
-            <p className="text-[13px] font-semibold text-primary-soft">
-              {waitingDate ? `${nextLabel} opens ${waitingDate}` : `${nextLabel} opens next week`}
-            </p>
-            <h1 className="mt-1.5 text-[clamp(1.5rem,1.1rem+1.6vw,2.1rem)] text-primary-foreground">
-              You’re caught up for this week.
-            </h1>
-            <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">
-              One new module opens each week, so there is room for what you noticed or planned to happen out in your
-              life. Nothing is overdue.
-              Everything already open stays open: your journal, your Life Map, and every step you have done.
-            </p>
-            <Link to="/journal" className={`mt-5 ${marigoldButton}`}>
-              Open your journal
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
         ) : next ? (
           <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
-            <p className="text-[13px] font-semibold text-primary-soft">
+            <p className="text-[13px] font-semibold text-primary-foreground/85">
               {started ? "Pick up where you left off" : "Next step"}
             </p>
             <h1 className="mt-1.5 text-[clamp(1.5rem,1.1rem+1.6vw,2.1rem)] text-primary-foreground">
@@ -311,58 +290,45 @@ function MemberHome() {
             const row = progress.byOrder[module.order];
             if (!row) return null;
             const pct = row.stepCount ? Math.round((row.writtenCount / row.stepCount) * 100) : 0;
-            const open = row.unlocked;
+            /** Completed means every step in the module has a saved line. One line does not complete a module. */
+            const status = row.complete
+              ? { label: "Completed", tone: "text-foreground" }
+              : row.writtenCount > 0
+                ? { label: "In progress", tone: "text-foreground" }
+                : { label: "Not started", tone: "text-muted-faint" };
             const content = (
               <span className="flex items-center justify-between gap-4">
                 <span className="min-w-0">
                   <span className="block text-[13px] font-semibold text-accent-ink">{row.label}</span>
                   <span className="block text-[16px] leading-snug text-foreground">{module.title}</span>
                 </span>
-                {open ? (
-                  <span className="flex shrink-0 items-center gap-2">
-                    <span className="sr-only">
-                      {row.writtenCount} of {row.stepCount} steps saved
-                    </span>
-                    <span aria-hidden="true" className="h-2 w-20 overflow-hidden rounded-full bg-secondary sm:w-28">
-                      <span className="block h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
-                    </span>
+                <span className="flex shrink-0 items-center gap-2">
+                  <span className={`text-[13px] font-medium ${status.tone}`}>{status.label}</span>
+                  <span className="sr-only">
+                    {row.writtenCount} of {row.stepCount} steps have a saved line
                   </span>
-                ) : row.lockReason === "week" ? (
-                  <span className="shrink-0 text-[13px] text-muted-faint">
-                    {row.opensAt ? `Opens ${formatOpenDate(row.opensAt)}` : "Opens next week"}
+                  <span aria-hidden="true" className="h-2 w-20 overflow-hidden rounded-full bg-secondary sm:w-28">
+                    <span className="block h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
                   </span>
-                ) : (
-                  <span className="shrink-0 text-[13px] text-muted-faint">Not open yet</span>
-                )}
+                </span>
               </span>
             );
             return (
               <li key={module.id || module.slug}>
-                {open ? (
-                  <Link
-                    to={`/module/${module.slug}`}
-                    className="block rounded-xl border border-border bg-card px-4 py-3 transition hover:bg-secondary"
-                  >
-                    {content}
-                  </Link>
-                ) : (
-                  <div aria-disabled="true" className="rounded-xl border border-border bg-card px-4 py-3 opacity-80">
-                    {content}
-                  </div>
-                )}
+                <Link
+                  to={`/module/${module.slug}`}
+                  className="block rounded-xl border border-border bg-card px-4 py-3 transition hover:bg-secondary"
+                >
+                  {content}
+                </Link>
               </li>
             );
           })}
         </ol>
         <p className="mt-3 text-[14px] leading-relaxed text-muted-faint">
-          One new module opens each week, once every step before it holds a saved line. The aim is to keep the
-          workbook to about 2–3 hours a week. Modules 6–10 are still being built.
+          Explore the modules at your own pace. You can move between activities, revisit earlier discoveries, and return
+          whenever you’re ready. There’s no required order or deadline.
         </p>
-        {progress.pacingSkipped ? (
-          <p className="mt-2 text-[13px] leading-relaxed text-muted-faint">
-            Admin view: weekly pacing is skipped for you so every module stays open for review. Participants see it.
-          </p>
-        ) : null}
       </section>
 
       <PrivacyNote />
