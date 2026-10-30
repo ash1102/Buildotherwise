@@ -115,7 +115,8 @@ export function buildProgress({ modules, lessonsByOrder, answers, states, pacing
      */
     const lessons = ((lessonsByOrder || {})[module.order] || []).filter(isWorkbookLesson);
     const incomplete = lessons.filter((lesson) => !stepComplete(lesson, answers, states));
-    // Phase 1: no module waits on earlier saved steps. Only modules that are not built yet stay shut.
+    // Phase 1: no built module waits on earlier saved steps. Only modules that are not built yet stay shut.
+    const stepsOpen = !coming;
 
     // Weekly pacing. The first numbered module has nothing to wait a week on.
     let opensAt = null;
