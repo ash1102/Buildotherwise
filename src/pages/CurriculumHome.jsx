@@ -11,6 +11,7 @@ import { isWorkbookLesson } from "@/lib/curriculum";
 import WorkbookGate from "@/components/WorkbookGate";
 import { stepComplete } from "@/lib/progress";
 import { usePacedProgress } from "@/lib/pacing";
+import { moduleProgressDescription, moduleProgressLabel } from "@/lib/progressLabel";
 
 const INTEREST_FORM = "https://link.jotform.com/EhQXbmRwbk";
 
@@ -62,9 +63,15 @@ const PILOT_QUESTIONS = [
   "Which parts help, and which get in the way?",
 ];
 
-/** Dark plum text on marigold reads clearly in both light and dark mode. */
 const marigoldButton =
-  "inline-flex items-center gap-2 rounded-lg bg-primary-soft px-5 py-3 text-[15px] font-semibold text-[hsl(277_34%_16%)] transition hover:brightness-95";
+  "inline-flex items-center gap-2 rounded-lg bg-primary-soft px-5 py-3 text-[15px] font-semibold text-foreground transition hover:brightness-95";
+
+/**
+ * Participant dashboard only. Fixed dark plum text so the label stays readable on marigold in dark mode,
+ * where text-foreground turns light. The public front door keeps marigoldButton unchanged.
+ */
+const dashboardButton =
+  "inline-flex min-h-[44px] items-center gap-2 rounded-lg bg-primary-soft px-5 py-3 text-[15px] font-semibold text-[hsl(277_34%_16%)] transition hover:brightness-95";
 
 function StartButton() {
   return (
@@ -236,7 +243,7 @@ function MemberHome() {
             {next.purpose ? (
               <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">{next.purpose}</p>
             ) : null}
-            <Link to={`/lesson/${next.code}`} className={`mt-5 ${marigoldButton}`}>
+            <Link to={`/lesson/${next.code}`} className={`mt-5 ${dashboardButton}`}>
               {started ? "Continue" : "Start"}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
@@ -244,12 +251,12 @@ function MemberHome() {
         ) : (
           <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
             <h1 className="text-[clamp(1.5rem,1.1rem+1.6vw,2.1rem)] text-primary-foreground">
-              Every Pilot 1 step has a saved line.
+              Every open step has something saved.
             </h1>
             <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">
-              You can go back to any step, add to your journal, or look over your maps.
+              Saved isn’t the same as finished. You can go back to any step, add more, or write in your journal.
             </p>
-            <Link to="/discovery-map" className={`mt-5 ${marigoldButton}`}>
+            <Link to="/discovery-map" className={`mt-5 ${dashboardButton}`}>
               See what you gathered
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
@@ -290,23 +297,18 @@ function MemberHome() {
             const row = progress.byOrder[module.order];
             if (!row) return null;
             const pct = row.stepCount ? Math.round((row.writtenCount / row.stepCount) * 100) : 0;
-            /** Completed means every step in the module has a saved line. One line does not complete a module. */
-            const status = row.complete
-              ? { label: "Completed", tone: "text-foreground" }
-              : row.writtenCount > 0
-                ? { label: "In progress", tone: "text-foreground" }
-                : { label: "Not started", tone: "text-muted-faint" };
+            const status = moduleProgressLabel(row);
             const content = (
-              <span className="flex items-center justify-between gap-4">
+              <span className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                 <span className="min-w-0">
                   <span className="block text-[13px] font-semibold text-accent-ink">{row.label}</span>
                   <span className="block text-[16px] leading-snug text-foreground">{module.title}</span>
                 </span>
                 <span className="flex shrink-0 items-center gap-2">
-                  <span className={`text-[13px] font-medium ${status.tone}`}>{status.label}</span>
-                  <span className="sr-only">
-                    {row.writtenCount} of {row.stepCount} steps have a saved line
+                  <span aria-hidden="true" className={`text-[13px] font-medium ${status.muted ? "text-muted-faint" : "text-foreground"}`}>
+                    {status.text}
                   </span>
+                  <span className="sr-only">{moduleProgressDescription(row)}</span>
                   <span aria-hidden="true" className="h-2 w-20 overflow-hidden rounded-full bg-secondary sm:w-28">
                     <span className="block h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
                   </span>
