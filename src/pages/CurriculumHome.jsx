@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowUpRight, BookOpen, Compass, Map } from "lucide-react";
+import { Archive, ArrowRight, ArrowUpRight, BookOpen, Layers, Map } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
 import { useLifeMap, useWorkbook } from "@/lib/workbook";
 import { MAP_PICK_KEY, lifeMapHasEntries } from "@/lib/lifeMap";
@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/AuthContext";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 import { isWorkbookLesson } from "@/lib/curriculum";
 import WorkbookGate from "@/components/WorkbookGate";
+import DiscoveryStart from "@/components/discovery/DiscoveryStart";
 import { stepComplete } from "@/lib/progress";
 import { usePacedProgress } from "@/lib/pacing";
 import { moduleProgressDescription, moduleProgressLabel } from "@/lib/progressLabel";
@@ -223,73 +224,115 @@ function MemberHome() {
   const nextModule = next ? modules.find((module) => module.order === next.module_order) : null;
   const nextLabel = nextModule ? `Module ${nextModule.order}` : "";
 
+  /** "Skip discovery": go straight to the module list. Respects reduced motion and moves focus there. */
+  const goToWorkbook = useCallback(() => {
+    const target = document.getElementById("workbook");
+    if (!target) return;
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    target.focus({ preventScroll: true });
+  }, []);
+
+  const toolLink = "flex min-h-[44px] items-start gap-3 rounded-xl border border-border bg-card p-4 text-left transition hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
+
   return (
     <div className="space-y-10">
-      <section>
-        <p className="workbook-label">{started ? "Welcome back" : "Welcome"}</p>
-        {loading ? (
-          <div aria-busy="true" className="mt-3 h-[140px] animate-pulse rounded-2xl bg-border/60" />
-        ) : next ? (
-          <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
-            <p className="text-[13px] font-semibold text-primary-foreground/85">
-              {started ? "Pick up where you left off" : "Next step"}
-            </p>
-            <h1 className="mt-1.5 text-[clamp(1.5rem,1.1rem+1.6vw,2.1rem)] text-primary-foreground">
-              {nextLabel ? `${nextLabel} · ${next.title}` : next.title}
-            </h1>
-            {next.purpose ? (
-              <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">{next.purpose}</p>
-            ) : null}
-            <Link to={`/lesson/${next.code}`} className={`mt-5 ${dashboardButton}`}>
-              {started ? "Continue" : "Start"}
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-        ) : (
-          <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
-            <h1 className="text-[clamp(1.5rem,1.1rem+1.6vw,2.1rem)] text-primary-foreground">
-              Every open step has something saved.
-            </h1>
-            <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">
-              Saved isn’t the same as finished. You can go back to any step, add more, or write in your journal.
-            </p>
-            <Link to="/discovery-map" className={`mt-5 ${dashboardButton}`}>
-              See what you gathered
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-        )}
+      {loading ? (
+        <div aria-busy="true" className="h-[220px] animate-pulse rounded-2xl bg-border/60" />
+      ) : (
+        <>
+          {started && next ? (
+            <section aria-labelledby="continue-heading">
+              <p className="workbook-label">Welcome back</p>
+              <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
+                <p className="text-[13px] font-semibold text-primary-foreground/85">Continue where you left off</p>
+                <h1 id="continue-heading" className="mt-1.5 text-[clamp(1.5rem,1.1rem+1.6vw,2.1rem)] text-primary-foreground">
+                  {nextLabel ? `${nextLabel} · ${next.title}` : next.title}
+                </h1>
+                {next.purpose ? (
+                  <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">{next.purpose}</p>
+                ) : null}
+                <Link to={`/lesson/${next.code}`} className={`mt-5 ${dashboardButton}`}>
+                  Continue
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </div>
+            </section>
+          ) : null}
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <Link to="/journal" className="rounded-xl border border-border bg-card p-4 transition hover:bg-secondary">
-            <BookOpen className="h-5 w-5 text-accent-ink" aria-hidden="true" />
-            <span className="mt-2 block font-semibold">Your Journal</span>
-            <span className="block text-[15px] text-muted-foreground">Notes you have saved.</span>
-          </Link>
-          <Link to="/map" className="rounded-xl border border-border bg-card p-4 transition hover:bg-secondary">
-            <Map className="h-5 w-5 text-accent-ink" aria-hidden="true" />
-            <span className="mt-2 block font-semibold">Your Life Map</span>
-            <span className="block text-[15px] text-muted-foreground">
-              {mapPlaced
-                ? "Recent places, activities, people, observations, and possible threads."
-                : "Optional. A way to look at where your time and energy go, whenever it’s useful."}
-            </span>
-          </Link>
-          <Link to="/aspects" className="rounded-xl border border-border bg-card p-4 transition hover:bg-secondary">
-            <Compass className="h-5 w-5 text-accent-ink" aria-hidden="true" />
-            <span className="mt-2 block font-semibold">How the workbook works</span>
-            <span className="block text-[15px] text-muted-foreground">The pieces you will use.</span>
-          </Link>
-        </div>
-      </section>
+          {started && !next ? (
+            <section aria-labelledby="saved-heading">
+              <p className="workbook-label">Welcome back</p>
+              <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
+                <h1 id="saved-heading" className="text-[clamp(1.5rem,1.1rem+1.6vw,2.1rem)] text-primary-foreground">
+                  Every open step has something saved.
+                </h1>
+                <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">
+                  Saved isn’t the same as finished. You can go back to any step, add more, or write in your journal.
+                </p>
+                <Link to="/discovery-map" className={`mt-5 ${dashboardButton}`}>
+                  See what you gathered
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </div>
+            </section>
+          ) : null}
 
-      <section>
+          <DiscoveryStart onSkip={goToWorkbook} headingLevel={started ? "h2" : "h1"} />
+
+          <nav aria-label="Your tools">
+            <ul className="grid gap-3 sm:grid-cols-2">
+              <li>
+                <Link to="/journal" className={toolLink}>
+                  <BookOpen className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
+                  <span>
+                    <span className="block font-semibold">Your Journal</span>
+                    <span className="block text-[15px] text-muted-foreground">Notes you have saved.</span>
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/map" className={toolLink}>
+                  <Map className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
+                  <span>
+                    <span className="block font-semibold">Your Life Map</span>
+                    <span className="block text-[15px] text-muted-foreground">
+                      {mapPlaced
+                        ? "Recent places, activities, people, observations, and possible threads."
+                        : "Optional. A way to look at where your time and energy go, whenever it’s useful."}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <button type="button" onClick={goToWorkbook} className={`${toolLink} w-full`}>
+                  <Layers className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
+                  <span>
+                    <span className="block font-semibold">Explore the Workbook</span>
+                    <span className="block text-[15px] text-muted-foreground">All five modules, open in any order.</span>
+                  </span>
+                </button>
+              </li>
+              <li>
+                <Link to="/my-records" className={toolLink}>
+                  <Archive className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
+                  <span>
+                    <span className="block font-semibold">Records</span>
+                    <span className="block text-[15px] text-muted-foreground">What you chose to keep.</span>
+                  </span>
+                </Link>
+              </li>
+            </ul>
+          </nav>
+        </>
+      )}
+
+      <section aria-labelledby="workbook">
         <p className="workbook-label">Your progress · Pilot 1</p>
-        <Link to="/map" className="mt-3 block rounded-xl border border-border bg-card px-4 py-3 transition hover:bg-secondary">
-          <span className="block text-[13px] font-semibold text-accent-ink">Optional companion</span>
-          <span className="block text-[16px] leading-snug text-foreground">Life Map</span>
-        </Link>
-        <ol className="mt-2 grid gap-2">
+        <h2 id="workbook" tabIndex={-1} className="mt-1 text-[22px] outline-none">
+          Explore the Workbook
+        </h2>
+        <ol className="mt-3 grid gap-2">
           {liveModules.map((module) => {
             const row = progress.byOrder[module.order];
             if (!row) return null;
@@ -326,7 +369,10 @@ function MemberHome() {
         </ol>
         <p className="mt-3 text-[14px] leading-relaxed text-muted-faint">
           Explore the modules at your own pace. You can move between activities, revisit earlier discoveries, and return
-          whenever you’re ready. There’s no required order or deadline.
+          whenever you’re ready. There’s no required order or deadline.{" "}
+          <Link to="/aspects" className="font-medium text-accent-ink underline underline-offset-2">
+            How the workbook works
+          </Link>
         </p>
       </section>
 
