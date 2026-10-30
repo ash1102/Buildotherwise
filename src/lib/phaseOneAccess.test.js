@@ -50,7 +50,7 @@ test("unbuilt modules (coming_later, in_development) stay unavailable", () => {
   const p = progress();
   for (const order of [6, 7, 8, 9, 10]) {
     const row = p.byOrder[order];
-    if (!row) continue; // not listed at all also counts as unavailable
+    assert.ok(row, `Module ${order} row exists`);
     assert.equal(row.unlocked, false, `Module ${order}`);
   }
 });
