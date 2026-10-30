@@ -57,7 +57,7 @@ export default function GettingStartedPage() {
           real-world experiences. You can pass, pause, or change your mind.
         </p>
         <p className="mt-2 max-w-[68ch] text-[15px] leading-relaxed text-muted-faint">
-          One short welcome, about five minutes. Then Module 1 opens. Your Life Map is always there in its own tab if
+          One short welcome, about five minutes. Then your dashboard opens. Your Life Map is always there in its own tab if
           you want it.
         </p>
       </header>

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import useCurriculum from "@/hooks/useCurriculum";
 import {
   buildCarrySources,
@@ -140,7 +140,7 @@ export default function LessonPage() {
   const stepsDone = gettingStartedFinished(lessons, answers, states);
   /**
    * The last Getting Started step never dead-ends.
-   * Done (or an admin previewing): go straight into Module 1.
+   * Done (or an admin previewing): back to the dashboard, where the participant picks the start.
    * An earlier step still open: go to that step.
    * Only this step open: say what opens it.
    */
@@ -152,9 +152,9 @@ export default function LessonPage() {
   let endNote;
   if (lastGs && (stepsDone || admin)) {
     forward = {
-      to: isAuthenticated ? firstPath : `/login?returnTo=${encodeURIComponent(firstPath)}`,
-      kicker: "Next: Module 1",
-      title: firstBookLesson ? firstBookLesson.title : "Module 1",
+      to: isAuthenticated ? "/" : `/login?returnTo=${encodeURIComponent("/")}`,
+      kicker: "Next: your dashboard",
+      title: "Pick wherever you want to start",
     };
   } else if (lastGs && openGsStep && openGsStep.code !== lesson.code) {
     const openNumber = gsSteps.findIndex((item) => item.code === openGsStep.code) + 1;
