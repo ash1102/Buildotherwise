@@ -46,7 +46,7 @@ import { bridgeIn, bridgeOut } from "@/lib/moduleBridges";
 import { decisionOptionsFor, participationRoutesFor, routeGuidanceFor, setAnswer, useAnswers, answerKey } from "@/lib/workbook";
 import { AGREEMENT_APPROACH, AGREEMENT_CODE, AGREEMENT_NOTE, AGREEMENT_WHY, JOIN_CHOICES, isGettingStartedLesson, joinChoiceText, splitChoice } from "@/lib/gettingStarted";
 import LearningAgreement from "@/components/gettingStarted/LearningAgreement";
-import GoDeeperJournal, { JournalLessonTitle } from "./GoDeeperJournal";
+import GoDeeperJournal from "./GoDeeperJournal";
 import { hasGoDeeper } from "@/lib/journalPrompts";
 
 /** Steps drawn entirely by one interactive piece (see src/lib/interactions.js). */

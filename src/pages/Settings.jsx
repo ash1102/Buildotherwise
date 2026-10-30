@@ -316,7 +316,7 @@ export default function Settings() {
         </p>
         <button type="button" onClick={download} className={primaryButton}>
           <Download className="h-4 w-4" aria-hidden="true" />
-          Download everything I’ve written
+          Download my workbook and reflections
         </button>
 
         <div className="border-t border-border pt-4">
