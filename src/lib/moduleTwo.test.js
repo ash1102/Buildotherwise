@@ -78,14 +78,14 @@ test("completion: an answer, 'done', or an earlier-version answer completes each
   assert.equal(stepComplete(L("M2-L2"), {}, { "M2-L2": "Pass" }), true);
 });
 
-test("Module 3 opens once Module 2 is done, writing or not", () => {
+test("Module 3 is open with nothing saved (Phase 1: no step gate)", () => {
   const modules = [2, 3].map((order) => ({ order, slug: `m${order}`, title: `M${order}`, kind: "module", status: "live" }));
   const lessonsByOrder = {
     2: ["M2-L1", "M2-L2", "M2-L3"].map((code) => ({ code, module_order: 2, try_prompts: ["x"] })),
     3: [{ code: "M3-L1", module_order: 3, try_prompts: ["x"] }],
   };
   const done = { "M2-L1#finished": "x", "M2-L2#finished": "x", "M2-L3#finished": "x" };
-  assert.equal(buildProgress({ modules, lessonsByOrder, answers: {}, states: {} }).byOrder[3].unlocked, false);
+  assert.equal(buildProgress({ modules, lessonsByOrder, answers: {}, states: {} }).byOrder[3].unlocked, true);
   assert.equal(buildProgress({ modules, lessonsByOrder, answers: done, states: {} }).byOrder[3].unlocked, true);
 });
 
