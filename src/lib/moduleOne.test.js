@@ -40,14 +40,14 @@ test("answers saved in the earlier versions of Module 1 still count", () => {
   assert.equal(stepComplete(L2, {}, { "M1-L2": "Pass" }), true);
 });
 
-test("Module 2 opens once every Module 1 lesson is complete, writing or not", () => {
+test("Module 2 is open with nothing saved (Phase 1: no step gate)", () => {
   const modules = [
     { order: 1, slug: "m1", title: "One", kind: "module", status: "live" },
     { order: 2, slug: "m2", title: "Two", kind: "module", status: "live" },
   ];
   const lessonsByOrder = { 1: [L1, L2, L3], 2: [{ code: "M2-L1", module_order: 2, try_prompts: ["x"] }] };
   const none = buildProgress({ modules, lessonsByOrder, answers: {}, states: {} });
-  assert.equal(none.byOrder[2].unlocked, false);
+  assert.equal(none.byOrder[2].unlocked, true);
   const done = { "M1-L1#finished": "x", "M1-L2#finished": "x", "M1-L3#finished": "x" };
   assert.equal(buildProgress({ modules, lessonsByOrder, answers: done, states: {} }).byOrder[2].unlocked, true);
 });
