@@ -64,7 +64,7 @@ export default function PreviewNotes() {
           want to keep, correct them, delete them, or take a copy away.
         </p>
         <p className="mt-3 text-[15px] text-muted-faint">
-          {rows.length} saved · {carried} marked to carry forward · only you can see these notes
+          {rows.length} saved · {carried} marked to carry forward · other participants can’t see these notes
         </p>
       </header>
 

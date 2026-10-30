@@ -344,7 +344,7 @@ export default function LifeMapPage() {
 
       <div>
         <PrivacyNote>
-          The map is saved on this device and copied to your account. In the app, only your account can open it. A Markdown download includes the full text of any journal entry linked to a line, not only that journal entry’s title. Downloading or printing is yours to do.
+          The map is saved on this device and copied to your account. Other participants can’t see it. Ashley runs the app, so she can see what’s stored. A Markdown download includes the full text of any journal entry linked to a line, not only that journal entry’s title. Downloading or printing is yours to do.
         </PrivacyNote>
       </div>
 

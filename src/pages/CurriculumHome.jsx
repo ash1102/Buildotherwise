@@ -52,7 +52,7 @@ const INCLUDES = [
   "Short lessons, each with a worked example",
   "Space to write, and one clear next decision at the end of every step",
   "No grades, scores or streaks",
-  "What you write is saved to your account. Only you can open it in the app, and sharing is always your choice.",
+  "What you write is saved to your account. Other participants can’t see it, and sharing is always your choice.",
 ];
 
 const PILOT_QUESTIONS = [
@@ -63,19 +63,16 @@ const PILOT_QUESTIONS = [
   "Which parts help, and which get in the way?",
 ];
 
-const marigoldButton =
-  "inline-flex items-center gap-2 rounded-lg bg-primary-soft px-5 py-3 text-[15px] font-semibold text-foreground transition hover:brightness-95";
-
 /**
- * Participant dashboard only. Fixed dark plum text so the label stays readable on marigold in dark mode,
- * where text-foreground turns light. The public front door keeps marigoldButton unchanged.
+ * Marigold buttons (member dashboard and public Start now). Fixed dark plum text so the label stays readable on marigold in dark mode,
+ * where text-foreground turns light.
  */
 const dashboardButton =
   "inline-flex min-h-[44px] items-center gap-2 rounded-lg bg-primary-soft px-5 py-3 text-[15px] font-semibold text-[hsl(277_34%_16%)] transition hover:brightness-95";
 
 function StartButton() {
   return (
-    <Link to="/getting-started" className={marigoldButton}>
+    <Link to="/getting-started" className={dashboardButton}>
       Start now
       <ArrowRight className="h-4 w-4" aria-hidden="true" />
     </Link>

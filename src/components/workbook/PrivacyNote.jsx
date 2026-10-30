@@ -17,7 +17,7 @@ export default function PrivacyNote({ children }) {
         <Lock className="h-3.5 w-3.5 text-accent-ink" aria-hidden="true" />
       </span>
       <span>
-        {children || "Saved to your account, so it’s there on any device. Only you can open it in the app."}
+        {children || "Saved to your account. Other participants can’t see it. Ashley runs the app, so she can see what’s stored."}
       </span>
     </p>
   );

@@ -24,8 +24,7 @@ export default function About() {
         <p>
           The program is Getting Started plus ten modules, and each step follows the same shape: a short teaching block,
           a worked example, a choice of how you want to take part, somewhere to write, and a Next Decision. There are
-          no grades, no scores and no streak to keep. Your writing is saved to your account, so it is there on any device, and only you
-          can open it in the app.
+          no grades, no scores and no streak to keep. Your writing is saved to your account. Other participants can’t see it. Ashley runs the app, so she can see what’s stored.
         </p>
         <p>
           It is written for adults navigating a transition: a job that has ended or worn thin, training you are weighing

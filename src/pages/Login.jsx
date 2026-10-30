@@ -53,7 +53,7 @@ export default function Login() {
           </Link>
           <span className="mt-3 block text-[13px] leading-relaxed text-muted-foreground">
             Why an account? It opens your journal, the workbook modules and group threads, and it keeps what you
-            write, so it is there on any device. Only you can open it in the app. Sharing anything is a separate choice.
+            write in your account. Other participants can’t see it. Sharing anything is a separate choice.
           </span>
         </>
       }

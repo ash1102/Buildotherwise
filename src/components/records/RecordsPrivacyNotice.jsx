@@ -20,9 +20,9 @@ export default function RecordsPrivacyNotice() {
       <ul className="mt-3 list-disc space-y-1.5 pl-5 text-[15px] leading-relaxed text-muted-foreground">
         <li>
           These records are saved to <strong className="text-foreground">your Entrepalooza account</strong>, in the
-          app&rsquo;s database, which is hosted by Base44. That is why they follow you when you sign in on another device.
+          app&rsquo;s database, which is hosted by Base44.
         </li>
-        <li>In the app, only your account can open, change or delete them. Other learners can&rsquo;t see them.</li>
+        <li>Other learners can&rsquo;t see them.</li>
         <li>Build Otherwise runs the app, so it has technical access to that database.</li>
         <li>
           Your step answers and journal are kept the same way, in your account. A draft copied from a step is not

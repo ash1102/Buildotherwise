@@ -305,15 +305,13 @@ export default function Settings() {
 
       <Section title="My data">
         <p className="text-[16px] leading-relaxed text-muted-foreground">
-          Your journal, answers and maps are saved to your Entrepalooza account, so they follow you to any device you
-          sign in on. <SyncLine />
+          Your journal, answers and maps are saved to your Entrepalooza account. <SyncLine />
         </p>
         <p className="text-[16px] leading-relaxed text-muted-foreground">
           <Link to="/my-records" className="font-medium text-accent-ink underline underline-offset-2">
             My Records
           </Link>{" "}
-          are saved the same way. Everything is kept in the app’s database, hosted by Base44. In the app, only your
-          account can open, change or delete it. Ashley runs the app, so she can see what’s stored, but she doesn’t
+          are saved the same way. Everything is kept in the app’s database, hosted by Base44. Other participants can’t open it. Ashley runs the app, so she can see what’s stored, but she doesn’t
           read your entries unless you share them.
         </p>
         <button type="button" onClick={download} className={primaryButton}>
