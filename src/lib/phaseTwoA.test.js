@@ -188,7 +188,8 @@ test("the all-saved banner is gone, and per-module saved counts and the page hea
   assert.match(home, /moduleProgressLabel\(row\)/);
   assert.match(home, /moduleProgressDescription\(row\)/);
   assert.match(home, /usePacedProgress\(\{ modules, lessonsByOrder, answers, states \}\)/);
-  assert.match(home, /headingLevel=\{started && next \? "h2" : "h1"\}/, "the page always keeps exactly one h1");
+  assert.match(home, /<DiscoveryStart onSkip=\{goToWorkbook\} headingLevel="h1" \/>/, "discovery holds the page's only h1");
+  assert.doesNotMatch(home, /<h1/, "no other h1 on the member dashboard");
 });
 
 test("question navigation: one featured question, the full list only behind a collapsed control", () => {
@@ -220,4 +221,15 @@ test("colour: dashboard and discovery use the plum family, marigold stays on the
   assert.ok(marigold.some((line) => /absolute inset-x-0 top-0 h-1 bg-primary-soft/.test(line)));
   assert.doesNotMatch(view, /peer-checked:bg-primary-soft/, "selected answers are plum, not marigold");
   assert.match(read("src/pages/CurriculumHome.jsx"), /className="dashboard-plum space-y-10"/);
+});
+
+test("returning participants: Discovery first, a smaller Continue card right below it, same destination", () => {
+  const home = read("src/pages/CurriculumHome.jsx");
+  const discovery = home.indexOf("<DiscoveryStart");
+  const resume = home.indexOf('aria-labelledby="continue-heading"');
+  const tools = home.indexOf('aria-label="Your tools"');
+  assert.ok(discovery > 0 && discovery < resume && resume < tools, "Discovery, then Continue, then tools");
+  assert.match(home, /\{started && next \? \(/, "still only for returning participants with a next step");
+  assert.match(home, /to=\{`\/lesson\/\$\{next\.code\}`\}/, "same destination");
+  assert.match(home, /Continue where you left off/);
 });

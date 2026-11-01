@@ -241,27 +241,27 @@ function MemberHome() {
         <div aria-busy="true" className="h-[220px] animate-pulse rounded-2xl bg-border/60" />
       ) : (
         <>
-          {started && next ? (
-            <section aria-labelledby="continue-heading">
-              <p className="workbook-label">Welcome back</p>
-              <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
-                <p className="text-[13px] font-semibold text-primary-foreground/85">Continue where you left off</p>
-                <h1 id="continue-heading" className="mt-1.5 text-[clamp(1.5rem,1.1rem+1.6vw,2.1rem)] text-primary-foreground">
-                  {nextLabel ? `${nextLabel} · ${next.title}` : next.title}
-                </h1>
-                {next.purpose ? (
-                  <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">{next.purpose}</p>
-                ) : null}
-                <Link to={`/lesson/${next.code}`} className={`mt-5 ${dashboardButton}`}>
-                  Continue
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-              </div>
-            </section>
-          ) : null}
+          {/* Discovery leads the page and holds the h1. "Continue where you left off" is a smaller, secondary card right below it. */}
+          <div className="space-y-4">
+            <DiscoveryStart onSkip={goToWorkbook} headingLevel="h1" />
 
-          {/* The discovery heading is the page's h1 unless the "continue where you left off" card above already is. */}
-          <DiscoveryStart onSkip={goToWorkbook} headingLevel={started && next ? "h2" : "h1"} />
+            {started && next ? (
+              <section aria-labelledby="continue-heading" className="rounded-xl border border-border bg-card px-4 py-4 sm:px-5">
+                <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3">
+                  <div className="min-w-0 flex-1 basis-[16rem]">
+                    <p className="text-[13px] font-semibold text-accent-ink">Continue where you left off</p>
+                    <h2 id="continue-heading" className="mt-1 text-[17px] leading-snug text-foreground">
+                      {nextLabel ? `${nextLabel} · ${next.title}` : next.title}
+                    </h2>
+                  </div>
+                  <Link to={`/lesson/${next.code}`} className={dashboardButton}>
+                    Continue
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                </div>
+              </section>
+            ) : null}
+          </div>
 
           <nav aria-label="Your tools">
             <ul className="grid gap-3 sm:grid-cols-2">
