@@ -51,7 +51,7 @@ export const ASPECTS = [
     number: "04",
     label: "Private reflection and self-discovery",
     promise: "Your writing is kept in your account, and sharing is a separate, deliberate act.",
-    body: "What you write is saved to your account. Other participants can’t open it. Ashley runs the app, so she can see what’s stored, but she doesn’t read your entries unless you share them. It goes to anyone else only if you share an entry, send feedback, post to a Tribe Thread, or bring entries into the reflection partner. Each of those is a separate choice you make.",
+    body: "What you write is saved to your account. Other participants can’t open it. Build Otherwise runs this app, so our team can see what’s stored on it. Your entries stay private unless you choose to share them. It goes to anyone else only if you share an entry, send feedback, post to a Tribe Thread, or bring entries into the reflection partner. Each of those is a separate choice you make.",
     interaction: "privacy",
     tryLabel: "Try it: choose what happens to a line",
     note: "Nothing is sent by this page. It shows the choice you are given in the workbook.",
