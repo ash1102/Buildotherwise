@@ -79,7 +79,7 @@ export default function Layout() {
               Tribe Threads are group discussions on the workbook’s practices. Replies there are shared with your group,
               under your name, and only if you post one.
             </p>
-            <p className="mt-2">Pilot 1: Getting Started and Modules 1–10. © Build Otherwise.</p>
+            <p className="mt-2">Getting Started and Modules 1–5 are open. Modules 6–10 are locked. © Build Otherwise.</p>
           </div>
         </footer>
 
