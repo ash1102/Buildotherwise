@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { ArrowRight, ChevronDown, Info } from "lucide-react";
 import {
   OWN_EXPERIMENT,
@@ -11,12 +12,14 @@ import {
   groupQuestionsForPath,
   thoughtFor,
 } from "@/lib/dashboardDiscovery";
+import { TITLE_MAX, createThread, threadFromDiscovery, updateThread } from "@/lib/discoveryThreads";
 
 /**
  * Discovery on the dashboard: Notice -> Explore -> Choose.
- * Everything here is component state. Nothing is written to the account, the device, the
- * workbook, the journal or the Life Map, so there is nothing to sync, export or delete.
- * "Save to My Discoveries" is shown but switched off until the saving design is approved.
+ * Everything is component state until the participant presses Save on the Choose step. Save is the only
+ * thing that writes: it creates one DiscoveryThread row on their account (see src/lib/discoveryThreads.js),
+ * and Save again updates that same row. Nothing is copied into the Journal, the Life Map, My Records or the workbook.
+ * Start over, Explore something else and Skip write nothing.
  * One invitation shows at a time, and the way to the workbook is on screen at every step.
  */
 
@@ -84,14 +87,27 @@ function BrowseQuestions({ pointId, currentId, onPick }) {
   );
 }
 
-const SAVING_READY = false;
-
-const INITIAL = { stage: "welcome", pointId: null, questionId: null, seen: [], own: false, text: "", optionId: null, notes: "", related: false };
+const INITIAL = {
+  stage: "welcome",
+  pointId: null,
+  questionId: null,
+  seen: [],
+  own: false,
+  text: "",
+  optionId: null,
+  notes: "",
+  related: false,
+  saveOpen: false,
+  title: "",
+  savedId: null,
+};
 
 const textareaClass = "mt-2 w-full rounded-xl border border-border bg-card px-3 py-2 text-[16px] leading-relaxed text-foreground";
 
 export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
   const [state, setState] = useState(INITIAL);
+  const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("");
   const headingRef = useRef(null);
   const firstRender = useRef(true);
   const Heading = headingLevel;
@@ -122,6 +138,9 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
       optionId: null,
       notes: "",
       related: false,
+      saveOpen: false,
+      title: "",
+      savedId: null,
     }));
 
   const choosePoint = (pointId) => showQuestion(firstQuestionFor(pointId), { pointId, seen: [] });
@@ -129,7 +148,24 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
     const next = anotherQuestionFor(state.pointId, state.questionId, state.seen);
     if (next) showQuestion(next);
   };
-  const setOwn = (own) => setState((c) => ({ ...c, own, text: "", optionId: null, notes: "", related: false }));
+  const setOwn = (own) =>
+    setState((c) => ({ ...c, own, text: "", optionId: null, notes: "", related: false, saveOpen: false, title: "", savedId: null }));
+
+  // The only function in this file that writes anything. It runs from the Save form's submit and nowhere else.
+  const saveDiscovery = async () => {
+    setSaving(true);
+    setSaveMessage("");
+    try {
+      const data = threadFromDiscovery({ title: state.title, state });
+      const row = state.savedId ? await updateThread(state.savedId, data) : await createThread(data);
+      setState((c) => ({ ...c, savedId: row.id || c.savedId, saveOpen: false }));
+      setSaveMessage(state.savedId ? "Your saved discovery was updated." : "Saved to My Discoveries.");
+    } catch {
+      setSaveMessage("That didn’t save. Your words are still here. Try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const OriginalResponse = ({ label }) =>
     written ? (
@@ -236,7 +272,7 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
           <p className="text-[13px] font-semibold text-accent-ink">Explore</p>
           <p className="mt-2 text-[15px] font-semibold text-primary-foreground/90">{question ? question.text : "Your own question or observation"}</p>
           <div className="mt-3">
-            <OriginalResponse label={question ? "What you wrote (not saved)" : "Your question or observation (not saved)"} />
+            <OriginalResponse label={question ? "What you wrote" : "Your question or observation"} />
           </div>
           <Heading
             id="discovery-heading"
@@ -307,10 +343,10 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
           >
             What would you like to do next?
           </Heading>
-          <OriginalResponse label={question ? "What you wrote (not saved)" : "Your question or observation (not saved)"} />
+          <OriginalResponse label={question ? "What you wrote" : "Your question or observation"} />
           {state.notes.trim() ? (
             <p className="max-w-[62ch] rounded-xl bg-primary-foreground/10 px-4 py-3 text-[15px] leading-relaxed text-primary-foreground/90">
-              <span className="block text-[13px] font-semibold">Your notes (not saved)</span>
+              <span className="block text-[13px] font-semibold">Your notes</span>
               <span className="mt-1 block whitespace-pre-wrap break-words">{state.notes.trim()}</span>
             </p>
           ) : null}
@@ -327,11 +363,15 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
             <li>
               <button
                 type="button"
-                className={`${actionButton} disabled:cursor-not-allowed disabled:opacity-60`}
-                disabled={!SAVING_READY}
-                aria-describedby="discovery-save-note"
+                aria-expanded={state.saveOpen}
+                aria-controls={state.saveOpen ? "discovery-save-form" : undefined}
+                className={actionButton}
+                onClick={() => {
+                  setSaveMessage("");
+                  setState((c) => ({ ...c, saveOpen: !c.saveOpen }));
+                }}
               >
-                Save to My Discoveries
+                {state.savedId ? "Update My Discoveries" : "Save to My Discoveries"}
               </button>
             </li>
             <li>
@@ -351,11 +391,50 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
               </button>
             </li>
           </ul>
-          {SAVING_READY ? null : (
-            <p id="discovery-save-note" className="text-[14px] text-primary-foreground/80">
-              Saving isn’t switched on yet, so nothing here can be saved for now.
+          {state.saveOpen ? (
+            <form
+              id="discovery-save-form"
+              className="rounded-xl border border-border px-4 py-4"
+              onSubmit={(event) => {
+                event.preventDefault();
+                saveDiscovery();
+              }}
+            >
+              <label htmlFor="discovery-title" className="block text-[15px] text-primary-foreground/90">
+                Give it a title, if you want one. Optional.
+              </label>
+              <input
+                id="discovery-title"
+                type="text"
+                maxLength={TITLE_MAX}
+                value={state.title}
+                onChange={(event) => setState((c) => ({ ...c, title: event.target.value }))}
+                className="mt-2 w-full rounded-xl border border-border bg-card px-3 py-2 text-[16px] text-foreground"
+              />
+              <p className="mt-2 text-[14px] leading-relaxed text-primary-foreground/85">
+                This keeps the question, what you wrote, your answer to the follow-up, and your notes. It goes to your
+                Entrepalooza account. It isn’t copied to your Journal, Life Map or Records.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <button type="submit" disabled={saving} className={`${primaryButton} disabled:opacity-60`}>
+                  {saving ? "Saving…" : state.savedId ? "Update" : "Save"}
+                </button>
+                <button type="button" className={quietButton} onClick={() => setState((c) => ({ ...c, saveOpen: false }))}>
+                  Not now
+                </button>
+              </div>
+            </form>
+          ) : null}
+          {saveMessage ? (
+            <p role="status" className="text-[15px] font-medium text-primary-foreground">
+              {saveMessage}{" "}
+              {state.savedId && saveMessage !== "" && !saveMessage.startsWith("That didn") ? (
+                <Link to="/my-discoveries" className="underline underline-offset-2">
+                  Open My Discoveries
+                </Link>
+              ) : null}
             </p>
-          )}
+          ) : null}
 
           {state.related ? (
             <div id="discovery-experiment" className="rounded-xl border border-border px-4 py-4">
@@ -372,15 +451,25 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
           <button type="button" className={textButton} onClick={onSkip}>
             Skip this and go to the workbook
           </button>
+          <Link to="/my-discoveries" className={textButton}>
+            My Discoveries
+          </Link>
           {state.stage !== "welcome" ? (
-            <button type="button" className={textButton} onClick={() => setState(INITIAL)}>
+            <button type="button" className={textButton} onClick={() => {
+                setSaveMessage("");
+                setState(INITIAL);
+              }}>
               Start over
             </button>
           ) : null}
         </div>
         <p className="flex items-start gap-2 text-[14px] leading-relaxed text-primary-foreground/85">
           <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-          <span>Nothing you choose or type here is saved. It’s gone when you leave this page.</span>
+          <span>
+            Nothing you choose or type here is saved unless you press Save to My Discoveries. If you don’t, it’s gone
+            when you leave this page. If you do, it goes to your Entrepalooza account, and it isn’t copied to your
+            Journal, Life Map or Records.
+          </span>
         </p>
       </div>
     </section>
