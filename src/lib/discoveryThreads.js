@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { OWN_QUESTION_LABEL, TEXT_MAX, TITLE_MAX } from "@/lib/discoveryThreadData";
+import { deleteAllPaged } from "@/lib/deletionSteps";
 
 /**
- * My Discoveries: threads a participant chose to keep from Discovery on the dashboard.
+ * The original storage for discoveries saved from Discovery on the dashboard. New saves go to the
+ * Discovery Record (DiscoveryRecord); these rows are read until they are moved, and never deleted by the move.
  * Stored in the DiscoveryThread entity, one row per discovery, readable and writable only by the
  * account that created it. Nothing here is written unless a participant presses Save, and nothing
  * is copied into the Journal, Life Map, My Records or the workbook.
@@ -31,22 +33,8 @@ export function deleteThread(id) {
 }
 
 /** Deletes every thread on this account. Reads again after each batch, so accounts over 200 rows are cleared too. */
-export async function deleteAllThreads() {
-  let total = 0;
-  let previous = "";
-  for (;;) {
-    const rows = (await listMyThreads()) || [];
-    if (!rows.length) return total;
-    const batch = rows.map((row) => row.id).join(",");
-    if (batch === previous) {
-      throw new Error("Threads keep coming back after delete, so deletion stopped. Some entries may remain.");
-    }
-    previous = batch;
-    for (const row of rows) {
-      await deleteThread(row.id);
-      total += 1;
-    }
-  }
+export function deleteAllThreads() {
+  return deleteAllPaged(listMyThreads, deleteThread, "Discoveries");
 }
 
 /** Loads the signed-in participant's saved discoveries. */
