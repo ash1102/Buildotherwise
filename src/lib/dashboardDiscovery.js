@@ -318,6 +318,12 @@ export function questionsForPath(pointId) {
   return point ? point.order.map((id) => QUESTIONS[id]) : [];
 }
 
+/** The same six questions, split for the collapsed "Browse all questions" list: the three closest to the path, then the rest. */
+export function groupQuestionsForPath(pointId) {
+  const all = questionsForPath(pointId);
+  return { closest: all.slice(0, 3), rest: all.slice(3) };
+}
+
 export function startingPoint(id) {
   return STARTING_POINTS.find((point) => point.id === id) || null;
 }
