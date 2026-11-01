@@ -26,7 +26,7 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
         </div>
 
         <div className="mt-6 lg:mt-0">
-          <p className="text-[13px] font-semibold text-primary-soft">Build Otherwise · Pilot 1</p>
+          <p className="text-[13px] font-semibold text-primary-soft">Build Otherwise</p>
           <p className="mt-2 max-w-[22ch] text-[clamp(1.4rem,1rem+2vw,2.6rem)] font-semibold leading-[1.1] tracking-tight">
             You don’t need your whole life figured out.
           </p>
