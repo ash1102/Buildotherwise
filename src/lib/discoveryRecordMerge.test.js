@@ -3,7 +3,10 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import {
+  MIGRATION_LOCK,
   MIGRATION_SWITCH,
+  dedupeByThreadId,
+  deleteMigratedEntry,
   editableFromRecord,
   editableFromThread,
   isDiscoveryFlowRecord,
@@ -15,6 +18,7 @@ import {
   runMigration,
   threadsForExport,
   unmovedThreads,
+  withMigrationLock,
 } from "./discoveryMigration.js";
 import { deleteAllPaged, runSteps } from "./deletionSteps.js";
 import { discoveryExportLines, threadFromDiscovery } from "./discoveryThreadData.js";
@@ -45,7 +49,22 @@ const thread = (id, extra = {}) => ({
 });
 
 /** An in-memory account: threads, records and the migration record, with switchable failures. */
-function fakeAccount(threads, { failCreateFor = [], failStateWrite = false, corruptState = false, failListThreads = false } = {}) {
+const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+/** A minimal stand-in for navigator.locks: one holder at a time, the rest wait in order. */
+function fakeLocks() {
+  const queues = new Map();
+  return {
+    request(name, fn) {
+      const previous = queues.get(name) || Promise.resolve();
+      const run = previous.then(() => fn());
+      queues.set(name, run.catch(() => {}));
+      return run;
+    },
+  };
+}
+
+function fakeAccount(threads, { failCreateFor = [], failStateWrite = false, corruptState = false, failListThreads = false, slow = false } = {}) {
   const account = {
     threads: threads.map((t) => ({ ...t })),
     records: [],
@@ -63,12 +82,16 @@ function fakeAccount(threads, { failCreateFor = [], failStateWrite = false, corr
       if (failStateWrite) throw new Error("state write failed");
       account.state = JSON.stringify([...state.ids]);
     },
-    listRecords: async () => account.records.map((r) => ({ ...r })),
+    listRecords: async () => {
+      if (slow) await tick();
+      return account.records.map((r) => ({ ...r }));
+    },
     listThreads: async () => {
       if (failListThreads) throw new Error("list failed");
       return account.threads.map((t) => ({ ...t }));
     },
     createRecord: async (fields) => {
+      if (slow) await tick();
       if (failCreateFor.includes(fields.source.thread_id)) throw new Error("create failed");
       account.creates += 1;
       account.records.push({ id: `rec-${next++}`, ...fields });
@@ -337,4 +360,129 @@ test("participants see 'Discovery Record' everywhere, and /my-discoveries redire
   for (const file of files) assert.doesNotMatch(read(file), /to="\/my-discoveries"/, file);
   assert.match(read("src/App.jsx"), /path="\/my-discoveries" element=\{<Navigate to="\/record" replace \/>\}/);
   assert.doesNotMatch(read("src/App.jsx"), /MyDiscoveriesPage/);
+});
+
+// ---------- Two tabs, delete safeguards ----------
+
+test("two tabs migrating at once without the lock would duplicate (this is the risk the lock removes)", async () => {
+  const account = fakeAccount([thread("t1"), thread("t2")], { slow: true });
+  await Promise.all([runMigration(account.io), runMigration(account.io)]);
+  assert.ok(account.records.length > 2, "both tabs copied the same threads");
+});
+
+test("two tabs migrating at once with the lock create each record exactly once", async () => {
+  const locks = fakeLocks();
+  const account = fakeAccount([thread("t1"), thread("t2"), thread("t3")], { slow: true });
+  const tab = () => withMigrationLock(() => runMigration(account.io), locks);
+  const results = await Promise.all([tab(), tab(), tab()]);
+  assert.equal(account.records.length, 3);
+  assert.deepEqual(account.records.map((r) => r.source.thread_id).sort(), ["t1", "t2", "t3"]);
+  assert.equal(results.filter((r) => r.moved > 0).length, 1, "only one tab did the move");
+  assert.equal(results.reduce((sum, r) => sum + r.moved, 0), 3);
+  assert.equal(MIGRATION_LOCK, "entrepalooza-discovery-migration");
+});
+
+test("the lock is released when a run fails, so the next tab can go", async () => {
+  const locks = fakeLocks();
+  await assert.rejects(withMigrationLock(async () => { throw new Error("boom"); }, locks));
+  assert.equal(await withMigrationLock(async () => "ok", locks), "ok");
+});
+
+test("without Web Locks the work still runs", async () => {
+  assert.equal(await withMigrationLock(async () => "ran", undefined), "ran");
+});
+
+test("a repeat copy from another device is hidden (oldest kept), never deleted", () => {
+  const rows = [
+    { id: "b", created_date: "2026-11-01T10:00:02Z", source: { thread_id: "t1" } },
+    { id: "a", created_date: "2026-11-01T10:00:01Z", source: { thread_id: "t1" } },
+    { id: "c", created_date: "2026-11-01T10:00:03Z", source: { thread_id: "t2" } },
+    { id: "d", created_date: "2026-11-01T10:00:04Z", source: null },
+    { id: "e", created_date: "2026-11-01T10:00:05Z", source: { thread_id: "" } },
+  ];
+  const kept = dedupeByThreadId(rows).map((r) => r.id).sort();
+  assert.deepEqual(kept, ["a", "c", "d", "e"]);
+  assert.equal(rows.length, 5, "input untouched");
+});
+
+function deleteHarness({ failTombstone = false, failRecord = false, failThread = false, threadRows } = {}) {
+  const calls = [];
+  const rows = threadRows || [{ id: "t1" }];
+  return {
+    calls,
+    io: {
+      tombstone: async (id) => { calls.push(["tombstone", id]); if (failTombstone) throw new Error("tombstone failed"); },
+      deleteRecord: async () => { calls.push(["deleteRecord"]); if (failRecord) throw new Error("record delete failed"); },
+      findThreadRows: async (id) => { calls.push(["find", id]); return rows; },
+      deleteThread: async (id) => { calls.push(["deleteThread", id]); if (failThread) throw new Error("thread delete failed"); },
+    },
+  };
+}
+const migratedEntry = (threadId = "t1") => ({ id: "r1", source: { thread_id: threadId, migrated_from: "DiscoveryThread" } });
+
+test("deleting a migrated entry records the thread id first, then deletes the record, then exactly its original", async () => {
+  const h = deleteHarness();
+  const result = await deleteMigratedEntry({ entry: migratedEntry(), ...h.io });
+  assert.deepEqual(h.calls, [["tombstone", "t1"], ["deleteRecord"], ["find", "t1"], ["deleteThread", "t1"]]);
+  assert.deepEqual(result, { originalKept: false, threadDeleted: true });
+});
+
+test("if the thread id can't be recorded, nothing is deleted", async () => {
+  const restore = quiet();
+  const h = deleteHarness({ failTombstone: true });
+  await assert.rejects(deleteMigratedEntry({ entry: migratedEntry(), ...h.io }));
+  restore();
+  assert.deepEqual(h.calls, [["tombstone", "t1"]]);
+});
+
+test("if the record can't be deleted, the original is left alone", async () => {
+  const h = deleteHarness({ failRecord: true });
+  await assert.rejects(deleteMigratedEntry({ entry: migratedEntry(), ...h.io }));
+  assert.equal(h.calls.some((c) => c[0] === "deleteThread"), false);
+});
+
+test("only the single row whose id matches is deleted, even if the lookup returns more", async () => {
+  const h = deleteHarness({ threadRows: [{ id: "other-1" }, { id: "t1" }, { id: "other-2" }] });
+  await deleteMigratedEntry({ entry: migratedEntry(), ...h.io });
+  assert.deepEqual(h.calls.filter((c) => c[0] === "deleteThread"), [["deleteThread", "t1"]]);
+
+  const none = deleteHarness({ threadRows: [{ id: "other-1" }] });
+  const result = await deleteMigratedEntry({ entry: migratedEntry(), ...none.io });
+  assert.equal(none.calls.some((c) => c[0] === "deleteThread"), false, "no exact match, so nothing deleted");
+  assert.deepEqual(result, { originalKept: false, threadDeleted: false });
+});
+
+test("an entry without the migration marker never touches DiscoveryThread", async () => {
+  for (const entry of [{ id: "r1", source: { kind: "question" } }, { id: "r2", source: { thread_id: "t1" } }, { id: "r3", source: null }, { id: "r4" }]) {
+    const h = deleteHarness();
+    await deleteMigratedEntry({ entry, ...h.io });
+    assert.deepEqual(h.calls, [["deleteRecord"]], JSON.stringify(entry));
+  }
+});
+
+test("if the original can't be deleted, the entry is still gone, the person is told, and it can't come back", async () => {
+  const restore = quiet();
+  const h = deleteHarness({ failThread: true });
+  const result = await deleteMigratedEntry({ entry: migratedEntry(), ...h.io });
+  restore();
+  assert.deepEqual(result, { originalKept: true, threadDeleted: false });
+  assert.deepEqual(h.calls.slice(0, 2), [["tombstone", "t1"], ["deleteRecord"]]);
+  // The recorded id keeps migration, the page and the download from using the leftover original.
+  const moved = ["t1"];
+  assert.deepEqual(planMigration({ threads: [thread("t1")], movedIds: moved }).toCreate, []);
+  assert.deepEqual(unmovedThreads([thread("t1")], [], moved), []);
+  assert.deepEqual(threadsForExport([thread("t1")], [], moved), []);
+});
+
+test("wiring: migrate, delete one and delete all all take the lock; reads merge ids across devices", () => {
+  const lib = read("src/lib/discoveries.js");
+  assert.match(lib, /migrating = withMigrationLock\(\(\) =>\s*runMigration\(/);
+  assert.match(lib, /export function removeDiscoveryConfirmed\(id\) \{\s*return withMigrationLock\(/);
+  assert.match(lib, /export function deleteAllDiscoveryRecords\(\) \{\s*return withMigrationLock\(/);
+  assert.match(read("src/lib/discoveryThreads.js"), /return withMigrationLock\(\(\) => deleteAllPaged\(listMyThreads/);
+  assert.match(lib, /latest\.ids\.forEach\(\(id\) => state\.ids\.add\(id\)\)/, "a write never drops ids another tab recorded");
+  assert.match(lib, /dedupeByThreadId\(await listAllRecords\(\)\)/);
+  assert.match(read("src/pages/Settings.jsx"), /threadsForExport\(threads, records, movedIds\)/);
+  assert.equal(MIGRATION_SWITCH.enabled, false);
+  assert.deepEqual(MIGRATION_SWITCH.testEmails, []);
 });

@@ -151,7 +151,7 @@ export default function DiscoveryRecordPage() {
 
   const afterDelete = (result) => {
     const words = result?.originalKept
-      ? "Deleted from your Discovery Record. An earlier saved copy couldn’t be removed; it is still in your download. Try deleting it again from Settings, or email Start@buildotherwise.org."
+      ? "Deleted from your Discovery Record. An earlier saved copy couldn’t be removed. It is hidden and won’t come back. Delete your whole Discovery Record in Settings to clear it, or email Start@buildotherwise.org."
       : "Deleted from your Discovery Record.";
     setStatus(words);
     toast({ title: words });
