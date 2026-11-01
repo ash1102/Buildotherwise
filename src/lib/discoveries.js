@@ -409,13 +409,21 @@ export function loadDiscoveries() {
 
 /** Deletes every DiscoveryRecord row on this account. Used by Settings. Resolves to the number deleted. */
 export async function deleteAllDiscoveryRecords() {
-  const rows = (await entity().list("-created_date", 1000)) || [];
-  for (const row of rows) {
-    await entity().delete(row.id);
+  let total = 0;
+  try {
+    for (;;) {
+      const rows = (await entity().list("-created_date", 200)) || [];
+      if (!rows.length) break;
+      for (const row of rows) {
+        await entity().delete(row.id);
+        total += 1;
+      }
+    }
+  } finally {
+    cache = [];
+    notify();
   }
-  cache = [];
-  notify();
-  return rows.length;
+  return total;
 }
 
 /** Plain-text lines for the workbook download. Oldest first. Blank-safe for migrated, DiscoveryStart and WorkbookSources entries. */
