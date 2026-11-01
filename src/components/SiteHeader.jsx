@@ -80,7 +80,7 @@ export default function SiteHeader() {
           </span>
           <span className="min-w-0">
             <span className="block truncate text-[16px] font-semibold leading-tight text-foreground">Entrepalooza</span>
-            <span className="hidden text-[12px] leading-tight text-muted-faint sm:block">Build Otherwise · Pilot 1</span>
+            <span className="hidden text-[12px] leading-tight text-muted-faint sm:block">Build Otherwise</span>
           </span>
         </Link>
 
