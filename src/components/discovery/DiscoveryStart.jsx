@@ -6,6 +6,7 @@ import {
   STARTING_POINTS,
   anotherQuestionFor,
   firstQuestionFor,
+  framingFor,
   nextQuestionFor,
   questionsForPath,
   thoughtFor,
