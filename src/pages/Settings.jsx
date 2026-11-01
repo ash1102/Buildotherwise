@@ -12,7 +12,7 @@ import { TEXT_SIZES, THEMES, useDisplay } from "@/lib/display";
 import { useToast } from "@/components/ui/use-toast";
 import MyGettingStarted from "@/components/gettingStarted/MyGettingStarted";
 import { Link } from "react-router-dom";
-import { deleteRecord, listMyRecords } from "@/lib/learnerRecords";
+import { deleteRecord, listAllMyRecords } from "@/lib/learnerRecords";
 import { deleteAllThreads, discoveryExportLines, listMyThreads } from "@/lib/discoveryThreads";
 import { deleteAllDiscoveryRecords, listDiscoveries, recordExportLines } from "@/lib/discoveries";
 
@@ -146,6 +146,43 @@ function clearDevice() {
   window.dispatchEvent(new CustomEvent("entrepalooza:change", { detail: null }));
 }
 
+/** Runs each deletion step even if an earlier one fails. Returns the labels of the steps that did not finish. */
+async function runSteps(steps) {
+  const failed = [];
+  for (const [label, run] of steps) {
+    try {
+      await run();
+    } catch (error) {
+      console.error(`Deletion step failed: ${label}`, error);
+      failed.push(label);
+    }
+  }
+  return failed;
+}
+
+/** Deletes every My Records entry on this account. Attempts all of them, then reports any that failed. */
+async function deleteAllMyRecords() {
+  const rows = await listAllMyRecords();
+  let failedCount = 0;
+  for (const row of rows) {
+    try {
+      await deleteRecord(row.id);
+    } catch {
+      failedCount += 1;
+    }
+  }
+  if (failedCount) throw new Error(`${failedCount} of ${rows.length} records could not be deleted.`);
+  return rows.length;
+}
+
+/** Everything the workbook delete covers, in order. */
+const WORKBOOK_STEPS = () => [
+  ["your journal and workbook", deleteAccountWorkbook],
+  ["your discoveries", deleteAllThreads],
+  ["your Discovery Record", deleteAllDiscoveryRecords],
+  ["My Records", deleteAllMyRecords],
+];
+
 const SYNC_WORDS = {
   saved: "Everything is saved.",
   saving: "Saving…",
@@ -179,6 +216,7 @@ export default function Settings() {
   const [alsoClear, setAlsoClear] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [deleteSent, setDeleteSent] = useState(false);
+  const [deleteResult, setDeleteResult] = useState(null);
 
   const changePassword = async (event) => {
     event.preventDefault();
@@ -238,17 +276,10 @@ export default function Settings() {
         email: user?.email || "",
         description: "Account deletion request",
       });
+      const failed = alsoClear ? await runSteps(WORKBOOK_STEPS()) : [];
+      if (alsoClear && !failed.length) clearDevice();
+      setDeleteResult({ failed, cleared: alsoClear && !failed.length });
       setDeleteSent(true);
-      if (alsoClear) {
-        try {
-          await deleteAccountWorkbook();
-          await deleteAllThreads();
-          await deleteAllDiscoveryRecords();
-        } catch {
-          /* the account deletion request still covers it */
-        }
-        clearDevice();
-      }
     } catch (error) {
       toast({ title: `That didn't send. Please email ${CONTACT} instead.` });
     } finally {
@@ -259,12 +290,9 @@ export default function Settings() {
   const deleteAllRecords = async () => {
     setDeletingRecords(true);
     try {
-      const rows = await listMyRecords();
-      for (const row of rows || []) {
-        await deleteRecord(row.id);
-      }
+      const count = await deleteAllMyRecords();
       setConfirmRecords(false);
-      toast({ title: rows && rows.length ? "Your records were deleted from your account." : "You have no saved records." });
+      toast({ title: count ? "Your records were deleted from your account." : "You have no saved records." });
     } catch {
       toast({ title: `Some records didn't delete. Try again, or email ${CONTACT}.` });
     } finally {
@@ -352,10 +380,10 @@ export default function Settings() {
         </button>
 
         <div className="border-t border-border pt-4">
-          <h3 className="text-[16px]">Delete my workbook and discoveries</h3>
+          <h3 className="text-[16px]">Delete my workbook, discoveries and My Records</h3>
           <p className="mt-1 text-[15px] leading-relaxed text-muted-foreground">
-            Removes your journal, step answers, decisions and maps, plus your discoveries and Discovery Record, from your account and from this device. This can’t be
-            undone, so download a copy first if you want one. My Records are not deleted; use the button below for those.
+            Removes your journal, step answers, decisions and maps, your discoveries, your Discovery Record and My Records, from your account and from this device. This can’t be
+            undone, so download a copy first if you want one. To delete only My Records, use the button below.
           </p>
           {confirmClear ? (
             <div className="mt-3 flex flex-wrap gap-2">
@@ -366,11 +394,15 @@ export default function Settings() {
                 onClick={async () => {
                   setClearing(true);
                   try {
-                    await deleteAccountWorkbook();
-                    await deleteAllThreads();
-                    await deleteAllDiscoveryRecords();
-                    clearDevice();
-                    toast({ title: "Your workbook and discoveries were deleted from your account." });
+                    const failed = await runSteps(WORKBOOK_STEPS());
+                    if (failed.length) {
+                      toast({
+                        title: `Some of it didn't delete: ${failed.join(", ")}. Nothing was marked complete, and your copy on this device was kept. Try again, or email ${CONTACT}.`,
+                      });
+                    } else {
+                      clearDevice();
+                      toast({ title: "Your workbook, discoveries and My Records were deleted from your account." });
+                    }
                   } catch {
                     toast({ title: `Some of it didn't delete. Try again, or email ${CONTACT}.` });
                   } finally {
@@ -379,7 +411,7 @@ export default function Settings() {
                   }
                 }}
               >
-                {clearing ? "Deleting…" : "Yes, delete my workbook and discoveries"}
+                {clearing ? "Deleting…" : "Yes, delete my workbook, discoveries and My Records"}
               </button>
               <button type="button" className={secondaryButton} onClick={() => setConfirmClear(false)}>
                 Cancel
@@ -387,7 +419,7 @@ export default function Settings() {
             </div>
           ) : (
             <button type="button" className={`mt-3 ${secondaryButton}`} onClick={() => setConfirmClear(true)}>
-              Delete my workbook and discoveries
+              Delete my workbook, discoveries and My Records
             </button>
           )}
         </div>
@@ -456,10 +488,21 @@ export default function Settings() {
 
       <Section title="Delete my account">
         {deleteSent ? (
-          <p className="text-[16px] leading-relaxed">
-            Your request has been sent. Your account will be deleted, and you’ll get a confirmation at{" "}
-            {user?.email || "your email"}. Questions: {CONTACT}.
-          </p>
+          <div className="space-y-2 text-[16px] leading-relaxed">
+            <p>Your deletion request was sent to the Build Otherwise team.</p>
+            {deleteResult?.cleared ? (
+              <p>Your workbook, journal, discoveries and My Records were deleted from your account and from this device.</p>
+            ) : null}
+            {deleteResult?.failed?.length ? (
+              <p className="text-accent-ink">
+                Some of your data could not be deleted: {deleteResult.failed.join(", ")}. Nothing has been marked complete,
+                and your copy on this device was kept so nothing is lost. Email {CONTACT} and we will finish it.
+              </p>
+            ) : null}
+            {!deleteResult?.cleared && !deleteResult?.failed?.length ? (
+              <p>Your workbook, journal, discoveries and My Records stay in your account. Email {CONTACT} if you want them removed too.</p>
+            ) : null}
+          </div>
         ) : (
           <>
             <p className="text-[16px] leading-relaxed text-muted-foreground">
@@ -474,7 +517,7 @@ export default function Settings() {
                     onChange={(event) => setAlsoClear(event.target.checked)}
                     className="mt-1"
                   />
-                  Also delete my workbook, journal and discoveries from my account now
+                  Also delete my workbook, journal, discoveries and My Records from my account now
                 </label>
                 <div className="flex flex-wrap gap-2">
                   <button type="button" disabled={deleting} className={dangerButton} onClick={requestDeletion}>
