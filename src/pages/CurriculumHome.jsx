@@ -233,10 +233,10 @@ function MemberHome() {
     target.focus({ preventScroll: true });
   }, []);
 
-  const toolLink = "flex min-h-[44px] items-start gap-3 rounded-xl border border-border bg-card p-4 text-left transition hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
+  const toolLink = "flex min-h-[44px] items-start gap-3 rounded-xl border border-border bg-card p-4 text-left transition hover:bg-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 
   return (
-    <div className="space-y-10">
+    <div className="dashboard-plum space-y-10">
       {loading ? (
         <div aria-busy="true" className="h-[220px] animate-pulse rounded-2xl bg-border/60" />
       ) : (
@@ -260,25 +260,8 @@ function MemberHome() {
             </section>
           ) : null}
 
-          {started && !next ? (
-            <section aria-labelledby="saved-heading">
-              <p className="workbook-label">Welcome back</p>
-              <div className="mt-3 rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8">
-                <h1 id="saved-heading" className="text-[clamp(1.5rem,1.1rem+1.6vw,2.1rem)] text-primary-foreground">
-                  Every open step has something saved.
-                </h1>
-                <p className="mt-2 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/85">
-                  Saved isn’t the same as finished. You can go back to any step, add more, or write in your journal.
-                </p>
-                <Link to="/discovery-map" className={`mt-5 ${dashboardButton}`}>
-                  See what you gathered
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-              </div>
-            </section>
-          ) : null}
-
-          <DiscoveryStart onSkip={goToWorkbook} headingLevel={started ? "h2" : "h1"} />
+          {/* The discovery heading is the page's h1 unless the "continue where you left off" card above already is. */}
+          <DiscoveryStart onSkip={goToWorkbook} headingLevel={started && next ? "h2" : "h1"} />
 
           <nav aria-label="Your tools">
             <ul className="grid gap-3 sm:grid-cols-2">
@@ -350,7 +333,7 @@ function MemberHome() {
                   </span>
                   <span className="sr-only">{moduleProgressDescription(row)}</span>
                   <span aria-hidden="true" className="h-2 w-20 overflow-hidden rounded-full bg-secondary sm:w-28">
-                    <span className="block h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+                    <span className="block h-full rounded-full bg-accent-ink" style={{ width: `${pct}%` }} />
                   </span>
                 </span>
               </span>
