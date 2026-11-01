@@ -111,7 +111,7 @@ export default function LessonPage() {
   if (!lesson || (!module && !gsLesson)) {
     return (
       <div className="py-10">
-        <h1>That step isn’t part of Pilot 1.</h1>
+        <h1>That step isn’t part of the workbook.</h1>
         <Link to="/" className="mt-4 inline-block text-[16px] font-medium text-accent-ink underline underline-offset-2">
           Back to the program list
         </Link>
