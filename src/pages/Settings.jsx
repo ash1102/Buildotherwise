@@ -388,6 +388,7 @@ export default function Settings() {
           ) : (
             <button type="button" className={`mt-3 ${secondaryButton}`} onClick={() => setConfirmClear(true)}>
               Delete my workbook and discoveries
+            </button>
           )}
         </div>
 
