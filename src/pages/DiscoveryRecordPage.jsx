@@ -46,9 +46,8 @@ export default function DiscoveryRecordPage() {
         (entry.decision_updates || []).forEach((update) =>
           parts.push(`Earlier decision: ${update.decision} (${moment(update.date).format("D MMMM YYYY")})`)
         );
-        if (entry.source && entry.source.label) {
-          parts.push(`From: ${entry.source.lesson_title || entry.source.label}`);
-        }
+        const from = entry.source && (entry.source.lesson_title || entry.source.label || entry.source.question_text);
+        if (from) parts.push(`From: ${from}`);
         contextRows(entry.context).forEach((row) => parts.push(`- ${row.label} ${row.value}`));
         return parts.join("\n");
       });
