@@ -186,6 +186,25 @@ export async function deleteRecord(id) {
   return entity().delete(id);
 }
 
+/** Every LearnerRecord on this account, read in pages. Throws rather than returning a partial list. */
+export async function listAllMyRecords(pageSize = 200) {
+  const all = [];
+  const seen = new Set();
+  for (let skip = 0; ; skip += pageSize) {
+    const page = (await entity().list("-updated_date", pageSize, skip)) || [];
+    let fresh = 0;
+    for (const row of page) {
+      if (!seen.has(row.id)) {
+        seen.add(row.id);
+        all.push(row);
+        fresh += 1;
+      }
+    }
+    if (page.length < pageSize) return all;
+    if (!fresh) throw new Error("Paging stopped returning new rows, so the list would be incomplete.");
+  }
+}
+
 /** Loads the signed-in learner's records, keyed by type (newest wins if there are two). */
 export function useLearnerRecords() {
   const [byType, setByType] = useState({});
