@@ -141,6 +141,93 @@ export function updateDiscovery(id, patch) {
   });
 }
 
+/**
+ * Saves a new entry and resolves only once the account has confirmed it.
+ * Use this where the participant needs to know the save happened (the Save button on Discovery).
+ * Resolves to the saved entry, or rejects with the error so the caller can keep the words on screen.
+ */
+export async function createDiscoveryConfirmed(fields = {}) {
+  const now = new Date().toISOString();
+  const decision = fields.decision || "";
+  const payload = {
+    title: "",
+    body: "",
+    context: {},
+    decision: "",
+    decision_date: "",
+    decision_note: "",
+    decision_updates: [],
+    source: null,
+    ...fields,
+    decision,
+    decision_date: decision ? now : "",
+  };
+  const row = await entity().create(toPayload(payload));
+  const entry = fromRow({ ...payload, ...row });
+  cache = sortNewest([...cache.filter((item) => item.id !== entry.id), entry]);
+  notify();
+  return entry;
+}
+
+/** Updates an entry and resolves only once the account has confirmed it. Rejects on failure. */
+export async function updateDiscoveryConfirmed(id, patch) {
+  const realId = await resolveId(id);
+  if (!realId) throw new Error("This entry hasn't reached your account yet. Try again in a moment.");
+  const row = await entity().update(realId, patch);
+  cache = cache.map((entry) =>
+    entry.id === id ? { ...entry, ...patch, updated_date: row?.updated_date || new Date().toISOString() } : entry
+  );
+  notify();
+  return row;
+}
+
+/**
+ * One-time move of DiscoveryThread rows into DiscoveryRecord.
+ * Idempotent: each thread's id is stored on the new entry as source.thread_id, and any thread that already
+ * has a record is skipped. Original DiscoveryThread rows are never deleted here.
+ * Returns { moved, skipped, failed }.
+ */
+export async function migrateThreadsToRecords(listThreads) {
+  const result = { moved: 0, skipped: 0, failed: 0 };
+  const threads = (await listThreads()) || [];
+  const existing = (await entity().list("-created_date", 1000)) || [];
+  const alreadyMoved = new Set(existing.map((row) => row?.source?.thread_id).filter(Boolean));
+
+  for (const thread of threads) {
+    if (alreadyMoved.has(thread.id)) {
+      result.skipped += 1;
+      continue;
+    }
+    try {
+      await entity().create(
+        toPayload({
+          ...emptyDiscovery(),
+          title: thread.title || "",
+          body: thread.response || "",
+          source: {
+            thread_id: thread.id,
+            kind: thread.source || "",
+            question_id: thread.question_id || "",
+            question_text: thread.question_text || "",
+            path_id: thread.path_id || "",
+            follow_up_text: thread.follow_up_text || "",
+            option_id: thread.option_id || "",
+            option_label: thread.option_label || "",
+            notes: thread.notes || "",
+            migrated_from: "DiscoveryThread",
+          },
+        })
+      );
+      alreadyMoved.add(thread.id);
+      result.moved += 1;
+    } catch (error) {
+      console.error("Could not migrate a discovery thread", error);
+      result.failed += 1;
+    }
+  }
+  return result;
+}
+
 export function removeDiscovery(id) {
   cache = cache.filter((entry) => entry.id !== id);
   notify();
