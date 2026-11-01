@@ -66,8 +66,13 @@ test("only three follow-ups are rewritten by path, the rest stay original, and e
       const key = `${point.id}/${id}`;
       const framed = framingFor(point.id, id);
       assert.equal(framed.followUp, rewritten[key] || QUESTIONS[id].followUp, `${key} follow-up`);
-      assert.ok(PATH_FRAMING[point.id][id].experiment, `${key} keeps a path experiment`);
-      assert.equal(framed.experiment, PATH_FRAMING[point.id][id].experiment, `${key} experiment`);
+      const pathEntry = PATH_FRAMING[point.id][id];
+      if (point.order[0] === id && point.id === "attention") {
+        assert.equal(framed.experiment, QUESTIONS[id].experiment, `${key} opening question uses its own experiment`);
+      } else {
+        assert.ok(pathEntry && pathEntry.experiment, `${key} keeps a path experiment`);
+        assert.equal(framed.experiment, pathEntry.experiment, `${key} experiment`);
+      }
     }
   }
   assert.equal(Object.values(PATH_FRAMING).flatMap((p) => Object.values(p)).filter((e) => e.followUp).length, 3);
