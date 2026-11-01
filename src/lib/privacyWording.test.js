@@ -27,6 +27,6 @@ test("no cross-device promise and no 'only you' claim in participant-facing copy
 });
 
 test("administrative access is still explained", () => {
-  assert.match(flat("src/pages/Settings.jsx"), /Ashley runs the app, so she can see what’s stored/);
+  assert.match(flat("src/pages/Settings.jsx"), /Build Otherwise runs this app, so our team can see what’s stored on it/);
   assert.match(flat("src/components/records/RecordsPrivacyNotice.jsx"), /technical access to that database/);
 });
