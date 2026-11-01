@@ -27,7 +27,7 @@ export default function StepList({ section }) {
           <p className="mt-2 text-[14px] text-muted-faint">
             {partsFor(step).join(" · ") || "No parts yet"}
             {step.decision ? " · Next Decision" : ""}
-            {step.closesPilot ? " · closes Pilot 1" : ""}
+            {step.closesPilot ? " · last open step" : ""}
           </p>
           <Link
             to={`/preview/step/${step.code}`}
