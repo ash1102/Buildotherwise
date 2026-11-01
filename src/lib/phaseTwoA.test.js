@@ -5,9 +5,12 @@ import {
   QUESTIONS,
   STARTING_POINTS,
   NO_CHOICE_THOUGHT,
+  PATH_FRAMING,
   anotherQuestionFor,
   firstQuestionFor,
+  framingFor,
   nextQuestionFor,
+  questionsForPath,
   thoughtFor,
 } from "./dashboardDiscovery.js";
 import { cleanWelcomeReturn, rememberWelcomeReturn, takeWelcomeDestination } from "./welcomeReturn.js";
