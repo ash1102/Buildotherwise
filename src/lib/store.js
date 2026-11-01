@@ -19,7 +19,6 @@ export const SYNCED_KEYS = new Set([
   "lifeMapPick",
   "lifeMapPositions",
   "discoveryNotes",
-  "discoveries",
   "plannedTry",
   "tryCheckIns",
   "moduleOpenedAt",
