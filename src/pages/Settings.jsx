@@ -14,6 +14,7 @@ import MyGettingStarted from "@/components/gettingStarted/MyGettingStarted";
 import { Link } from "react-router-dom";
 import { deleteRecord, listMyRecords } from "@/lib/learnerRecords";
 import { deleteAllThreads, discoveryExportLines, listMyThreads } from "@/lib/discoveryThreads";
+import { deleteAllDiscoveryRecords, listDiscoveries, recordExportLines } from "@/lib/discoveries";
 
 const STORE_PREFIX = "entrepalooza.v1.";
 const CONTACT = "Start@buildotherwise.org";
@@ -204,6 +205,7 @@ export default function Settings() {
     try {
       const threads = (await listMyThreads()) || [];
       text = `${text}\n${discoveryExportLines(threads).join("\n")}`;
+      text = `${text}\n${recordExportLines(listDiscoveries()).join("\n")}`;
     } catch {
       toast({ title: "Your workbook downloaded, but My Discoveries couldn’t be added. Try again in a moment." });
     }
@@ -213,7 +215,9 @@ export default function Settings() {
   const deleteAllDiscoveries = async () => {
     setDeletingDiscoveries(true);
     try {
-      const count = await deleteAllThreads();
+      const threadCount = await deleteAllThreads();
+      const recordCount = await deleteAllDiscoveryRecords();
+      const count = threadCount + recordCount;
       setConfirmDiscoveries(false);
       toast({ title: count ? "Your discoveries were deleted from your account." : "You have no saved discoveries." });
     } catch {
@@ -335,8 +339,8 @@ export default function Settings() {
             My Records
           </Link>{" "}
           and{" "}
-          <Link to="/my-discoveries" className="font-medium text-accent-ink underline underline-offset-2">
-            My Discoveries
+          <Link to="/record" className="font-medium text-accent-ink underline underline-offset-2">
+            Discovery Record
           </Link>{" "}
           are saved to your account too, only when you press Save. Everything is kept in the app’s database, hosted by Base44. Other participants can’t open it. Build Otherwise runs this app, so our team can see what’s stored on it. Your entries stay private unless you choose to share them.
         </p>
