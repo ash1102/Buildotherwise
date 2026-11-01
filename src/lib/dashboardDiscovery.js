@@ -12,17 +12,17 @@ export const STARTING_POINTS = [
   {
     id: "attention",
     label: "Something keeps catching my attention.",
-    order: ["lost-track", "mild-curiosity", "self-taught", "overlooked"],
+    order: ["noticing", "overlooked", "lost-track", "self-taught", "mild-curiosity", "change"],
   },
   {
     id: "different",
     label: "I want something different, but I don’t know what.",
-    order: ["overlooked", "self-taught", "mild-curiosity", "lost-track"],
+    order: ["change", "lost-track", "self-taught", "overlooked", "mild-curiosity", "noticing"],
   },
   {
     id: "looking",
     label: "I’m just looking around.",
-    order: ["mild-curiosity", "self-taught", "lost-track", "overlooked"],
+    order: ["mild-curiosity", "self-taught", "overlooked", "lost-track", "noticing", "change"],
   },
 ];
 
@@ -126,6 +126,71 @@ export const QUESTIONS = {
     experiment:
       "The next time you lose track of time, write down what you were doing in one line. Don’t decide what it means.",
   },
+  noticing: {
+    id: "noticing",
+    text: "What’s something you keep noticing that other people don’t seem to pay much attention to?",
+    followUp: "What makes you want to understand it better?",
+    options: [
+      {
+        id: "keeps",
+        label: "I keep coming back to it.",
+        thought:
+          "Coming back to something again and again means it has hold of you. It doesn’t have to be more than that yet.",
+      },
+      {
+        id: "why",
+        label: "I wonder why others don’t see it.",
+        thought:
+          "Noticing what others miss is a real kind of attention. It can also just mean you see things from a different angle, which is worth knowing about yourself.",
+      },
+      {
+        id: "common",
+        label: "I want to know whether it’s common.",
+        thought:
+          "Checking how common something is makes a good first step. You can find out without deciding what it means.",
+      },
+      {
+        id: "stands",
+        label: "I’m not sure. It just stands out.",
+        thought: "That’s enough. Plenty of interests begin with something that simply stood out.",
+      },
+    ],
+    experiment:
+      "Write it down in one sentence, without deciding whether it matters. Come back to that sentence in a week and notice whether it still catches you.",
+  },
+  change: {
+    id: "change",
+    text: "If something about your ordinary week could be different, what would you want more of—or less of?",
+    followUp: "Which of those feels closest to true right now?",
+    options: [
+      {
+        id: "more",
+        label: "More of something small I already enjoy.",
+        thought:
+          "Small changes to an ordinary week are often the most reachable. Starting small doesn’t mean aiming low.",
+      },
+      {
+        id: "less",
+        label: "Less of something that wears me down.",
+        thought:
+          "Knowing what you want less of can be as useful as knowing what you want more of. It points at the friction, which is often where the real options are.",
+      },
+      {
+        id: "time",
+        label: "A different use of my time, not a different life.",
+        thought:
+          "A change doesn’t have to be large to matter. Rearranging an hour or two can be enough to notice a difference.",
+      },
+      {
+        id: "unsure",
+        label: "I’m not sure yet.",
+        thought:
+          "Not knowing yet is a normal place to be. You can leave the question open and still learn from it.",
+      },
+    ],
+    experiment:
+      "For one day, notice the moments your week feels lighter and the moments it feels heavier. Write one line for each. Don’t change anything yet.",
+  },
   "mild-curiosity": {
     id: "mild-curiosity",
     text: "What’s something you’re mildly curious about—not passionate about, not talented at, just curious about?",
@@ -164,6 +229,15 @@ export const QUESTIONS = {
 /** What a visitor sees after skipping the follow-up, or when no option fits. */
 export const NO_CHOICE_THOUGHT =
   "There’s no right answer here, and leaving it open is a fine answer too.";
+
+/**
+ * Every question on a path, in that path's order: its own questions first, then the rest.
+ * Nothing is hidden. A participant can open any of them from any path.
+ */
+export function questionsForPath(pointId) {
+  const point = startingPoint(pointId);
+  return point ? point.order.map((id) => QUESTIONS[id]) : [];
+}
 
 export function startingPoint(id) {
   return STARTING_POINTS.find((point) => point.id === id) || null;
