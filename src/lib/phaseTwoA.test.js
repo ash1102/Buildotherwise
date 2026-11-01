@@ -181,3 +181,42 @@ test("Let me in moves on only on a new tap, and the gate remembers the request",
   assert.match(read("src/pages/LessonPage.jsx"), /GettingStartedRedirect/);
   assert.match(read("src/lib/destinationAfterAuth.js"), /rememberWelcomeReturn\(dest\)/);
 });
+
+test("the all-saved banner is gone, and per-module saved counts and the page heading are intact", () => {
+  const home = read("src/pages/CurriculumHome.jsx");
+  assert.doesNotMatch(home, /Every open step has something saved|saved-heading|See what you gathered/);
+  assert.match(home, /moduleProgressLabel\(row\)/);
+  assert.match(home, /moduleProgressDescription\(row\)/);
+  assert.match(home, /usePacedProgress\(\{ modules, lessonsByOrder, answers, states \}\)/);
+  assert.match(home, /headingLevel=\{started && next \? "h2" : "h1"\}/, "the page always keeps exactly one h1");
+});
+
+test("question navigation: one featured question, the full list only behind a collapsed control", () => {
+  const view = read("src/components/discovery/DiscoveryStart.jsx");
+  for (const label of ["Explore this one", "Show me another question", "Browse all questions"]) assert.ok(view.includes(label), label);
+  assert.match(view, /const \[open, setOpen\] = useState\(false\)/, "starts collapsed");
+  assert.match(view, /aria-expanded=\{open\}/);
+  assert.match(view, /\{open \? \(\s*<div id=\{panelId\}/, "the list renders only when opened");
+  assert.doesNotMatch(view, /OtherQuestions|Explore a different question/);
+  assert.match(view, /Skip this and go to the workbook/);
+  assert.match(view, /Start over/);
+  for (const point of STARTING_POINTS) {
+    const { closest, rest } = groupQuestionsForPath(point.id);
+    assert.deepEqual([...closest, ...rest].map((q) => q.id), point.order, `${point.id}: all six, in path order`);
+    assert.equal(closest.length, 3);
+    assert.equal(rest.length, 3);
+  }
+});
+
+test("colour: dashboard and discovery use the plum family, marigold stays on the primary-action button only", () => {
+  const css = read("src/index.css");
+  assert.match(css, /\.discovery-surface \{[^}]*--primary: 277 34\.3% 26\.9%/);
+  assert.match(css, /\.dark \.dashboard-plum \{[^}]*--primary: 277 34\.3% 26\.9%[^}]*--card: 272\.7 24\.4% 17\.6%/);
+  assert.doesNotMatch(css, /\.dark \.discovery-surface/, "no second, grayer plum for dark mode");
+  const view = read("src/components/discovery/DiscoveryStart.jsx");
+  const marigold = view.split("\n").filter((line) => line.includes("bg-primary-soft"));
+  assert.equal(marigold.length, 1, "marigold appears once, in primaryButton");
+  assert.match(marigold[0], /primaryButton|inline-flex/);
+  assert.doesNotMatch(view, /peer-checked:bg-primary-soft/, "selected answers are plum, not marigold");
+  assert.match(read("src/pages/CurriculumHome.jsx"), /className="dashboard-plum space-y-10"/);
+});
