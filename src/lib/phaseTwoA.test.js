@@ -141,22 +141,26 @@ test("the copy never names a strength, talent, passion or business opportunity",
   }
 });
 
-test("Discovery writes only on an explicit Save, and only to DiscoveryThread", () => {
+test("Discovery writes only on an explicit Save, and only to the Discovery Record, after the account confirms", () => {
   const start = read("src/components/discovery/DiscoveryStart.jsx");
   assert.doesNotMatch(start, /localStorage|sessionStorage|useStore|writeStore|readStore|base44|entities|fetch\(|setItem|useWorkbook|useLifeMap|useJournal|learnerRecords|LearnerRecord|UserStore/);
   assert.doesNotMatch(read("src/lib/dashboardDiscovery.js"), /base44|entities|fetch\(|localStorage/);
+  assert.doesNotMatch(start, /createThread\(|updateThread\(/, "new saves no longer go to the old DiscoveryThread storage");
   // The only calls that write are inside saveDiscovery, and saveDiscovery runs only from the Save form's submit.
-  assert.equal((start.match(/createThread\(|updateThread\(/g) || []).length, 2);
+  assert.equal((start.match(/createDiscoveryConfirmed\(|updateDiscoveryConfirmed\(/g) || []).length, 2);
+  assert.doesNotMatch(start, /createDiscovery\(|updateDiscovery\(/, "never the fire-and-forget versions");
   const fn = start.slice(start.indexOf("const saveDiscovery"), start.indexOf("const OriginalResponse"));
-  assert.match(fn, /createThread\(data\)/);
-  assert.match(fn, /updateThread\(state\.savedId, data\)/);
+  assert.match(fn, /await createDiscoveryConfirmed\(recordFieldsFromDiscovery\(data\)\)/);
+  assert.match(fn, /await updateDiscoveryConfirmed\(state\.savedId, recordFieldsFromDiscovery\(data\)\)/);
+  assert.ok(fn.indexOf("await") < fn.indexOf("Saved to Discovery Record"), "success is shown only after the save resolves");
+  assert.match(fn, /catch[\s\S]*Your words are still here/, "a failed save keeps the words on screen");
   assert.equal((start.match(/saveDiscovery\(\)/g) || []).length, 1, "called once, from the form submit");
   assert.match(start, /onSubmit=\{\(event\) => \{\s*event\.preventDefault\(\);\s*saveDiscovery\(\);/);
-  assert.match(start, /Nothing you choose or type here is saved unless you press Save to My Discoveries/);
+  assert.match(start, /Nothing you choose or type here is saved unless you press Save to Discovery Record/);
   assert.doesNotMatch(start, /SAVING_READY/);
 });
 
-test("My Discoveries saves what was on screen, in the participant's words, and nothing else", () => {
+test("Saving from Discovery keeps what was on screen, in the participant's words, and nothing else", () => {
   const picked = threadFromDiscovery({
     title: "  ",
     state: { questionId: "noticing", pointId: "attention", own: false, text: "  the way lists calm me ", optionId: QUESTIONS.noticing.options[0].id, notes: " more later " },
@@ -190,7 +194,7 @@ test("the download text carries saved discoveries and nothing is invented", () =
     { title: "A", created_date: "2026-01-02T00:00:00Z", question_text: "Q?", response: "mine", notes: "n", source: "question", option_label: "opt", follow_up_text: "F?" },
     { title: "B", source: "own", response: "own words", question_text: "Your own question or observation" },
   ]).join("\n");
-  assert.match(text, /## My Discoveries \(2 discoveries\)/);
+  assert.match(text, /## Discovery Record: earlier saves \(2 discoveries\)/);
   assert.match(text, /Your response: mine/);
   assert.match(text, /Your question or observation: own words/);
   assert.match(text, /You chose: opt/);
@@ -208,11 +212,11 @@ test("DiscoveryThread is owner-only on every operation, stored apart from the Jo
   const lib = read("src/lib/discoveryThreads.js");
   assert.match(lib, /entities\.DiscoveryThread/);
   assert.doesNotMatch(lib, /LearnerRecord|UserStore|writeStore|localStorage|useJournal|useLifeMap|entities\.(Journal|LifeMap)/);
-  const page = read("src/pages/MyDiscoveriesPage.jsx");
-  assert.doesNotMatch(page, /localStorage|LearnerRecord|UserStore|useJournal|useLifeMap|writeStore/);
-  assert.match(read("src/App.jsx"), /path="\/my-discoveries"/);
-  assert.match(read("src/pages/CurriculumHome.jsx"), /to="\/my-discoveries"/);
-  assert.match(read("src/pages/Settings.jsx"), /Delete all My Discoveries/);
+  const page = read("src/pages/DiscoveryRecordPage.jsx") + read("src/components/discovery/DiscoveryFlowEntry.jsx");
+  assert.doesNotMatch(page, /localStorage|LearnerRecord|useJournal|useLifeMap|writeStore/);
+  assert.match(read("src/App.jsx"), /path="\/my-discoveries" element=\{<Navigate to="\/record" replace \/>\}/, "old links redirect");
+  assert.match(read("src/pages/CurriculumHome.jsx"), /to="\/record"/);
+  assert.match(read("src/pages/Settings.jsx"), /Delete my whole Discovery Record/);
   assert.match(read("src/pages/Settings.jsx"), /discoveryExportLines/);
 });
 
@@ -307,7 +311,7 @@ test("returning participants: Discovery first, a smaller Continue card right bel
 
 test("Notice -> Explore -> Choose: own words, one follow-up, four choices, experiments only on request", () => {
   const view = read("src/components/discovery/DiscoveryStart.jsx");
-  for (const label of ["Write my own instead", "Keep exploring", "Save to My Discoveries", "Try something related", "Explore something else", "Start over"]) {
+  for (const label of ["Write my own instead", "Keep exploring", "Save to Discovery Record", "Try something related", "Explore something else", "Start over"]) {
     assert.ok(view.includes(label), label);
   }
   assert.equal((view.match(/\{followUp\}/g) || []).length >= 1, true);
