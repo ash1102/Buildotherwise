@@ -13,8 +13,9 @@ import { useToast } from "@/components/ui/use-toast";
 import MyGettingStarted from "@/components/gettingStarted/MyGettingStarted";
 import { Link } from "react-router-dom";
 import { deleteRecord, listAllMyRecords } from "@/lib/learnerRecords";
-import { deleteAllThreads, discoveryExportLines, listMyThreads } from "@/lib/discoveryThreads";
-import { deleteAllDiscoveryRecords, listDiscoveries, recordExportLines } from "@/lib/discoveries";
+import { deleteAllThreads, discoveryExportLines } from "@/lib/discoveryThreads";
+import { deleteAllDiscoveryRecords, listAllDiscoveryRecords, listAllThreads, recordExportLines } from "@/lib/discoveries";
+import { threadsForExport } from "@/lib/discoveryMigration";
 import { runSteps } from "@/lib/deletionSteps";
 
 const STORE_PREFIX = "entrepalooza.v1.";
@@ -227,12 +228,15 @@ export default function Settings() {
   const download = async () => {
     const stamp = new Date().toISOString().slice(0, 10);
     let text = buildExport(lessonsByCode || {});
+    // Read straight from the account, so the Discovery Record is included even if its page was never opened.
+    // A discovery moved into the Discovery Record is written once: its original copy is left out.
     try {
-      const threads = (await listMyThreads()) || [];
-      text = `${text}\n${discoveryExportLines(threads).join("\n")}`;
-      text = `${text}\n${recordExportLines(listDiscoveries()).join("\n")}`;
+      const [records, threads] = await Promise.all([listAllDiscoveryRecords(), listAllThreads()]);
+      text = `${text}\n${recordExportLines(records).join("\n")}`;
+      const earlier = threadsForExport(threads, records);
+      if (earlier.length) text = `${text}\n${discoveryExportLines(earlier).join("\n")}`;
     } catch {
-      toast({ title: "Your workbook downloaded, but My Discoveries couldn’t be added. Try again in a moment." });
+      toast({ title: "Your workbook downloaded, but your Discovery Record couldn’t be added. Try again in a moment." });
     }
     downloadText(`entrepalooza-workbook-${stamp}.md`, text);
   };
@@ -244,9 +248,9 @@ export default function Settings() {
       const recordCount = await deleteAllDiscoveryRecords();
       const count = threadCount + recordCount;
       setConfirmDiscoveries(false);
-      toast({ title: count ? "Your discoveries were deleted from your account." : "You have no saved discoveries." });
+      toast({ title: count ? "Your Discovery Record was deleted from your account." : "Your Discovery Record has nothing in it." });
     } catch {
-      toast({ title: `Some discoveries didn't delete. Try again, or email ${CONTACT}.` });
+      toast({ title: `Some Discovery Record entries didn't delete. Try again, or email ${CONTACT}.` });
     } finally {
       setDeletingDiscoveries(false);
     }
@@ -434,15 +438,15 @@ export default function Settings() {
         </div>
 
         <div className="border-t border-border pt-4">
-          <h3 className="text-[16px]">Delete all My Discoveries from my account</h3>
+          <h3 className="text-[16px]">Delete my whole Discovery Record from my account</h3>
           <p className="mt-1 text-[15px] leading-relaxed text-muted-foreground">
-            Removes every discovery on your My Discoveries page from the database. Your workbook, journal and records
-            stay. You can also delete discoveries one at a time on the My Discoveries page.
+            Removes every entry in your Discovery Record from the database, including any earlier saved copies. Your
+            workbook, journal and My Records stay. You can also delete entries one at a time on the Discovery Record page.
           </p>
           {confirmDiscoveries ? (
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" className={dangerButton} disabled={deletingDiscoveries} onClick={deleteAllDiscoveries}>
-                {deletingDiscoveries ? "Deleting…" : "Yes, delete all my discoveries"}
+                {deletingDiscoveries ? "Deleting…" : "Yes, delete my whole Discovery Record"}
               </button>
               <button type="button" className={secondaryButton} onClick={() => setConfirmDiscoveries(false)}>
                 Cancel
@@ -450,7 +454,7 @@ export default function Settings() {
             </div>
           ) : (
             <button type="button" className={`mt-3 ${secondaryButton}`} onClick={() => setConfirmDiscoveries(true)}>
-              Delete all My Discoveries
+              Delete my whole Discovery Record
             </button>
           )}
         </div>

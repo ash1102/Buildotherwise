@@ -1,7 +1,7 @@
 import { QUESTIONS, framingFor, startingPoint } from "./dashboardDiscovery.js";
 
 /**
- * The plain, no-network half of My Discoveries: what gets saved from Discovery, titles, and the download text.
+ * The plain, no-network half of saving from Discovery: what gets saved from Discovery, titles, and the download text.
  * Kept free of the account client so it can be tested on its own.
  */
 
@@ -47,7 +47,7 @@ export function pathLabel(pathId) {
 
 /** Lines for the account download. Each field is the participant's own words or the wording they saw. */
 export function discoveryExportLines(threads) {
-  const lines = [`## My Discoveries (${threads.length} ${threads.length === 1 ? "discovery" : "discoveries"})`, ""];
+  const lines = [`## Discovery Record: earlier saves (${threads.length} ${threads.length === 1 ? "discovery" : "discoveries"})`, ""];
   [...threads]
     .sort((a, b) => ((a.created_date || "") > (b.created_date || "") ? 1 : -1))
     .forEach((t) => {
