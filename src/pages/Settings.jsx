@@ -175,12 +175,12 @@ async function deleteAllMyRecords() {
   return rows.length;
 }
 
-/** Everything the workbook delete covers, in order. */
+/** Everything the workbook delete covers. The workbook (which also holds the migration record) goes last, so a failure earlier cannot leave discoveries that a later migration would recreate. */
 const WORKBOOK_STEPS = () => [
-  ["your journal and workbook", deleteAccountWorkbook],
   ["your discoveries", deleteAllThreads],
   ["your Discovery Record", deleteAllDiscoveryRecords],
   ["My Records", deleteAllMyRecords],
+  ["your journal and workbook", deleteAccountWorkbook],
 ];
 
 const SYNC_WORDS = {
