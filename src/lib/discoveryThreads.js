@@ -30,12 +30,17 @@ export function deleteThread(id) {
   return entity().delete(id);
 }
 
+/** Deletes every thread on this account. Reads again after each batch, so accounts over 200 rows are cleared too. */
 export async function deleteAllThreads() {
-  const rows = (await listMyThreads()) || [];
-  for (const row of rows) {
-    await deleteThread(row.id);
+  let total = 0;
+  for (;;) {
+    const rows = (await listMyThreads()) || [];
+    if (!rows.length) return total;
+    for (const row of rows) {
+      await deleteThread(row.id);
+      total += 1;
+    }
   }
-  return rows.length;
 }
 
 /** Loads the signed-in participant's saved discoveries. */
