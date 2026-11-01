@@ -196,7 +196,8 @@ export default function DiscoveryRecordPage() {
           Two different things live on this page. <strong className="font-semibold text-foreground">Saved answers</strong> are
           what the steps already hold, kept where you wrote them.{" "}
           <strong className="font-semibold text-foreground">Discoveries you keep</strong> are the few things you choose to
-          carry forward yourself. Nothing is added here on your behalf.
+          carry forward yourself, added here or saved from Discovery on your dashboard. Open one to change it, change
+          what you chose, or try something related. Nothing is added here on your behalf.
         </p>
         <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-faint">
           This is not a score or a finished account of who you are. A few words, uncertainty, or nothing to add yet are all
@@ -266,8 +267,8 @@ export default function DiscoveryRecordPage() {
           <div className="rounded-xl border border-dashed border-input bg-card p-5">
             <p className="text-[17px] font-semibold text-foreground">Nothing kept yet.</p>
             <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
-              Keep something when it is worth carrying forward. Answers you saved in the steps below are already yours and
-              do not need adding here.
+              Keep something when it is worth carrying forward, here or with Save to Discovery Record on your dashboard.
+              Answers you saved in the steps below are already yours and do not need adding here.
             </p>
           </div>
         )}
