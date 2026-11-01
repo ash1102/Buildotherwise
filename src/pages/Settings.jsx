@@ -338,8 +338,7 @@ export default function Settings() {
           <Link to="/my-discoveries" className="font-medium text-accent-ink underline underline-offset-2">
             My Discoveries
           </Link>{" "}
-          are saved to your account too, only when you press Save. Everything is kept in the app’s database, hosted by Base44. Other participants can’t open it. Ashley runs the app, so she can see what’s stored, but she doesn’t
-          read your entries unless you share them.
+          are saved to your account too, only when you press Save. Everything is kept in the app’s database, hosted by Base44. Other participants can’t open it. Build Otherwise runs this app, so our team can see what’s stored on it. Your entries stay private unless you choose to share them.
         </p>
         <button type="button" onClick={download} className={primaryButton}>
           <Download className="h-4 w-4" aria-hidden="true" />
