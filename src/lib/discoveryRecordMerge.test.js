@@ -489,3 +489,33 @@ test("wiring: migrate, delete one and delete all all take the lock; reads merge 
   assert.equal(MIGRATION_SWITCH.enabled, false);
   assert.deepEqual(MIGRATION_SWITCH.testEmails, []);
 });
+
+test("deleting a migrated entry also deletes repeat copies of that same discovery first, and only those", async () => {
+  const calls = [];
+  const io = {
+    tombstone: async () => calls.push("tombstone"),
+    deleteRecord: async () => calls.push("deleteVisible"),
+    findThreadRows: async () => [{ id: "t1" }],
+    deleteThread: async () => calls.push("deleteThread"),
+    findSiblingRecordIds: async (id) => { calls.push(`siblings:${id}`); return ["dup-1", "dup-2"]; },
+    deleteRecordById: async (id) => calls.push(`delete:${id}`),
+  };
+  await deleteMigratedEntry({ entry: migratedEntry(), ...io });
+  assert.deepEqual(calls, ["tombstone", "siblings:t1", "delete:dup-1", "delete:dup-2", "deleteVisible", "deleteThread"]);
+
+  const failing = [];
+  const bad = { ...io, deleteRecordById: async () => { failing.push("x"); throw new Error("nope"); }, deleteRecord: async () => failing.push("visible") };
+  await assert.rejects(deleteMigratedEntry({ entry: migratedEntry(), ...bad }));
+  assert.deepEqual(failing, ["x"], "if a repeat copy can't be deleted the visible entry stays, so the person can retry");
+
+  const plain = [];
+  await deleteMigratedEntry({ entry: { id: "r9", source: { kind: "question" } }, ...io, findSiblingRecordIds: async () => { plain.push("looked"); return ["dup"]; }, deleteRecord: async () => plain.push("visible") });
+  assert.deepEqual(plain, ["visible"], "an entry that wasn't moved never looks for siblings");
+});
+
+test("the Discovery Record page reads again after the move even when this tab copied nothing", () => {
+  const page = read("src/pages/DiscoveryRecordPage.jsx");
+  assert.match(page, /await migrateThreadsToRecords\(\);\s*\/\/[^\n]*\n\s*await reloadDiscoveries\(\);/);
+  assert.doesNotMatch(page, /if \(result\.moved\)/);
+  assert.match(read("src/lib/discoveries.js"), /export async function reloadDiscoveries\(\) \{\s*if \(loading\) await loading/);
+});

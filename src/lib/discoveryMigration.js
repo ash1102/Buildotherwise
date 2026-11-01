@@ -252,6 +252,7 @@ export function dedupeByThreadId(records = []) {
 
 /**
  * Deletes one Discovery Record entry and, if it was moved from DiscoveryThread, its one matching original.
+ *  0. (see below) any repeat copy of the same discovery is deleted first.
  *  1. tombstone(threadId): the thread id is written to the migration record first. If that fails, nothing is
  *     deleted, so a deleted discovery can never be copied back by a later migration.
  *  2. deleteRecord(): the record is deleted.
@@ -259,10 +260,25 @@ export function dedupeByThreadId(records = []) {
  *     id equals source.thread_id. No other row is ever touched.
  * Resolves to { originalKept, threadDeleted }. Rejects (with nothing deleted) if step 1 or 2 fails.
  */
-export async function deleteMigratedEntry({ entry, tombstone, deleteRecord, findThreadRows, deleteThread }) {
+export async function deleteMigratedEntry({
+  entry,
+  tombstone,
+  deleteRecord,
+  findThreadRows,
+  deleteThread,
+  findSiblingRecordIds,
+  deleteRecordById,
+}) {
   const source = entry?.source || {};
   const threadId = source.migrated_from === "DiscoveryThread" && typeof source.thread_id === "string" ? source.thread_id : "";
-  if (threadId) await tombstone(threadId);
+  if (threadId) {
+    await tombstone(threadId);
+    // A repeat copy of this same discovery (from a rare cross-device race) is deleted with it, so it can't surface
+    // once the visible one is gone. Only copies carrying this thread id and the migration marker; all before the
+    // visible entry, so a failure here leaves the visible entry in place and the person can retry.
+    const siblings = findSiblingRecordIds ? (await findSiblingRecordIds(threadId)) || [] : [];
+    for (const id of siblings) await deleteRecordById(id);
+  }
   await deleteRecord();
   if (!threadId) return { originalKept: false, threadDeleted: false };
   try {

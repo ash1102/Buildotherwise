@@ -315,6 +315,11 @@ export function removeDiscoveryConfirmed(id) {
         await writeMigrationState(state);
       },
       deleteRecord: () => entity().delete(realId),
+      findSiblingRecordIds: async (threadId) =>
+        (await listAllRecords())
+          .filter((row) => row.id !== realId && row.source?.thread_id === threadId && row.source?.migrated_from === "DiscoveryThread")
+          .map((row) => row.id),
+      deleteRecordById: (rowId) => entity().delete(rowId),
       findThreadRows: (threadId) => base44.entities.DiscoveryThread.filter({ id: threadId }, "-updated_date", 2),
       deleteThread: (threadId) => base44.entities.DiscoveryThread.delete(threadId),
     });
@@ -432,6 +437,12 @@ async function doLoad() {
   } catch (error) {
     console.error("Discovery Record could not load", error);
   }
+}
+
+/** Loads again after any load already in progress finishes, so a change made meanwhile (a migration) is never missed. */
+export async function reloadDiscoveries() {
+  if (loading) await loading.catch(() => {});
+  return loadDiscoveries();
 }
 
 /** Loads the signed-in participant's Discovery Record from their account. Safe to call repeatedly. */

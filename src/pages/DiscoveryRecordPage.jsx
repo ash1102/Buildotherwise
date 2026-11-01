@@ -9,9 +9,9 @@ import {
   listAllDiscoveryRecords,
   listAllThreads,
   listDiscoveries,
-  loadDiscoveries,
   migrateThreadsToRecords,
   readMovedThreadIds,
+  reloadDiscoveries,
   removeDiscoveryConfirmed,
   updateDiscoveryConfirmed,
   useDiscoveries,
@@ -48,8 +48,9 @@ function useEarlierDiscoveries(email) {
     try {
       if (migrationAllowed(email)) {
         try {
-          const result = await migrateThreadsToRecords();
-          if (result.moved) await loadDiscoveries();
+          await migrateThreadsToRecords();
+          // Always read again: another tab may have done the move while this one waited its turn.
+          await reloadDiscoveries();
         } catch (error) {
           // Nothing is lost: anything not moved is still shown below from its original copy.
           console.error("Discovery migration did not finish", error);
