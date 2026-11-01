@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { PREFIX, makeId, resolveKey } from "./store";
+import { planMigration } from "./discoveryMigration";
 
 /**
  * Discovery Record entries live on the participant's account, one DiscoveryRecord row each,
@@ -222,8 +223,8 @@ function listAllRecords() {
  * later deletes the record, so the thread is never copied again.
  */
 async function readMigrationState() {
-  const rows = (await base44.entities.UserStore.list("-updated_date", 200)) || [];
-  const row = rows.find((item) => item.store_key === MIGRATION_KEY) || null;
+  const rows = (await base44.entities.UserStore.filter({ store_key: MIGRATION_KEY }, "-updated_date", 5)) || [];
+  const row = rows[0] || null;
   let ids = [];
   if (row && row.value) {
     try {
@@ -243,8 +244,12 @@ async function writeMigrationState(state) {
     client_updated_at: Date.now(),
     description: "Discovery migration record. Do not edit.",
   };
-  if (state.row) await base44.entities.UserStore.update(state.row.id, payload);
-  else await base44.entities.UserStore.create(payload);
+  if (state.row) {
+    await base44.entities.UserStore.update(state.row.id, payload);
+  } else {
+    // Keep the new row, so the next write updates it instead of creating a second migration record.
+    state.row = await base44.entities.UserStore.create(payload);
+  }
 }
 
 export async function migrateThreadsToRecords(listThreads = listAllThreads) {
@@ -252,13 +257,14 @@ export async function migrateThreadsToRecords(listThreads = listAllThreads) {
   const state = await readMigrationState();
   const records = await listAllRecords();
   const threads = (await listThreads()) || [];
-  const alreadyMoved = new Set([...state.ids, ...records.map((row) => row?.source?.thread_id).filter(Boolean)]);
+  const plan = planMigration({
+    threads,
+    recordThreadIds: records.map((row) => row?.source?.thread_id),
+    movedIds: [...state.ids],
+  });
+  result.skipped = plan.skipped;
 
-  for (const thread of threads) {
-    if (alreadyMoved.has(thread.id)) {
-      result.skipped += 1;
-      continue;
-    }
+  for (const thread of plan.toCreate) {
     try {
       await entity().create(
         toPayload({
@@ -279,15 +285,21 @@ export async function migrateThreadsToRecords(listThreads = listAllThreads) {
           },
         })
       );
-      alreadyMoved.add(thread.id);
-      state.ids.add(thread.id);
       result.moved += 1;
     } catch (error) {
       console.error("Could not migrate a discovery thread", error);
       result.failed += 1;
+      continue;
+    }
+    // Record each move as it lands, so an interrupted run does not copy the same thread again.
+    state.ids.add(thread.id);
+    try {
+      await writeMigrationState(state);
+    } catch (error) {
+      // The new record's source.thread_id still stops a repeat copy on the next run.
+      console.error("Migration record could not be saved", error);
     }
   }
-  await writeMigrationState(state);
   return result;
 }
 
@@ -373,7 +385,7 @@ function clearDeviceEntries() {
 
 async function doLoad() {
   try {
-    const rows = (await entity().list("-created_date", 500)) || [];
+    const rows = await listAllRecords();
     const remote = rows.map(fromRow);
     const known = new Set(remote.map((entry) => `${entry.title}\u0000${entry.body}`));
 
@@ -411,9 +423,15 @@ export function loadDiscoveries() {
 export async function deleteAllDiscoveryRecords() {
   let total = 0;
   try {
+    let previous = "";
     for (;;) {
       const rows = (await entity().list("-created_date", 200)) || [];
       if (!rows.length) break;
+      const batch = rows.map((row) => row.id).join(",");
+      if (batch === previous) {
+        throw new Error("Rows keep coming back after delete, so deletion stopped. Some entries may remain.");
+      }
+      previous = batch;
       for (const row of rows) {
         await entity().delete(row.id);
         total += 1;
