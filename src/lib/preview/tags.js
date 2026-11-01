@@ -66,5 +66,5 @@ export const NEXT_DECISION_LABELS = [
 export const CONTINUE_LOOKING = "Keep looking";
 
 /** Pilot split from the build brief. */
-export const PILOT_ONE = "Pilot 1";
-export const OPTIONAL_AFTER_PILOT_ONE = "Optional, after Pilot 1";
+export const PILOT_ONE = "Open now";
+export const OPTIONAL_AFTER_PILOT_ONE = "Optional, after Modules 1–5";
