@@ -25,8 +25,8 @@ test("the three starting points each lead to a real question, and all four appro
     "I’m just looking around.",
   ]);
   for (const point of STARTING_POINTS) {
-    assert.equal(point.order.length, 4);
-    assert.equal(new Set(point.order).size, 4);
+    assert.equal(point.order.length, 6);
+    assert.equal(new Set(point.order).size, 6);
     point.order.forEach((id) => assert.ok(QUESTIONS[id], `${point.id} -> ${id}`));
     assert.ok(firstQuestionFor(point.id).text.length > 10);
   }
