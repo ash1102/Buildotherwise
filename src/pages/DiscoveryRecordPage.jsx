@@ -1,9 +1,31 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import moment from "moment";
 import { Download, Plus, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { contextRows, createDiscovery, listDiscoveries, useDiscoveries } from "@/lib/discoveries";
+import {
+  contextRows,
+  createDiscovery,
+  listAllDiscoveryRecords,
+  listAllThreads,
+  listDiscoveries,
+  loadDiscoveries,
+  migrateThreadsToRecords,
+  readMovedThreadIds,
+  removeDiscoveryConfirmed,
+  updateDiscoveryConfirmed,
+  useDiscoveries,
+} from "@/lib/discoveries";
+import {
+  editableFromRecord,
+  editableFromThread,
+  isDiscoveryFlowRecord,
+  migrationAllowed,
+  recordPatchFromEdit,
+  unmovedThreads,
+} from "@/lib/discoveryMigration";
+import { deleteThread, updateThread } from "@/lib/discoveryThreads";
+import { useAuth } from "@/lib/AuthContext";
 import { GROUP_LABELS, entriesFromAnswers, tryLogValues } from "@/lib/discovery";
 import { useDecisions, useDiscoveryNotes, useWorkbook } from "@/lib/workbook";
 import { downloadText } from "@/lib/download";
@@ -11,9 +33,52 @@ import PrivacyNote from "@/components/workbook/PrivacyNote";
 import DiscoveryForm from "@/components/discovery/DiscoveryForm";
 import DiscoveryCard from "@/components/discovery/DiscoveryCard";
 import WorkbookSources from "@/components/discovery/WorkbookSources";
+import DiscoveryFlowEntry from "@/components/discovery/DiscoveryFlowEntry";
+
+/**
+ * Discoveries saved from Discovery before the Discovery Record took them over, read straight from the account.
+ * Shows only threads no record points at, so a moved discovery appears once. When migration is switched on for
+ * this account (see MIGRATION_SWITCH), it runs first; until then the earlier saves are shown and edited in place.
+ */
+function useEarlierDiscoveries(email) {
+  const [threads, setThreads] = useState([]);
+  const [state, setState] = useState("loading");
+
+  const refresh = useCallback(async () => {
+    try {
+      if (migrationAllowed(email)) {
+        try {
+          const result = await migrateThreadsToRecords();
+          if (result.moved) await loadDiscoveries();
+        } catch (error) {
+          // Nothing is lost: anything not moved is still shown below from its original copy.
+          console.error("Discovery migration did not finish", error);
+        }
+      }
+      const [records, all, movedIds] = await Promise.all([listAllDiscoveryRecords(), listAllThreads(), readMovedThreadIds()]);
+      setThreads(unmovedThreads(all, records, movedIds));
+      setState("ready");
+    } catch (error) {
+      console.error("Earlier discoveries could not load", error);
+      setState("failed");
+    }
+  }, [email]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return { threads, setThreads, state };
+}
+
+function newestFirst(a, b) {
+  return (a.created_date || "") < (b.created_date || "") ? 1 : -1;
+}
 
 export default function DiscoveryRecordPage() {
   const discoveries = useDiscoveries();
+  const { user } = useAuth();
+  const earlier = useEarlierDiscoveries(user?.email);
   const { answers } = useWorkbook();
   const decisions = useDecisions();
   const notes = useDiscoveryNotes();
@@ -38,8 +103,14 @@ export default function DiscoveryRecordPage() {
   const download = () => {
     const blocks = [];
 
-    if (discoveries.length) {
-      const lines = discoveries.map((entry) => {
+    if (discoveries.length || earlier.threads.length) {
+      const fromThreads = earlier.threads.map((thread) => ({
+        title: thread.title,
+        body: thread.response,
+        created_date: thread.created_date,
+        source: { question_text: thread.question_text, option_label: thread.option_label, notes: thread.notes },
+      }));
+      const lines = [...discoveries, ...fromThreads].map((entry) => {
         const parts = [`### ${entry.title || moment(entry.created_date).format("D MMMM YYYY")}`];
         parts.push(entry.body || "(no words yet)");
         if (entry.decision) parts.push(`Next decision: ${entry.decision}`);
@@ -48,6 +119,8 @@ export default function DiscoveryRecordPage() {
         );
         const from = entry.source && (entry.source.lesson_title || entry.source.label || entry.source.question_text);
         if (from) parts.push(`From: ${from}`);
+        if (entry.source && entry.source.option_label) parts.push(`You chose: ${entry.source.option_label}`);
+        if (entry.source && entry.source.notes) parts.push(`Your notes: ${entry.source.notes}`);
         contextRows(entry.context).forEach((row) => parts.push(`- ${row.label} ${row.value}`));
         return parts.join("\n");
       });
@@ -75,6 +148,44 @@ export default function DiscoveryRecordPage() {
 
     downloadText("entrepalooza-discovery-record.md", `# Discovery Record\n\n${blocks.join("\n\n")}`);
   };
+
+  const afterDelete = (result) => {
+    const words = result?.originalKept
+      ? "Deleted from your Discovery Record. An earlier saved copy couldn’t be removed; it is still in your download. Try deleting it again from Settings, or email Start@buildotherwise.org."
+      : "Deleted from your Discovery Record.";
+    setStatus(words);
+    toast({ title: words });
+  };
+
+  const items = [
+    ...discoveries.map((entry) =>
+      isDiscoveryFlowRecord(entry)
+        ? {
+            kind: "flow",
+            key: `record-${entry.id}`,
+            created_date: entry.created_date,
+            editable: editableFromRecord(entry),
+            onSave: (next) => updateDiscoveryConfirmed(entry.id, recordPatchFromEdit(entry, next)),
+            onDelete: async () => afterDelete(await removeDiscoveryConfirmed(entry.id)),
+          }
+        : { kind: "card", key: `record-${entry.id}`, created_date: entry.created_date, entry }
+    ),
+    ...earlier.threads.map((thread) => ({
+      kind: "flow",
+      key: `thread-${thread.id}`,
+      created_date: thread.created_date,
+      editable: editableFromThread(thread),
+      onSave: async (next) => {
+        const saved = await updateThread(thread.id, next);
+        earlier.setThreads((list) => list.map((t) => (t.id === thread.id ? { ...t, ...next, ...(saved || {}) } : t)));
+      },
+      onDelete: async () => {
+        await deleteThread(thread.id);
+        earlier.setThreads((list) => list.filter((t) => t.id !== thread.id));
+        afterDelete({ originalKept: false });
+      },
+    })),
+  ].sort(newestFirst);
 
   return (
     <div className="space-y-7">
@@ -135,13 +246,23 @@ export default function DiscoveryRecordPage() {
           {status}
         </p>
 
-        {discoveries.length ? (
+        {earlier.state === "failed" ? (
+          <p className="text-[15px] text-muted-foreground">
+            Some discoveries you saved earlier didn’t load. Refresh the page. Nothing has been deleted.
+          </p>
+        ) : null}
+
+        {items.length ? (
           <div className="space-y-3">
-            {discoveries.map((entry) => (
-              <DiscoveryCard key={entry.id} entry={entry} />
-            ))}
+            {items.map((item) =>
+              item.kind === "card" ? (
+                <DiscoveryCard key={item.key} entry={item.entry} />
+              ) : (
+                <DiscoveryFlowEntry key={item.key} item={item.editable} onSave={item.onSave} onDelete={item.onDelete} />
+              )
+            )}
           </div>
-        ) : adding ? null : (
+        ) : adding || earlier.state === "loading" ? null : (
           <div className="rounded-xl border border-dashed border-input bg-card p-5">
             <p className="text-[17px] font-semibold text-foreground">Nothing kept yet.</p>
             <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
