@@ -22,14 +22,14 @@ import {
 const primaryButton =
   "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-primary-soft px-5 py-3 text-[15px] font-semibold text-[hsl(277_34%_16%)] transition hover:brightness-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground";
 const quietButton =
-  "inline-flex min-h-[44px] items-center justify-center rounded-lg border border-primary-foreground/40 px-5 py-3 text-[15px] font-medium text-primary-foreground transition hover:bg-primary-foreground/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground";
+  "inline-flex min-h-[44px] items-center justify-center rounded-lg border border-border bg-primary-foreground/10 px-5 py-3 text-[15px] font-medium text-primary-foreground transition hover:bg-primary-foreground/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground";
 const textButton =
   "inline-flex min-h-[44px] items-center rounded-md px-1 text-[15px] font-medium text-primary-foreground underline underline-offset-2 transition hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground";
 const choiceButton =
-  "flex min-h-[52px] w-full items-center rounded-xl border border-primary-foreground/40 bg-primary-foreground/10 px-4 py-3 text-left text-[16px] leading-snug text-primary-foreground transition hover:bg-primary-foreground/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground";
+  "flex min-h-[52px] w-full items-center rounded-xl border border-border bg-primary-foreground/10 px-4 py-3 text-left text-[16px] leading-snug text-primary-foreground transition hover:bg-primary-foreground/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground";
 
 const pickButton =
-  "flex min-h-[44px] w-full items-center rounded-lg border border-primary-foreground/30 px-4 py-2.5 text-left text-[15px] leading-snug text-primary-foreground transition hover:bg-primary-foreground/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground";
+  "flex min-h-[44px] w-full items-center rounded-lg border border-border bg-primary-foreground/5 px-4 py-2.5 text-left text-[15px] leading-snug text-primary-foreground transition hover:bg-primary-foreground/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground";
 
 /**
  * All six questions, grouped by the path the participant started on, behind a collapsed control.
@@ -122,8 +122,9 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
   return (
     <section
       aria-labelledby="discovery-heading"
-      className="discovery-surface rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8 sm:py-9"
+      className="discovery-surface relative overflow-hidden rounded-2xl border border-border bg-primary px-5 py-7 text-primary-foreground sm:px-8 sm:py-9"
     >
+      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-primary-soft" />
       {state.stage === "welcome" ? (
         <>
           <Heading
@@ -152,7 +153,7 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
 
       {state.stage === "question" && question ? (
         <>
-          <p className="text-[13px] font-semibold text-primary-foreground/85">A question to look at</p>
+          <p className="text-[13px] font-semibold text-accent-ink">A question to look at</p>
           <Heading
             id="discovery-heading"
             ref={headingRef}
@@ -203,7 +204,7 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
                     onChange={() => setState((c) => ({ ...c, optionId: option.id }))}
                     className="peer sr-only"
                   />
-                  <span className="flex min-h-[52px] items-center gap-3 rounded-xl border border-primary-foreground/40 bg-primary-foreground/10 px-4 py-3 text-[16px] leading-snug text-primary-foreground transition hover:bg-primary-foreground/20 peer-checked:border-primary-foreground peer-checked:bg-primary-foreground/25 peer-checked:font-semibold peer-checked:shadow-[inset_0_0_0_1px_hsl(var(--primary-foreground))] peer-checked:[&_.dot_span]:opacity-100 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary-foreground">
+                  <span className="flex min-h-[52px] items-center gap-3 rounded-xl border border-border bg-primary-foreground/10 px-4 py-3 text-[16px] leading-snug text-primary-foreground transition hover:bg-primary-foreground/20 peer-checked:border-primary-foreground peer-checked:bg-primary-foreground/25 peer-checked:font-semibold peer-checked:shadow-[inset_0_0_0_1px_hsl(var(--primary-foreground))] peer-checked:[&_.dot_span]:opacity-100 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary-foreground">
                     <span aria-hidden="true" className="dot grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 border-primary-foreground/70">
                       <span className="h-2.5 w-2.5 rounded-full bg-primary-foreground opacity-0 transition-opacity" />
                     </span>
@@ -261,8 +262,8 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
                   </p>
                 ) : null}
 
-                <div className="rounded-xl border border-primary-foreground/30 px-4 py-4">
-                  <p className="text-[13px] font-semibold text-primary-foreground/85">A small experiment · optional</p>
+                <div className="rounded-xl border border-border px-4 py-4">
+                  <p className="text-[13px] font-semibold text-accent-ink">A small experiment · optional</p>
                   <p className="mt-1 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/95">
                     {framingFor(state.pointId, question.id).experiment}
                   </p>
@@ -271,7 +272,7 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
 
                 {upNext ? (
                   <div>
-                    <p className="text-[13px] font-semibold text-primary-foreground/85">Another question you might like</p>
+                    <p className="text-[13px] font-semibold text-accent-ink">Another question you might like</p>
                     <p className="mt-1 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/95">{upNext.text}</p>
                     <button type="button" className={`mt-3 ${primaryButton}`} onClick={() => showQuestion(upNext)}>
                       Look at this one
@@ -297,7 +298,7 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
           })()
         : null}
 
-      <div className="mt-6 space-y-3 border-t border-primary-foreground/25 pt-4">
+      <div className="mt-6 space-y-3 border-t border-border pt-4">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
           <button type="button" className={textButton} onClick={onSkip}>
             Skip this and go to the workbook

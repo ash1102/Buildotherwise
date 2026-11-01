@@ -210,13 +210,14 @@ test("question navigation: one featured question, the full list only behind a co
 
 test("colour: dashboard and discovery use the plum family, marigold stays on the primary-action button only", () => {
   const css = read("src/index.css");
-  assert.match(css, /\.discovery-surface \{[^}]*--primary: 277 34\.3% 26\.9%/);
+  assert.match(css, /\.discovery-surface \{[^}]*--primary: 272\.7 24\.4% 17\.6%/, "discovery uses the workbook-card plum");
   assert.match(css, /\.dark \.dashboard-plum \{[^}]*--primary: 277 34\.3% 26\.9%[^}]*--card: 272\.7 24\.4% 17\.6%/);
   assert.doesNotMatch(css, /\.dark \.discovery-surface/, "no second, grayer plum for dark mode");
   const view = read("src/components/discovery/DiscoveryStart.jsx");
   const marigold = view.split("\n").filter((line) => line.includes("bg-primary-soft"));
-  assert.equal(marigold.length, 1, "marigold appears once, in primaryButton");
-  assert.match(marigold[0], /primaryButton|inline-flex/);
+  assert.equal(marigold.length, 2, "marigold appears twice: the primary action button and the thin top edge");
+  assert.ok(marigold.some((line) => /inline-flex/.test(line)));
+  assert.ok(marigold.some((line) => /absolute inset-x-0 top-0 h-1 bg-primary-soft/.test(line)));
   assert.doesNotMatch(view, /peer-checked:bg-primary-soft/, "selected answers are plum, not marigold");
   assert.match(read("src/pages/CurriculumHome.jsx"), /className="dashboard-plum space-y-10"/);
 });
