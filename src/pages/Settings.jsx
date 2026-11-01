@@ -13,6 +13,7 @@ import { useToast } from "@/components/ui/use-toast";
 import MyGettingStarted from "@/components/gettingStarted/MyGettingStarted";
 import { Link } from "react-router-dom";
 import { deleteRecord, listMyRecords } from "@/lib/learnerRecords";
+import { deleteAllThreads, discoveryExportLines, listMyThreads } from "@/lib/discoveryThreads";
 
 const STORE_PREFIX = "entrepalooza.v1.";
 const CONTACT = "Start@buildotherwise.org";
@@ -171,6 +172,8 @@ export default function Settings() {
   const [clearing, setClearing] = useState(false);
   const [confirmRecords, setConfirmRecords] = useState(false);
   const [deletingRecords, setDeletingRecords] = useState(false);
+  const [confirmDiscoveries, setConfirmDiscoveries] = useState(false);
+  const [deletingDiscoveries, setDeletingDiscoveries] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [alsoClear, setAlsoClear] = useState(true);
   const [deleting, setDeleting] = useState(false);
@@ -195,9 +198,29 @@ export default function Settings() {
     }
   };
 
-  const download = () => {
+  const download = async () => {
     const stamp = new Date().toISOString().slice(0, 10);
-    downloadText(`entrepalooza-workbook-${stamp}.md`, buildExport(lessonsByCode || {}));
+    let text = buildExport(lessonsByCode || {});
+    try {
+      const threads = (await listMyThreads()) || [];
+      text = `${text}\n${discoveryExportLines(threads).join("\n")}`;
+    } catch {
+      toast({ title: "Your workbook downloaded, but My Discoveries couldn’t be added. Try again in a moment." });
+    }
+    downloadText(`entrepalooza-workbook-${stamp}.md`, text);
+  };
+
+  const deleteAllDiscoveries = async () => {
+    setDeletingDiscoveries(true);
+    try {
+      const count = await deleteAllThreads();
+      setConfirmDiscoveries(false);
+      toast({ title: count ? "Your discoveries were deleted from your account." : "You have no saved discoveries." });
+    } catch {
+      toast({ title: `Some discoveries didn't delete. Try again, or email ${CONTACT}.` });
+    } finally {
+      setDeletingDiscoveries(false);
+    }
   };
 
   const requestDeletion = async () => {
@@ -311,20 +334,24 @@ export default function Settings() {
           <Link to="/my-records" className="font-medium text-accent-ink underline underline-offset-2">
             My Records
           </Link>{" "}
-          are saved the same way. Everything is kept in the app’s database, hosted by Base44. Other participants can’t open it. Ashley runs the app, so she can see what’s stored, but she doesn’t
+          and{" "}
+          <Link to="/my-discoveries" className="font-medium text-accent-ink underline underline-offset-2">
+            My Discoveries
+          </Link>{" "}
+          are saved to your account too, only when you press Save. Everything is kept in the app’s database, hosted by Base44. Other participants can’t open it. Ashley runs the app, so she can see what’s stored, but she doesn’t
           read your entries unless you share them.
         </p>
         <button type="button" onClick={download} className={primaryButton}>
           <Download className="h-4 w-4" aria-hidden="true" />
-          Download my workbook and reflections
+          Download my workbook, reflections and discoveries
         </button>
 
         <div className="border-t border-border pt-4">
           <h3 className="text-[16px]">Delete my workbook from my account</h3>
           <p className="mt-1 text-[15px] leading-relaxed text-muted-foreground">
             Removes your journal, step answers, decisions and maps from your account and from this device. This can’t be
-            undone, so download a copy first if you want one. It does not delete My Records; use the button below for
-            that.
+            undone, so download a copy first if you want one. It does not delete My Records or My Discoveries; use the
+            buttons below for those.
           </p>
           {confirmClear ? (
             <div className="mt-3 flex flex-wrap gap-2">
@@ -377,6 +404,28 @@ export default function Settings() {
           ) : (
             <button type="button" className={`mt-3 ${secondaryButton}`} onClick={() => setConfirmRecords(true)}>
               Delete all My Records
+            </button>
+          )}
+        </div>
+
+        <div className="border-t border-border pt-4">
+          <h3 className="text-[16px]">Delete all My Discoveries from my account</h3>
+          <p className="mt-1 text-[15px] leading-relaxed text-muted-foreground">
+            Removes every discovery on your My Discoveries page from the database. Your workbook, journal and records
+            stay. You can also delete discoveries one at a time on the My Discoveries page.
+          </p>
+          {confirmDiscoveries ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button type="button" className={dangerButton} disabled={deletingDiscoveries} onClick={deleteAllDiscoveries}>
+                {deletingDiscoveries ? "Deleting…" : "Yes, delete all my discoveries"}
+              </button>
+              <button type="button" className={secondaryButton} onClick={() => setConfirmDiscoveries(false)}>
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button type="button" className={`mt-3 ${secondaryButton}`} onClick={() => setConfirmDiscoveries(true)}>
+              Delete all My Discoveries
             </button>
           )}
         </div>
