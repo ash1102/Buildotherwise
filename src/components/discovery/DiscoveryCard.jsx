@@ -68,16 +68,17 @@ export default function DiscoveryCard({ entry }) {
         </dl>
       ) : null}
 
-      {source && source.label ? (
+      {source && (source.label || source.lesson_title || source.question_text) ? (
         <p className="mt-3 flex flex-wrap items-center gap-1.5 text-[12px] text-teal-deep">
           <BookOpen className="h-3 w-3 shrink-0" aria-hidden="true" />
           From{" "}
-          <Link
-            className={`${LINK_CLASS} hover:text-copper`}
-            to={source.lesson_code ? `/lesson/${source.lesson_code}` : "/journal"}
-          >
-            {source.lesson_title || source.label}
-          </Link>
+          {source.lesson_code ? (
+            <Link className={`${LINK_CLASS} hover:text-copper`} to={`/lesson/${source.lesson_code}`}>
+              {source.lesson_title || source.label || source.lesson_code}
+            </Link>
+          ) : (
+            <span>{source.lesson_title || source.label || source.question_text}</span>
+          )}
           {source.date ? (
             <span className="text-ink-faint">· {moment(source.date).format("D MMM YYYY")}</span>
           ) : null}
