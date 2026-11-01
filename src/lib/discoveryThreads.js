@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { OWN_QUESTION_LABEL, TEXT_MAX, TITLE_MAX } from "@/lib/discoveryThreadData";
 import { deleteAllPaged } from "@/lib/deletionSteps";
+import { withMigrationLock } from "@/lib/discoveryMigration";
 
 /**
  * The original storage for discoveries saved from Discovery on the dashboard. New saves go to the
@@ -34,7 +35,7 @@ export function deleteThread(id) {
 
 /** Deletes every thread on this account. Reads again after each batch, so accounts over 200 rows are cleared too. */
 export function deleteAllThreads() {
-  return deleteAllPaged(listMyThreads, deleteThread, "Discoveries");
+  return withMigrationLock(() => deleteAllPaged(listMyThreads, deleteThread, "Discoveries"));
 }
 
 /** Loads the signed-in participant's saved discoveries. */

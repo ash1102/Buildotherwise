@@ -14,7 +14,7 @@ import MyGettingStarted from "@/components/gettingStarted/MyGettingStarted";
 import { Link } from "react-router-dom";
 import { deleteRecord, listAllMyRecords } from "@/lib/learnerRecords";
 import { deleteAllThreads, discoveryExportLines } from "@/lib/discoveryThreads";
-import { deleteAllDiscoveryRecords, listAllDiscoveryRecords, listAllThreads, recordExportLines } from "@/lib/discoveries";
+import { deleteAllDiscoveryRecords, listAllDiscoveryRecords, listAllThreads, readMovedThreadIds, recordExportLines } from "@/lib/discoveries";
 import { threadsForExport } from "@/lib/discoveryMigration";
 import { runSteps } from "@/lib/deletionSteps";
 
@@ -231,9 +231,9 @@ export default function Settings() {
     // Read straight from the account, so the Discovery Record is included even if its page was never opened.
     // A discovery moved into the Discovery Record is written once: its original copy is left out.
     try {
-      const [records, threads] = await Promise.all([listAllDiscoveryRecords(), listAllThreads()]);
+      const [records, threads, movedIds] = await Promise.all([listAllDiscoveryRecords(), listAllThreads(), readMovedThreadIds()]);
       text = `${text}\n${recordExportLines(records).join("\n")}`;
-      const earlier = threadsForExport(threads, records);
+      const earlier = threadsForExport(threads, records, movedIds);
       if (earlier.length) text = `${text}\n${discoveryExportLines(earlier).join("\n")}`;
     } catch {
       toast({ title: "Your workbook downloaded, but your Discovery Record couldn’t be added. Try again in a moment." });

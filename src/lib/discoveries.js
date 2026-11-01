@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { PREFIX, makeId, resolveKey } from "./store";
-import { runMigration } from "./discoveryMigration";
+import { dedupeByThreadId, deleteMigratedEntry, runMigration, withMigrationLock } from "./discoveryMigration";
 import { deleteAllPaged } from "./deletionSteps";
 
 /**
@@ -221,7 +221,7 @@ function listAllRecords() {
 
 /** Every DiscoveryRecord row on this account, read straight from the account (not the in-memory copy). */
 export async function listAllDiscoveryRecords() {
-  return (await listAllRecords()).map(fromRow);
+  return dedupeByThreadId(await listAllRecords()).map(fromRow);
 }
 
 /**
@@ -231,16 +231,19 @@ export async function listAllDiscoveryRecords() {
 async function readMigrationState() {
   const rows = (await base44.entities.UserStore.filter({ store_key: MIGRATION_KEY }, "-updated_date", 5)) || [];
   const row = rows[0] || null;
-  let ids = [];
-  if (row && row.value) {
+  const ids = new Set();
+  for (const item of rows) {
+    if (!item || !item.value) continue;
+    let parsed;
     try {
-      ids = JSON.parse(row.value);
+      parsed = JSON.parse(item.value);
     } catch {
       throw new Error("The migration record can't be read, so migration stopped. Nothing was created.");
     }
+    if (!Array.isArray(parsed)) throw new Error("The migration record has an unexpected shape. Migration stopped.");
+    parsed.forEach((id) => ids.add(id));
   }
-  if (!Array.isArray(ids)) throw new Error("The migration record has an unexpected shape. Migration stopped.");
-  return { row, ids: new Set(ids) };
+  return { row, ids };
 }
 
 /** The ids already moved, for deciding which threads still show on the page. Empty if it can't be read. */
@@ -253,6 +256,10 @@ export async function readMovedThreadIds() {
 }
 
 async function writeMigrationState(state) {
+  // Merge with what the account holds now, so ids another device or tab recorded are never overwritten.
+  const latest = await readMigrationState();
+  latest.ids.forEach((id) => state.ids.add(id));
+  if (!state.row) state.row = latest.row;
   const payload = {
     store_key: MIGRATION_KEY,
     value: JSON.stringify([...state.ids]),
@@ -269,15 +276,21 @@ async function writeMigrationState(state) {
 
 let migrating = null;
 
+/**
+ * Runs the move while holding the cross-tab lock, with the plan read fresh once the lock is held, so a second
+ * tab waits and then finds nothing left to copy. Also one run at a time within this tab.
+ */
 export function migrateThreadsToRecords() {
   if (!migrating) {
-    migrating = runMigration({
-      readState: readMigrationState,
-      writeState: writeMigrationState,
-      listRecords: listAllRecords,
-      listThreads: listAllThreads,
-      createRecord: (fields) => entity().create(toPayload({ ...emptyDiscovery(), ...fields })),
-    }).finally(() => {
+    migrating = withMigrationLock(() =>
+      runMigration({
+        readState: readMigrationState,
+        writeState: writeMigrationState,
+        listRecords: listAllRecords,
+        listThreads: listAllThreads,
+        createRecord: (fields) => entity().create(toPayload({ ...emptyDiscovery(), ...fields })),
+      })
+    ).finally(() => {
       migrating = null;
     });
   }
@@ -286,25 +299,29 @@ export function migrateThreadsToRecords() {
 
 /**
  * Deletes one entry and resolves only once the account confirms it. Rejects (and keeps the entry) on failure.
- * When the entry was moved from the original storage, the original copy is deleted too, because the participant
- * asked for this discovery to be deleted. Resolves to { originalKept } so the page can say if that part failed.
+ * For an entry moved from the original storage, the one matching DiscoveryThread row is deleted too, after the
+ * thread id is recorded so migration can never copy it back. Resolves to { originalKept, threadDeleted }.
  */
-export async function removeDiscoveryConfirmed(id) {
-  const entry = getDiscovery(id);
-  const realId = await resolveId(id);
-  if (!realId) throw new Error("This entry hasn't reached your account yet. Try again in a moment.");
-  await entity().delete(realId);
-  cache = cache.filter((item) => item.id !== id);
-  notify();
-  const threadId = entry?.source?.thread_id;
-  if (!threadId) return { originalKept: false };
-  try {
-    await base44.entities.DiscoveryThread.delete(threadId);
-    return { originalKept: false };
-  } catch (error) {
-    console.error("The original copy of this discovery could not be deleted", error);
-    return { originalKept: true };
-  }
+export function removeDiscoveryConfirmed(id) {
+  return withMigrationLock(async () => {
+    const entry = getDiscovery(id);
+    const realId = await resolveId(id);
+    if (!realId) throw new Error("This entry hasn't reached your account yet. Try again in a moment.");
+    const result = await deleteMigratedEntry({
+      entry,
+      tombstone: async (threadId) => {
+        const state = await readMigrationState();
+        state.ids.add(threadId);
+        await writeMigrationState(state);
+      },
+      deleteRecord: () => entity().delete(realId),
+      findThreadRows: (threadId) => base44.entities.DiscoveryThread.filter({ id: threadId }, "-updated_date", 2),
+      deleteThread: (threadId) => base44.entities.DiscoveryThread.delete(threadId),
+    });
+    cache = cache.filter((item) => item.id !== id);
+    notify();
+    return result;
+  });
 }
 
 export function removeDiscovery(id) {
@@ -389,7 +406,7 @@ function clearDeviceEntries() {
 
 async function doLoad() {
   try {
-    const rows = await listAllRecords();
+    const rows = dedupeByThreadId(await listAllRecords());
     const remote = rows.map(fromRow);
     const known = new Set(remote.map((entry) => `${entry.title}\u0000${entry.body}`));
 
@@ -424,13 +441,15 @@ export function loadDiscoveries() {
 }
 
 /** Deletes every DiscoveryRecord row on this account. Used by Settings. Resolves to the number deleted. */
-export async function deleteAllDiscoveryRecords() {
-  try {
-    return await deleteAllPaged(() => entity().list("-created_date", 200), (id) => entity().delete(id), "Discovery Record entries");
-  } finally {
-    cache = [];
-    notify();
-  }
+export function deleteAllDiscoveryRecords() {
+  return withMigrationLock(async () => {
+    try {
+      return await deleteAllPaged(() => entity().list("-created_date", 200), (id) => entity().delete(id), "Discovery Record entries");
+    } finally {
+      cache = [];
+      notify();
+    }
+  });
 }
 
 /** Plain-text lines for the workbook download. Oldest first. Blank-safe for migrated, DiscoveryStart and WorkbookSources entries. */

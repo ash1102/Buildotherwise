@@ -121,9 +121,9 @@ export function unmovedThreads(threads = [], records = [], movedIds = []) {
   }).toCreate;
 }
 
-/** Threads for the download: every thread no record points at, so a moved discovery is written once. */
-export function threadsForExport(threads = [], records = []) {
-  const linked = new Set(records.map((row) => row?.source?.thread_id).filter(Boolean));
+/** Threads for the download: every thread no record points at and not already moved, so a moved or deleted discovery is not written again. */
+export function threadsForExport(threads = [], records = [], movedIds = []) {
+  const linked = new Set([...records.map((row) => row?.source?.thread_id), ...movedIds].filter(Boolean));
   const seen = new Set();
   return threads.filter((thread) => {
     if (!thread || !thread.id || linked.has(thread.id) || seen.has(thread.id)) return false;
@@ -212,4 +212,66 @@ export function recordFieldsFromDiscovery(row) {
       description: row.description,
     },
   };
+}
+
+/** The one lock every migration, discovery delete and delete-all takes, so they never overlap across tabs. */
+export const MIGRATION_LOCK = "entrepalooza-discovery-migration";
+
+/**
+ * Runs fn while holding the cross-tab lock (Web Locks), waiting its turn if another tab holds it.
+ * Not re-entrant: never call a locked function from inside another locked function.
+ * Without Web Locks the work still runs; the fresh plan, the duplicate guard below and the migration record
+ * then limit the damage to a rare cross-device race, which dedupeByThreadId hides.
+ */
+export function withMigrationLock(fn, locks = typeof navigator !== "undefined" ? navigator.locks : undefined) {
+  if (locks && typeof locks.request === "function") return locks.request(MIGRATION_LOCK, fn);
+  return fn();
+}
+
+/**
+ * Hides repeat copies of one thread: for each source.thread_id only the oldest record is kept.
+ * Nothing is deleted. Works on raw rows and on mapped entries.
+ */
+export function dedupeByThreadId(records = []) {
+  const byAge = [...records].sort((a, b) => {
+    const x = a?.created_date || "";
+    const y = b?.created_date || "";
+    if (x !== y) return x < y ? -1 : 1;
+    return String(a?.id) < String(b?.id) ? -1 : 1;
+  });
+  const seen = new Set();
+  const hide = new Set();
+  for (const record of byAge) {
+    const threadId = record?.source?.thread_id;
+    if (!threadId) continue;
+    if (seen.has(threadId)) hide.add(record);
+    else seen.add(threadId);
+  }
+  return records.filter((record) => !hide.has(record));
+}
+
+/**
+ * Deletes one Discovery Record entry and, if it was moved from DiscoveryThread, its one matching original.
+ *  1. tombstone(threadId): the thread id is written to the migration record first. If that fails, nothing is
+ *     deleted, so a deleted discovery can never be copied back by a later migration.
+ *  2. deleteRecord(): the record is deleted.
+ *  3. The original is deleted only when the entry carries the migration marker, and only the single row whose
+ *     id equals source.thread_id. No other row is ever touched.
+ * Resolves to { originalKept, threadDeleted }. Rejects (with nothing deleted) if step 1 or 2 fails.
+ */
+export async function deleteMigratedEntry({ entry, tombstone, deleteRecord, findThreadRows, deleteThread }) {
+  const source = entry?.source || {};
+  const threadId = source.migrated_from === "DiscoveryThread" && typeof source.thread_id === "string" ? source.thread_id : "";
+  if (threadId) await tombstone(threadId);
+  await deleteRecord();
+  if (!threadId) return { originalKept: false, threadDeleted: false };
+  try {
+    const exact = ((await findThreadRows(threadId)) || []).filter((row) => row && row.id === threadId);
+    if (!exact.length) return { originalKept: false, threadDeleted: false };
+    await deleteThread(exact[0].id);
+    return { originalKept: false, threadDeleted: true };
+  } catch (error) {
+    console.error("The original copy of this discovery could not be deleted", error);
+    return { originalKept: true, threadDeleted: false };
+  }
 }
