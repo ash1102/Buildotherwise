@@ -12,7 +12,8 @@ import {
   groupQuestionsForPath,
   thoughtFor,
 } from "@/lib/dashboardDiscovery";
-import { TITLE_MAX, createThread, threadFromDiscovery, updateThread } from "@/lib/discoveryThreads";
+import { TITLE_MAX, threadFromDiscovery } from "@/lib/discoveryThreadData";
+import { createDiscoveryConfirmed, updateDiscoveryConfirmed } from "@/lib/discoveries";
 
 /**
  * Discovery on the dashboard: Notice -> Explore -> Choose.
@@ -102,6 +103,28 @@ const INITIAL = {
   savedId: null,
 };
 
+/**
+ * Maps the saved-discovery row into the DiscoveryRecord shape.
+ * The discovery's own details live under `source`, so the title, body and context stay the participant's words.
+ */
+function toRecordFields(row) {
+  return {
+    title: row.title,
+    body: row.response,
+    source: {
+      kind: row.source,
+      question_id: row.question_id,
+      question_text: row.question_text,
+      path_id: row.path_id,
+      follow_up_text: row.follow_up_text,
+      option_id: row.option_id,
+      option_label: row.option_label,
+      notes: row.notes,
+      description: row.description,
+    },
+  };
+}
+
 const textareaClass = "mt-2 w-full rounded-xl border border-border bg-card px-3 py-2 text-[16px] leading-relaxed text-foreground";
 
 export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
@@ -152,16 +175,21 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
     setState((c) => ({ ...c, own, text: "", optionId: null, notes: "", related: false, saveOpen: false, title: "", savedId: null }));
 
   // The only function in this file that writes anything. It runs from the Save form's submit and nowhere else.
+  // Success is shown only after the account confirms the write. On failure the entered words stay on screen.
   const saveDiscovery = async () => {
     setSaving(true);
     setSaveMessage("");
     try {
       const data = threadFromDiscovery({ title: state.title, state });
-      const row = state.savedId ? await updateThread(state.savedId, data) : await createThread(data);
-      setState((c) => ({ ...c, savedId: row.id || c.savedId, saveOpen: false }));
-      setSaveMessage(state.savedId ? "Your saved discovery was updated." : "Saved to My Discoveries.");
-    } catch {
-      setSaveMessage("That didn’t save. Your words are still here. Try again.");
+      const entry = state.savedId
+        ? await updateDiscoveryConfirmed(state.savedId, toRecordFields(data))
+        : await createDiscoveryConfirmed(toRecordFields(data));
+      const savedId = entry?.id || state.savedId;
+      setState((c) => ({ ...c, savedId, saveOpen: false }));
+      setSaveMessage("Saved to Discovery Record.");
+    } catch (error) {
+      console.error("Discovery save failed", error);
+      setSaveMessage("That didn’t save to your account. Your words are still here. Try again.");
     } finally {
       setSaving(false);
     }
