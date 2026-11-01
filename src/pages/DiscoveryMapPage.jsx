@@ -183,7 +183,7 @@ export default function DiscoveryMapPage() {
           </div>
         ) : (
           <p className="mt-2 text-[16px] leading-relaxed text-muted-foreground">
-            Every module of Pilot 1 in order, with the steps you have touched. Open it when you want the whole path at
+            Every open module in order, with the steps you have touched. Open it when you want the whole path at
             once.
           </p>
         )}
