@@ -9,7 +9,6 @@ import ScrollToTop from './components/ScrollToTop';
 import Layout from '@/components/Layout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import LoginRedirect from '@/components/LoginRedirect';
-import UnderConstructionGate from '@/components/UnderConstruction';
 
 // Every route loads its own code on first visit, so the first screen starts faster in the WebView.
 const PageNotFound = lazy(() => import('./lib/PageNotFound'));
@@ -97,7 +96,6 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
-    <UnderConstructionGate>
     <Suspense fallback={<RouteFallback />}>
       <Routes>
         <Route element={<Layout />}>
@@ -144,7 +142,6 @@ const AuthenticatedApp = () => {
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </Suspense>
-    </UnderConstructionGate>
   );
 };
 
