@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 import { deleteRecord, listAllMyRecords } from "@/lib/learnerRecords";
 import { deleteAllThreads, discoveryExportLines, listMyThreads } from "@/lib/discoveryThreads";
 import { deleteAllDiscoveryRecords, listDiscoveries, recordExportLines } from "@/lib/discoveries";
+import { runSteps } from "@/lib/deletionSteps";
 
 const STORE_PREFIX = "entrepalooza.v1.";
 const CONTACT = "Start@buildotherwise.org";
@@ -146,20 +147,6 @@ function clearDevice() {
   window.dispatchEvent(new CustomEvent("entrepalooza:change", { detail: null }));
 }
 
-/** Runs each deletion step even if an earlier one fails. Returns the labels of the steps that did not finish. */
-async function runSteps(steps) {
-  const failed = [];
-  for (const [label, run] of steps) {
-    try {
-      await run();
-    } catch (error) {
-      console.error(`Deletion step failed: ${label}`, error);
-      failed.push(label);
-    }
-  }
-  return failed;
-}
-
 /** Deletes every My Records entry on this account. Attempts all of them, then reports any that failed. */
 async function deleteAllMyRecords() {
   const rows = await listAllMyRecords();
@@ -180,7 +167,7 @@ const WORKBOOK_STEPS = () => [
   ["your discoveries", deleteAllThreads],
   ["your Discovery Record", deleteAllDiscoveryRecords],
   ["My Records", deleteAllMyRecords],
-  ["your journal and workbook", deleteAccountWorkbook],
+  ["your journal and workbook", deleteAccountWorkbook, { requiresClean: true }],
 ];
 
 const SYNC_WORDS = {
