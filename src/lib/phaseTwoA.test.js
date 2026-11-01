@@ -49,8 +49,38 @@ test("each path frames its questions differently, keeps the original four follow
   const banned = /\b(your|a) (strength|talent|passion|gift)\b|business (opportunity|idea)|you(’re| are) (good|great|talented|gifted)|means you should/i;
   for (const path of Object.values(PATH_FRAMING)) {
     for (const entry of Object.values(path)) {
-      assert.doesNotMatch(entry.followUp, banned);
-      assert.doesNotMatch(entry.experiment, banned);
+      if (entry.followUp) assert.doesNotMatch(entry.followUp, banned);
+      if (entry.experiment) assert.doesNotMatch(entry.experiment, banned);
+    }
+  }
+});
+
+test("only three follow-ups are rewritten by path, the rest stay original, and experiments stay path-specific", () => {
+  const rewritten = {
+    "attention/overlooked": "What do you usually do when it catches your attention?",
+    "different/change": "Which of these is closest to the change you’d want?",
+    "looking/mild-curiosity": "What would you like to do with it, if anything?",
+  };
+  for (const point of STARTING_POINTS) {
+    for (const id of point.order) {
+      const key = `${point.id}/${id}`;
+      const framed = framingFor(point.id, id);
+      assert.equal(framed.followUp, rewritten[key] || QUESTIONS[id].followUp, `${key} follow-up`);
+      assert.ok(PATH_FRAMING[point.id][id].experiment, `${key} keeps a path experiment`);
+      assert.equal(framed.experiment, PATH_FRAMING[point.id][id].experiment, `${key} experiment`);
+    }
+  }
+  assert.equal(Object.values(PATH_FRAMING).flatMap((p) => Object.values(p)).filter((e) => e.followUp).length, 3);
+});
+
+test("framingFor falls back per field, and to the question's own wording for unknown paths", () => {
+  assert.equal(framingFor("attention", "lost-track").followUp, QUESTIONS["lost-track"].followUp);
+  assert.equal(framingFor("nope", "self-taught").followUp, QUESTIONS["self-taught"].followUp);
+  assert.equal(framingFor("nope", "self-taught").experiment, QUESTIONS["self-taught"].experiment);
+  for (const point of STARTING_POINTS) {
+    for (const id of point.order) {
+      const framed = framingFor(point.id, id);
+      assert.ok(framed.followUp && framed.experiment, `${point.id}/${id} never empty`);
     }
   }
 });
