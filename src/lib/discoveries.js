@@ -187,11 +187,72 @@ export async function updateDiscoveryConfirmed(id, patch) {
  * has a record is skipped. Original DiscoveryThread rows are never deleted here.
  * Returns { moved, skipped, failed }.
  */
-export async function migrateThreadsToRecords(listThreads) {
+const MIGRATION_KEY = "discoveryThreadMigration";
+
+/** Reads every page of a list. Throws instead of returning a partial list. */
+async function listAllPages(fetchPage, pageSize = 200) {
+  const all = [];
+  const seen = new Set();
+  for (let skip = 0; ; skip += pageSize) {
+    const page = (await fetchPage(skip, pageSize)) || [];
+    let fresh = 0;
+    for (const row of page) {
+      if (!seen.has(row.id)) {
+        seen.add(row.id);
+        all.push(row);
+        fresh += 1;
+      }
+    }
+    if (page.length < pageSize) return all;
+    if (!fresh) throw new Error("Paging stopped returning new rows, so the list would be incomplete. Nothing was created.");
+  }
+}
+
+/** Every DiscoveryThread row on this account. */
+export function listAllThreads() {
+  return listAllPages((skip, limit) => base44.entities.DiscoveryThread.list("-updated_date", limit, skip));
+}
+
+function listAllRecords() {
+  return listAllPages((skip, limit) => entity().list("-created_date", limit, skip));
+}
+
+/**
+ * Thread ids already moved once, stored on the account. The id stays here even if the participant
+ * later deletes the record, so the thread is never copied again.
+ */
+async function readMigrationState() {
+  const rows = (await base44.entities.UserStore.list("-updated_date", 200)) || [];
+  const row = rows.find((item) => item.store_key === MIGRATION_KEY) || null;
+  let ids = [];
+  if (row && row.value) {
+    try {
+      ids = JSON.parse(row.value);
+    } catch {
+      throw new Error("The migration record can't be read, so migration stopped. Nothing was created.");
+    }
+  }
+  if (!Array.isArray(ids)) throw new Error("The migration record has an unexpected shape. Migration stopped.");
+  return { row, ids: new Set(ids) };
+}
+
+async function writeMigrationState(state) {
+  const payload = {
+    store_key: MIGRATION_KEY,
+    value: JSON.stringify([...state.ids]),
+    client_updated_at: Date.now(),
+    description: "Discovery migration record. Do not edit.",
+  };
+  if (state.row) await base44.entities.UserStore.update(state.row.id, payload);
+  else await base44.entities.UserStore.create(payload);
+}
+
+export async function migrateThreadsToRecords(listThreads = listAllThreads) {
   const result = { moved: 0, skipped: 0, failed: 0 };
+  const state = await readMigrationState();
+  const records = await listAllRecords();
   const threads = (await listThreads()) || [];
-  const existing = (await entity().list("-created_date", 1000)) || [];
-  const alreadyMoved = new Set(existing.map((row) => row?.source?.thread_id).filter(Boolean));
+  const alreadyMoved = new Set([...state.ids, ...records.map((row) => row?.source?.thread_id).filter(Boolean)]);
 
   for (const thread of threads) {
     if (alreadyMoved.has(thread.id)) {
@@ -219,12 +280,14 @@ export async function migrateThreadsToRecords(listThreads) {
         })
       );
       alreadyMoved.add(thread.id);
+      state.ids.add(thread.id);
       result.moved += 1;
     } catch (error) {
       console.error("Could not migrate a discovery thread", error);
       result.failed += 1;
     }
   }
+  await writeMigrationState(state);
   return result;
 }
 
