@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ArrowRight, ChevronDown, Info } from "lucide-react";
 import {
-  CHOOSE_ACTIONS,
   OWN_EXPERIMENT,
   OWN_FOLLOW_UP,
   QUESTIONS,
@@ -10,7 +9,6 @@ import {
   firstQuestionFor,
   framingFor,
   groupQuestionsForPath,
-  nextQuestionFor,
   thoughtFor,
 } from "@/lib/dashboardDiscovery";
 

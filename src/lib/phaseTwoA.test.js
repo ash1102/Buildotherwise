@@ -10,6 +10,8 @@ import {
   firstQuestionFor,
   framingFor,
   groupQuestionsForPath,
+  OWN_EXPERIMENT,
+  OWN_FOLLOW_UP,
   nextQuestionFor,
   questionsForPath,
   thoughtFor,
@@ -143,6 +145,7 @@ test("discovery stores nothing: no storage, store, account or network calls in t
     assert.doesNotMatch(read(file), /localStorage|sessionStorage|useStore|writeStore|readStore|base44|entities|fetch\(|setItem|useWorkbook|useLifeMap/, file);
   }
   assert.match(read("src/components/discovery/DiscoveryStart.jsx"), /Nothing you choose or type here is saved/);
+  assert.match(read("src/components/discovery/DiscoveryStart.jsx"), /const SAVING_READY = false/, "saving stays off until the persistence design is approved");
 });
 
 test("the dashboard keeps its routes and always offers the workbook", () => {
@@ -232,4 +235,20 @@ test("returning participants: Discovery first, a smaller Continue card right bel
   assert.match(home, /\{started && next \? \(/, "still only for returning participants with a next step");
   assert.match(home, /to=\{`\/lesson\/\$\{next\.code\}`\}/, "same destination");
   assert.match(home, /Continue where you left off/);
+});
+
+test("Notice -> Explore -> Choose: own words, one follow-up, four choices, experiments only on request", () => {
+  const view = read("src/components/discovery/DiscoveryStart.jsx");
+  for (const label of ["Write my own instead", "Keep exploring", "Save to My Discoveries", "Try something related", "Explore something else", "Start over"]) {
+    assert.ok(view.includes(label), label);
+  }
+  assert.equal((view.match(/\{followUp\}/g) || []).length >= 1, true);
+  assert.match(view, /\{state\.related \? \(\s*<div id="discovery-experiment"/, "the experiment renders only after 'Try something related'");
+  assert.doesNotMatch(view, /disabled=\{[^}]*related/, "experiments are never required");
+  assert.match(view, /Anything you notice, about the subject or about yourself\. Optional\./);
+  assert.doesNotMatch(view, /required/, "no answer is required");
+  assert.match(view, /disabled=\{state\.own && !written\}/, "only an empty own-words entry can't be explored");
+  for (const text of [OWN_FOLLOW_UP, OWN_EXPERIMENT]) assert.doesNotMatch(text, /strength|talent|passion|opportunity|you are|you\u2019re (a|an) /i);
+  assert.equal(QUESTIONS && Object.keys(QUESTIONS).length, 6);
+  assert.deepEqual(STARTING_POINTS.map((p) => p.id), ["attention", "different", "looking"]);
 });
