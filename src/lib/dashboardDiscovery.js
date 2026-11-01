@@ -26,6 +26,98 @@ export const STARTING_POINTS = [
   },
 ];
 
+/**
+ * Path-specific follow-ups and experiments. A question keeps its base wording and options everywhere.
+ * Under a path it can be asked differently and suggest a different small experiment.
+ * A missing entry falls back to the question's own follow-up and experiment.
+ */
+export const PATH_FRAMING = {
+  attention: {
+    "lost-track": {
+      followUp: "What were you paying attention to when that happened?",
+      experiment: "Next time something holds your attention, note the first thing that caught it. Don’t decide what it means yet.",
+    },
+    overlooked: {
+      followUp: "What did you do the last time it caught your attention?",
+      experiment: "The next time you notice it, ask one person nearby whether they’ve noticed it too. You’re only finding out how common it is.",
+    },
+    "self-taught": {
+      followUp: "Did it start with something that kept pulling you back?",
+      experiment: "Find one small thing you’ve taught yourself and write down what first caught your interest in it.",
+    },
+    "mild-curiosity": {
+      followUp: "Does this curiosity connect to what keeps catching your attention?",
+      experiment: "Spend fifteen minutes on it, then notice whether it leads back to the thing that first caught your attention.",
+    },
+    change: {
+      followUp: "If that attention pointed somewhere, what would you want more of?",
+      experiment: "For one day, write down the moments your attention drifts toward something. Don’t change anything yet.",
+    },
+  },
+  different: {
+    change: {
+      followUp: "Which part of your week would you change first if you could?",
+      experiment: "For one day, notice the moments your week feels lighter and the moments it feels heavier. Write one line for each.",
+    },
+    "lost-track": {
+      followUp: "Was there something you did that felt like a break from the usual week?",
+      experiment: "Think about the last time you lost track of time. Write down what made that time different from an ordinary one.",
+    },
+    "self-taught": {
+      followUp: "Did you learn something that made your week feel more like your own?",
+      experiment: "Pick one thing you taught yourself and ask whether you could make more room for it.",
+    },
+    overlooked: {
+      followUp: "Is there a problem you notice that you’d like to spend more time on?",
+      experiment: "Notice one problem this week you usually skip. Write one line about what you’d want to do differently about it.",
+    },
+    "mild-curiosity": {
+      followUp: "Would following this curiosity feel like a change?",
+      experiment: "Spend fifteen minutes on it this week. Notice whether it feels like a break or like more of the same.",
+    },
+    noticing: {
+      followUp: "Does this thing you keep noticing point toward something different?",
+      experiment: "Write the thing you keep noticing in one sentence, then write one thing about your week that would change if you paid more attention to it.",
+    },
+  },
+  looking: {
+    "mild-curiosity": {
+      followUp: "Would you like to take it a little further?",
+      experiment: "Spend fifteen minutes with it: read one thing, watch one video, or ask one person. Then notice whether you want more or you’re done.",
+    },
+    "self-taught": {
+      followUp: "Is there something you picked up along the way that you’d like to look at more closely?",
+      experiment: "Ask one person how they would do the thing you taught yourself. Notice where their way differs from yours.",
+    },
+    overlooked: {
+      followUp: "Is there something you notice in passing that you’d want to look into?",
+      experiment: "Next time you notice a problem in passing, write it down. Don’t decide whether it matters.",
+    },
+    "lost-track": {
+      followUp: "Was there a moment you were fully absorbed in something?",
+      experiment: "Next time you lose track of time, write down what you were doing in one line. Don’t decide what it means.",
+    },
+    noticing: {
+      followUp: "Is this something you’d like to look into a little more?",
+      experiment: "Write it down in one sentence, without deciding whether it matters. Come back to it in a week.",
+    },
+    change: {
+      followUp: "Does anything about your week come to mind when you look around?",
+      experiment: "For one day, notice the moments your week feels lighter and heavier. Write one line for each.",
+    },
+  },
+};
+
+/** The follow-up and experiment a question carries on a given path, falling back to its own. */
+export function framingFor(pointId, questionId) {
+  const question = QUESTIONS[questionId];
+  const framed = PATH_FRAMING[pointId] && PATH_FRAMING[pointId][questionId];
+  return {
+    followUp: framed ? framed.followUp : question.followUp,
+    experiment: framed ? framed.experiment : question.experiment,
+  };
+}
+
 export const QUESTIONS = {
   "self-taught": {
     id: "self-taught",
