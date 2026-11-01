@@ -242,6 +242,8 @@ export default function Settings() {
       if (alsoClear) {
         try {
           await deleteAccountWorkbook();
+          await deleteAllThreads();
+          await deleteAllDiscoveryRecords();
         } catch {
           /* the account deletion request still covers it */
         }
@@ -350,11 +352,10 @@ export default function Settings() {
         </button>
 
         <div className="border-t border-border pt-4">
-          <h3 className="text-[16px]">Delete my workbook from my account</h3>
+          <h3 className="text-[16px]">Delete my workbook and discoveries</h3>
           <p className="mt-1 text-[15px] leading-relaxed text-muted-foreground">
-            Removes your journal, step answers, decisions and maps from your account and from this device. This can’t be
-            undone, so download a copy first if you want one. It does not delete My Records or My Discoveries; use the
-            buttons below for those.
+            Removes your journal, step answers, decisions and maps, plus your discoveries and Discovery Record, from your account and from this device. This can’t be
+            undone, so download a copy first if you want one. My Records are not deleted; use the button below for those.
           </p>
           {confirmClear ? (
             <div className="mt-3 flex flex-wrap gap-2">
@@ -366,8 +367,10 @@ export default function Settings() {
                   setClearing(true);
                   try {
                     await deleteAccountWorkbook();
+                    await deleteAllThreads();
+                    await deleteAllDiscoveryRecords();
                     clearDevice();
-                    toast({ title: "Your workbook was deleted from your account." });
+                    toast({ title: "Your workbook and discoveries were deleted from your account." });
                   } catch {
                     toast({ title: `Some of it didn't delete. Try again, or email ${CONTACT}.` });
                   } finally {
@@ -376,7 +379,7 @@ export default function Settings() {
                   }
                 }}
               >
-                {clearing ? "Deleting…" : "Yes, delete my workbook"}
+                {clearing ? "Deleting…" : "Yes, delete my workbook and discoveries"}
               </button>
               <button type="button" className={secondaryButton} onClick={() => setConfirmClear(false)}>
                 Cancel
@@ -384,8 +387,7 @@ export default function Settings() {
             </div>
           ) : (
             <button type="button" className={`mt-3 ${secondaryButton}`} onClick={() => setConfirmClear(true)}>
-              Delete my workbook
-            </button>
+              Delete my workbook and discoveries
           )}
         </div>
 
@@ -471,7 +473,7 @@ export default function Settings() {
                     onChange={(event) => setAlsoClear(event.target.checked)}
                     className="mt-1"
                   />
-                  Also delete my workbook and journal from my account now
+                  Also delete my workbook, journal and discoveries from my account now
                 </label>
                 <div className="flex flex-wrap gap-2">
                   <button type="button" disabled={deleting} className={dangerButton} onClick={requestDeletion}>
