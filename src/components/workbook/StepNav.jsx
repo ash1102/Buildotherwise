@@ -66,7 +66,7 @@ export default function StepNav({
       <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
     </Link>
   ) : endNote === "" ? null : (
-    <span className="text-[15px] text-muted-faint">{endNote || "This is the last step in Pilot 1."}</span>
+    <span className="text-[15px] text-muted-faint">{endNote || "This is the last step in the open workbook."}</span>
   );
 
   return (
