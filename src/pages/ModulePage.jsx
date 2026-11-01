@@ -68,7 +68,6 @@ function ModuleBody() {
   }
 
   const lessons = (lessonsByOrder[module.order] || []).filter(isWorkbookLesson);
-  const moduleSixStart = module.order === 5 ? (lessonsByOrder[6] || []).filter(isWorkbookLesson)[0] : null;
   const coming = isComingLater(module);
   const row = progress.byOrder[module.order];
   const locked = Boolean(row && !row.unlocked && !coming);
@@ -99,10 +98,8 @@ function ModuleBody() {
               <p className="workbook-label">The halfway point</p>
               <p className="mt-2 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
                 Modules 1–5 end with this module. You can go back through the lessons or open your Conversation Journal
-                anytime. Module 6 is in the app if you want to continue on your own. Moving on is optional. Nothing here
-                signs you up for a group or follow-up support.
+                anytime. Nothing here signs you up for a group or follow-up support.
               </p>
-              <ModuleFiveContinue lesson={moduleSixStart} />
               <Link
                 to="/record"
                 className="mt-4 flex items-center gap-2 text-[15px] font-medium text-accent-ink underline underline-offset-2"
