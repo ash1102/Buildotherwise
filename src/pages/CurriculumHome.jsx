@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Archive, ArrowRight, ArrowUpRight, BookOpen, Layers, Map } from "lucide-react";
+import { Archive, ArrowRight, ArrowUpRight, BookOpen, Compass, Layers, Map } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
 import { useLifeMap, useWorkbook } from "@/lib/workbook";
 import { MAP_PICK_KEY, lifeMapHasEntries } from "@/lib/lifeMap";
@@ -295,6 +295,15 @@ function MemberHome() {
                     <span className="block text-[15px] text-muted-foreground">All five modules, open in any order.</span>
                   </span>
                 </button>
+              </li>
+              <li>
+                <Link to="/my-discoveries" className={toolLink}>
+                  <Compass className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
+                  <span>
+                    <span className="block font-semibold">My Discoveries</span>
+                    <span className="block text-[15px] text-muted-foreground">Questions you chose to keep.</span>
+                  </span>
+                </Link>
               </li>
               <li>
                 <Link to="/my-records" className={toolLink}>

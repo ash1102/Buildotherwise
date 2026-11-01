@@ -12,7 +12,7 @@ import {
   updateThread,
   useDiscoveryThreads,
 } from "@/lib/discoveryThreads";
-import { OWN_EXPERIMENT, QUESTIONS, thoughtFor } from "@/lib/dashboardDiscovery";
+import { OWN_EXPERIMENT, QUESTIONS, framingFor, thoughtFor } from "@/lib/dashboardDiscovery";
 
 const primary =
   "inline-flex min-h-[44px] items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-[15px] font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
@@ -197,7 +197,7 @@ function DiscoveryDetail({ row, onBack, onChanged, onDeleted }) {
         {related ? (
           <div id="disc-experiment" className="mt-4">
             <p className="workbook-label">A small experiment · optional</p>
-            <p className="mt-1 max-w-[60ch] text-[16px] leading-relaxed">{row.source === "own" || !question ? OWN_EXPERIMENT : question.experiment || OWN_EXPERIMENT}</p>
+            <p className="mt-1 max-w-[60ch] text-[16px] leading-relaxed">{question ? framingFor(row.path_id || null, question.id).experiment : OWN_EXPERIMENT}</p>
             <p className="mt-2 text-[14px] text-muted-foreground">Skip it if it doesn’t fit. Add what you notice to your notes above.</p>
           </div>
         ) : null}
