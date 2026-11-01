@@ -376,16 +376,27 @@ body {
   animation: journal-slide-out 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
-/* Discovery panel: a deep plum surface in both themes. It re-points the primary tokens for this panel only,
-   so text, dividers and focus rings inside it follow the plum and the marigold action stays as it is. */
+/* Participant dashboard and discovery: one deep-plum family from the Entrepalooza palette.
+   Dusk plum #4A2D5C for the main surfaces (discovery, continue), deeper plum #2E2238 for cards,
+   cream #F2ECE4 for text, lavender #C9A6DE only for small labels, icons and the progress fill,
+   and marigold only for primary actions (the --primary-soft token, used by the action buttons).
+   These tokens are re-pointed inside .dashboard-plum and .discovery-surface only, so no other page changes. */
 .discovery-surface {
   --primary: 277 34.3% 26.9%; /* dusk plum #4A2D5C */
-  --primary-foreground: 38.2 35.5% 93.9%; /* chalk */
+  --primary-foreground: 34.3 35% 92.2%; /* cream #F2ECE4 */
 }
 
-.dark .discovery-surface {
-  --primary: 272.7 24.4% 17.6%; /* deep plum #2E2238 (dark plum wash) */
-  --primary-foreground: 34.3 35% 92.2%; /* warm cream */
+.dark .dashboard-plum {
+  --primary: 277 34.3% 26.9%; /* dusk plum #4A2D5C, replaces light lavender */
+  --primary-foreground: 34.3 35% 92.2%; /* cream */
+  --card: 272.7 24.4% 17.6%; /* deep plum #2E2238, replaces gray-purple */
+  --card-foreground: 34.3 35% 92.2%;
+  --secondary: 275 28% 23%; /* plum hover and track #3C2A4B */
+  --secondary-foreground: 34.3 35% 92.2%;
+  --border: 277 24% 33%; /* plum line #5A4069 */
+  --muted-foreground: 34 24% 82%; /* warm cream, not gray-purple */
+  --muted-faint: 34 20% 76%;
+  --ring: 34.3 35% 92.2%;
 }
 
 @media print {
