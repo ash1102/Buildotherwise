@@ -33,9 +33,15 @@ export function deleteThread(id) {
 /** Deletes every thread on this account. Reads again after each batch, so accounts over 200 rows are cleared too. */
 export async function deleteAllThreads() {
   let total = 0;
+  let previous = "";
   for (;;) {
     const rows = (await listMyThreads()) || [];
     if (!rows.length) return total;
+    const batch = rows.map((row) => row.id).join(",");
+    if (batch === previous) {
+      throw new Error("Threads keep coming back after delete, so deletion stopped. Some entries may remain.");
+    }
+    previous = batch;
     for (const row of rows) {
       await deleteThread(row.id);
       total += 1;
