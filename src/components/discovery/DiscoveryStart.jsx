@@ -7,6 +7,7 @@ import {
   anotherQuestionFor,
   firstQuestionFor,
   nextQuestionFor,
+  questionsForPath,
   thoughtFor,
 } from "@/lib/dashboardDiscovery";
 
@@ -25,6 +26,47 @@ const textButton =
   "inline-flex min-h-[44px] items-center rounded-md px-1 text-[15px] font-medium text-primary-foreground underline underline-offset-2 transition hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground";
 const choiceButton =
   "flex min-h-[52px] w-full items-center rounded-xl border border-primary-foreground/40 bg-primary-foreground/10 px-4 py-3 text-left text-[16px] leading-snug text-primary-foreground transition hover:bg-primary-foreground/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground";
+
+const pickButton =
+  "flex min-h-[44px] w-full items-center rounded-lg border border-primary-foreground/30 px-4 py-2.5 text-left text-[15px] leading-snug text-primary-foreground transition hover:bg-primary-foreground/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-foreground";
+
+/**
+ * Every question, grouped by the path the participant started on. Their own path's questions come first,
+ * but any question can be opened from here at any time. Picking one doesn't change the starting path.
+ */
+function OtherQuestions({ pointId, currentId, onPick }) {
+  const all = questionsForPath(pointId);
+  const closest = all.slice(0, 3);
+  const rest = all.slice(3);
+  const item = (q) => {
+    const current = q.id === currentId;
+    return (
+      <li key={q.id}>
+        <button
+          type="button"
+          aria-current={current ? "true" : undefined}
+          onClick={() => onPick(q)}
+          className={`${pickButton} ${current ? "bg-primary-foreground/15 font-semibold" : ""}`}
+        >
+          {q.text}
+        </button>
+      </li>
+    );
+  };
+  return (
+    <div className="mt-6 space-y-3">
+      <p className="text-[14px] font-semibold text-primary-foreground/85">Explore a different question</p>
+      <div>
+        <p className="text-[13px] text-primary-foreground/80">Closest to where you started</p>
+        <ul className="mt-2 grid gap-2">{closest.map(item)}</ul>
+      </div>
+      <div>
+        <p className="text-[13px] text-primary-foreground/80">Other questions</p>
+        <ul className="mt-2 grid gap-2">{rest.map(item)}</ul>
+      </div>
+    </div>
+  );
+}
 
 const INITIAL = { stage: "welcome", pointId: null, questionId: null, seen: [], optionId: null, text: "" };
 
@@ -65,7 +107,7 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
   return (
     <section
       aria-labelledby="discovery-heading"
-      className="rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8 sm:py-9"
+      className="discovery-surface rounded-2xl bg-primary px-5 py-7 text-primary-foreground sm:px-8 sm:py-9"
     >
       {state.stage === "welcome" ? (
         <>
@@ -113,6 +155,7 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
               Show me another question
             </button>
           </div>
+          <OtherQuestions pointId={state.pointId} currentId={question.id} onPick={showQuestion} />
         </>
       ) : null}
 
@@ -223,6 +266,7 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
                   </p>
                 )}
 
+                <OtherQuestions pointId={state.pointId} currentId={question.id} onPick={showQuestion} />
                 <p className="text-[15px] text-primary-foreground/90">
                   Want to keep a thought? Your{" "}
                   <Link to="/journal" className="font-medium underline underline-offset-2">
