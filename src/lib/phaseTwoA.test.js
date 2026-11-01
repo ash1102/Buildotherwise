@@ -9,6 +9,7 @@ import {
   anotherQuestionFor,
   firstQuestionFor,
   framingFor,
+  groupQuestionsForPath,
   nextQuestionFor,
   questionsForPath,
   thoughtFor,
