@@ -174,10 +174,10 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
             tabIndex={-1}
             className="mt-2 text-[clamp(1.4rem,1.1rem+1.4vw,1.9rem)] leading-snug text-primary-foreground outline-none"
           >
-            {question.followUp}
+            {framingFor(state.pointId, question.id).followUp}
           </Heading>
           <fieldset className="mt-4">
-            <legend className="sr-only">{question.followUp} Choose one, or skip.</legend>
+            <legend className="sr-only">{framingFor(state.pointId, question.id).followUp} Choose one, or skip.</legend>
             <div className="grid gap-3">
               {question.options.map((option) => (
                 <label key={option.id} className="block cursor-pointer">
@@ -247,7 +247,7 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
                 <div className="rounded-xl border border-primary-foreground/30 px-4 py-4">
                   <p className="text-[13px] font-semibold text-primary-foreground/85">A small experiment · optional</p>
                   <p className="mt-1 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/95">
-                    {question.experiment}
+                    {framingFor(state.pointId, question.id).experiment}
                   </p>
                   <p className="mt-2 text-[14px] text-primary-foreground/80">Skip it if it doesn’t fit.</p>
                 </div>
