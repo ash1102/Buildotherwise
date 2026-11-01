@@ -16,6 +16,7 @@ import {
   questionsForPath,
   thoughtFor,
 } from "./dashboardDiscovery.js";
+import { discoveryExportLines, threadFromDiscovery } from "./discoveryThreadData.js";
 import { cleanWelcomeReturn, rememberWelcomeReturn, takeWelcomeDestination } from "./welcomeReturn.js";
 
 const read = (file) => readFileSync(file, "utf8");
@@ -140,12 +141,79 @@ test("the copy never names a strength, talent, passion or business opportunity",
   }
 });
 
-test("discovery stores nothing: no storage, store, account or network calls in the prototype", () => {
-  for (const file of ["src/components/discovery/DiscoveryStart.jsx", "src/lib/dashboardDiscovery.js"]) {
-    assert.doesNotMatch(read(file), /localStorage|sessionStorage|useStore|writeStore|readStore|base44|entities|fetch\(|setItem|useWorkbook|useLifeMap/, file);
+test("Discovery writes only on an explicit Save, and only to DiscoveryThread", () => {
+  const start = read("src/components/discovery/DiscoveryStart.jsx");
+  assert.doesNotMatch(start, /localStorage|sessionStorage|useStore|writeStore|readStore|base44|entities|fetch\(|setItem|useWorkbook|useLifeMap|useJournal|learnerRecords|LearnerRecord|UserStore/);
+  assert.doesNotMatch(read("src/lib/dashboardDiscovery.js"), /base44|entities|fetch\(|localStorage/);
+  // The only calls that write are inside saveDiscovery, and saveDiscovery runs only from the Save form's submit.
+  assert.equal((start.match(/createThread\(|updateThread\(/g) || []).length, 2);
+  const fn = start.slice(start.indexOf("const saveDiscovery"), start.indexOf("const OriginalResponse"));
+  assert.match(fn, /createThread\(data\)/);
+  assert.match(fn, /updateThread\(state\.savedId, data\)/);
+  assert.equal((start.match(/saveDiscovery\(\)/g) || []).length, 1, "called once, from the form submit");
+  assert.match(start, /onSubmit=\{\(event\) => \{\s*event\.preventDefault\(\);\s*saveDiscovery\(\);/);
+  assert.match(start, /Nothing you choose or type here is saved unless you press Save to My Discoveries/);
+  assert.doesNotMatch(start, /SAVING_READY/);
+});
+
+test("My Discoveries saves what was on screen, in the participant's words, and nothing else", () => {
+  const picked = threadFromDiscovery({
+    title: "  ",
+    state: { questionId: "noticing", pointId: "attention", own: false, text: "  the way lists calm me ", optionId: QUESTIONS.noticing.options[0].id, notes: " more later " },
+  });
+  assert.equal(picked.source, "question");
+  assert.equal(picked.question_id, "noticing");
+  assert.equal(picked.question_text, QUESTIONS.noticing.text);
+  assert.equal(picked.response, "the way lists calm me");
+  assert.equal(picked.option_label, QUESTIONS.noticing.options[0].label);
+  assert.equal(picked.notes, "more later");
+  assert.equal(picked.follow_up_text, framingFor("attention", "noticing").followUp);
+  assert.equal(picked.title, "the way lists calm me", "blank title falls back to their own words");
+
+  const own = threadFromDiscovery({ title: "My title", state: { questionId: null, pointId: null, own: true, text: "I keep fixing other people's spreadsheets", optionId: null, notes: "" } });
+  assert.equal(own.source, "own");
+  assert.equal(own.question_id, "");
+  assert.equal(own.option_id, "");
+  assert.equal(own.follow_up_text, "");
+  assert.equal(own.title, "My title");
+  assert.deepEqual(
+    Object.keys(own).sort(),
+    ["description", "follow_up_text", "notes", "option_id", "option_label", "path_id", "question_id", "question_text", "response", "source", "title"]
+  );
+
+  const noAnswer = threadFromDiscovery({ title: "", state: { questionId: "noticing", pointId: "looking", own: false, text: "", optionId: null, notes: "" } });
+  assert.equal(noAnswer.title, QUESTIONS.noticing.text.length > 60 ? `${QUESTIONS.noticing.text.slice(0, 57).trimEnd()}…` : QUESTIONS.noticing.text);
+});
+
+test("the download text carries saved discoveries and nothing is invented", () => {
+  const text = discoveryExportLines([
+    { title: "A", created_date: "2026-01-02T00:00:00Z", question_text: "Q?", response: "mine", notes: "n", source: "question", option_label: "opt", follow_up_text: "F?" },
+    { title: "B", source: "own", response: "own words", question_text: "Your own question or observation" },
+  ]).join("\n");
+  assert.match(text, /## My Discoveries \(2 discoveries\)/);
+  assert.match(text, /Your response: mine/);
+  assert.match(text, /Your question or observation: own words/);
+  assert.match(text, /You chose: opt/);
+  assert.equal(discoveryExportLines([]).join("\n").includes("(0 discoveries)"), true);
+});
+
+test("DiscoveryThread is owner-only on every operation, stored apart from the Journal, Life Map, Records and UserStore", () => {
+  const schema = JSON.parse(read("base44/entities/DiscoveryThread.jsonc"));
+  const records = JSON.parse(read("base44/entities/LearnerRecord.jsonc"));
+  for (const op of ["create", "read", "update", "delete"]) {
+    assert.deepEqual(schema.rls[op], { created_by_id: "{{user.id}}" }, op);
+    assert.deepEqual(schema.rls[op], records.rls[op], `matches LearnerRecord for ${op}`);
   }
-  assert.match(read("src/components/discovery/DiscoveryStart.jsx"), /Nothing you choose or type here is saved/);
-  assert.match(read("src/components/discovery/DiscoveryStart.jsx"), /const SAVING_READY = false/, "saving stays off until the persistence design is approved");
+  assert.equal(schema.rls.read.user_condition, undefined, "no admin read rule");
+  const lib = read("src/lib/discoveryThreads.js");
+  assert.match(lib, /entities\.DiscoveryThread/);
+  assert.doesNotMatch(lib, /LearnerRecord|UserStore|writeStore|localStorage|useJournal|useLifeMap|entities\.(Journal|LifeMap)/);
+  const page = read("src/pages/MyDiscoveriesPage.jsx");
+  assert.doesNotMatch(page, /localStorage|LearnerRecord|UserStore|useJournal|useLifeMap|writeStore/);
+  assert.match(read("src/App.jsx"), /path="\/my-discoveries"/);
+  assert.match(read("src/pages/CurriculumHome.jsx"), /to="\/my-discoveries"/);
+  assert.match(read("src/pages/Settings.jsx"), /Delete all My Discoveries/);
+  assert.match(read("src/pages/Settings.jsx"), /discoveryExportLines/);
 });
 
 test("the dashboard keeps its routes and always offers the workbook", () => {
