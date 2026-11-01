@@ -363,3 +363,15 @@ export function anotherQuestionFor(pointId, currentId, seenIds = []) {
   const nextId = point.order[(at + 1) % point.order.length];
   return nextId === currentId ? null : QUESTIONS[nextId];
 }
+
+/**
+ * When a participant writes their own question or observation instead of using one of ours.
+ * One follow-up that holds both sides (the subject, and their own experience of it), no
+ * answer options, and a general experiment that doesn't assume what they wrote means anything.
+ */
+export const OWN_FOLLOW_UP = "What interests you about this, and what do you notice about it in your own experience?";
+export const OWN_EXPERIMENT =
+  "Spend fifteen minutes with it: read one thing, watch one video, or ask one person. Then notice whether you want more or you’re done. Either answer is fine.";
+
+/** The four things a participant can do after exploring. Experiments only appear after "related". */
+export const CHOOSE_ACTIONS = ["keep", "save", "related", "else"];

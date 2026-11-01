@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { ArrowRight, ChevronDown, Info } from "lucide-react";
 import {
+  CHOOSE_ACTIONS,
+  OWN_EXPERIMENT,
+  OWN_FOLLOW_UP,
   QUESTIONS,
   STARTING_POINTS,
   anotherQuestionFor,
@@ -13,9 +15,10 @@ import {
 } from "@/lib/dashboardDiscovery";
 
 /**
- * Discovery on the dashboard (Phase 2A prototype).
+ * Discovery on the dashboard: Notice -> Explore -> Choose.
  * Everything here is component state. Nothing is written to the account, the device, the
  * workbook, the journal or the Life Map, so there is nothing to sync, export or delete.
+ * "Save to My Discoveries" is shown but switched off until the saving design is approved.
  * One invitation shows at a time, and the way to the workbook is on screen at every step.
  */
 
@@ -83,7 +86,11 @@ function BrowseQuestions({ pointId, currentId, onPick }) {
   );
 }
 
-const INITIAL = { stage: "welcome", pointId: null, questionId: null, seen: [], optionId: null, text: "" };
+const SAVING_READY = false;
+
+const INITIAL = { stage: "welcome", pointId: null, questionId: null, seen: [], own: false, text: "", optionId: null, notes: "", related: false };
+
+const textareaClass = "mt-2 w-full rounded-xl border border-border bg-card px-3 py-2 text-[16px] leading-relaxed text-foreground";
 
 export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
   const [state, setState] = useState(INITIAL);
@@ -98,9 +105,12 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
       return;
     }
     if (headingRef.current) headingRef.current.focus();
-  }, [state.stage, state.questionId]);
+  }, [state.stage, state.questionId, state.own]);
 
-  const question = state.questionId ? QUESTIONS[state.questionId] : null;
+  const question = state.questionId && !state.own ? QUESTIONS[state.questionId] : null;
+  const written = state.text.trim();
+  const followUp = question ? framingFor(state.pointId, question.id).followUp : OWN_FOLLOW_UP;
+  const experiment = question ? framingFor(state.pointId, question.id).experiment : OWN_EXPERIMENT;
 
   const showQuestion = (next, extra = {}) =>
     setState((current) => ({
@@ -109,8 +119,11 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
       stage: "question",
       questionId: next.id,
       seen: current.seen.includes(next.id) ? current.seen : [...current.seen, next.id],
-      optionId: null,
+      own: false,
       text: "",
+      optionId: null,
+      notes: "",
+      related: false,
     }));
 
   const choosePoint = (pointId) => showQuestion(firstQuestionFor(pointId), { pointId, seen: [] });
@@ -118,6 +131,17 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
     const next = anotherQuestionFor(state.pointId, state.questionId, state.seen);
     if (next) showQuestion(next);
   };
+  const setOwn = (own) => setState((c) => ({ ...c, own, text: "", optionId: null, notes: "", related: false }));
+
+  const OriginalResponse = ({ label }) =>
+    written ? (
+      <p className="max-w-[62ch] rounded-xl bg-primary-foreground/10 px-4 py-3 text-[15px] leading-relaxed text-primary-foreground/90">
+        <span className="block text-[13px] font-semibold">{label}</span>
+        <span className="mt-1 block whitespace-pre-wrap break-words">{written}</span>
+      </p>
+    ) : null;
+
+  const actionButton = `${quietButton} w-full justify-start text-left`;
 
   return (
     <section
@@ -151,80 +175,115 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
         </>
       ) : null}
 
-      {state.stage === "question" && question ? (
+      {state.stage === "question" && (question || state.own) ? (
         <>
-          <p className="text-[13px] font-semibold text-accent-ink">A question to look at</p>
+          <p className="text-[13px] font-semibold text-accent-ink">Notice</p>
           <Heading
             id="discovery-heading"
             ref={headingRef}
             tabIndex={-1}
             className="mt-2 max-w-[34ch] text-[clamp(1.4rem,1.1rem+1.4vw,1.9rem)] leading-snug text-primary-foreground outline-none"
           >
-            {question.text}
+            {state.own ? "Write your own question, or something you’ve noticed." : question.text}
           </Heading>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <button type="button" className={primaryButton} onClick={() => setState((c) => ({ ...c, stage: "followup" }))}>
-              Explore this one
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </button>
-            <button type="button" className={quietButton} onClick={another}>
-              Show me another question
-            </button>
-          </div>
-          <BrowseQuestions key={question.id} pointId={state.pointId} currentId={question.id} onPick={showQuestion} />
-        </>
-      ) : null}
-
-      {state.stage === "followup" && question ? (
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            setState((c) => ({ ...c, stage: "result" }));
-          }}
-        >
-          <p className="text-[13px] font-semibold text-primary-foreground/85">{question.text}</p>
-          <Heading
-            id="discovery-heading"
-            ref={headingRef}
-            tabIndex={-1}
-            className="mt-2 text-[clamp(1.4rem,1.1rem+1.4vw,1.9rem)] leading-snug text-primary-foreground outline-none"
-          >
-            {framingFor(state.pointId, question.id).followUp}
-          </Heading>
-          <fieldset className="mt-4">
-            <legend className="sr-only">{framingFor(state.pointId, question.id).followUp} Choose one, or skip.</legend>
-            <div className="grid gap-3">
-              {question.options.map((option) => (
-                <label key={option.id} className="block cursor-pointer">
-                  <input
-                    type="radio"
-                    name={`follow-${question.id}`}
-                    value={option.id}
-                    checked={state.optionId === option.id}
-                    onChange={() => setState((c) => ({ ...c, optionId: option.id }))}
-                    className="peer sr-only"
-                  />
-                  <span className="flex min-h-[52px] items-center gap-3 rounded-xl border border-border bg-primary-foreground/10 px-4 py-3 text-[16px] leading-snug text-primary-foreground transition hover:bg-primary-foreground/20 peer-checked:border-primary-foreground peer-checked:bg-primary-foreground/25 peer-checked:font-semibold peer-checked:shadow-[inset_0_0_0_1px_hsl(var(--primary-foreground))] peer-checked:[&_.dot_span]:opacity-100 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary-foreground">
-                    <span aria-hidden="true" className="dot grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 border-primary-foreground/70">
-                      <span className="h-2.5 w-2.5 rounded-full bg-primary-foreground opacity-0 transition-opacity" />
-                    </span>
-                    {option.label}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
           <div className="mt-4">
             <label htmlFor="discovery-own-words" className="block text-[15px] text-primary-foreground/90">
-              In your own words, if you want. Optional, and not saved.
+              {state.own ? "Your question or observation" : "Your response, if you want to write one. Optional."}
             </label>
             <textarea
               id="discovery-own-words"
               rows={3}
-              maxLength={300}
+              maxLength={600}
               value={state.text}
               onChange={(event) => setState((c) => ({ ...c, text: event.target.value }))}
-              className="mt-2 w-full rounded-xl border border-border bg-card px-3 py-2 text-[16px] leading-relaxed text-foreground"
+              className={textareaClass}
+            />
+          </div>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <button
+              type="button"
+              className={`${primaryButton} disabled:cursor-not-allowed disabled:opacity-60`}
+              disabled={state.own && !written}
+              onClick={() => setState((c) => ({ ...c, stage: "explore" }))}
+            >
+              {state.own ? "Explore this" : "Explore this one"}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </button>
+            {state.own ? (
+              <button type="button" className={quietButton} onClick={() => setOwn(false)}>
+                Use one of the questions instead
+              </button>
+            ) : (
+              <>
+                <button type="button" className={quietButton} onClick={another}>
+                  Show me another question
+                </button>
+                <button type="button" className={quietButton} onClick={() => setOwn(true)}>
+                  Write my own instead
+                </button>
+              </>
+            )}
+          </div>
+          {state.own ? null : <BrowseQuestions key={question.id} pointId={state.pointId} currentId={question.id} onPick={showQuestion} />}
+        </>
+      ) : null}
+
+      {state.stage === "explore" && (question || state.own) ? (
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            setState((c) => ({ ...c, stage: "choose" }));
+          }}
+        >
+          <p className="text-[13px] font-semibold text-accent-ink">Explore</p>
+          <p className="mt-2 text-[15px] font-semibold text-primary-foreground/90">{question ? question.text : "Your own question or observation"}</p>
+          <div className="mt-3">
+            <OriginalResponse label={question ? "What you wrote (not saved)" : "Your question or observation (not saved)"} />
+          </div>
+          <Heading
+            id="discovery-heading"
+            ref={headingRef}
+            tabIndex={-1}
+            className="mt-4 text-[clamp(1.4rem,1.1rem+1.4vw,1.9rem)] leading-snug text-primary-foreground outline-none"
+          >
+            {followUp}
+          </Heading>
+          {question ? (
+            <fieldset className="mt-4">
+              <legend className="sr-only">{followUp} Choose one, or skip.</legend>
+              <div className="grid gap-3">
+                {question.options.map((option) => (
+                  <label key={option.id} className="block cursor-pointer">
+                    <input
+                      type="radio"
+                      name={`follow-${question.id}`}
+                      value={option.id}
+                      checked={state.optionId === option.id}
+                      onChange={() => setState((c) => ({ ...c, optionId: option.id }))}
+                      className="peer sr-only"
+                    />
+                    <span className="flex min-h-[52px] items-center gap-3 rounded-xl border border-border bg-primary-foreground/10 px-4 py-3 text-[16px] leading-snug text-primary-foreground transition hover:bg-primary-foreground/20 peer-checked:border-primary-foreground peer-checked:bg-primary-foreground/25 peer-checked:font-semibold peer-checked:shadow-[inset_0_0_0_1px_hsl(var(--primary-foreground))] peer-checked:[&_.dot_span]:opacity-100 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary-foreground">
+                      <span aria-hidden="true" className="dot grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 border-primary-foreground/70">
+                        <span className="h-2.5 w-2.5 rounded-full bg-primary-foreground opacity-0 transition-opacity" />
+                      </span>
+                      {option.label}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ) : null}
+          <div className="mt-4">
+            <label htmlFor="discovery-notes" className="block text-[15px] text-primary-foreground/90">
+              Anything you notice, about the subject or about yourself. Optional.
+            </label>
+            <textarea
+              id="discovery-notes"
+              rows={3}
+              maxLength={600}
+              value={state.notes}
+              onChange={(event) => setState((c) => ({ ...c, notes: event.target.value }))}
+              className={textareaClass}
             />
           </div>
           <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -232,71 +291,83 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
               Continue
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
-            <button type="button" className={quietButton} onClick={another}>
-              Skip this question
+            <button type="button" className={quietButton} onClick={() => setState((c) => ({ ...c, stage: "question" }))}>
+              Back
             </button>
           </div>
         </form>
       ) : null}
 
-      {state.stage === "result" && question
-        ? (() => {
-            const upNext = nextQuestionFor(state.pointId, state.seen, state.questionId);
-            return (
-              <div className="space-y-5">
-                <Heading
-                  id="discovery-heading"
-                  ref={headingRef}
-                  tabIndex={-1}
-                  className="text-[clamp(1.3rem,1.05rem+1.2vw,1.7rem)] leading-snug text-primary-foreground outline-none"
-                >
-                  Something to think about
-                </Heading>
-                <p className="max-w-[62ch] text-[17px] leading-relaxed text-primary-foreground/95">
-                  {thoughtFor(question.id, state.optionId)}
-                </p>
-                {state.text.trim() ? (
-                  <p className="max-w-[62ch] rounded-xl bg-primary-foreground/10 px-4 py-3 text-[15px] leading-relaxed text-primary-foreground/90">
-                    <span className="block text-[13px] font-semibold">You wrote (not saved)</span>
-                    <span className="mt-1 block whitespace-pre-wrap break-words">{state.text.trim()}</span>
-                  </p>
-                ) : null}
+      {state.stage === "choose" && (question || state.own) ? (
+        <div className="space-y-5">
+          <p className="text-[13px] font-semibold text-accent-ink">Choose</p>
+          <Heading
+            id="discovery-heading"
+            ref={headingRef}
+            tabIndex={-1}
+            className="text-[clamp(1.3rem,1.05rem+1.2vw,1.7rem)] leading-snug text-primary-foreground outline-none"
+          >
+            What would you like to do next?
+          </Heading>
+          <OriginalResponse label={question ? "What you wrote (not saved)" : "Your question or observation (not saved)"} />
+          {state.notes.trim() ? (
+            <p className="max-w-[62ch] rounded-xl bg-primary-foreground/10 px-4 py-3 text-[15px] leading-relaxed text-primary-foreground/90">
+              <span className="block text-[13px] font-semibold">Your notes (not saved)</span>
+              <span className="mt-1 block whitespace-pre-wrap break-words">{state.notes.trim()}</span>
+            </p>
+          ) : null}
+          {question && state.optionId ? (
+            <p className="max-w-[62ch] text-[16px] leading-relaxed text-primary-foreground/95">{thoughtFor(question.id, state.optionId)}</p>
+          ) : null}
 
-                <div className="rounded-xl border border-border px-4 py-4">
-                  <p className="text-[13px] font-semibold text-accent-ink">A small experiment · optional</p>
-                  <p className="mt-1 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/95">
-                    {framingFor(state.pointId, question.id).experiment}
-                  </p>
-                  <p className="mt-2 text-[14px] text-primary-foreground/80">Skip it if it doesn’t fit.</p>
-                </div>
+          <ul className="grid gap-3 sm:grid-cols-2">
+            <li>
+              <button type="button" className={actionButton} onClick={() => setState((c) => ({ ...c, stage: "explore" }))}>
+                Keep exploring
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                className={`${actionButton} disabled:cursor-not-allowed disabled:opacity-60`}
+                disabled={!SAVING_READY}
+                aria-describedby="discovery-save-note"
+              >
+                Save to My Discoveries
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                aria-expanded={state.related}
+                aria-controls={state.related ? "discovery-experiment" : undefined}
+                className={actionButton}
+                onClick={() => setState((c) => ({ ...c, related: !c.related }))}
+              >
+                Try something related
+              </button>
+            </li>
+            <li>
+              <button type="button" className={actionButton} onClick={another}>
+                Explore something else
+              </button>
+            </li>
+          </ul>
+          {SAVING_READY ? null : (
+            <p id="discovery-save-note" className="text-[14px] text-primary-foreground/80">
+              Saving isn’t switched on yet, so nothing here can be saved for now.
+            </p>
+          )}
 
-                {upNext ? (
-                  <div>
-                    <p className="text-[13px] font-semibold text-accent-ink">Another question you might like</p>
-                    <p className="mt-1 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/95">{upNext.text}</p>
-                    <button type="button" className={`mt-3 ${primaryButton}`} onClick={() => showQuestion(upNext)}>
-                      Look at this one
-                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                    </button>
-                  </div>
-                ) : (
-                  <p className="max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/95">
-                    That’s all six questions for now. The workbook has more to try whenever you’re ready.
-                  </p>
-                )}
-
-                <BrowseQuestions key={question.id} pointId={state.pointId} currentId={question.id} onPick={showQuestion} />
-                <p className="text-[15px] text-primary-foreground/90">
-                  Want to keep a thought? Your{" "}
-                  <Link to="/journal" className="font-medium underline underline-offset-2">
-                    Journal
-                  </Link>{" "}
-                  is the place. Nothing here goes there on its own.
-                </p>
-              </div>
-            );
-          })()
-        : null}
+          {state.related ? (
+            <div id="discovery-experiment" className="rounded-xl border border-border px-4 py-4">
+              <p className="text-[13px] font-semibold text-accent-ink">A small experiment · optional</p>
+              <p className="mt-1 max-w-[60ch] text-[16px] leading-relaxed text-primary-foreground/95">{experiment}</p>
+              <p className="mt-2 text-[14px] text-primary-foreground/80">Skip it if it doesn’t fit.</p>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="mt-6 space-y-3 border-t border-border pt-4">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
@@ -311,7 +382,7 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
         </div>
         <p className="flex items-start gap-2 text-[14px] leading-relaxed text-primary-foreground/85">
           <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-          <span>This is a prototype. Nothing you choose or type here is saved. It’s gone when you leave this page.</span>
+          <span>Nothing you choose or type here is saved. It’s gone when you leave this page.</span>
         </p>
       </div>
     </section>
