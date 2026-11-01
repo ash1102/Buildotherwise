@@ -1,0 +1,59 @@
+{
+  "description": "A Discovery Record entry kept on the participant's account. Visible only to the account that created it.",
+  "name": "DiscoveryRecord",
+  "properties": {
+    "body": {
+      "description": "What the participant noticed, in their own words.",
+      "type": "string"
+    },
+    "context": {
+      "description": "Optional context answers, keyed by field name. Their own words.",
+      "type": "object"
+    },
+    "decision": {
+      "description": "The current Next Decision for this entry.",
+      "type": "string"
+    },
+    "decision_date": {
+      "description": "When the current decision was written, ISO date.",
+      "type": "string"
+    },
+    "decision_note": {
+      "description": "Optional note that goes with the current decision.",
+      "type": "string"
+    },
+    "decision_updates": {
+      "description": "Earlier decisions, kept when the participant revises one.",
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "source": {
+      "description": "Where the entry came from, if anywhere. Copied as saved.",
+      "type": "object"
+    },
+    "title": {
+      "description": "The title the participant gave this entry. Their own words.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "body"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    }
+  },
+  "type": "object"
+}

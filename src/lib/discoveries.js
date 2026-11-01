@@ -1,13 +1,20 @@
 import { useEffect, useState } from "react";
-import { makeId, readStore, subscribeStore, writeStore } from "./store";
+import { base44 } from "@/api/base44Client";
+import { PREFIX, makeId, resolveKey } from "./store";
 
 /**
- * Discovery entries live in their own browser-local list.
- * Nothing here writes to the stores the rest of the workbook already uses
- * (answers, decisions, stepState, carried, lifeMap, discoveryNotes, journal),
- * so adding, editing or deleting a discovery never changes a source entry.
+ * Discovery Record entries live on the participant's account, one DiscoveryRecord row each,
+ * readable and writable only by the account that created them.
+ *
+ * The app reads from an in-memory copy so pages can respond at once. Changes update that copy
+ * immediately and save to the account in the background. Entries saved on this device before
+ * this change are copied to the account once, then removed from the device.
+ *
+ * Nothing here writes to the stores the rest of the workbook uses (answers, decisions, stepState,
+ * carried, lifeMap, discoveryNotes, journal), so a discovery never changes a source entry.
  */
 const KEY = "discoveries";
+const entity = () => base44.entities.DiscoveryRecord;
 
 /** The optional context questions, in the order the page offers them. */
 export const DISCOVERY_CONTEXT_FIELDS = [
@@ -22,13 +29,57 @@ export function emptyDiscovery() {
   return { title: "", body: "", context: {}, decision: "" };
 }
 
-export function listDiscoveries() {
-  const items = readStore(KEY, []);
+let cache = [];
+let loaded = false;
+let loading = null;
+/** temp id -> promise of the real account id (or null if the save failed) */
+const pendingIds = new Map();
+const listeners = new Set();
+
+function notify() {
+  listeners.forEach((listener) => listener());
+}
+
+export function subscribeDiscoveries(listener) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function sortNewest(items) {
   return [...items].sort((a, b) => (a.created_date < b.created_date ? 1 : -1));
 }
 
+function fromRow(row) {
+  return {
+    id: row.id,
+    title: row.title || "",
+    body: row.body || "",
+    context: row.context || {},
+    decision: row.decision || "",
+    decision_date: row.decision_date || "",
+    decision_note: row.decision_note || "",
+    decision_updates: row.decision_updates || [],
+    source: row.source || null,
+    created_date: row.created_date || new Date().toISOString(),
+    updated_date: row.updated_date || row.created_date || new Date().toISOString(),
+  };
+}
+
+function toPayload(entry) {
+  const { id, created_date, updated_date, ...payload } = entry; // eslint-disable-line no-unused-vars
+  return payload;
+}
+
+function resolveId(id) {
+  return pendingIds.get(id) || Promise.resolve(id);
+}
+
+export function listDiscoveries() {
+  return sortNewest(cache);
+}
+
 export function getDiscovery(id) {
-  return readStore(KEY, []).find((entry) => entry.id === id) || null;
+  return cache.find((entry) => entry.id === id) || null;
 }
 
 export function createDiscovery(fields = {}) {
@@ -50,24 +101,58 @@ export function createDiscovery(fields = {}) {
     decision,
     decision_date: decision ? now : "",
   };
-  writeStore(KEY, [...readStore(KEY, []), entry]);
+  cache = sortNewest([...cache, entry]);
+  notify();
+
+  const saved = entity()
+    .create(toPayload(entry))
+    .then((row) => {
+      cache = cache.map((item) =>
+        item.id === entry.id ? { ...item, id: row.id, created_date: row.created_date || item.created_date } : item
+      );
+      pendingIds.delete(entry.id);
+      notify();
+      return row.id;
+    })
+    .catch((error) => {
+      console.error("Discovery Record save failed", error);
+      cache = cache.filter((item) => item.id !== entry.id);
+      pendingIds.delete(entry.id);
+      notify();
+      return null;
+    });
+  pendingIds.set(entry.id, saved);
   return entry;
 }
 
 export function updateDiscovery(id, patch) {
-  writeStore(
-    KEY,
-    readStore(KEY, []).map((entry) =>
-      entry.id === id ? { ...entry, ...patch, updated_date: new Date().toISOString() } : entry
-    )
+  cache = cache.map((entry) =>
+    entry.id === id ? { ...entry, ...patch, updated_date: new Date().toISOString() } : entry
   );
+  notify();
+  resolveId(id).then((realId) => {
+    if (!realId) return;
+    entity()
+      .update(realId, patch)
+      .catch((error) => {
+        console.error("Discovery Record update failed", error);
+        loadDiscoveries();
+      });
+  });
 }
 
 export function removeDiscovery(id) {
-  writeStore(
-    KEY,
-    readStore(KEY, []).filter((entry) => entry.id !== id)
-  );
+  cache = cache.filter((entry) => entry.id !== id);
+  notify();
+  resolveId(id).then((realId) => {
+    if (!realId) return;
+    entity()
+      .delete(realId)
+      .catch((error) => {
+        console.error("Discovery Record delete failed", error);
+        loadDiscoveries();
+      });
+  });
 }
 
 /**
@@ -110,8 +195,74 @@ export function contextRows(context) {
   })).filter((row) => row.value);
 }
 
+/** Entries saved on this device before the move. Read once, then cleared after they reach the account. */
+function legacyDeviceEntries() {
+  const found = [];
+  const keys = [PREFIX + resolveKey(KEY), PREFIX + KEY];
+  for (const storageKey of [...new Set(keys)]) {
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      const items = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(items)) found.push(...items);
+    } catch {
+      /* unreadable old copy: nothing to move */
+    }
+  }
+  return found;
+}
+
+function clearDeviceEntries() {
+  for (const storageKey of new Set([PREFIX + resolveKey(KEY), PREFIX + KEY])) {
+    try {
+      window.localStorage.removeItem(storageKey);
+    } catch {
+      /* storage unavailable: leave it */
+    }
+  }
+}
+
+async function doLoad() {
+  try {
+    const rows = (await entity().list("-created_date", 500)) || [];
+    const remote = rows.map(fromRow);
+    const known = new Set(remote.map((entry) => `${entry.title}\u0000${entry.body}`));
+
+    const local = legacyDeviceEntries();
+    const toMove = local.filter((entry) => !known.has(`${entry.title || ""}\u0000${entry.body || ""}`));
+    const moved = [];
+    let allMoved = true;
+    for (const item of toMove) {
+      try {
+        const row = await entity().create(toPayload({ ...emptyDiscovery(), ...item }));
+        moved.push(fromRow(row));
+      } catch (error) {
+        allMoved = false;
+        console.error("Could not move a Discovery Record entry to the account", error);
+      }
+    }
+    if (allMoved && local.length) clearDeviceEntries();
+
+    const pendingNow = cache.filter((entry) => pendingIds.has(entry.id));
+    cache = sortNewest([...remote, ...moved, ...pendingNow]);
+    loaded = true;
+    notify();
+  } catch (error) {
+    console.error("Discovery Record could not load", error);
+  }
+}
+
+/** Loads the signed-in participant's Discovery Record from their account. Safe to call repeatedly. */
+export function loadDiscoveries() {
+  if (!loading) loading = doLoad().finally(() => (loading = null));
+  return loading;
+}
+
 export function useDiscoveries() {
   const [items, setItems] = useState(() => listDiscoveries());
-  useEffect(() => subscribeStore(KEY, () => setItems(listDiscoveries())), []);
+  useEffect(() => {
+    const off = subscribeDiscoveries(() => setItems(listDiscoveries()));
+    if (!loaded) loadDiscoveries();
+    return off;
+  }, []);
   return items;
 }
