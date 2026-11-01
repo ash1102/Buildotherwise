@@ -35,14 +35,14 @@ export default function About() {
           one. So are the other paths.
         </p>
         <p>
-          Entrepalooza is built by Build Otherwise, using the Scars to Strategy framework. Pilot 1 is the current release: Getting Started and
-          Modules 1–10. Nothing in the workbook promises a job, an income or business success. It is an educational
+          Entrepalooza is built by Build Otherwise, using the Scars to Strategy framework. The workbook is open now: Getting Started and
+          Modules 1–5. Modules 6–10 are locked for now. Nothing in the workbook promises a job, an income or business success. It is an educational
           workbook, not therapy, treatment or diagnosis, and it is not a readiness test.
         </p>
       </div>
 
       <div className="workbook-section">
-        <h2 className="text-[18px]">What Pilot 1 is testing</h2>
+        <h2 className="text-[18px]">What the workbook is testing</h2>
         <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
           The pilot tests the program, not you. We’re checking whether Entrepalooza is clear, doable and worth your
           time. We’re not promising jobs, income or business results. The questions we’re asking:
