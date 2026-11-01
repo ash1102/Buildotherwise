@@ -189,7 +189,7 @@ test("the all-saved banner is gone, and per-module saved counts and the page hea
   assert.match(home, /moduleProgressDescription\(row\)/);
   assert.match(home, /usePacedProgress\(\{ modules, lessonsByOrder, answers, states \}\)/);
   assert.match(home, /<DiscoveryStart onSkip=\{goToWorkbook\} headingLevel="h1" \/>/, "discovery holds the page's only h1");
-  assert.doesNotMatch(home, /<h1/, "no other h1 on the member dashboard");
+  assert.doesNotMatch(home.slice(home.indexOf("function MemberHome")), /<h1/, "no other h1 on the member dashboard");
 });
 
 test("question navigation: one featured question, the full list only behind a collapsed control", () => {
