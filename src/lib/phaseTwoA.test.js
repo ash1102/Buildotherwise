@@ -34,7 +34,6 @@ test("the three starting points each lead to a real question, and all four appro
 });
 
 test("each path frames its questions differently, keeps the original four follow-ups, and every question stays reachable", () => {
-  const { PATH_FRAMING, framingFor, questionsForPath } = await import("./dashboardDiscovery.js");
   for (const point of STARTING_POINTS) {
     const all = questionsForPath(point.id).map((q) => q.id);
     assert.equal(all.length, 6, `${point.id} shows all six`);
@@ -44,12 +43,6 @@ test("each path frames its questions differently, keeps the original four follow
       assert.ok(framed.experiment.length > 20, `${point.id}/${id} experiment`);
     }
   }
-  // The four original follow-ups stay exact on every path that shows them, unless a path has its own wording.
-  assert.equal(framingFor("looking", "mild-curiosity").followUp.length > 0, true);
-  assert.equal(QUESTIONS["self-taught"].followUp, "What got you started?");
-  assert.equal(QUESTIONS.overlooked.followUp, "What do you usually do when you notice it?");
-  assert.equal(QUESTIONS["lost-track"].followUp, "How did you feel afterward?");
-  assert.equal(QUESTIONS["mild-curiosity"].followUp, "What would you like to do with that curiosity?");
   const banned = /\b(your|a) (strength|talent|passion|gift)\b|business (opportunity|idea)|you(’re| are) (good|great|talented|gifted)|means you should/i;
   for (const path of Object.values(PATH_FRAMING)) {
     for (const entry of Object.values(path)) {
@@ -58,6 +51,8 @@ test("each path frames its questions differently, keeps the original four follow
     }
   }
 });
+
+test("approved question and follow-up wording is exact", () => {
   assert.equal(QUESTIONS["self-taught"].text, "What’s something you’ve figured out how to do that nobody actually taught you?");
   assert.equal(QUESTIONS["self-taught"].followUp, "What got you started?");
   assert.equal(QUESTIONS.overlooked.text, "What’s a problem you notice that other people seem to overlook?");
