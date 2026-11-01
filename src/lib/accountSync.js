@@ -281,7 +281,7 @@ export async function stopAccountSync() {
 /** Delete this account's saved workbook from the account and from this device. */
 export async function deleteAccountWorkbook() {
   const userId = currentUser;
-  if (!userId) return 0;
+  if (!userId) throw new Error("No account is connected on this device, so the workbook could not be deleted from it.");
   if (timer) {
     clearTimeout(timer);
     timer = null;
