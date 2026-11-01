@@ -272,7 +272,7 @@ export default function PreviewStepPage() {
 
       {step.closesPilot ? (
         <p className="rounded-md border border-dashed border-input bg-secondary p-4 text-[16px] leading-relaxed text-muted-foreground">
-          This is the end of Pilot 1. Modules 6 to 10 are optional and are not assigned to you: nothing carries on by
+          This is the end of Modules 1–5. Modules 6 to 10 are optional and are not assigned to you: nothing carries on by
           itself, and nothing here decides that for you.
         </p>
       ) : null}
