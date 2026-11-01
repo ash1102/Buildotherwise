@@ -18,7 +18,9 @@
     "test:module-two": "node --import ./scripts/register-js-extension.mjs --test src/lib/moduleTwo.test.js",
     "test:module-five": "node --import ./scripts/register-js-extension.mjs --test src/lib/moduleFive.test.js",
     "test:phase-one": "node --import ./scripts/register-js-extension.mjs --test src/lib/phaseOneAccess.test.js src/lib/privacyWording.test.js",
-    "test:phase-two": "node --import ./scripts/register-js-extension.mjs --test src/lib/phaseTwoA.test.js"
+    "test:phase-two": "node --import ./scripts/register-js-extension.mjs --test src/lib/phaseTwoA.test.js",
+    "test:discovery-record": "node --import ./scripts/register-js-extension.mjs --test src/lib/discoveryRecordMerge.test.js",
+    "test:all": "node --import ./scripts/register-js-extension.mjs --test src/lib/*.test.js"
   },
   "dependencies": {
     "@base44/sdk": "^0.8.57",

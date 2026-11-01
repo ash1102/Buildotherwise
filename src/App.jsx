@@ -111,7 +111,7 @@ const AuthenticatedApp = () => {
             <Route path="/map" element={<LifeMapPage />} />
             <Route path="/discovery-map" element={<DiscoveryMapPage />} />
             <Route path="/record" element={<DiscoveryRecordPage />} />
-            {/* Old links to My Discoveries still work: it is now part of the Discovery Record. */}
+            {/* Old /my-discoveries links still work: that page is now part of the Discovery Record. */}
             <Route path="/my-discoveries" element={<Navigate to="/record" replace />} />
             <Route path="/my-records" element={<MyRecordsPage />} />
             <Route path="/program-library" element={<ProgramLibrary />} />

@@ -267,7 +267,7 @@ test("deleting one moved entry also deletes its original copy, and says so if th
   const fn = lib.slice(lib.indexOf("export async function removeDiscoveryConfirmed"), lib.indexOf("export function removeDiscovery("));
   assert.ok(fn.indexOf("entity().delete(realId)") < fn.indexOf("DiscoveryThread.delete(threadId)"), "the entry goes first");
   assert.match(fn, /originalKept: true/);
-  const migrate = lib.slice(lib.indexOf("export function migrateThreadsToRecords"), lib.indexOf("export async function removeDiscoveryConfirmed"));
+  const migrate = lib.slice(lib.indexOf("export function migrateThreadsToRecords"), lib.indexOf("/**\n * Deletes one entry and resolves"));
   assert.doesNotMatch(migrate, /delete/i, "migration itself never deletes");
   assert.match(lib, /if \(!migrating\)/, "one migration at a time per tab");
 });
