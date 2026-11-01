@@ -376,6 +376,18 @@ body {
   animation: journal-slide-out 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
+/* Discovery panel: a deep plum surface in both themes. It re-points the primary tokens for this panel only,
+   so text, dividers and focus rings inside it follow the plum and the marigold action stays as it is. */
+.discovery-surface {
+  --primary: 277 34.3% 26.9%; /* dusk plum #4A2D5C */
+  --primary-foreground: 38.2 35.5% 93.9%; /* chalk */
+}
+
+.dark .discovery-surface {
+  --primary: 272.7 24.4% 17.6%; /* deep plum #2E2238 (dark plum wash) */
+  --primary-foreground: 34.3 35% 92.2%; /* warm cream */
+}
+
 @media print {
   .no-print {
     display: none !important;
