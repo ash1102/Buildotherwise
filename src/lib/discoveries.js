@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { PREFIX, makeId, resolveKey } from "./store";
-import { planMigration } from "./discoveryMigration";
+import { runMigration } from "./discoveryMigration";
+import { deleteAllPaged } from "./deletionSteps";
 
 /**
  * Discovery Record entries live on the participant's account, one DiscoveryRecord row each,
@@ -183,10 +184,10 @@ export async function updateDiscoveryConfirmed(id, patch) {
 }
 
 /**
- * One-time move of DiscoveryThread rows into DiscoveryRecord.
- * Idempotent: each thread's id is stored on the new entry as source.thread_id, and any thread that already
- * has a record is skipped. Original DiscoveryThread rows are never deleted here.
- * Returns { moved, skipped, failed }.
+ * One-time move of DiscoveryThread rows into DiscoveryRecord. The rules live in discoveryMigration.js.
+ * Idempotent: each thread's id is stored on the new entry as source.thread_id and in a migration record on the
+ * account, and any thread already moved is skipped. Original DiscoveryThread rows are never deleted here.
+ * Only one run at a time per tab. Resolves to { moved, skipped, failed }.
  */
 const MIGRATION_KEY = "discoveryThreadMigration";
 
@@ -218,6 +219,11 @@ function listAllRecords() {
   return listAllPages((skip, limit) => entity().list("-created_date", limit, skip));
 }
 
+/** Every DiscoveryRecord row on this account, read straight from the account (not the in-memory copy). */
+export async function listAllDiscoveryRecords() {
+  return (await listAllRecords()).map(fromRow);
+}
+
 /**
  * Thread ids already moved once, stored on the account. The id stays here even if the participant
  * later deletes the record, so the thread is never copied again.
@@ -237,6 +243,15 @@ async function readMigrationState() {
   return { row, ids: new Set(ids) };
 }
 
+/** The ids already moved, for deciding which threads still show on the page. Empty if it can't be read. */
+export async function readMovedThreadIds() {
+  try {
+    return [...(await readMigrationState()).ids];
+  } catch {
+    return [];
+  }
+}
+
 async function writeMigrationState(state) {
   const payload = {
     store_key: MIGRATION_KEY,
@@ -252,55 +267,44 @@ async function writeMigrationState(state) {
   }
 }
 
-export async function migrateThreadsToRecords(listThreads = listAllThreads) {
-  const result = { moved: 0, skipped: 0, failed: 0 };
-  const state = await readMigrationState();
-  const records = await listAllRecords();
-  const threads = (await listThreads()) || [];
-  const plan = planMigration({
-    threads,
-    recordThreadIds: records.map((row) => row?.source?.thread_id),
-    movedIds: [...state.ids],
-  });
-  result.skipped = plan.skipped;
+let migrating = null;
 
-  for (const thread of plan.toCreate) {
-    try {
-      await entity().create(
-        toPayload({
-          ...emptyDiscovery(),
-          title: thread.title || "",
-          body: thread.response || "",
-          source: {
-            thread_id: thread.id,
-            kind: thread.source || "",
-            question_id: thread.question_id || "",
-            question_text: thread.question_text || "",
-            path_id: thread.path_id || "",
-            follow_up_text: thread.follow_up_text || "",
-            option_id: thread.option_id || "",
-            option_label: thread.option_label || "",
-            notes: thread.notes || "",
-            migrated_from: "DiscoveryThread",
-          },
-        })
-      );
-      result.moved += 1;
-    } catch (error) {
-      console.error("Could not migrate a discovery thread", error);
-      result.failed += 1;
-      continue;
-    }
-    // Record each move as it lands, so an interrupted run does not copy the same thread again.
-    state.ids.add(thread.id);
-    try {
-      await writeMigrationState(state);
-    } catch (error) {
-      // The new record's source.thread_id still stops a repeat copy on the next run.
-      console.error("Migration record could not be saved", error);
-    }
+export function migrateThreadsToRecords() {
+  if (!migrating) {
+    migrating = runMigration({
+      readState: readMigrationState,
+      writeState: writeMigrationState,
+      listRecords: listAllRecords,
+      listThreads: listAllThreads,
+      createRecord: (fields) => entity().create(toPayload({ ...emptyDiscovery(), ...fields })),
+    }).finally(() => {
+      migrating = null;
+    });
   }
-  return result;
+  return migrating;
+}
+
+/**
+ * Deletes one entry and resolves only once the account confirms it. Rejects (and keeps the entry) on failure.
+ * When the entry was moved from the original storage, the original copy is deleted too, because the participant
+ * asked for this discovery to be deleted. Resolves to { originalKept } so the page can say if that part failed.
+ */
+export async function removeDiscoveryConfirmed(id) {
+  const entry = getDiscovery(id);
+  const realId = await resolveId(id);
+  if (!realId) throw new Error("This entry hasn't reached your account yet. Try again in a moment.");
+  await entity().delete(realId);
+  cache = cache.filter((item) => item.id !== id);
+  notify();
+  const threadId = entry?.source?.thread_id;
+  if (!threadId) return { originalKept: false };
+  try {
+    await base44.entities.DiscoveryThread.delete(threadId);
+    return { originalKept: false };
+  } catch (error) {
+    console.error("The original copy of this discovery could not be deleted", error);
+    return { originalKept: true };
+  }
 }
 
 export function removeDiscovery(id) {
@@ -421,33 +425,18 @@ export function loadDiscoveries() {
 
 /** Deletes every DiscoveryRecord row on this account. Used by Settings. Resolves to the number deleted. */
 export async function deleteAllDiscoveryRecords() {
-  let total = 0;
   try {
-    let previous = "";
-    for (;;) {
-      const rows = (await entity().list("-created_date", 200)) || [];
-      if (!rows.length) break;
-      const batch = rows.map((row) => row.id).join(",");
-      if (batch === previous) {
-        throw new Error("Rows keep coming back after delete, so deletion stopped. Some entries may remain.");
-      }
-      previous = batch;
-      for (const row of rows) {
-        await entity().delete(row.id);
-        total += 1;
-      }
-    }
+    return await deleteAllPaged(() => entity().list("-created_date", 200), (id) => entity().delete(id), "Discovery Record entries");
   } finally {
     cache = [];
     notify();
   }
-  return total;
 }
 
 /** Plain-text lines for the workbook download. Oldest first. Blank-safe for migrated, DiscoveryStart and WorkbookSources entries. */
 export function recordExportLines(records = []) {
   if (!records.length) return [];
-  const lines = ["", "## My Discovery Record", ""];
+  const lines = ["", "## Discovery Record", ""];
   [...records]
     .sort((a, b) => (a.created_date > b.created_date ? 1 : -1))
     .forEach((entry) => {
