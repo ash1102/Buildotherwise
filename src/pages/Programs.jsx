@@ -24,7 +24,7 @@ export default function Programs() {
 
       <section className="workbook-section space-y-4">
         <div>
-          <p className="workbook-label">Flagship program · Pilot 1</p>
+          <p className="workbook-label">Flagship program</p>
           <h2 className="mt-1 text-[22px]">Entrepalooza</h2>
           <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
             A self-paced online workbook for adults in the middle of a change who want to test what comes next in real
@@ -76,7 +76,7 @@ export default function Programs() {
         <div>
           <h3 className="text-[16px] font-semibold text-foreground">Format</h3>
           <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
-            Online and self-paced. The workbook is open now. Pilot 1 tests the program, not you: whether it’s clear,
+            Online and self-paced. The workbook is open now. The pilot tests the program, not you: whether it’s clear,
             doable and worth your time.
           </p>
         </div>
