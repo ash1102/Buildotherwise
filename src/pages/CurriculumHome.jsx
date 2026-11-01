@@ -85,7 +85,7 @@ function PublicHome() {
   return (
     <div className="space-y-12">
       <section className="rounded-2xl bg-primary px-5 py-10 text-primary-foreground sm:px-10 sm:py-14">
-        <p className="text-[13px] font-semibold text-primary-soft">Entrepalooza · Pilot 1 · online · from Build Otherwise</p>
+        <p className="text-[13px] font-semibold text-primary-soft">Entrepalooza · online · from Build Otherwise</p>
         <h1 className="mt-3 max-w-[18ch] text-[clamp(2.2rem,1.4rem+3.6vw,3.6rem)] leading-[1.05] tracking-tight text-primary-foreground">
           You don’t need your whole life figured out.
         </h1>
@@ -157,7 +157,7 @@ function PublicHome() {
       </section>
 
       <section className="max-w-[68ch]">
-        <p className="workbook-label">About Pilot 1</p>
+        <p className="workbook-label">About the workbook</p>
         <h2 className="mt-1.5">The pilot tests the program, not you.</h2>
         <p className="mt-2 text-[17px] leading-relaxed text-muted-foreground">
           We’re checking whether Entrepalooza is clear, doable and worth your time. We’re not promising jobs, income or
@@ -176,9 +176,9 @@ function PublicHome() {
       </section>
 
       <section className="rounded-2xl bg-primary px-5 py-9 text-primary-foreground sm:px-10">
-        <h2 className="text-primary-foreground">Want in on Pilot 1?</h2>
+        <h2 className="text-primary-foreground">Want in?</h2>
         <p className="mt-2 max-w-[60ch] text-[17px] leading-relaxed text-primary-foreground/85">
-          Pilot 1 is online and open now. Begin whenever you like, and join the list if you want updates.
+          The workbook is online and open now. Begin whenever you like, and join the list if you want updates.
         </p>
         <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
           <StartButton />
@@ -320,7 +320,7 @@ function MemberHome() {
       )}
 
       <section aria-labelledby="workbook">
-        <p className="workbook-label">Your progress · Pilot 1</p>
+        <p className="workbook-label">Your progress</p>
         <h2 id="workbook" tabIndex={-1} className="mt-1 text-[22px] outline-none">
           Explore the Workbook
         </h2>
