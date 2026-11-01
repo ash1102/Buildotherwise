@@ -165,7 +165,7 @@ async function deleteAllMyRecords() {
 
 /** Everything the workbook delete covers. The workbook (which also holds the migration record) goes last, so a failure earlier cannot leave discoveries that a later migration would recreate. */
 const WORKBOOK_STEPS = () => [
-  ["your discoveries", deleteAllThreads],
+  ["the earlier saved copies in your Discovery Record", deleteAllThreads],
   ["your Discovery Record", deleteAllDiscoveryRecords],
   ["My Records", deleteAllMyRecords],
   ["your journal and workbook", deleteAccountWorkbook, { requiresClean: true }],
@@ -367,13 +367,13 @@ export default function Settings() {
         </p>
         <button type="button" onClick={download} className={primaryButton}>
           <Download className="h-4 w-4" aria-hidden="true" />
-          Download my workbook, reflections and discoveries
+          Download my workbook, reflections and Discovery Record
         </button>
 
         <div className="border-t border-border pt-4">
-          <h3 className="text-[16px]">Delete my workbook, discoveries and My Records</h3>
+          <h3 className="text-[16px]">Delete my workbook, Discovery Record and My Records</h3>
           <p className="mt-1 text-[15px] leading-relaxed text-muted-foreground">
-            Removes your journal, step answers, decisions and maps, your discoveries, your Discovery Record and My Records, from your account and from this device. This can’t be
+            Removes your journal, step answers, decisions and maps, your Discovery Record and My Records, from your account and from this device. This can’t be
             undone, so download a copy first if you want one. To delete only My Records, use the button below.
           </p>
           {confirmClear ? (
@@ -392,7 +392,7 @@ export default function Settings() {
                       });
                     } else {
                       clearDevice();
-                      toast({ title: "Your workbook, discoveries and My Records were deleted from your account." });
+                      toast({ title: "Your workbook, Discovery Record and My Records were deleted from your account." });
                     }
                   } catch {
                     toast({ title: `Some of it didn't delete. Try again, or email ${CONTACT}.` });
@@ -402,7 +402,7 @@ export default function Settings() {
                   }
                 }}
               >
-                {clearing ? "Deleting…" : "Yes, delete my workbook, discoveries and My Records"}
+                {clearing ? "Deleting…" : "Yes, delete my workbook, Discovery Record and My Records"}
               </button>
               <button type="button" className={secondaryButton} onClick={() => setConfirmClear(false)}>
                 Cancel
@@ -410,7 +410,7 @@ export default function Settings() {
             </div>
           ) : (
             <button type="button" className={`mt-3 ${secondaryButton}`} onClick={() => setConfirmClear(true)}>
-              Delete my workbook, discoveries and My Records
+              Delete my workbook, Discovery Record and My Records
             </button>
           )}
         </div>
@@ -482,7 +482,7 @@ export default function Settings() {
           <div className="space-y-2 text-[16px] leading-relaxed">
             <p>Your deletion request was sent to the Build Otherwise team.</p>
             {deleteResult?.cleared ? (
-              <p>Your workbook, journal, discoveries and My Records were deleted from your account and from this device.</p>
+              <p>Your workbook, journal, Discovery Record and My Records were deleted from your account and from this device.</p>
             ) : null}
             {deleteResult?.failed?.length ? (
               <p className="text-accent-ink">
@@ -491,7 +491,7 @@ export default function Settings() {
               </p>
             ) : null}
             {!deleteResult?.cleared && !deleteResult?.failed?.length ? (
-              <p>Your workbook, journal, discoveries and My Records stay in your account. Email {CONTACT} if you want them removed too.</p>
+              <p>Your workbook, journal, Discovery Record and My Records stay in your account. Email {CONTACT} if you want them removed too.</p>
             ) : null}
           </div>
         ) : (
@@ -508,7 +508,7 @@ export default function Settings() {
                     onChange={(event) => setAlsoClear(event.target.checked)}
                     className="mt-1"
                   />
-                  Also delete my workbook, journal, discoveries and My Records from my account now
+                  Also delete my workbook, journal, Discovery Record and My Records from my account now
                 </label>
                 <div className="flex flex-wrap gap-2">
                   <button type="button" disabled={deleting} className={dangerButton} onClick={requestDeletion}>
