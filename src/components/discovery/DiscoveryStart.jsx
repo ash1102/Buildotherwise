@@ -14,6 +14,7 @@ import {
 } from "@/lib/dashboardDiscovery";
 import { TITLE_MAX, threadFromDiscovery } from "@/lib/discoveryThreadData";
 import { createDiscoveryConfirmed, updateDiscoveryConfirmed } from "@/lib/discoveries";
+import { recordFieldsFromDiscovery } from "@/lib/discoveryMigration";
 
 /**
  * Discovery on the dashboard: Notice -> Explore -> Choose.
@@ -103,28 +104,6 @@ const INITIAL = {
   savedId: null,
 };
 
-/**
- * Maps the saved-discovery row into the DiscoveryRecord shape.
- * The discovery's own details live under `source`, so the title, body and context stay the participant's words.
- */
-function toRecordFields(row) {
-  return {
-    title: row.title,
-    body: row.response,
-    source: {
-      kind: row.source,
-      question_id: row.question_id,
-      question_text: row.question_text,
-      path_id: row.path_id,
-      follow_up_text: row.follow_up_text,
-      option_id: row.option_id,
-      option_label: row.option_label,
-      notes: row.notes,
-      description: row.description,
-    },
-  };
-}
-
 const textareaClass = "mt-2 w-full rounded-xl border border-border bg-card px-3 py-2 text-[16px] leading-relaxed text-foreground";
 
 export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
@@ -182,11 +161,11 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
     try {
       const data = threadFromDiscovery({ title: state.title, state });
       const entry = state.savedId
-        ? await updateDiscoveryConfirmed(state.savedId, toRecordFields(data))
-        : await createDiscoveryConfirmed(toRecordFields(data));
+        ? await updateDiscoveryConfirmed(state.savedId, recordFieldsFromDiscovery(data))
+        : await createDiscoveryConfirmed(recordFieldsFromDiscovery(data));
       const savedId = entry?.id || state.savedId;
       setState((c) => ({ ...c, savedId, saveOpen: false }));
-      setSaveMessage("Saved to Discovery Record.");
+      setSaveMessage(state.savedId ? "Your Discovery Record entry was updated." : "Saved to Discovery Record.");
     } catch (error) {
       console.error("Discovery save failed", error);
       setSaveMessage("That didn’t save to your account. Your words are still here. Try again.");
@@ -399,7 +378,7 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
                   setState((c) => ({ ...c, saveOpen: !c.saveOpen }));
                 }}
               >
-                {state.savedId ? "Update My Discoveries" : "Save to My Discoveries"}
+                {state.savedId ? "Update Discovery Record" : "Save to Discovery Record"}
               </button>
             </li>
             <li>
@@ -457,8 +436,8 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
             <p role="status" className="text-[15px] font-medium text-primary-foreground">
               {saveMessage}{" "}
               {state.savedId && saveMessage !== "" && !saveMessage.startsWith("That didn") ? (
-                <Link to="/my-discoveries" className="underline underline-offset-2">
-                  Open My Discoveries
+                <Link to="/record" className="underline underline-offset-2">
+                  Open Discovery Record
                 </Link>
               ) : null}
             </p>
@@ -479,8 +458,8 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
           <button type="button" className={textButton} onClick={onSkip}>
             Skip this and go to the workbook
           </button>
-          <Link to="/my-discoveries" className={textButton}>
-            My Discoveries
+          <Link to="/record" className={textButton}>
+            Discovery Record
           </Link>
           {state.stage !== "welcome" ? (
             <button type="button" className={textButton} onClick={() => {
@@ -494,7 +473,7 @@ export default function DiscoveryStart({ onSkip, headingLevel = "h2" }) {
         <p className="flex items-start gap-2 text-[14px] leading-relaxed text-primary-foreground/85">
           <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           <span>
-            Nothing you choose or type here is saved unless you press Save to My Discoveries. If you don’t, it’s gone
+            Nothing you choose or type here is saved unless you press Save to Discovery Record. If you don’t, it’s gone
             when you leave this page. If you do, it goes to your Entrepalooza account, and it isn’t copied to your
             Journal, Life Map or Records.
           </span>

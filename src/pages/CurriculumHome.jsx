@@ -297,11 +297,11 @@ function MemberHome() {
                 </button>
               </li>
               <li>
-                <Link to="/my-discoveries" className={toolLink}>
+                <Link to="/record" className={toolLink}>
                   <Compass className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
                   <span>
-                    <span className="block font-semibold">My Discoveries</span>
-                    <span className="block text-[15px] text-muted-foreground">Questions you chose to keep.</span>
+                    <span className="block font-semibold">Discovery Record</span>
+                    <span className="block text-[15px] text-muted-foreground">What you chose to keep.</span>
                   </span>
                 </Link>
               </li>

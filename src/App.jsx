@@ -20,7 +20,6 @@ const JournalPage = lazy(() => import('@/pages/JournalPage'));
 const JournalReflection = lazy(() => import('@/pages/JournalReflection'));
 const LifeMapPage = lazy(() => import('@/pages/LifeMapPage'));
 const DiscoveryRecordPage = lazy(() => import('@/pages/DiscoveryRecordPage'));
-const MyDiscoveriesPage = lazy(() => import('@/pages/MyDiscoveriesPage'));
 const MyRecordsPage = lazy(() => import('@/pages/MyRecordsPage'));
 const ProgramLibrary = lazy(() => import('@/pages/ProgramLibrary'));
 const TribeThreads = lazy(() => import('@/pages/TribeThreads'));
@@ -112,7 +111,8 @@ const AuthenticatedApp = () => {
             <Route path="/map" element={<LifeMapPage />} />
             <Route path="/discovery-map" element={<DiscoveryMapPage />} />
             <Route path="/record" element={<DiscoveryRecordPage />} />
-            <Route path="/my-discoveries" element={<MyDiscoveriesPage />} />
+            {/* Old links to My Discoveries still work: it is now part of the Discovery Record. */}
+            <Route path="/my-discoveries" element={<Navigate to="/record" replace />} />
             <Route path="/my-records" element={<MyRecordsPage />} />
             <Route path="/program-library" element={<ProgramLibrary />} />
             <Route path="/tribe-threads" element={<TribeThreads />} />
