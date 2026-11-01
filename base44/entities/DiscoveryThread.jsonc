@@ -1,0 +1,58 @@
+{
+  "name": "DiscoveryThread",
+  "type": "object",
+  "properties": {
+    "source": {
+      "type": "string",
+      "enum": ["question", "own"],
+      "description": "Whether it started from one of the dashboard questions or from the participant's own question or observation."
+    },
+    "title": {
+      "type": "string",
+      "description": "The title the participant gave this discovery. Their own words."
+    },
+    "question_id": {
+      "type": "string",
+      "description": "Which dashboard question it started from. Empty when the participant wrote their own."
+    },
+    "question_text": {
+      "type": "string",
+      "description": "The question exactly as it was worded when saved, so the discovery still reads the same later."
+    },
+    "path_id": {
+      "type": "string",
+      "description": "Which starting path the participant chose (attention, different, looking)."
+    },
+    "response": {
+      "type": "string",
+      "description": "The participant's own response, or their own question or observation. Never edited by staff."
+    },
+    "follow_up_text": {
+      "type": "string",
+      "description": "The follow-up question exactly as it was worded when saved."
+    },
+    "option_id": {
+      "type": "string",
+      "description": "The follow-up answer they selected, if any."
+    },
+    "option_label": {
+      "type": "string",
+      "description": "The wording of the selected follow-up answer, as it was when saved."
+    },
+    "notes": {
+      "type": "string",
+      "description": "What the participant noticed while exploring, in their own words. Never edited by staff."
+    },
+    "description": {
+      "type": "string",
+      "description": "Short label for search and previews."
+    }
+  },
+  "required": ["source"],
+  "rls": {
+    "create": { "created_by_id": "{{user.id}}" },
+    "read": { "created_by_id": "{{user.id}}" },
+    "update": { "created_by_id": "{{user.id}}" },
+    "delete": { "created_by_id": "{{user.id}}" }
+  }
+}
