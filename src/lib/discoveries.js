@@ -344,6 +344,42 @@ export function loadDiscoveries() {
   return loading;
 }
 
+/** Deletes every DiscoveryRecord row on this account. Used by Settings. Resolves to the number deleted. */
+export async function deleteAllDiscoveryRecords() {
+  const rows = (await entity().list("-created_date", 1000)) || [];
+  for (const row of rows) {
+    await entity().delete(row.id);
+  }
+  cache = [];
+  notify();
+  return rows.length;
+}
+
+/** Plain-text lines for the workbook download. Oldest first. Blank-safe for migrated, DiscoveryStart and WorkbookSources entries. */
+export function recordExportLines(records = []) {
+  if (!records.length) return [];
+  const lines = ["", "## My Discovery Record", ""];
+  [...records]
+    .sort((a, b) => (a.created_date > b.created_date ? 1 : -1))
+    .forEach((entry) => {
+      const source = entry.source || {};
+      const when = entry.created_date ? new Date(entry.created_date).toLocaleString() : "";
+      const from = source.question_text || source.lesson_title || source.label || "";
+      lines.push(`### ${entry.title || "Untitled discovery"}${when ? ` · ${when}` : ""}`);
+      if (from) lines.push(`From: ${from}`);
+      if (source.option_label) lines.push(`Chose: ${source.option_label}`);
+      if (source.follow_up_text) lines.push(`Follow-up: ${source.follow_up_text}`);
+      if (source.notes) lines.push(`Notes: ${source.notes}`);
+      if (entry.body) lines.push(entry.body);
+      contextRows(entry.context).forEach((row) => lines.push(`${row.label} ${row.value}`));
+      if (entry.decision) {
+        lines.push(`Decision: ${entry.decision}${entry.decision_note ? ` (${entry.decision_note})` : ""}`);
+      }
+      lines.push("");
+    });
+  return lines;
+}
+
 export function useDiscoveries() {
   const [items, setItems] = useState(() => listDiscoveries());
   useEffect(() => {
