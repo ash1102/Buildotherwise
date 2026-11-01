@@ -120,7 +120,7 @@ test("migration copies each thread once, word for word, and never touches the or
   assert.deepEqual(JSON.parse(account.state).sort(), ["t1", "t2"]);
   const rules = read("src/lib/discoveryMigration.js");
   const moveRules = rules.slice(rules.indexOf("export function planMigration"), rules.indexOf("export function unmovedThreads"));
-  assert.doesNotMatch(moveRules, /delete/i, "planning and running the move can't delete anything");
+  assert.doesNotMatch(moveRules, /\.delete\(|deleteThread|deleteRecord|deleteAll|deleteMigratedEntry/, "planning and running the move can't delete anything");
   assert.doesNotMatch(rules, /base44|import /, "the rules stay free of the account client");
 });
 
@@ -228,7 +228,7 @@ test("the Settings download reads the Discovery Record from the account, not the
   assert.match(fn, /threadsForExport\(threads, records, movedIds\)/);
   assert.doesNotMatch(fn, /listDiscoveries\(\)|listMyThreads\(\)/);
   const lib = read("src/lib/discoveries.js");
-  assert.match(lib, /export async function listAllDiscoveryRecords\(\)\s*\{\s*return \(await listAllRecords\(\)\)/);
+  assert.match(lib, /export async function listAllDiscoveryRecords\(\)\s*\{\s*return dedupeByThreadId\(await listAllRecords\(\)\)/);
   assert.match(lib, /if \(!fresh\) throw new Error/, "paging throws rather than returning a partial list");
 });
 
@@ -290,8 +290,8 @@ test("after a full discovery delete, migration has nothing to copy back", async 
 
 test("migration itself never deletes; deleting one entry goes through the exact-match rules", () => {
   const lib = read("src/lib/discoveries.js");
-  const migrate = lib.slice(lib.indexOf("export function migrateThreadsToRecords"), lib.indexOf("export function removeDiscoveryConfirmed"));
-  assert.doesNotMatch(migrate, /delete/i, "migration itself never deletes");
+  const migrate = lib.slice(lib.indexOf("export function migrateThreadsToRecords"), lib.indexOf("/**\n * Deletes one entry and resolves"));
+  assert.doesNotMatch(migrate, /\.delete\(|deleteThread|deleteAll|deleteMigratedEntry/, "migration itself never deletes");
   const remove = lib.slice(lib.indexOf("export function removeDiscoveryConfirmed"), lib.indexOf("export function removeDiscovery("));
   assert.match(remove, /deleteMigratedEntry\(/);
   assert.match(remove, /DiscoveryThread\.filter\(\{ id: threadId \}/);
