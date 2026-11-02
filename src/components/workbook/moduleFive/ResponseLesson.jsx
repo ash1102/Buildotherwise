@@ -65,6 +65,8 @@ function PartReading({ readings }) {
           small change count the same. A change after you try something doesn't prove the try caused it. Stopping, or
           leaving a working setup alone, is not a failure.
         </P>
+        <P>Keeping a useful part of a pattern does not mean continuing behavior that puts you or someone else at risk. If a pattern involves substance use, self-harm, unsafe situations, or harm to others, safety comes first. You can explore the need it was meeting without repeating the risky behavior.</P>
+        <P>You can choose support instead of experimenting on your own. You do not have to describe anything sensitive here.</P>
         <P>If you try anything, use a moment that is already in your week. You don't need a setback or a made-up crisis.</P>
       </Panel>
       <LongerReading readings={readings} />

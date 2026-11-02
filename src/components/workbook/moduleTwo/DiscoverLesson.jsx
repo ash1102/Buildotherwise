@@ -54,7 +54,10 @@ function PartLook({ answers }) {
         </p>
       )}
       {happened.outcome === OUTCOMES[3] || happened.outcome === OUTCOMES[4] ? (
-        <p className="text-[15px] text-muted-foreground">You haven’t had the experience yet, and that’s fine. The rest of this lesson still works with what you know so far.</p>
+        <div className="space-y-2 rounded-lg border border-border bg-card p-4">
+          <p className="text-[15px] text-muted-foreground">You haven’t had the experience yet, and that’s fine. You can review your plan, choose a different way to explore, or continue with what you know so far. No experience is being assumed.</p>
+          <Link to="/lesson/M2-L1" className="inline-block text-[15px] font-medium text-accent-ink underline underline-offset-2">Go back to my plan</Link>
+        </div>
       ) : null}
     </div>
   );
@@ -112,7 +115,7 @@ function PartWhere({ lesson, answers }) {
   const direction = readKey(answers, CODE, "direction");
   return (
     <div className="space-y-5">
-      <P>Based on what you know right now, where would you like to go from here? None of these is better than the others.</P>
+      <P>Whether you tried something, observed from a distance, or have not tried it yet, where would you like to go from here? None of these is better than the others.</P>
       <SingleChoice
         legend="Where from here?"
         options={DIRECTIONS}

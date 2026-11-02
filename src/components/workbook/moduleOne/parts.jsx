@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { answerKey } from "@/lib/workbook";
@@ -254,6 +255,7 @@ export function FinishControl({ code, answers }) {
         <Check className="h-4 w-4" aria-hidden="true" />
         Marked done
       </span>
+      <Link to="/" className="inline-flex min-h-[44px] items-center text-[15px] font-medium text-accent-ink underline underline-offset-2">Choose another lesson</Link>
       <button type="button" onClick={() => markFinished(code, false)} className="text-[14px] text-muted-foreground underline underline-offset-2">
         Undo
       </button>

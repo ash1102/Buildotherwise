@@ -49,7 +49,7 @@ export default function Programs() {
         <div>
           <h3 className="text-[16px] font-semibold text-foreground">Every decision counts</h3>
           <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
-            Each step ends with a choice that’s yours to make:
+            Across the workbook, you can make choices like these. Not every lesson uses the same options, and you can pause or skip without explaining:
           </p>
           <ul className="mt-2 flex flex-wrap gap-2">
             {DECISIONS.map((decision) => (
@@ -66,7 +66,7 @@ export default function Programs() {
         <div>
           <h3 className="text-[16px] font-semibold text-foreground">What’s included</h3>
           <ul className="mt-2 max-w-[68ch] list-disc space-y-1.5 pl-5 text-[16px] leading-relaxed text-muted-foreground">
-            <li>Getting Started plus ten modules, each with short teaching, a worked example and space to write.</li>
+            <li>Getting Started and Modules 1–5 are available in the current pilot. Later modules are still in development.</li>
             <li>A private journal and a Life Map to see your own patterns.</li>
             <li>Tribe Threads, group discussions where you post only if you choose to.</li>
             <li>No grades, scores or streaks.</li>
@@ -76,7 +76,7 @@ export default function Programs() {
         <div>
           <h3 className="text-[16px] font-semibold text-foreground">Format</h3>
           <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
-            Online and self-paced. The workbook is open now. The pilot tests the program, not you: whether it’s clear,
+            Online and self-paced. The current pilot includes Getting Started and five modules. The pilot tests the program, not you: whether it’s clear,
             doable and worth your time.
           </p>
         </div>
