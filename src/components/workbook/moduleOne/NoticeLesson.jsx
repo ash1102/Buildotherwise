@@ -276,6 +276,10 @@ function PartLook({ lesson, answers }) {
           Nothing is saved from earlier in this lesson. You can go back, answer from memory below, or leave it.
         </p>
       )}
+      {encounterCards.length && (text || map) ? <Panel tone="note" title="Could there be a connection?">
+        <P>You noticed something in your experience and selected {encounterCards.map(card => card.title).join(", ")}. They might connect, or they might not. You decide.</P>
+        <PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index="connection" label="A connection or question worth exploring (optional)" variant="inline" />
+      </Panel> : null}
       <div className="space-y-2">
         <p className="text-[15px] text-muted-foreground">Some things people notice:</p>
         <ul className="list-disc space-y-1 pl-5 text-[15px] text-muted-foreground">
