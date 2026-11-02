@@ -142,6 +142,11 @@ function PartEncounter({ lesson, answers }) {
         <details key={card.id} className="rounded-xl border border-border bg-card p-4">
           <summary className="cursor-pointer text-[16px] font-medium">Explore {card.title} now (optional)</summary>
           <p className="mt-3 text-[15px] leading-relaxed">{card.description}</p>
+          {card.id === "behavior" ? <div className="mt-3 space-y-3 rounded-lg bg-secondary p-3">
+            <p className="text-[15px] font-medium">Try a human behavior thought experiment</p>
+            <P>Two people get the same feedback. One feels encouraged, the other feels dismissed. What might account for the difference?</P>
+            <p className="text-[14px] text-muted-foreground">Try imagining two explanations. What information would you need before making a judgment? You do not need to decide who is right.</p>
+          </div> : null}
           <p className="mt-2 text-[15px] text-muted-foreground">What would you want to understand, watch, ask, or try to learn more about this possibility?</p>
           <div className="mt-3"><PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index={"explore-" + card.id} label="My question or small experiment (optional)" variant="inline" /></div>
           <p className="mt-2 text-[14px] text-muted-foreground">No right answer. You can leave it, come back, or change direction.</p>
