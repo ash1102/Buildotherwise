@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { FEEDBACK_SYSTEM_PROMPT, COMPANION_SYSTEM_INSTRUCTION, REFLECTION_AGENT_INSTRUCTIONS } from './prompts.js';
-import { handleAnswerFeedback, parseReply, buildUserMessage, MAX_PER_HOUR } from './feedback.js';
+import { FEEDBACK_SYSTEM_PROMPT, COMPANION_SYSTEM_INSTRUCTION, REFLECTION_AGENT_INSTRUCTIONS, REFLECTION_SHARED_PROTECTIONS } from './prompts.js';
+import { handleAnswerFeedback, parseReply, buildUserMessage, feedbackThinkingLevel, MAX_PER_HOUR, MAX_OUTPUT_TOKENS } from './feedback.js';
+import { feedbackContext, FEEDBACK_SLICE_MAX, getKnowledge } from './knowledge.js';
 import { buildRequestBody } from './gemini.js';
 import { handleSubmitInquiry, buildEmail, MAX_PER_EMAIL_PER_HOUR } from './inquiry.js';
 import {
@@ -22,6 +23,12 @@ test('prompts are copied verbatim from the Base44 functions', () => {
   const agent = JSON.parse(fs.readFileSync('base44/agents/conversation_journal_reflection.jsonc', 'utf8')).instructions;
   assert.equal(REFLECTION_AGENT_INSTRUCTIONS, agent);
   assert.match(FEEDBACK_SYSTEM_PROMPT, /Do not treat entrepreneurship/);
+  assert.match(FEEDBACK_SYSTEM_PROMPT, /One useful observation is better than three thin ones/);
+  assert.match(FEEDBACK_SYSTEM_PROMPT, /USING THE LESSON/);
+  assert.match(FEEDBACK_SYSTEM_PROMPT, /Zero or one optional question/);
+  assert.doesNotMatch(FEEDBACK_SYSTEM_PROMPT, /Name what is already clear or specific/);
+  assert.doesNotMatch(FEEDBACK_SYSTEM_PROMPT, /Use tentative language \("it may be"/);
+  assert.match(REFLECTION_SHARED_PROTECTIONS, /No therapy, recovery, corporate, or motivational clichés\. No praise inflation\. No shame\./);
   assert.match(COMPANION_SYSTEM_INSTRUCTION, /not a crisis service/);
 });
 
@@ -63,7 +70,7 @@ test('answerFeedback: uses Gemini only, saves trimmed feedback, never returns th
   const out = await body(res);
   assert.equal(out.status, 200);
   assert.equal(client.inserted[0].observations.length, 3);
-  assert.equal(client.inserted[0].questions.length, 2);
+  assert.equal(client.inserted[0].questions.length, 1);
   assert.ok(!JSON.stringify(out).includes('secret-k'));
   assert.equal(calls.length, 1);
   assert.match(calls[0].url, /generativelanguage\.googleapis\.com\/v1beta\/models\/m:generateContent/);
@@ -86,10 +93,95 @@ test('answerFeedback: hourly limit, provider failure, unreadable reply', async (
   assert.equal((await handleAnswerFeedback({ payload: goodPayload, auth, env, fetchImpl: async () => okJson({ candidates: [{ content: { parts: [{ text: 'no json' }] } }] }) })).status, 502);
 });
 
+test('answerFeedback: an empty questions list is saved, and blank strings are dropped', async () => {
+  const emptyClient = fakeClient();
+  const emptyReply = { modelVersion: 'g-1', candidates: [{ content: { parts: [{ text: '{"summary":"S","observations":["A distinction in the answer."],"questions":[]}' }] } }] };
+  const emptyRes = await handleAnswerFeedback({
+    payload: goodPayload,
+    auth: { user: { id: 'u' }, client: emptyClient },
+    env: { GEMINI_API_KEY: 'k', GEMINI_MODEL: 'm' },
+    fetchImpl: async () => okJson(emptyReply),
+  });
+  assert.equal(emptyRes.status, 200);
+  assert.deepEqual(emptyClient.inserted[0].questions, []);
+
+  const blankClient = fakeClient();
+  const blankReply = { modelVersion: 'g-1', candidates: [{ content: { parts: [{ text: '{"summary":"S","observations":["One"],"questions":["","  ","Could the quiet be the part you noticed?"]}' }] } }] };
+  await handleAnswerFeedback({
+    payload: goodPayload,
+    auth: { user: { id: 'u' }, client: blankClient },
+    env: { GEMINI_API_KEY: 'k', GEMINI_MODEL: 'm' },
+    fetchImpl: async () => okJson(blankReply),
+  });
+  assert.deepEqual(blankClient.inserted[0].questions, ['Could the quiet be the part you noticed?']);
+});
+
 test('answerFeedback helpers', () => {
   assert.equal(parseReply('x {"a":1} y').a, 1);
   assert.equal(parseReply('nothing'), null);
-  assert.match(buildUserMessage({ sourceType: 'discovery_record', lessonTitle: '', sourceLabel: 'L', text: 'T' }), /^A Discovery Record entry\./);
+  assert.match(buildUserMessage({ sourceType: 'discovery_record', sourceLabel: 'L', text: 'T' }), /^A Discovery Record entry\./);
+  assert.equal(feedbackThinkingLevel({}), 'minimal');
+  assert.equal(feedbackThinkingLevel({ GEMINI_THINKING_LEVEL: 'off' }), null);
+  assert.equal(feedbackThinkingLevel({ GEMINI_THINKING_LEVEL: 'high' }), 'high');
+  assert.equal(MAX_OUTPUT_TOKENS, 600);
+});
+
+test('answerFeedback: unknown lesson stays generic', async () => {
+  const calls = [];
+  const fetchImpl = async (url, init) => { calls.push(JSON.parse(init.body)); return okJson(geminiFeedback); };
+  const payload = { ...goodPayload, lesson_code: 'M9-L9', source_label: 'A question that is not in the program file' };
+  const res = await handleAnswerFeedback({ payload, auth: { user: { id: 'u' }, client: fakeClient() }, env: { GEMINI_API_KEY: 'k' }, fetchImpl });
+  assert.equal(res.status, 200);
+  assert.equal(calls[0].systemInstruction.parts[0].text, FEEDBACK_SYSTEM_PROMPT);
+  assert.match(calls[0].contents[0].parts[0].text, /Question: A question that is not in the program file/);
+  assert.equal(calls[0].generationConfig.thinkingConfig.thinkingLevel, 'minimal');
+  assert.equal(calls[0].generationConfig.maxOutputTokens, 600);
+});
+
+test('answerFeedback: lesson context for three modules uses the brief and one answer', async () => {
+  const cases = [
+    { lesson_code: 'M1-L1', prompt_id: 'stood-out', source_label: 'What, if anything, stood out?', text: 'I keep walking past the library and I am not sure the building is what I am noticing.' },
+    { lesson_code: 'M3-L2', prompt_id: '0', source_label: 'What will you try differently?', text: 'I tried the same task with the radio off. It was worse, not better.' },
+    { lesson_code: 'M5-L3', prompt_id: 'next', source_label: 'What you chose to do next', text: 'I want to pause. I do not want to start a business, and I am not picking a job today either.' },
+  ];
+  for (const item of cases) {
+    const calls = [];
+    const fetchImpl = async (_url, init) => { calls.push(JSON.parse(init.body)); return okJson(geminiFeedback); };
+    const res = await handleAnswerFeedback({
+      payload: { source_type: 'workbook_answer', source_key: `${item.lesson_code}#${item.prompt_id}`, ...item },
+      auth: { user: { id: 'u' }, client: fakeClient() },
+      env: { GEMINI_API_KEY: 'k', GEMINI_MODEL: 'gemini-3.5-flash-lite' },
+      fetchImpl,
+    });
+    assert.equal(res.status, 200);
+    const sent = calls[0];
+    const system = sent.systemInstruction.parts[0].text;
+    const user = sent.contents[0].parts[0].text;
+    assert.ok(system.startsWith(FEEDBACK_SYSTEM_PROMPT));
+    assert.match(system, /Build Otherwise is an emerging social-impact initiative founded by Ashley Christine Zeck\./);
+    assert.doesNotMatch(system, /pending_approval|\bdraft\b/i);
+    assert.doesNotMatch(system, /You stay in charge|Your week/);
+    assert.ok(!user.includes('secret'));
+    assert.match(user, new RegExp(`<answer>\\n${item.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
+    assert.equal((user.match(/<answer>/g) || []).length, 1);
+    const background = system.slice(FEEDBACK_SYSTEM_PROMPT.length);
+    assert.ok(background.length <= FEEDBACK_SLICE_MAX + 2);
+    assert.equal(sent.generationConfig.maxOutputTokens, 600);
+    assert.match(sent.contents[0].parts[0].text, /Question: /);
+  }
+  const m1 = feedbackContext({ lessonCode: 'M1-L1' });
+  const m3 = feedbackContext({ lessonCode: 'M3-L2' });
+  const m5 = feedbackContext({ lessonCode: 'M5-L3' });
+  assert.match(m1, /Find Something Worth Exploring/);
+  assert.match(m1, /Notice what draws your attention/);
+  assert.match(m3, /Test How I Operate/);
+  assert.match(m5, /Tuning Your Instrument/);
+  assert.match(m5, /Check an impression and take stock/);
+  assert.doesNotMatch(m1, /Learn Through One Small Try/);
+  assert.doesNotMatch(m5, /Test How I Operate/);
+  const brief = getKnowledge().program.program_brief.text;
+  assert.ok(m1.includes('## 1. Understand Build Otherwise'));
+  assert.ok(brief.includes(m1.split('\n').find((line) => line.startsWith('Build Otherwise is an emerging'))));
 });
 
 /* ---------- submitInquiry ---------- */
@@ -166,7 +258,7 @@ test('companion: input checks', async () => {
 test('companion: fixture reply hides thoughts, sends the system instruction, accepts old key name', async () => {
   resetRateLimit();
   let sent;
-  const fetchImpl = async (url, init) => { sent = JSON.parse(init.body); assert.ok(url.includes('gemini-3.8-flash')); assert.equal(init.headers['x-goog-api-key'], 'old'); return okJson(geminiOk); };
+  const fetchImpl = async (url, init) => { sent = JSON.parse(init.body); assert.ok(url.includes('gemini-3.5-flash-lite')); assert.equal(init.headers['x-goog-api-key'], 'old'); return okJson(geminiOk); };
   const out = await body(await handleCompanion({ rawBody: JSON.stringify({ mode: 'fixture', scenario: 'pass' }), auth: admin, env: { Gemini_key: 'old' }, fetchImpl }));
   assert.equal(out.reply, 'hi');
   assert.ok(sent.systemInstruction.parts[0].text.startsWith(COMPANION_SYSTEM_INSTRUCTION));

@@ -4,6 +4,7 @@
   "sources": {
     "modules_and_lessons": "migration/content/Module.json, Lesson.json",
     "mission_and_beliefs": "src/pages/Mission.jsx",
+    "program_brief": "migration/content/program-brief.md",
     "life_map": "src/lib/lifeMap.js (MAP_SECTIONS)",
     "discovery_ways": "src/lib/discoveryWays.js (WAY_KINDS, NEEDS; draft wording pending review)",
     "reflection_boundaries": "src/components/reflection/BoundariesNote.jsx"
@@ -38,6 +39,10 @@
         "body": "We’re early. We test what we build, say what we don’t know yet, and don’t claim results we haven’t measured."
       }
     ],
+    "program_brief": {
+      "header": "Ashley Zeck's Draft 1, 2026-11-02",
+      "text": "## 1. Understand Build Otherwise\nBuild Otherwise is an emerging social-impact initiative founded by Ashley Christine Zeck.\nIts work explores how people can discover possibilities beyond the circumstances, experiences, and identities that may have shaped their lives.\nThe initiative recognizes that difficult experiences and unconventional survival skills can sometimes reveal useful abilities, knowledge, or perspectives.\nHowever, hardship is never treated as inherently beneficial, necessary, or something a person must transform into productivity.\nPeople are not required to find meaning in suffering, demonstrate resilience, or build a business from their experiences.\nBuild Otherwise values:\n- Personal agency and self-determination.\n- Experiential learning and experimentation.\n- Intellectual independence and critical thinking.\n- Evidence over assumptions.\n- Community without coercion.\n- Multiple definitions of success.\n- Recognition of real-world constraints.\n- Opportunities to discover interests and capabilities without predetermined outcomes.\nIts Scars to Strategy framework explores difficult experiences and unconventional strengths as possible assets, without requiring anyone to regard their hardship as worthwhile.\nBuild Otherwise is an emerging initiative. Its educational program is experimental, and effectiveness must not be presented as established or scientifically proven.\n\n## 2. Understand Entrepalooza\nEntrepalooza is Build Otherwise's flagship experimental educational program.\nIt combines: Self-discovery. Experiential learning. Reflection. Real-world experimentation. Exploration of interests and possibilities. Critical thinking and evidence gathering. Community and social connection. Optional entrepreneurship.\nEntrepreneurship is one possible direction, never the required or preferred outcome.\nA participant might discover an interest in employment, education, volunteering, creative work, community involvement, independent projects, entrepreneurship, or something entirely different.\nThey may also decide to pause, reconsider, or remain uncertain.\nThese are all legitimate outcomes.\nThe program is intended to provide opportunities for participants to discover their own direction, not tell them what their direction should be.\n\n## 3. Understand the Educational Approach\nEntrepalooza is informed by several complementary ideas:\nSelf-determination: Participants should retain meaningful control over their choices, exploration, and decisions.\nExperiential learning: People can learn by trying things, observing what happens, reflecting, and deciding what to explore next.\nIntrinsic motivation: Curiosity, interest, and enjoyment are meaningful signals worth investigating, without treating them as proof of a permanent passion or calling.\nEvidence-based reflection: Participants should be able to distinguish what happened from what they believe it means.\nContextual understanding: Abilities and behavior are influenced by environments, resources, opportunities, and circumstances. A difficult experience with a task does not necessarily indicate a personal deficiency.\nRespect for uncertainty: Not knowing something is information, not failure.\nThese are educational influences, not claims that Entrepalooza is a validated psychological intervention.\n"
+    },
     "life_map_sections": [
       {
         "key": "places",
@@ -121,6 +126,183 @@
     ]
   },
   "modules": {
+    "getting-started": {
+      "number": 0,
+      "slug": "getting-started",
+      "title": "Getting Started",
+      "purpose": "Understand the offer, rights and limits, then freely decide whether and how to participate.",
+      "description": "Understand the offer, rights and limits, then freely decide whether and how to participate.",
+      "status": "live",
+      "lessons": [
+        {
+          "code": "O.1",
+          "title": "Welcome: what this is, and what stays private",
+          "order": 1,
+          "type": "orientation",
+          "duration_min": 5,
+          "purpose": "Know what this is, what it isn’t, and what stays yours, before you decide anything.",
+          "teach": "## Welcome\n\nEntrepalooza helps you explore interests and possibilities through learning, conversation, and small real-world experiences. You don’t need to know your direction before you begin.\n\nEntrepreneurship is one possible direction. It isn’t a required destination.\n\n## What this is, and isn’t\n\nThis is a structured way to notice, try something small, reflect on what happened, and decide what’s next. A job, training, a project, a business, a pause, or still looking all are valid outcomes.\n\nIt is not therapy or treatment. It is not a promise of a job, income, or business success. It is not a test of whether you’re ready. You don’t have to tell your story.\n\n## What stays yours\n\nYou decide what to share. What you write stays in your account. Other participants can’t see it, and your private journal isn’t shared unless you choose to share it. Build Otherwise administrators run this app and may access the information stored in it. You can skip any question without giving a reason. In Settings, you can download or delete your workbook, journal, Life Map, and related reflections. My Records is managed separately. You are not required to share medical, legal, or other sensitive personal history. If we ever ask to use your words, record something, or follow up later, each one gets its own yes or no.\n\nYou can change direction, pause, or stop at any time. To pause or leave, email Start@buildotherwise.org. No reason needed.\n\nType in any box, or tap Dictate and talk like you’re telling a friend. Questions or concerns: Start@buildotherwise.org.",
+          "boundary": "Don’t invent testimonials or require a recovery or business narrative.",
+          "reflect_prompts": [
+            ""
+          ],
+          "try_prompts": [
+            "",
+            "",
+            ""
+          ],
+          "carry_forward": [],
+          "routes": [
+            "Say it",
+            "Write it",
+            "Watch",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "O.2",
+          "title": "Your rights and privacy",
+          "order": 2,
+          "type": "orientation",
+          "duration_min": 10,
+          "purpose": "Know your rights here, what stays private, and how to fix or raise something.",
+          "teach": "You decide what you share. Passing on a personal question never needs an explanation.\n\nTaking part, evaluation, recording, using your story, and follow-up are separate choices. Saying yes to one does not mean yes to the others. Each one gets its own Yes, No, or Not now.\n\nWhat you write in the workbook stays in your account. Other participants can’t see it. You can ask who can see what’s stored, ask for a correction, or download or delete what you’ve written. You will never be asked for medical, legal, or personal history to take part.",
+          "boundary": "Don’t collect addiction, legal, or diagnostic histories to prove eligibility. Keep participation, evaluation, recording, story use, and follow-up as separate choices.",
+          "reflect_prompts": [
+            "What's clearer about privacy now? What do you still want to ask?"
+          ],
+          "try_prompts": [
+            "One right you plan to use here (for example, passing without explaining).",
+            "One choice you'd want kept separate: evaluation, recording, your story, or follow-up."
+          ],
+          "what_comes_out": "A short record or observation. Private and pass routes count.",
+          "carry_forward": [],
+          "routes": [
+            "Say it",
+            "Write it",
+            "Watch",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "O.3",
+          "title": "How we give feedback",
+          "order": 3,
+          "type": "orientation",
+          "duration_min": 12,
+          "purpose": "Practice giving, receiving, declining, and revising feedback without pressure.",
+          "teach": "The Group Code is a group agreement, not a loyalty pledge. You don’t have to call yourself a builder to use it.\n\nThe core practice is asking before you give advice, challenge an interpretation, or share someone’s work. Respect “no,” “not now,” passing, and changing one’s mind. Speak about an action or a piece of evidence; do not diagnose or assign an identity. Offer only support you can actually provide.\n\nAgreeing to the Code means you’ve read it. It does not take away your right to pass or your privacy.",
+          "boundary": "Keep participant choice, the right to pass, and facilitator boundaries intact.",
+          "reflect_prompts": [
+            "Who made the decision in the example? What would pressure have looked like?"
+          ],
+          "try_prompts": [
+            "Using the supply-shelf example, pick the reply you'd want: “A question is okay,” “I’d like a suggestion,” or “No feedback right now.”",
+            "Optional: one line of the Group Code you'd want explained more."
+          ],
+          "what_comes_out": "A short record or observation. Private and pass routes count.",
+          "carry_forward": [],
+          "routes": [
+            "Say it",
+            "Write it",
+            "Watch",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "O.4",
+          "title": "What makes it work for you",
+          "order": 4,
+          "type": "orientation",
+          "duration_min": 3,
+          "purpose": "Optional. A few lines so taking part fits your life.",
+          "teach": "This step is optional. Fill it in now, later, or not at all. It doesn’t hold anything up.\n\nFill in what’s useful. Leave the rest blank. “None” and “I don’t know yet” are complete answers.\n\nThis stays private in your workbook. If you want Ashley to know something, email Start@buildotherwise.org.",
+          "boundary": "This plan is not a consent form. Consent choices are a separate record completed later.",
+          "reflect_prompts": [],
+          "try_prompts": [
+            "",
+            "",
+            "How you’d like to take part (for example: writing, voice, mostly reading first)",
+            "Anything that makes it harder to show up (time, phone or data, access, other)",
+            "Support you’d want, or “none for now”"
+          ],
+          "carry_forward": [],
+          "routes": [
+            "Say it",
+            "Write it",
+            "Watch",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "O.5",
+          "title": "Make this experience yours",
+          "order": 5,
+          "type": "orientation",
+          "duration_min": 2,
+          "purpose": "Entrepalooza isn’t about following someone else’s plan. It’s about exploring what matters to you, trying new things, and deciding what to do with what you discover.",
+          "teach": "You don’t need to know your destination yet.\n\nThis is yours. You can change your answers anytime. To pause or leave, email Start@buildotherwise.org. No reason needed.",
+          "reflect_prompts": [],
+          "try_prompts": [
+            "",
+            "",
+            "What brings you here?",
+            "How do you want to approach this?",
+            "Anything else you want to remember about why you’re starting? (Optional)"
+          ],
+          "carry_forward": [],
+          "routes": [
+            "Say it",
+            "Write it",
+            "Watch",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "O.6",
+          "title": "Map your life right now",
+          "order": 6,
+          "type": "tool",
+          "duration_min": 30,
+          "purpose": "Notice what already occupies your time, attention, energy, movement, and relationships before deciding what might be worth exploring.",
+          "teach": "This exercise starts with what your life actually looks like right now, not with a passion, a business idea, or a life purpose.\n\nOrdinary places and activities often get left out when someone is asked to “tell me about yourself.” The map is a way to notice them. You’ll put the places you regularly go on one page — grocery, library, work, school, transit, relatives, parks, services, or wherever you actually go — and add the activities that don’t have a clear physical place (online research, phone calls, caregiving at home, job searching from a library or living room). Mark energy, curiosity, and barriers with whatever symbols you choose.\n\nWhat is missing can matter as much as what is present. A place or activity may be absent because you don’t currently care about it, or because you can’t currently reach it (transit, money, schedule, distance, childcare). Both are information. Barriers are practical constraints, not mindset problems.\n\nThe map is a snapshot of this moment. It can change. Empty sections are honest. Nothing is scored. You can keep the whole map private, share only one section, or stop and return later. It is evidence of where your life is right now. It does not tell you who you are or what you must do next.",
+          "reflect_prompts": [
+            "Which line surprised you?",
+            "What's still missing?"
+          ],
+          "try_prompts": [],
+          "what_comes_out": "A map you can add to, change, download, and keep private, with journal entries linked wherever you choose. Nothing here is scored.",
+          "carry_forward": [],
+          "routes": [
+            "Add lines",
+            "Link a journal entry",
+            "Observe",
+            "Come back later",
+            "Pass",
+            "Pause or stop"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        }
+      ],
+      "lessons_included": true
+    },
     "find-something-worth-exploring": {
       "number": 1,
       "slug": "find-something-worth-exploring",
@@ -224,7 +406,127 @@
       "purpose": "Choose one bounded, reversible try and review what it teaches, its conditions and costs.",
       "description": "Choose one bounded, reversible try and review what it teaches, its conditions and costs.",
       "status": "live",
-      "lessons_included": false
+      "lessons": [
+        {
+          "code": "M2-L1",
+          "title": "Find Something to Try",
+          "order": 1,
+          "type": "experiment",
+          "duration_min": 20,
+          "purpose": "Explore a few real possibilities and choose one small experience you could try.",
+          "teach": "## Find a possibility\n\nYou don't need to begin with an idea. You can discover one through someone else's work, a community activity, a skill demonstration, a local opportunity, or a subject you've never explored.\n\nHere are a few places to look: work and trades; art and making; technology; community and volunteering; science and nature; entrepreneurship; or everyday problems you'd like to understand. These are starting categories, not choices you have to commit to.\n\n## Make it real\n\nChoose one accessible way to get closer: watch how something is done, speak with someone who does it, attend an introductory event, read a firsthand account, or try an appropriate beginner task. Keep it small enough to fit your time, money, responsibilities, and safety. You can choose observation if hands-on participation isn't possible.\n\nIf you'd like another person's perspective, the Module 1 Tribe Threads are a place to exchange discoveries. Posting is optional.\n\nYou don't need to write a research plan. Just decide what you'd like to explore and a realistic way to encounter it.\n\n## Choose how to begin\n\nBring an observation or uncertainty from Module 1, browse an unfamiliar possibility, or talk through the options with someone you choose. The starting cards include everyday activities, creativity, nature, community participation, and work. Each card has four ways in, and you can add your own.\n\nEach card describes an encounter and what you need. Check practical access before planning a visit or conversation. Choosing a card records a starting point, not a completed experience. If it helps, use your learning agreement to choose the support and limits that make trying something workable.",
+          "boundary": "Source draft: `06-module-1-facilitator-guide.md`. This is working curriculum content and remains in **Draft** until rehearsed. Keep participant choice, the right to pass, and facilitator boundaries intact.\nSource pages (Ashley Zeck workspace): [‣](https://app.notion.com/p/b7a4e722bdf582f2b31781b8928c479e?pvs=21) · [‣](https://app.notion.com/p/a484e722bdf58371b7a381c08ebacb96?pvs=21)",
+          "reflect_prompts": [
+            ""
+          ],
+          "try_prompts": [
+            "What would you like to explore?",
+            "What is one practical way to encounter or try it?",
+            "What support or access would make it possible?",
+            "What time, cost, or safety limit should you respect?",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          "what_comes_out": "You have a possible experience to explore. You can do it before moving to the next lesson, or return when there's an opportunity.",
+          "carry_forward": [
+            "M1-L1",
+            "M1-L3"
+          ],
+          "routes": [
+            "Explore something unfamiliar",
+            "Follow something I'm already curious about",
+            "Observe or ask someone",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "M2-L2",
+          "title": "Give It a Try—and Notice",
+          "order": 2,
+          "type": "reflection",
+          "duration_min": 10,
+          "purpose": "Experience one manageable activity or observe it, then notice what actually happened.",
+          "teach": "## Learn by encountering something\n\nThe smallest useful experiment may be watching someone work, asking a question, visiting a place, or trying a beginner activity. It doesn't have to become a project or business.\n\nIf you saved a plan on the last step, bring it into this one and start there. That plan is what you are noticing.\n\nIf you have an activity from the previous lesson, try it when you have a realistic opportunity. You can also switch to a different possibility. Don't risk your safety, spend money you can't spare, or neglect important responsibilities to finish a workbook step.\n\n## What did you actually learn?\n\nNotice what happened before deciding what it says about you. Enjoying a demonstration doesn't necessarily mean you'd like the daily work. Difficulty on a first attempt doesn't prove you lack ability. Access, instructions, support, and time all affect what you can experience.\n\nIf you couldn't try anything, that matters too: what prevented access, and would another route be more realistic? You can return to this lesson after an experience.\n\n## Notice the parts and the kind of encounter\n\nReading, watching, talking with someone, visiting, and doing an activity yourself provide different kinds of information. Name what you actually encountered. Watching an enjoyable demonstration does not establish how doing the activity would feel.\n\nNotice changes within the experience: where your attention increased or faded, which parts raised questions, and how the people, setting, instructions, or support shaped what happened. Write privately, talk it through, or combine both. Give your answers honest, thoughtful attention without inventing a result.",
+          "boundary": "Source draft: `06-module-1-facilitator-guide.md`. This is working curriculum content and remains in **Draft** until rehearsed. Keep participant choice, the right to pass, and facilitator boundaries intact.\nSource pages (Ashley Zeck workspace): [‣](https://app.notion.com/p/b7a4e722bdf582f2b31781b8928c479e?pvs=21) · [‣](https://app.notion.com/p/a484e722bdf58371b7a381c08ebacb96?pvs=21)",
+          "reflect_prompts": [
+            "",
+            "What kind of encounter did you actually have: reading, watching, a conversation, a visit, doing an activity yourself, or a combination? If you did not have an opportunity, record that.",
+            "At what point did your attention change? Was there a particular part you wanted to understand better?",
+            "How did the people, setting, instructions, or available support affect the experience? What remains uncertain?"
+          ],
+          "try_prompts": [
+            "What caught your attention?",
+            "What did you actually do or observe?",
+            "What surprised, frustrated, or interested you?",
+            "What helped or made participation difficult?",
+            "What did it take in time, money, energy, or support?",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          "what_comes_out": "Keep a brief record of what happened, or a question to investigate when an opportunity becomes available.",
+          "carry_forward": [
+            "M2-L1"
+          ],
+          "routes": [
+            "I tried something",
+            "I observed or spoke with someone",
+            "I couldn't access an opportunity yet",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "M2-L3",
+          "title": "What Did You Discover?",
+          "order": 3,
+          "type": "next_decision",
+          "duration_min": 10,
+          "purpose": "Decide whether a possibility deserves more exploration, based on what actually happened.",
+          "teach": "## An experience can change your mind\n\nYou might be more interested than you expected, less interested, or unsure. Perhaps you enjoyed one part but not another. Maybe the activity appealed to you but the conditions didn't work. Any of those results can help you choose what to explore next.\n\nYou don't need to reach a conclusion about your personality or your future. Compare what you expected with what you experienced, and consider what still isn't known.\n\nIf you're ready to choose a direction, the Next Decision options are below. You can continue, change the approach, test again, pause, stop, or look elsewhere. You can also wait until you've actually had a chance to try something.\n\n## Look at how interest changes\n\nInterest can grow when you stay with something, learn more about it, and come to value it. It can also fade or stay undeveloped. Initial excitement does not establish a lasting interest. One disappointing encounter does not settle the question either.\n\nAs a next step in this program, you can choose another encounter with the same possibility, a different task or setting, more information, or something else. Repeating is an option, not a requirement. If you return to something, compare what changed and what stayed the same.\n\nA useful outcome can be a possibility worth exploring further, a clearer question, a practical barrier, uncertainty, or deciding to look elsewhere. You choose what to bring into Module 3, where you can examine the conditions around a task.",
+          "boundary": "Source draft: `06-module-1-facilitator-guide.md`. This is working curriculum content and remains in **Draft** until rehearsed. Keep participant choice, the right to pass, and facilitator boundaries intact.\nSource pages (Ashley Zeck workspace): [‣](https://app.notion.com/p/b7a4e722bdf582f2b31781b8928c479e?pvs=21) · [‣](https://app.notion.com/p/a484e722bdf58371b7a381c08ebacb96?pvs=21)",
+          "reflect_prompts": [
+            "",
+            "",
+            "",
+            "",
+            "What did this encounter leave you with: a possibility to explore further, a clearer question, a practical barrier, uncertainty, or a reason to look elsewhere? Describe what supports your answer.",
+            "Would another encounter help you learn more? You could change the task or setting, ask a question, repeat something, or choose a different possibility. What would you hope to find out?"
+          ],
+          "try_prompts": [
+            "What was different from what you expected?",
+            "",
+            "",
+            "What do you still want to know?",
+            "What might you explore next?"
+          ],
+          "what_comes_out": "Keep whatever you learned, including a new question. A decision is available, not a verdict.",
+          "carry_forward": [
+            "M2-L1",
+            "M2-L2"
+          ],
+          "routes": [
+            "Review an experience",
+            "I haven't tried it yet",
+            "Record a decision only",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        }
+      ],
+      "lessons_included": true
     },
     "test-how-i-operate": {
       "number": 3,
@@ -233,7 +535,116 @@
       "purpose": "Test whether one setup change makes an activity more chosen, flexible or workable—not identify a learner type.",
       "description": "Test whether one setup change makes an activity more chosen, flexible or workable—not identify a learner type.",
       "status": "live",
-      "lessons_included": false
+      "lessons": [
+        {
+          "code": "M3-L1",
+          "title": "Understand the setup around a task",
+          "order": 1,
+          "type": "activity",
+          "duration_min": 20,
+          "purpose": "Describe one part of a task's setup and turn it into a question you could test.",
+          "teach": "Start with the encounter you already recorded in Module 2, if you have one. Bring that record into this step. An ordinary task from this week is the next place to look. The reply example below shows how to name a setup when you do not have your own task yet. It is a demonstration, not the assignment.\n\nAn operating condition is part of the setup in which you do a task — not a type of person. It can include how clear the instructions are, how much choice you have, noise, whether you work alone or with someone, how much is uncertain, and the time available.\n\nThe same task can feel different when its setup changes. You’re learning to describe one condition and ask what it changes for this task. A single attempt does not establish a personality type or a permanent preference. An observation describes what happened. An interpretation is your explanation of it. Keep those separate. “I don’t know what helped” is a valid starting point.",
+          "boundary": "A single attempt does not establish a personality type or a permanent preference. Personal work stays optional, and adverse conditions are never manufactured.",
+          "reflect_prompts": [
+            "What did you observe about starting, continuing, or stopping? What is still an interpretation?",
+            "What would you like to find out about one condition? “I don’t know yet” is valid."
+          ],
+          "try_prompts": [
+            "Start with the encounter you brought from Module 2, if you have one. If you do not, use an ordinary task from this week. Use the reply example only when neither is available. You can also leave this blank.",
+            "What part of its setup can you actually describe—for example, instructions, noise, company, choice, or available time?"
+          ],
+          "what_comes_out": "One task, one observed condition, and a question or honest unknown.",
+          "carry_forward": [
+            "M2-L1",
+            "M2-L2",
+            "M2-L3"
+          ],
+          "routes": [
+            "Use my Module 2 encounter",
+            "Use an everyday task",
+            "Use the reply example",
+            "Reflect privately",
+            "Observe",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "M3-L2",
+          "title": "Try changing one part of the setup",
+          "order": 2,
+          "type": "experiment",
+          "duration_min": 30,
+          "purpose": "Plan or attempt one reversible change, and notice both the result and the effort it takes.",
+          "teach": "Change one part of the setup around the task you named in the last lesson, or around the encounter you brought from Module 2. The reply example shows the shape of a comparison when you are planning only, or when you do not have your own task yet.\n\nA changed-condition test means trying one manageable adjustment around a task while keeping the task and amount of work as similar as practical. Choose a time limit and a stop rule before you start. A stop rule is a condition that tells you to end or change the activity.\n\nOne attempt can raise a useful question. It cannot prove that the change caused the result. Practice, familiarity, and other differences may also matter. You can plan the comparison without running it. Planning only is a complete route.",
+          "boundary": "Do not add pressure, deprivation, public performance or distress to create a comparison. One attempt can raise a useful question; it cannot prove that the change caused the result. A safe plan without an attempt remains valid.",
+          "reflect_prompts": [
+            "What actually happened, or why was it not tried? No opportunity is a valid result.",
+            "What effort or discomfort did it take, including afterward?",
+            "What might you try again, and what evidence would make you revise your conclusion?"
+          ],
+          "try_prompts": [
+            "What single part of the setup would you change?",
+            "What task and amount of time will stay similar? What else might differ?",
+            "What time limit, support, and stop rule would make the attempt workable? You can choose to plan only.",
+            "What would show that this was easier to start, easier to adjust, or easier to stop? You do not need to judge how intense it felt."
+          ],
+          "what_comes_out": "A bounded test plan, an actual result or non-attempt, cost, and a revisable conclusion.",
+          "carry_forward": [
+            "M3-L1",
+            "M2-L2"
+          ],
+          "routes": [
+            "Attempt it",
+            "Plan only",
+            "Attempt it with support or an adaptation",
+            "Observe",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "M3-L3",
+          "title": "Review what helped and what it cost",
+          "order": 3,
+          "type": "reflection",
+          "duration_min": 20,
+          "purpose": "Separate the result, the cost and the explanation, then choose what is worth carrying forward.",
+          "teach": "Review the task you actually tried. If the only thing you examined was the reply example, say so. Leave effort, distraction, enjoyment, and later fatigue unknown unless you have your own observations.\n\nA useful review includes what happened and what it took. Cost can mean time, effort, fatigue, discomfort, or help needed afterward. Finishing a task alone does not show that its conditions are sustainable.\n\nCompare your observation with your explanation. Keep uncertainty visible. You choose what to carry forward. A brief observation and an unanswered question are enough. You do not need a complete personal profile.",
+          "boundary": "Finishing a task alone does not show that its conditions are sustainable. Record practised, partly practised, no opportunity, not attempted and unknown as descriptions, never as scores. Ask permission before offering an interpretation, and accept correction or rejection.",
+          "reflect_prompts": [
+            "What did it cost during and afterward? What is unknown?",
+            "Would you choose that condition again? What could change your mind?",
+            "Which observation and unanswered question, if any, do you want to carry into Module 4?"
+          ],
+          "try_prompts": [
+            "What task and condition, if any, did you actually try?",
+            "What changed, and what else was different?",
+            "Did the condition affect choice, flexibility, enjoyment, pressure, or your ability to stop?"
+          ],
+          "what_comes_out": "Selected evidence (only what you choose to keep), cost, uncertainty, and one note about what would make you change your mind.",
+          "carry_forward": [
+            "M2-L2",
+            "M2-L3",
+            "M3-L2"
+          ],
+          "routes": [
+            "Answer privately",
+            "Observe",
+            "Carry only what you choose",
+            "Pass",
+            "Pause or stop"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        }
+      ],
+      "lessons_included": true
     },
     "check-the-story-build-evidence": {
       "number": 4,
@@ -242,7 +653,118 @@
       "purpose": "Keep an event, criticism or setback from automatically becoming a permanent verdict about the person. Accuracy, not forced positivity.",
       "description": "Keep an event, criticism or setback from automatically becoming a permanent verdict about the person. Accuracy, not forced positivity.",
       "status": "live",
-      "lessons_included": false
+      "lessons": [
+        {
+          "code": "M4-L1",
+          "title": "Separate what happened from what it means",
+          "order": 1,
+          "type": "reading",
+          "duration_min": 20,
+          "purpose": "Keep what happened separate from what you make it mean.",
+          "teach": "If you brought a record from Module 2 or Module 3, start there. The fictional example shows the distinctions when you would rather not use your own event.\n\nThis is the same move you practiced earlier: keep what happened separate from what you make it mean.\n\nAn event is what happened, described so someone else could observe or check it. A story is the meaning or explanation you attach. A verdict turns one event into a judgment about who you are. Uncertainty is what you don’t know yet. It is allowed to stay unknown.\n\nA harsh verdict can start a loop that reduces future tries. Separating the event from the verdict gives you another path: an accurate description, a question to check, and another small try if you want one. Feedback about an action is not a verdict about you. The goal is a more accurate statement you can revise. It does not have to sound positive.",
+          "boundary": "The goal is a more accurate statement you can revise, not a positive one. Feedback about an action is not a verdict about you, no cause is inferred, and no confession, public apology or identity claim is required.",
+          "reflect_prompts": [
+            "What more accurate statement fits the evidence now? It can remain uncertain.",
+            "Optional deepeners: What impact is known or assumed? What responsibility and context matter? What information challenges the first explanation?"
+          ],
+          "try_prompts": [
+            "What happened that you could observe or check? Start with something you brought from Module 2 or 3 if you have it. The fictional example is there when you do not.",
+            "What story, if any, was added?",
+            "What verdict, if any, followed? “None” or “I don’t know” is valid.",
+            "What is still uncertain?"
+          ],
+          "what_comes_out": "An event/story/verdict/uncertainty distinction and a more accurate, revisable statement.",
+          "carry_forward": [
+            "M2-L2",
+            "M3-L3"
+          ],
+          "routes": [
+            "Use what I brought from an earlier module",
+            "Use an everyday task",
+            "Use the fictional example",
+            "Reflect privately",
+            "Observe",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "M4-L2",
+          "title": "Use one small action as evidence",
+          "order": 2,
+          "type": "activity",
+          "duration_min": 30,
+          "purpose": "Use one small, observable action as evidence about the statement you kept separate from a verdict.",
+          "teach": "This practice gathers evidence about the statement you separated from a verdict in the last lesson. It is not an exercise in becoming a better person.\n\nIf a standard would help you choose the action, use one. A value is something that matters to you. A standard is what that value asks of you in a particular situation. A practice is the small action you can actually observe. The action is the evidence. You do not need a value statement to finish this lesson.\n\nA pressure cue is something you notice before your usual response. You choose the cue. You do not have to create pressure to find one.\n\nStart with an action connected to your own statement when you have one. The accuracy example on this page is the demonstration when you do not.\n\n**Good to know:** showing up, asking for help, using support, honoring a boundary, stopping at a stop rule, partly completing something, revising a plan, returning after a pause, repairing something, and choosing not to continue all count as evidence. Support and collaboration do not make the evidence less valid.",
+          "boundary": "All of these count as capability evidence: showing up, asking for help, using an accommodation or support, honoring a boundary, stopping at a stop rule, partly completing something, revising a plan, returning after a pause, repairing something, and choosing not to continue. Support, accommodation and collaboration do not make the evidence less valid. No forced pledge, confession, public apology or real contact is required.",
+          "reflect_prompts": [
+            "How will you tell what actually happened rather than just what you intended?",
+            "What will you record if there is no opportunity or you choose not to try?",
+            "What might the usual response or planned action cost?"
+          ],
+          "try_prompts": [
+            "What small action would give you evidence about the statement from the last lesson? Use the accuracy example on this page only if you have no other action in mind.",
+            "Ownership check: If you are using a value, does it belong to you, or to the program, a facilitator, family, an employer, or a peer group? It’s fine to pick a different one, or to skip the value and keep the action.",
+            "What cue would help you notice a chance to practice? What do you usually do then?",
+            "What is the smallest action you could observe yourself taking?",
+            "Make a small practice plan: the action, a chance to try it in the next seven days, your limits, and when you’ll stop. Seven days is a window to notice chances, not a quota. If no chance comes up, record that. Planning only is valid."
+          ],
+          "what_comes_out": "One observable practice plan with a cue, limits, and a no-opportunity option.",
+          "carry_forward": [
+            "M4-L1",
+            "M2-L2"
+          ],
+          "routes": [
+            "Use an action from my own week",
+            "Use the accuracy example on this page",
+            "Reflect privately",
+            "Observe",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "M4-L3",
+          "title": "Review the evidence and revise your statement",
+          "order": 3,
+          "type": "reflection",
+          "duration_min": 20,
+          "purpose": "Use new observations to revise a statement and choose a specific next action.",
+          "teach": "Revision means changing your wording when you learn something new. Keep your earlier wording available so you can see what changed and why.\n\nEvidence is what you actually observed or can check. It may support part of your statement and challenge another part. One attempt rarely settles a broad claim. You can recognize responsibility and still describe context, uncertainty, or a skill you need. Carry one useful observation and a next action forward if you want to. You decide what stays private.",
+          "boundary": "Keep the earlier wording visible so you can see what changed and why. Record practised, partly practised, missed with an opportunity, no opportunity, not attempted or unknown as descriptions, never scores. No diagnosis, treatment effect, or identity transformation is claimed.",
+          "reflect_prompts": [
+            "Which parts of the statement are supported, challenged, or still unknown? Did pressure, criticism, or shame shape the earlier story?",
+            "What responsibility, repair, support, or skill need remains?",
+            "What wording is more accurate now? You may keep it private. Starters if helpful: “The evidence shows that I…” / “Under these conditions, I was able to…” / “I don’t know yet, but I can test…”",
+            "What cue and protective limit, if any, will you carry into Module 5? (A protective limit is a boundary you choose to keep—like a time cap, a stop rule, or a responsibility you won’t drop.) Your next action and evidence stay with your Module 4 record."
+          ],
+          "try_prompts": [
+            "What earlier statement do you want to review? Start with the statement you wrote in the last lessons if you have one. The page-description example is there when you do not.",
+            "What actually happened or what information can you check?"
+          ],
+          "what_comes_out": "Earlier and revised wording, with selected evidence and one next action.",
+          "carry_forward": [
+            "M4-L1",
+            "M4-L2",
+            "M2-L3"
+          ],
+          "routes": [
+            "Answer privately",
+            "Use the page-description example",
+            "Observe",
+            "Pass",
+            "Pause or stop"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        }
+      ],
+      "lessons_included": true
     },
     "protect-what-works": {
       "number": 5,
@@ -251,6 +773,173 @@
       "purpose": "Listen to how an activity is going, then protect what already works or make one small reversible adjustment. The instrument is how you are engaging right now, not you. Useful does not have to mean calm.",
       "description": "Listen to how an activity is going, then protect what already works or make one small reversible adjustment. The instrument is how you are engaging right now, not you. Useful does not have to mean calm.",
       "status": "live",
+      "lessons": [
+        {
+          "code": "M5-L1",
+          "title": "Listen before you tune",
+          "order": 1,
+          "type": "activity",
+          "duration_min": 20,
+          "purpose": "Listen to how an activity is going, tell the five parts apart, and find one point where a choice or a pause could be available.",
+          "teach": "Tuning your instrument means listening to how an activity is going, then either leaving a working setup alone or making one small reversible adjustment. The instrument is the way you are engaging right now. It is not you, and it is not a type of person. Tuning is relative to the rest of your life. Calm is not the target.\n\n**If you're coming from Module 4:** you may have brought a pressure cue, the thing you notice before your usual response. You can start with that. You can also start with the activity from your Module 2 try, or with an activity that is already going well. If you are not sure, start fresh. You do not have to bring anything.\n\nAn activity can matter and still leave room for the rest of your life. It can also start to feel pressured and hard to set down. Research calls these harmonious passion and obsessive passion. They describe a relationship with an activity, not a kind of person. One intense stretch cannot tell you which is which.\n\nThe question here is whether participation is still chosen, and what it costs. You do not need to decide which pattern you are in.\n\nListening comes before any adjustment. When you want to look more closely, use the map below. It watches choice, pressure, and cost without making that judgment.\n\nA signal is a change you notice in your body, attention, pace, or energy. A story is the meaning you attach. An urge is what you feel pulled to do or avoid. Your usual action is what you commonly do next. Cost is what that action takes.\n\nThe sequence is signal → story → urge → usual action → cost. It is a way to separate observations, not a rule that everyone experiences all five in order. Any part can be absent or unknown. The aim is to keep a choice available. Calmness is not a completion requirement.\n\nStart with your own activity when you have one. Reading this page is a demonstration you can use when you want a task that is already in front of you, or when you would rather not use your own. You do not need to change your breathing, close your eyes, or create a feeling.",
+          "boundary": "No touch, movement, breathing, closed eyes or spiritual language is required. Calmness is not a completion requirement, and no distress is created. This is educational navigation, not treatment or crisis care.",
+          "reflect_prompts": [
+            "Which parts were observations, and which were explanations or unknowns?",
+            "Before which action could you make a choice or pause?",
+            "What support, limit, or stop rule would help keep that choice available? If you brought a protective limit from Module 4, does it still fit here, or would you change it?"
+          ],
+          "try_prompts": [
+            "Optional: If you brought a pressure cue from Module 4, where does it fit: signal, urge, outside condition, or not sure? You can skip this.",
+            "Signal: what change, if any, did you notice in your body, attention, pace, or energy?",
+            "Story: what meaning, if any, did you attach to it?",
+            "Urge: what did you feel pulled to do or avoid, if anything?",
+            "Usual action: what do you commonly do next? If unknown, describe only this attempt.",
+            "Cost: what time, effort, energy, or effect on responsibilities did you actually notice?",
+            "What outside condition or practical barrier mattered?"
+          ],
+          "what_comes_out": "One optional five-part map, and one support, condition, or stop rule. Choosing to protect what works or change one thing comes in the next lesson.",
+          "carry_forward": [
+            "M4-L3",
+            "M2-L2"
+          ],
+          "routes": [
+            "Start with an activity from my own try",
+            "Start with an activity that is going well",
+            "Start with the pressure cue I brought from Module 4",
+            "Use an ordinary task such as reading this page",
+            "Use a supplied case",
+            "Observe",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "M5-L2",
+          "title": "Keep what is in tune, or change one thing",
+          "order": 2,
+          "type": "activity",
+          "duration_min": 40,
+          "purpose": "Protect a setup that is already working, or change one thing and look at what happened next.",
+          "teach": "This is the adjustment, if you want one. You have already listened. Now you either protect a setup that is already working, or you change one thing. Both count the same. You are not fixing yourself.\n\nUse an activity you have actually been in when you have one. The reading-task example shows how to name a next action. It is the demonstration, not a substitute for your own activity.\n\nThere are two equal routes. Keeping what is in tune means noticing a condition that already supports chosen, flexible engagement and protecting it. Changing one thing means trying one small, reversible response during an ordinary task and recording what happened next.\n\nYou do not need a setback or a crisis to have something useful to learn. A useful next choice might mean understanding a limit or deciding to stop. It does not have to mean becoming calm. Use natural opportunities only. A change after a response does not prove the response caused it. Stopping or redirecting is not failure.",
+          "boundary": "Use natural opportunities only: no episode quota, daily log, or manufactured urgency. A change after a strategy does not prove the strategy caused it. Both routes are equal, and 'harmonious engagement achieved' is never scored. Stopping or redirecting is never a failure.",
+          "reflect_prompts": [
+            "What actually happened next, or why was it not attempted?",
+            "Was the next choice easier, harder, unchanged, or unclear?",
+            "What effort, discomfort, or later effect did you notice? What else might explain the result?"
+          ],
+          "try_prompts": [
+            "Keep what is in tune: What one condition is working, and how will you protect it this week? Will you continue, deepen, or repeat it?",
+            "Change one thing: What one small response, if any, would you like to try?",
+            "Change one thing: What would a useful next choice look like?",
+            "Change one thing: What duration, support, and stop rule will guide the attempt? You may plan only."
+          ],
+          "what_comes_out": "Either one protected working condition, or one small change with an actual observation or a non-attempt, its cost, and a next decision.",
+          "carry_forward": [
+            "M5-L1",
+            "M2-L2",
+            "M2-L3"
+          ],
+          "routes": [
+            "Keep what is in tune",
+            "Change one thing",
+            "Observe",
+            "Pass",
+            "Pause or stop"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "M5-L3",
+          "title": "Check an impression and take stock",
+          "order": 3,
+          "type": "next_decision",
+          "duration_min": 35,
+          "purpose": "Separate an impression from evidence, choose a decision rule and a boundary to protect, and take stock of what you want to keep from Modules 1–5.",
+          "teach": "The earlier lessons asked you to listen to how an activity is going and, if you chose, to protect what works or change one thing. This lesson is the stocktake. It is not another adjustment.\n\nIf you have an impression about your own try, start there. The statement about shorter instructions is a neutral example for practicing the distinction on this page.\n\nAn intuition is an impression or hunch. It can suggest a question, but it is not the same as evidence. Check what supports it, what challenges it, and what you do not yet know.\n\nA decision rule states what information will guide your next choice. A protected boundary names a limit you want to keep. This is a halfway point. Modules 6–10 turn outward, but moving on is optional. No readiness judgment or business direction is implied. If you want, note one piece of evidence, one thing worth keeping, and one support from Modules 1–5. You can pass.\n\nYou can add one note to your Life Map if you want. Skipping is fine.",
+          "boundary": "No readiness judgment and no business direction implied. Moving on to Module 6 is optional. Every exit belongs: keep, change, test again, pause, stop, another direction, or keep looking.",
+          "reflect_prompts": [
+            "What remains unknown? What information would change your mind?",
+            "What decision rule and boundary would you choose to keep?",
+            "Optional: What does this task ask of you (time, decisions, attention, interaction, uncertainty, resources, or effort)?",
+            "One piece of evidence you gathered:",
+            "One strategy, condition, or boundary worth keeping:",
+            "One support that mattered:",
+            "Optional: one question for later:",
+            "Optional, only if a pause or setback happened: what would make it workable to come back, and what would tell you not to? Coming back isn’t automatically preferred."
+          ],
+          "try_prompts": [
+            "What impression or assumption, if any, do you want to check?",
+            "What can you actually observe that supports or challenges it?"
+          ],
+          "what_comes_out": "What you choose to keep from Modules 1–5: one piece of evidence, one thing worth keeping, one support, one Next Decision, and an optional question.",
+          "carry_forward": [
+            "M2-L3",
+            "M3-L3",
+            "M4-L3",
+            "M5-L2"
+          ],
+          "routes": [
+            "Answer privately",
+            "Use the neutral example",
+            "Observe",
+            "Pass",
+            "Pause or stop",
+            "Add one note to your Life Map (or skip)"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        }
+      ],
+      "lessons_included": true
+    },
+    "check-reality-outside-yourself": {
+      "number": 6,
+      "slug": "check-reality-outside-yourself",
+      "title": "Check Reality Outside Yourself",
+      "purpose": "Explore outside information through equally legitimate pathway, problem/opportunity or continued-exploration branches.",
+      "description": "Explore outside information through equally legitimate pathway, problem/opportunity or continued-exploration branches.",
+      "status": "coming_later",
+      "lessons_included": false
+    },
+    "name-do-notice-the-try": {
+      "number": 7,
+      "slug": "name-do-notice-the-try",
+      "title": "Name the Try, Do the Try, Notice What It Taught",
+      "purpose": "Complete or plan one manageable try to create, practice or move forward, without requiring an offer, payment or audience response.",
+      "description": "Complete or plan one manageable try to create, practice or move forward, without requiring an offer, payment or audience response.",
+      "status": "coming_later",
+      "lessons_included": false
+    },
+    "check-what-this-costs": {
+      "number": 8,
+      "slug": "check-what-this-costs",
+      "title": "Check What This Costs",
+      "purpose": "Make money, time, labor and constraints visible enough to choose a financially honest path.",
+      "description": "Make money, time, labor and constraints visible enough to choose a financially honest path.",
+      "status": "coming_later",
+      "lessons_included": false
+    },
+    "choose-a-direction-that-fits-capacity": {
+      "number": 9,
+      "slug": "choose-a-direction-that-fits-capacity",
+      "title": "Choose a Direction That Fits Capacity",
+      "purpose": "Choose a revisable current direction after considering evidence and capacity—not a life mission.",
+      "description": "Choose a revisable current direction after considering evidence and capacity—not a life mission.",
+      "status": "coming_later",
+      "lessons_included": false
+    },
+    "build-the-tribe": {
+      "number": 10,
+      "slug": "build-the-tribe",
+      "title": "Build the Tribe",
+      "purpose": "Name voluntary belonging around the learning loop without tying membership to entrepreneurship, service or ongoing contact.",
+      "description": "Name voluntary belonging around the learning loop without tying membership to entrepreneurship, service or ongoing contact.",
+      "status": "in_development",
       "lessons_included": false
     }
   }

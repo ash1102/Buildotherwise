@@ -19,6 +19,7 @@ export default function FeedbackForm({ moduleOrder, lessonCode }) {
 
   const submit = async () => {
     if (!message.trim()) return;
+    setSent(false);
     setSending(true);
     try {
       await base44.entities.Feedback.create({
@@ -31,7 +32,7 @@ export default function FeedbackForm({ moduleOrder, lessonCode }) {
       setMessage("");
       toast({ title: "Thank you. That has been sent to the program creator." });
     } catch (error) {
-      toast({ title: "That didn't send. Please try again." });
+      toast({ title: "That didn't send. Your message is still here so you can try again.", variant: "destructive" });
     } finally {
       setSending(false);
     }
@@ -73,6 +74,7 @@ export default function FeedbackForm({ moduleOrder, lessonCode }) {
               </button>
             ))}
           </div>
+          <p className="mt-3 text-[14px] leading-relaxed text-muted-foreground">This feedback goes to the Build Otherwise team. It does not include your journal entries or workbook answers unless you choose to write them here.</p>
           <Textarea
             value={message}
             onChange={(event) => setMessage(event.target.value)}
@@ -91,7 +93,7 @@ export default function FeedbackForm({ moduleOrder, lessonCode }) {
               <Send className="mr-2 h-4 w-4" aria-hidden="true" />
               {sending ? "Sending…" : "Send feedback"}
             </Button>
-            {sent ? <span className="text-[14px] text-accent-ink">Received. Thank you.</span> : null}
+            {sent ? <span role="status" className="text-[14px] text-accent-ink">Received. Thank you.</span> : null}
           </div>
         </div>
       ) : null}

@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { USE_SUPABASE } from "@/api/supabaseCompat";
 import { useJournalEntries } from "@/lib/journal";
 import { REFLECTION_AGENT, STARTER_PROMPTS, entryBlock, newConversationName } from "@/lib/reflection";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
@@ -107,12 +106,13 @@ export default function JournalReflection() {
       if (refreshed) setMessages(refreshed.messages || []);
       return true;
     } catch (err) {
-      if (!USE_SUPABASE) {
-        setError("That didn't send. Nothing was lost. Try again in a moment.");
-        return false;
-      }
+      const status = err?.response?.status || err?.status || err?.response?.data?.status;
       const message = err?.response?.data?.error || err?.data?.error;
-      setError(message || "The reflection partner isn’t available right now. Nothing was lost.");
+      if (status === 402 || /credit|quota|payment required|limit reached/i.test(String(message || err?.message || ""))) {
+        setError("The AI reflection service is currently unavailable because its usage limit has been reached. Retrying immediately will not fix this. Your draft is still in the text box.");
+      } else {
+        setError(message || "The reflection service could not complete your request. Your draft is still here; check the conversation before retrying in case the message was received.");
+      }
       return false;
     } finally {
       setSending(false);

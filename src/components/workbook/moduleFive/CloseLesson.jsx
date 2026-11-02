@@ -205,6 +205,12 @@ function PartNext({ lesson, answers }) {
           <p className="text-[14px] text-muted-foreground">Choosing one of the options below replaces that earlier choice.</p>
         </Panel>
       ) : null}
+      {choice === "Seek support or resources" ? (
+        <div className="rounded-lg border border-border bg-card p-4 space-y-2">
+          <p className="text-[15px] font-medium text-foreground">Support is a real next step.</p>
+          <p className="text-[14px] text-muted-foreground">Explore the <Link to="/program-library" className="underline underline-offset-2">program resource library</Link>, or <Link to="/contact" className="underline underline-offset-2">contact Build Otherwise</Link> to ask about available help. For community services in the U.S., call 211. You do not need to explain anything personal to choose this path.</p>
+        </div>
+      ) : null}
       <SingleChoice
         legend="What, if anything, do you want to do next?"
         hint="Pick one, or leave it open. Tap the same one again to clear it."
