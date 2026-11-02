@@ -165,7 +165,7 @@ function PartEncounter({ lesson, answers }) {
       ) : (
         <p className="text-[15px] text-muted-foreground">You don’t need to select anything. Looking counts.</p>
       )}
-      <p className="text-[14px] text-muted-faint">There’s more room to explore possibilities like these in Module 2.</p>
+      <p className="text-[14px] text-muted-faint">You can investigate a possibility here, or explore more in Module 2.</p>
     </div>
   );
 }
