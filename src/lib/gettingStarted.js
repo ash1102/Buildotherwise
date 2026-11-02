@@ -98,7 +98,7 @@ export function readAgreement(answers) {
 
 /** The copy-button text. Lines nobody filled in are left out. */
 export function agreementText({ why, approach, note }) {
-  const lines = ["My Entrepalooza learning agreement"];
+  const lines = ["My Way Forward"];
   if (why) lines.push(`Why I'm here: ${why}`);
   if (approach) lines.push(`My approach: ${approach}`);
   if (note) lines.push(`My note: ${note}`);
