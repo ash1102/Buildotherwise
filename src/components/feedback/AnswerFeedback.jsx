@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import moment from "moment";
-import { MessageSquareText, Trash2 } from "lucide-react";
+import { MessageSquareText, Trash2, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { USE_SUPABASE } from "@/api/supabaseCompat";
@@ -88,11 +88,15 @@ export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, les
         className={`${LINK_CLASS} inline-flex items-center gap-1.5 text-[12.5px] text-teal-deep hover:text-copper`}
       >
         <MessageSquareText className="h-3 w-3 shrink-0" aria-hidden="true" />
-        {open ? "Hide feedback" : "Feedback"}
+        {open ? "Close the Discovery Companion" : "Ask the Discovery Companion"}
       </button>
 
       {open ? (
-        <section className="mt-2 rounded-lg border border-natural bg-ivory/70 p-4 text-left">
+        <section className="mt-2 rounded-lg border border-natural bg-ivory/70 p-4 text-left" aria-label="Discovery Companion feedback">
+          <div className="mb-3 flex items-start gap-3 border-b border-natural pb-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-teal-deep" aria-hidden="true"><Compass className="h-5 w-5" /></span>
+            <div><p className="text-[15px] font-semibold text-ink">Discovery Companion</p><p className="text-[12.5px] text-ink-soft">A second perspective, not a verdict. You decide what fits.</p></div>
+          </div>
           {!isAuthenticated ? (
             <p className="text-[13px] leading-relaxed text-ink-soft">
               Feedback is saved with your account, so it needs you signed in.{" "}
@@ -105,7 +109,7 @@ export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, les
               <p className="text-[12.5px] leading-relaxed text-ink-soft">
                 Optional. Tapping the button sends this answer to{" "}
                 {USE_SUPABASE ? "Gemini (an AI made by Google)" : "Claude (an AI made by Anthropic)"} for a short
-                response: what you wrote, what stands out, and a question or two. No scores. The feedback is saved with
+                response grounded in this answer and its lesson, with at most one optional question. No scores or judgments. This is a one-answer reflection, not a live chat. The feedback is saved with
                 your account, and you can delete it.
               </p>
 
@@ -165,7 +169,7 @@ export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, les
                   onClick={request}
                   className="rounded-full bg-primary text-primary-foreground hover:bg-teal-deep/90"
                 >
-                  {busy ? "Getting feedback…" : latest ? "Get new feedback" : "Get feedback"}
+                  {busy ? "Thinking about your answer…" : latest ? "Ask about this answer again" : "Ask about this answer"}
                 </Button>
                 <span aria-live="polite" className="text-[12.5px] text-copper">
                   {error}
