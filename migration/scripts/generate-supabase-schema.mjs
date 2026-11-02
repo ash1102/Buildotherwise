@@ -146,8 +146,10 @@ for (const file of files) {
     sql.push(`drop policy if exists ${name} on public.${table};`);
     if (sqlAction === 'insert') {
       // A new row is always stamped with its creator; the rule decides who may create.
-      const who = expr.replace('created_by_id = auth.uid()', 'auth.uid() is not null');
-      sql.push(`create policy ${name} on public.${table} for insert with check (${who} and (created_by_id is null or created_by_id = auth.uid()));`);
+      // Owner-only tables: the new row must belong to the person creating it.
+      const owned = expr.includes('created_by_id = auth.uid()');
+      const check = owned ? expr : `${expr} and (created_by_id is null or created_by_id = auth.uid())`;
+      sql.push(`create policy ${name} on public.${table} for insert with check (${check});`);
     } else if (sqlAction === 'update') {
       sql.push(`create policy ${name} on public.${table} for update using (${expr}) with check (${expr});`);
     } else {
