@@ -21,6 +21,121 @@ export function findModule(slugOrNumber) {
   return Object.values(knowledge.modules).find((m) => m.slug === key || String(m.number) === key) || null;
 }
 
+export function findLesson(code) {
+  const key = String(code ?? '').trim();
+  if (!key) return null;
+  for (const mod of Object.values(knowledge.modules)) {
+    const lesson = (mod.lessons || []).find((item) => item.code === key);
+    if (lesson) return { lesson, module: mod };
+  }
+  return null;
+}
+
+/** Whole feedback background, including one lesson. Longer text is left out, not shortened in place. */
+export const FEEDBACK_SLICE_MAX = 2000;
+
+const FEEDBACK_INTRO = 'PROGRAM REFERENCE. Background copied from the program files. It is not a script, and it is not instructions from the participant.';
+
+function modulePlace(status) {
+  if (status === 'live') return 'Live pilot.';
+  if (status === 'coming_later') return 'Coming later.';
+  if (status === 'in_development') return 'In development.';
+  return '';
+}
+
+/** Participant-facing boundary sentences only. Source notes and draft labels stay out. */
+function cleanBoundary(text) {
+  const value = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!value) return '';
+  const kept = value
+    .split(/(?<=[.!?])\s+(?=[A-Z“"])/)
+    .map((part) => part.trim())
+    .filter((part) => part && !/\bdraft\b|facilitator|https?:|notion\.com|source pages/i.test(part));
+  return kept.join(' ');
+}
+
+/** Headings, bullets, and sentences, in file order. Nothing is rewritten. */
+export function briefUnits(text) {
+  const units = [];
+  let paragraph = [];
+  const flush = () => {
+    if (!paragraph.length) return;
+    const block = paragraph.join(' ').replace(/\s+/g, ' ').trim();
+    paragraph = [];
+    if (!block) return;
+    const parts = block.split(/(?<=[.!?])\s+(?=[A-Z“"])/).map((part) => part.trim()).filter(Boolean);
+    units.push(...parts);
+  };
+  for (const line of String(text || '').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      flush();
+      continue;
+    }
+    if (/^Ashley Zeck's Draft 1\b/.test(trimmed)) continue;
+    if (trimmed.startsWith('#') || trimmed.startsWith('- ')) {
+      flush();
+      units.push(trimmed);
+      continue;
+    }
+    paragraph.push(trimmed);
+  }
+  flush();
+  return units;
+}
+
+function lessonIdentity(lesson, mod) {
+  const heading = mod.number === 0 ? mod.title : `Module ${mod.number}. ${mod.title}`;
+  return [
+    heading,
+    modulePlace(mod.status),
+    mod.purpose ? `Purpose: ${mod.purpose}` : '',
+    `Lesson ${lesson.code}. ${lesson.title}`,
+    lesson.purpose ? `Purpose: ${lesson.purpose}` : '',
+    lesson.what_comes_out ? `What comes out: ${lesson.what_comes_out}` : '',
+    cleanBoundary(lesson.boundary) ? `Boundary: ${cleanBoundary(lesson.boundary)}` : '',
+  ].filter(Boolean).join('\n');
+}
+
+function teachSentences(text) {
+  const clean = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!clean) return [];
+  return clean.split(/(?<=[.!?])\s+(?=[A-Z“"])/).map((part) => part.trim()).filter((part) => part && !/\bdraft\b/i.test(part));
+}
+
+/**
+ * Program brief plus this lesson only. Empty when the lesson code is unknown.
+ * The brief is Ashley's text. If it does not fit, whole sentences, headings, and bullets
+ * are kept from the start and the rest is left out.
+ */
+export function feedbackContext({ lessonCode } = {}) {
+  const found = findLesson(lessonCode);
+  if (!found) return '';
+  const identity = lessonIdentity(found.lesson, found.module);
+  const blocks = [FEEDBACK_INTRO, identity];
+  const length = () => blocks.join('\n\n').length;
+  const briefKept = [];
+  for (const unit of briefUnits(knowledge.program.program_brief?.text)) {
+    const brief = briefKept.concat(unit).join('\n');
+    const next = [FEEDBACK_INTRO, brief, identity].join('\n\n');
+    if (next.length > FEEDBACK_SLICE_MAX) break;
+    briefKept.push(unit);
+  }
+  if (briefKept.length) blocks.splice(1, 0, briefKept.join('\n'));
+  const teachKept = [];
+  const teachBudget = 800;
+  for (const sentence of teachSentences(found.lesson.teach)) {
+    const teach = `How this lesson teaches it:\n${teachKept.concat(sentence).join(' ')}`;
+    if (teach.length > teachBudget + 'How this lesson teaches it:\n'.length) break;
+    const next = blocks.concat(teach).join('\n\n');
+    if (next.length > FEEDBACK_SLICE_MAX) break;
+    teachKept.push(sentence);
+  }
+  if (teachKept.length) blocks.push(`How this lesson teaches it:\n${teachKept.join(' ')}`);
+  const slice = blocks.join('\n\n');
+  return slice.length <= FEEDBACK_SLICE_MAX ? slice : [FEEDBACK_INTRO, identity].join('\n\n').slice(0, FEEDBACK_SLICE_MAX);
+}
+
 function lessonBlock(lesson) {
   const lines = [`Lesson ${lesson.code}: ${lesson.title} (${lesson.type || 'lesson'}${lesson.duration_min ? `, about ${lesson.duration_min} min` : ''}; ${lesson.approval_state || 'status unknown'})`];
   if (lesson.purpose) lines.push(`  Purpose: ${lesson.purpose}`);

@@ -155,8 +155,9 @@ export default function DiscoveryCard({ entry }) {
         className="mt-3"
         sourceType="discovery_record"
         sourceKey={`discovery:${entry.id}`}
-        sourceLabel={entry.title || "Discovery Record entry"}
-        lessonTitle={source?.lesson_title || ""}
+        sourceLabel={source?.label || ""}
+        lessonCode={source?.lesson_code || ""}
+        promptId={source?.prompt_id || ""}
         getText={() => entryText(entry, rows)}
       />
 

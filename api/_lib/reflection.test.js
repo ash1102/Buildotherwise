@@ -122,8 +122,12 @@ test('knowledge: Module 1 is complete, copied from program content, and has no f
   const text = JSON.stringify(k);
   assert.ok(!/internal_notes|approval_note|approved_source|full_text_uri/.test(text));
   for (const l of lessons) if (l.internal_notes) assert.ok(!text.includes(l.internal_notes.slice(0, 60)));
-  assert.deepEqual(Object.values(k.modules).map((m) => m.number), [1, 2, 3, 4, 5]);
-  assert.ok(Object.values(k.modules).filter((m) => m.number > 1).every((m) => m.lessons_included === false));
+  assert.deepEqual(Object.values(k.modules).map((m) => m.number), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  assert.ok(Object.values(k.modules).filter((m) => m.number <= 5).every((m) => m.lessons_included === true && m.lessons.length > 0));
+  assert.ok(Object.values(k.modules).filter((m) => m.number >= 6).every((m) => m.lessons_included === false && !m.lessons));
+  assert.equal(k.program.program_brief.header, "Ashley Zeck's Draft 1, 2026-11-02");
+  assert.ok(k.program.program_brief.text.startsWith('## 1. Understand Build Otherwise'));
+  assert.ok(k.program.program_brief.text.includes('These are educational influences, not claims that Entrepalooza is a validated psychological intervention.'));
 });
 
 test('knowledge: program background carries beliefs, Life Map areas, autonomy, and draft status', () => {

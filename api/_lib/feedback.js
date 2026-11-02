@@ -7,10 +7,24 @@
 import { FEEDBACK_SYSTEM_PROMPT } from './prompts.js';
 import { clean, cleanList, recentCount, json } from './http.js';
 import { geminiKey, geminiModel, thinkingLevel, callGemini, extractReply, describeFailure, redact } from './gemini.js';
+import { feedbackContext, findLesson } from './knowledge.js';
 
 export const SOURCE_TYPES = new Set(['workbook_answer', 'discovery_record']);
 export const MAX_PER_HOUR = 15;
-export const MAX_OUTPUT_TOKENS = 2048; // room for thinking plus a ~170 word reply
+// About 170 words plus the JSON wrapper is roughly 250 tokens. 600 leaves a little room
+// when thinking level "minimal" still spends a few tokens, and it keeps the reply short.
+export const MAX_OUTPUT_TOKENS = 600;
+
+/**
+ * Gemini 3.5 Flash-Lite's lowest supported thinking level is "minimal", and that is its default.
+ * See https://ai.google.dev/gemini-api/docs/generate-content/thinking
+ * GEMINI_THINKING_LEVEL still overrides this. "off" omits the setting.
+ * callGemini retries a 400 once with no thinking level, which covers a model that rejects "minimal".
+ */
+export function feedbackThinkingLevel(env) {
+  if (String(env?.GEMINI_THINKING_LEVEL ?? '').trim() === '') return 'minimal';
+  return thinkingLevel(env);
+}
 
 export function parseReply(text) {
   const start = text.indexOf('{');
@@ -23,12 +37,11 @@ export function parseReply(text) {
   }
 }
 
-export function buildUserMessage({ sourceType, lessonTitle, sourceLabel, text }) {
+export function buildUserMessage({ sourceType, sourceLabel, text }) {
   const kindLabel = sourceType === 'discovery_record' ? 'A Discovery Record entry' : 'A workbook answer';
   return [
     `${kindLabel}.`,
-    lessonTitle ? `Step: ${lessonTitle}` : null,
-    sourceLabel ? `Question or title: ${sourceLabel}` : null,
+    sourceLabel ? `Question: ${sourceLabel}` : null,
     '',
     '<answer>',
     text,
@@ -36,6 +49,11 @@ export function buildUserMessage({ sourceType, lessonTitle, sourceLabel, text })
   ]
     .filter((line) => line !== null)
     .join('\n');
+}
+
+function feedbackSystem(lessonCode) {
+  const background = feedbackContext({ lessonCode });
+  return background ? `${FEEDBACK_SYSTEM_PROMPT}\n\n${background}` : FEEDBACK_SYSTEM_PROMPT;
 }
 
 /**
@@ -51,8 +69,14 @@ export async function handleAnswerFeedback({ payload, auth, env, fetchImpl }) {
     const sourceType = clean(payload?.source_type, 40);
     const sourceKey = clean(payload?.source_key, 300);
     const sourceLabel = clean(payload?.source_label, 600);
-    const lessonTitle = clean(payload?.lesson_title, 300);
+    const lessonCode = clean(payload?.lesson_code, 40);
+    const promptId = clean(payload?.prompt_id, 80);
     const text = clean(payload?.text, 6000);
+    const found = findLesson(lessonCode);
+    const lessonTitle = found?.lesson.title || clean(payload?.lesson_title, 300);
+    const storedPrompts = [...(found?.lesson.try_prompts || []), ...(found?.lesson.reflect_prompts || [])];
+    const storedIndex = /^\d+$/.test(promptId) ? Number(promptId) : -1;
+    const question = sourceLabel || (storedIndex >= 0 ? storedPrompts[storedIndex] || '' : '');
 
     if (!SOURCE_TYPES.has(sourceType) || !sourceKey) {
       return json({ error: 'Something is missing. Try again from the answer.' }, 400);
@@ -83,9 +107,9 @@ export async function handleAnswerFeedback({ payload, auth, env, fetchImpl }) {
         fetchImpl,
         apiKey,
         model,
-        system: FEEDBACK_SYSTEM_PROMPT,
-        turns: [{ role: 'user', text: buildUserMessage({ sourceType, lessonTitle, sourceLabel, text }) }],
-        level: thinkingLevel(env),
+        system: feedbackSystem(lessonCode),
+        turns: [{ role: 'user', text: buildUserMessage({ sourceType, sourceLabel: question, text }) }],
+        level: feedbackThinkingLevel(env),
         temperature: 0.5,
         maxOutputTokens: MAX_OUTPUT_TOKENS,
         json: true,
@@ -112,7 +136,7 @@ export async function handleAnswerFeedback({ payload, auth, env, fetchImpl }) {
     const row = {
       source_type: sourceType,
       source_key: sourceKey,
-      source_label: sourceLabel,
+      source_label: question,
       lesson_title: lessonTitle,
       answer_snapshot: text,
       summary: clean(parsed.summary, 1200),
