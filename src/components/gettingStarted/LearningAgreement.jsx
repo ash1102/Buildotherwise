@@ -144,7 +144,7 @@ export default function LearningAgreement({ lessonTitle = "Make this experience 
       </div>
 
       <div className="rounded-xl border border-border bg-card px-4 py-4">
-        <p className="text-[16px] font-semibold text-foreground">Your learning agreement</p>
+        <p className="text-[16px] font-semibold text-foreground">My Way Forward</p>
         <p className="mt-2 text-[16px] leading-relaxed text-foreground">{AGREEMENT_PERMISSION}</p>
         <p className="mt-3 text-[13px] text-muted-faint">Saved to your workbook as you go. You can change it anytime.</p>
       </div>
@@ -155,7 +155,7 @@ export default function LearningAgreement({ lessonTitle = "Make this experience 
         className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-input bg-card px-4 py-3 text-[15px] font-medium text-foreground transition hover:bg-secondary"
       >
         {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
-        {copied ? "Copied" : "Copy my agreement"}
+        {copied ? "Copied" : "Copy My Way Forward"}
       </button>
     </div>
   );
