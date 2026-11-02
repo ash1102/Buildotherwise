@@ -1,0 +1,257 @@
+{
+  "version": 1,
+  "note": "Copied from existing program files by migration/scripts/build-knowledge.mjs. Not written or reworded by AI. Lessons carry their approval_state: anything not \"approved\" is draft wording.",
+  "sources": {
+    "modules_and_lessons": "migration/content/Module.json, Lesson.json",
+    "mission_and_beliefs": "src/pages/Mission.jsx",
+    "life_map": "src/lib/lifeMap.js (MAP_SECTIONS)",
+    "discovery_ways": "src/lib/discoveryWays.js (WAY_KINDS, NEEDS; draft wording pending review)",
+    "reflection_boundaries": "src/components/reflection/BoundariesNote.jsx"
+  },
+  "program": {
+    "mission_page_text": [
+      "Build Otherwise is an early-stage social-impact initiative in Houston. We design practical, non-clinical learning for adults working out what comes next.",
+      "Many adults reach a point where the old path has ended or stopped fitting: after addiction, after incarceration, after a job ends, or after a long stretch of just getting through. Most of the help on offer either picks the next step for them or asks for a plan they don’t have yet.",
+      "What’s often missing is room to find out. A safe way to try small things in real life, look honestly at what happened, and choose for yourself, with people around you who aren’t steering.",
+      "We help adults in transition notice what holds their attention, test it through small real-world steps, reflect on what actually happened, and decide their own next direction.",
+      "A world where people coming through hard stretches get the time, tools and community to build a life and work that fit them, instead of being handed a path.",
+      "Our programs are built on Scars to Strategy, a framework for looking at difficult experiences, unconventional strengths and survival skills as possible assets. It never asks anyone to say their hardship was worth it.",
+      "Our first program, Entrepalooza, is in its first pilot. There are no results to report yet.",
+      "Build Otherwise is not yet a registered nonprofit. We’re working toward fiscal sponsorship.",
+      "We’re looking for partners, volunteers and reviewers to help shape the first pilot."
+    ],
+    "beliefs": [
+      {
+        "title": "You stay in charge",
+        "body": "People make their own decisions here. Support should never turn into control, and you can pass on anything."
+      },
+      {
+        "title": "Hardship isn’t a requirement",
+        "body": "We don’t assume suffering is good for anyone, and nobody has to turn their story into something productive. Skills people built just to get through can still count."
+      },
+      {
+        "title": "Many answers are complete",
+        "body": "A job, training, a project, a business, a pause, or still looking. Building a business is a real option, not the default."
+      },
+      {
+        "title": "Evidence before claims",
+        "body": "We’re early. We test what we build, say what we don’t know yet, and don’t claim results we haven’t measured."
+      }
+    ],
+    "life_map_sections": [
+      {
+        "key": "places",
+        "label": "Your week",
+        "prompt": "Places from a recent stretch you remember. Home counts."
+      },
+      {
+        "key": "placeless",
+        "label": "Activities",
+        "prompt": "Other things you did then, including at home, online, while travelling, or in different places."
+      },
+      {
+        "key": "energy",
+        "label": "Energy",
+        "prompt": "One recent observation about energy. Not a permanent description of the activity."
+      },
+      {
+        "key": "barriers",
+        "label": "What's missing",
+        "prompt": "Something that used to be part of life, something wanted but not reached, or what made access difficult. Absence is not the same as wanting it back."
+      },
+      {
+        "key": "threads",
+        "label": "Threads",
+        "prompt": "A repeated detail might be worth noticing. It does not tell you yet why it repeats, whether you like it, or whether you want more of it."
+      },
+      {
+        "key": "groups",
+        "label": "People and groups",
+        "prompt": "People and groups you have been in contact with, used to be with, or have wondered about. A role or group label is enough."
+      }
+    ],
+    "discovery_ways": {
+      "kinds": [
+        {
+          "id": "try",
+          "label": "Try it",
+          "short": "Do a small beginner version yourself."
+        },
+        {
+          "id": "watch",
+          "label": "Watch someone",
+          "short": "See how someone else does it."
+        },
+        {
+          "id": "ask",
+          "label": "Ask someone",
+          "short": "Ask one question of someone who knows."
+        },
+        {
+          "id": "notYet",
+          "label": "Not able to yet",
+          "short": "Note what’s in the way and keep a question for later."
+        }
+      ],
+      "needs": [
+        {
+          "id": "internet",
+          "label": "Internet or data"
+        },
+        {
+          "id": "travel",
+          "label": "Getting somewhere new"
+        },
+        {
+          "id": "contact",
+          "label": "Someone I know to ask"
+        },
+        {
+          "id": "phone",
+          "label": "A phone call or message"
+        }
+      ]
+    },
+    "reflection_boundaries": [
+      "No diagnosis, personality types, or guesses at hidden motives.",
+      "No scoring of readiness, motivation, purpose, or potential.",
+      "No action plan unless you ask for one.",
+      "Only your entries, brought in by you. Never anyone else's journal.",
+      "A carry-forward note is drafted for your approval, never saved for you."
+    ]
+  },
+  "modules": {
+    "find-something-worth-exploring": {
+      "number": 1,
+      "slug": "find-something-worth-exploring",
+      "title": "Find Something Worth Exploring",
+      "purpose": "Notice a thread worth exploring and how it could fit into life as it is now, without demanding a passion or business idea.",
+      "description": "Notice a thread worth exploring and how it could fit into life as it is now, without demanding a passion or business idea.",
+      "status": "live",
+      "lessons": [
+        {
+          "code": "M1-L1",
+          "title": "Notice what draws your attention",
+          "order": 1,
+          "type": "activity",
+          "duration_min": 10,
+          "purpose": "Explore where possible interests come from and identify a question worth investigating.",
+          "teach": "Interests are not always discovered by looking inward. They can develop through exposure, practice, conversation, necessity, and chance. You might notice a problem you want solved, a subject you keep returning to, or an unfamiliar activity you would like to experience. You may also have no clear candidate yet.\n\nAttention is not the same as enjoyment or commitment. Repeatedly thinking about something can reflect responsibility or worry as well as curiosity. What matters is investigating *why* it has your attention, rather than declaring it your passion.\n\nChoose something from your Life Map, an ordinary observation, or an unfamiliar topic you want to learn about. If nothing comes to mind, notice one activity or question you encounter during the coming week. This is an invitation to explore, not a test of self-knowledge.",
+          "boundary": "Keep participant choice, the right to pass, and facilitator boundaries intact. Skipped or blank answers are saved as “no response,” never as a decision.",
+          "reflect_prompts": [],
+          "try_prompts": [
+            "What is one activity, subject, question, or problem you might want to understand better?",
+            "What would you need to encounter, ask, or try to find out whether it interests you?"
+          ],
+          "what_comes_out": "A participant-selected observation, possible question, or honest uncertainty to bring into Module 2.",
+          "carry_forward": [
+            "O.6"
+          ],
+          "routes": [
+            "Use something I noticed",
+            "Bring a Life Map thread",
+            "Explore something unfamiliar",
+            "Nothing draws me in yet",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "M1-L2",
+          "title": "Attention is not a passion",
+          "order": 2,
+          "type": "reading",
+          "duration_min": 15,
+          "purpose": "Notice that time, intensity, or repeated attention is not yet a passion or a commitment.",
+          "teach": "Repeated attention is not a passion. You might think about something often because you are curious, because you are worried, or because someone needs you to. Spending a lot of time on it does not, by itself, tell you that it fits the rest of your life or that you should continue.\n\nYou do not need to judge how intense an interest is in this module. A question, or an honest unknown, is enough. Module 5, Tuning Your Instrument, is where you listen to how an activity is going, including intensity, choice, and pressure, after you have had a chance to try something.\n\nIf an activity already matters to you, you can notice whether you still have a choice about it. You do not have to decide that now.",
+          "boundary": "Keep participant choice, the right to pass, and facilitator boundaries intact. No scoring and no labeling anyone ‘obsessive.’",
+          "reflect_prompts": [
+            "What is one question about choice, pressure, or flexibility that this reading raises for you?"
+          ],
+          "try_prompts": [],
+          "what_comes_out": "A question to revisit, if useful.",
+          "carry_forward": [],
+          "routes": [
+            "Read the caution",
+            "Consider an activity I know",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        },
+        {
+          "code": "M1-L3",
+          "title": "Your learning agreement",
+          "order": 3,
+          "type": "activity",
+          "duration_min": 8,
+          "purpose": "Set a revisable agreement about your own learning and the support that will make exploration workable.",
+          "teach": "## Your part\n\nDecide what you are willing to try in Module 2, and give the discussion and reflection questions honest, thoughtful attention. Explain what you notice as fully as you can. This is about taking your own learning seriously. There is no required answer length, and you do not already need to know what interests you.\n\nYou can write privately, talk it through with someone you choose, or combine both. “I don’t know yet” and “nothing draws me in” are starting points you can explain and investigate.\n\n## The program’s part\n\nThe program offers possibilities to explore, questions to help you reflect, and room to ask for help or adjust your approach. If you filled in “What makes it work for you” in Getting Started, look back at it to identify support you need. Check what support is actually available before making a plan that depends on it.\n\n## Make the agreement yours\n\nRecord what you are willing to try and what you need to make that possible. Your exploration question may remain undecided. You can revise this agreement as you learn, change an experience, or pause. Trying something does not commit you to pursuing it afterward.\n\nModule 2 is where you choose and encounter an experience. You do not have to complete one here.",
+          "reflect_prompts": [
+            "When would it be useful to revisit this agreement—for example, after your first experience or if your circumstances change?",
+            "Optional: What’s one thing you believe about yourself that you haven’t had the opportunity to test? You’ll see it again in Module 4."
+          ],
+          "try_prompts": [
+            "What are you willing to try in Module 2, and how will you give the reflection questions honest attention? Describe it in your own words. Leaving the question open counts.",
+            "What observation or question, if any, would you like to bring into Module 2? “Nothing draws me in yet” is a valid starting point.",
+            "What support or adjustment would help you take part? You can look back at “What makes it work for you” in Getting Started, or say none for now."
+          ],
+          "what_comes_out": "A revisable learning agreement: what you are willing to try, a starting question or uncertainty, support needs, and a point to review it.",
+          "carry_forward": [
+            "M1-L1",
+            "O.4"
+          ],
+          "routes": [
+            "Say it",
+            "Write it",
+            "Watch",
+            "Pass"
+          ],
+          "decision_options": [],
+          "approval_state": "pending_approval",
+          "status": "draft"
+        }
+      ],
+      "lessons_included": true
+    },
+    "learn-through-one-small-try": {
+      "number": 2,
+      "slug": "learn-through-one-small-try",
+      "title": "Learn Through One Small Try",
+      "purpose": "Choose one bounded, reversible try and review what it teaches, its conditions and costs.",
+      "description": "Choose one bounded, reversible try and review what it teaches, its conditions and costs.",
+      "status": "live",
+      "lessons_included": false
+    },
+    "test-how-i-operate": {
+      "number": 3,
+      "slug": "test-how-i-operate",
+      "title": "Test How I Operate",
+      "purpose": "Test whether one setup change makes an activity more chosen, flexible or workable—not identify a learner type.",
+      "description": "Test whether one setup change makes an activity more chosen, flexible or workable—not identify a learner type.",
+      "status": "live",
+      "lessons_included": false
+    },
+    "check-the-story-build-evidence": {
+      "number": 4,
+      "slug": "check-the-story-build-evidence",
+      "title": "Check the Story, Build Evidence",
+      "purpose": "Keep an event, criticism or setback from automatically becoming a permanent verdict about the person. Accuracy, not forced positivity.",
+      "description": "Keep an event, criticism or setback from automatically becoming a permanent verdict about the person. Accuracy, not forced positivity.",
+      "status": "live",
+      "lessons_included": false
+    },
+    "protect-what-works": {
+      "number": 5,
+      "slug": "protect-what-works",
+      "title": "Tuning Your Instrument",
+      "purpose": "Listen to how an activity is going, then protect what already works or make one small reversible adjustment. The instrument is how you are engaging right now, not you. Useful does not have to mean calm.",
+      "description": "Listen to how an activity is going, then protect what already works or make one small reversible adjustment. The instrument is how you are engaging right now, not you. Useful does not have to mean calm.",
+      "status": "live",
+      "lessons_included": false
+    }
+  }
+}

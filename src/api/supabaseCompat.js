@@ -273,11 +273,31 @@ const notYet = (what) => async () => {
   throw apiError(`${what} isn't available on this version yet.`, 501);
 };
 
+/**
+ * The journal reflection partner. Conversations live in the person's own `reflection_conversation`
+ * rows (owner-only). Sending a message goes through /api/journalReflection, which asks Gemini and saves
+ * both the message and the reply. Same call names the page already uses.
+ */
+const REFLECTION_COLUMNS = 'id, created_date, name, messages';
+const toConversation = (row) =>
+  row ? { id: row.id, created_date: row.created_date, metadata: { name: row.name }, messages: row.messages || [], agent_name: 'conversation_journal_reflection' } : null;
+
 const agents = {
-  createConversation: notYet('The reflection partner'),
-  addMessage: notYet('The reflection partner'),
-  getConversation: notYet('The reflection partner'),
-  listConversations: async () => [],
+  async createConversation({ metadata } = {}) {
+    const row = unwrap(await supabase.from('reflection_conversation').insert({ name: metadata?.name || null }).select(REFLECTION_COLUMNS).single());
+    return toConversation(row);
+  },
+  async getConversation(id) {
+    return toConversation(unwrap(await supabase.from('reflection_conversation').select(REFLECTION_COLUMNS).eq('id', id).maybeSingle()));
+  },
+  async listConversations({ limit = 20 } = {}) {
+    const rows = unwrap(await supabase.from('reflection_conversation').select(REFLECTION_COLUMNS).order('created_date', { ascending: false }).limit(limit));
+    return (rows || []).map(toConversation);
+  },
+  async addMessage(conversation, message) {
+    const { data } = await functions.invoke('journalReflection', { conversation_id: conversation.id, content: message.content });
+    return data;
+  },
   subscribeToConversation: () => () => {},
 };
 
