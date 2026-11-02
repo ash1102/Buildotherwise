@@ -92,7 +92,15 @@ export default function Contact() {
         <p className="mt-2 text-[16px] leading-relaxed text-muted-foreground">
           Entrepalooza is an educational workbook, not therapy or treatment, and this form is not monitored around the
           clock. If you are in crisis or need clinical support, please contact your local emergency services or a
-          qualified professional rather than this form. [PLACEHOLDER: support route]
+          qualified professional rather than this form.
+        </p>
+        <p className="mt-3 text-[16px] leading-relaxed text-muted-foreground">
+          In the United States, call or text <a className="underline underline-offset-2" href="tel:988">988</a> for
+          24/7 Suicide &amp; Crisis Lifeline support, or visit{" "}
+          <a className="underline underline-offset-2" href="https://988lifeline.org/" target="_blank" rel="noopener noreferrer">988lifeline.org</a>.
+          For immediate danger, call <a className="underline underline-offset-2" href="tel:911">911</a>.
+          For help finding local community services, dial <a className="underline underline-offset-2" href="tel:211">211</a> or visit{" "}
+          <a className="underline underline-offset-2" href="https://www.211.org/" target="_blank" rel="noopener noreferrer">211.org</a>.
         </p>
       </div>
     </article>
