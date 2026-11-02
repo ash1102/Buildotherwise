@@ -151,7 +151,7 @@ function PartEncounter({ lesson, answers }) {
           <div className="mt-3"><PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index={"explore-" + card.id} label="My question or small experiment (optional)" variant="inline" /></div>
           <p className="mt-2 text-[14px] text-muted-foreground">No right answer. You can leave it, come back, or change direction.</p>
         </details>
-      ))
+      ))}
       {selectedIds.length ? (
         <div aria-live="polite">
           <Panel tone="note">
