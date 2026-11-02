@@ -3,6 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { getAnswer, setAnswer } from "@/lib/workbook";
 import { saveAnswer } from "@/lib/journal";
 import { addSpokenWords } from "@/lib/dictation";
+import AnswerFeedback from "@/components/feedback/AnswerFeedback";
 
 /**
  * One question, with the question itself as the label above the box. The answer is
@@ -113,7 +114,19 @@ export default function PromptField({
           compact ? "min-h-[2.75rem]" : "min-h-[5rem]"
         }`}
       />
-      <div className="mt-2 flex flex-wrap items-center justify-end gap-2">
+      <div className="mt-2 flex flex-wrap items-start justify-between gap-2">
+        {!compact && String(value || "").trim().length >= 10 ? (
+          <AnswerFeedback
+            className="min-w-0 flex-1"
+            sourceType="workbook_answer"
+            sourceKey={`${lessonCode}#${index}`}
+            sourceLabel={label}
+            lessonTitle={lessonTitle}
+            getText={() => valueRef.current}
+          />
+        ) : (
+          <span />
+        )}
         <span aria-live="polite" className="text-[14px] text-accent-ink">
           {state === "saved" ? "Saved" : state === "saving" ? "Saving…" : state === "error" ? "Not saved. Try again." : ""}
         </span>
