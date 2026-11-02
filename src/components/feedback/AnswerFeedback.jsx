@@ -58,8 +58,11 @@ export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, les
       if (data?.error) throw new Error(data.error);
       if (data?.feedback) setItems((prev) => [data.feedback, ...(prev || [])]);
     } catch (err) {
+      const status = err?.response?.status || err?.status;
       const message = err?.response?.data?.error || err?.data?.error || err?.message;
-      setError(message || "Feedback isn’t available right now. Your answer is unchanged.");
+      setError(status === 402 || /credit|quota|payment required|limit reached/i.test(String(message || ""))
+        ? "The AI service has reached its usage limit. Trying again immediately will not help. Your answer is unchanged."
+        : message || "The companion isn’t available right now. Your answer is unchanged.");
     } finally {
       setBusy(false);
     }
@@ -171,7 +174,7 @@ export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, les
                 >
                   {busy ? "Thinking about your answer…" : latest ? "Ask about this answer again" : "Ask about this answer"}
                 </Button>
-                <span aria-live="polite" className="text-[12.5px] text-copper">
+                <span role={error ? "alert" : "status"} aria-live="polite" className="text-[12.5px] text-copper">
                   {error}
                 </span>
               </div>
