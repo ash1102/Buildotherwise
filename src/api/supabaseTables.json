@@ -1,0 +1,67 @@
+{
+  "AnswerFeedback": {
+    "table": "answer_feedback",
+    "adminOnly": []
+  },
+  "DiscoveryRecord": {
+    "table": "discovery_record",
+    "adminOnly": []
+  },
+  "DiscoveryThread": {
+    "table": "discovery_thread",
+    "adminOnly": []
+  },
+  "Feedback": {
+    "table": "feedback",
+    "adminOnly": []
+  },
+  "GettingStartedSubmission": {
+    "table": "getting_started_submission",
+    "adminOnly": []
+  },
+  "Inquiry": {
+    "table": "inquiry",
+    "adminOnly": []
+  },
+  "LearnerRecord": {
+    "table": "learner_record",
+    "adminOnly": []
+  },
+  "Lesson": {
+    "table": "lesson",
+    "adminOnly": [
+      "internal_notes"
+    ]
+  },
+  "LessonReviewPackage": {
+    "table": "lesson_review_package",
+    "adminOnly": []
+  },
+  "LibraryResource": {
+    "table": "library_resource",
+    "adminOnly": [
+      "full_text_uri",
+      "internal_notes"
+    ]
+  },
+  "Module": {
+    "table": "module",
+    "adminOnly": []
+  },
+  "PreviewResponse": {
+    "table": "preview_response",
+    "adminOnly": []
+  },
+  "TribeReply": {
+    "table": "tribe_reply",
+    "adminOnly": []
+  },
+  "TribeThread": {
+    "table": "tribe_thread",
+    "adminOnly": []
+  },
+  "UserStore": {
+    "table": "user_store",
+    "adminOnly": []
+  }
+}
