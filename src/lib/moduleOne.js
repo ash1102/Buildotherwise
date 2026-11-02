@@ -99,12 +99,12 @@ export const COMPARE_OPTIONS = [
     label: "They're equally passionate about motorcycles.",
     // DRAFT feedback (Claude), built from the four points in the spec.
     feedback:
-      "That's one possibility, but the time they spend doesn't tell us that. Alex mentions enjoying the problems and stopping when something else needs attention. Sam mentions bills and family responsibilities.",
+      "That's one possibility, but the time they spend doesn't tell us that. Jordan mentions enjoying the problems and stopping when something else needs attention. Casey mentions bills and family responsibilities.",
   },
   {
     label: "Their reasons for engaging may be different.",
     feedback:
-      "That's what the descriptions suggest. Alex talks about enjoyment; Sam talks about money and responsibility. Even so, the reasons can overlap. Sam sometimes enjoys the work too.",
+      "That's what the descriptions suggest. Jordan talks about enjoyment; Casey talks about money and responsibility. Even so, the reasons can overlap. Casey sometimes enjoys the work too.",
   },
   {
     label: "We need more information before deciding how either person feels.",
@@ -117,7 +117,7 @@ export const COMPARE_OPTIONS = [
 export const COMPARE_TAKEAWAY =
   "Time spent, on its own, doesn't establish passion. Reasons and circumstances matter, and motivation usually has several influences at once.";
 
-export const LENS_OPTIONS = ["I'm thinking of an activity from my life", "I'll use Alex or Sam instead"];
+export const LENS_OPTIONS = ["I'm thinking of an activity from my life", "I'll use Jordan or Casey instead"];
 
 export const REASON_OPTIONS = [
   "I enjoy it.",
