@@ -16,7 +16,7 @@ export default function StepNav({
   next,
   nextIsModule = false,
   workbookLink = "/",
-  backLabel = "Back to the workbook",
+  backLabel = "Back to the module",
   forward = null,
   endNote,
   nextLabel = "",
@@ -85,7 +85,7 @@ export default function StepNav({
         </Link>
         {prev ? (
           <Link to={`/lesson/${prev.code}`} className="text-[15px] text-muted-foreground hover:text-foreground">
-            Previous {(prev.module_order ?? 0) === (next?.module_order ?? 0) ? "lesson" : "step"}: {prev.title}
+            Previous workbook step: {prev.title}
           </Link>
         ) : null}
       </div>
