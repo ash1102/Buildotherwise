@@ -264,8 +264,6 @@ export default function ProgramLibrary() {
       ) : null}
 
       </section>
-      ) : null}
-      </section>
     </div>
   );
 }
