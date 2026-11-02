@@ -24,15 +24,15 @@ function PartCompare({ lesson, answers }) {
   return (
     <div className="space-y-5">
       <div className="grid gap-3 sm:grid-cols-2">
-        <Panel tone="example" label="Fictional example" title="Alex">
+        <Panel tone="example" label="Fictional example" title="Jordan">
           <P>
-            Alex spends several hours each week learning to repair motorcycles. Alex enjoys solving mechanical problems and
+            Jordan spends several hours each week learning to repair motorcycles. Jordan enjoys solving mechanical problems and
             usually feels comfortable stopping when something else needs attention.
           </P>
         </Panel>
-        <Panel tone="example" label="Fictional example" title="Sam">
+        <Panel tone="example" label="Fictional example" title="Riley">
           <P>
-            Sam repairs motorcycles to earn money and meet family responsibilities. Sam sometimes enjoys the work, but often
+            Riley repairs motorcycles to earn money and meet family responsibilities. Riley sometimes enjoys the work, but often
             continues because bills need paying.
           </P>
         </Panel>
@@ -41,7 +41,7 @@ function PartCompare({ lesson, answers }) {
         legend="Both spend considerable time on the activity. What can we reasonably conclude?"
         options={COMPARE_OPTIONS.map((item) => item.label)}
         value={choice}
-        onChange={(next) => recordAnswer(lesson, "compare", next, "Alex and Sam: what can we reasonably conclude?")}
+        onChange={(next) => recordAnswer(lesson, "compare", next, "Jordan and Riley: what can we reasonably conclude?")}
       />
       <div aria-live="polite">
         {option ? (
@@ -113,19 +113,19 @@ function PartYours({ lesson, answers }) {
       </P>
       <SingleChoice
         legend="Which would you like to use?"
-        hint="Both work the same way. Using Alex or Sam is a complete way to do this part."
+        hint="Both work the same way. Using Jordan or Riley is a complete way to do this part."
         options={LENS_OPTIONS}
         value={lens}
         onChange={(next) => recordAnswer(lesson, "lens", next, "Which example I used")}
       />
       <MultiChoice
-        legend={fictional ? "What might keep Alex or Sam involved?" : "What might keep you involved?"}
+        legend={fictional ? "What might keep Jordan or Riley involved?" : "What might keep you involved?"}
         hint="Choose any that fit. More than one is fine."
         options={REASON_OPTIONS}
         values={reasons}
         only={NOT_SURE}
         onChange={(next) =>
-          recordAnswer(lesson, "reasons", joinMulti(next), fictional ? "What might keep Alex or Sam involved?" : "What might keep me involved?")
+          recordAnswer(lesson, "reasons", joinMulti(next), fictional ? "What might keep Jordan or Riley involved?" : "What might keep me involved?")
         }
       />
       <PromptField
