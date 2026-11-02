@@ -1,6 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import PromptField from "../PromptField";
 import PrivacyNote from "../PrivacyNote";
 import { useAnswers } from "@/lib/workbook";
@@ -60,8 +58,6 @@ function PartReading() {
   return (
     <div className="space-y-4">
       <Panel tone="reading">
-        {/* DRAFT (Claude): the spec's points joined to sentences kept from the published
-            reading "Attention is not a passion". The original stays unchanged in the Library. */}
         <P>People give their attention to activities for many reasons:</P>
         <ul className="grid max-w-[68ch] list-disc gap-x-8 gap-y-1 pl-5 text-[17px] leading-relaxed text-foreground sm:grid-cols-2">
           <li>enjoyment</li>
@@ -89,14 +85,10 @@ function PartReading() {
           something.
         </P>
         <p className="text-[14px] leading-relaxed text-muted-foreground">
-          Source: Entrepalooza Module 1 reading, “Attention is not a passion.” On interest growing through experience, see
-          the research connection in Lesson 1 (Hidi &amp; Renninger, 2006).
+          Research connection: Interests can develop through experience over time. Hidi and Renninger (2006)
+          describe one model of how interest develops. See the research explanation in Module 1, Lesson 1.
         </p>
       </Panel>
-      <Link to="/program-library" className="inline-flex items-center gap-1.5 text-[15px] font-medium text-accent-ink underline underline-offset-2">
-        Read the original “Attention is not a passion” in the Library
-        <ArrowRight className="h-4 w-4" aria-hidden="true" />
-      </Link>
     </div>
   );
 }
