@@ -36,6 +36,7 @@ export const GO_DEEPER = {
       "Did your interest grow through experience, or was it immediate?",
       "Have you ever lost interest in something you once enjoyed?",
       "What does that suggest about the way your interests can change?",
+      "Have you ever become curious about or good at something because of a difficult experience—even if you wouldn’t choose to go through it again?",
     ],
   },
   "M1-L3": {
