@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { setProgressUserId } from '@/lib/progressScope';
 import { startAccountSync, stopAccountSync } from '@/lib/accountSync';
+import { USE_SUPABASE } from '@/api/supabaseCompat';
 
 const AuthContext = createContext();
 
@@ -29,7 +30,9 @@ export const AuthProvider = ({ children }) => {
         setAppPublicSettings(publicSettings);
         
         // If we got the app public settings successfully, check if user is authenticated
-        if (appParams.token) {
+        // On Supabase the session can arrive just after load (a sign-in link or Google), so ask for it.
+        const hasSession = USE_SUPABASE ? await base44.auth.isAuthenticated() : Boolean(appParams.token);
+        if (hasSession) {
           await checkUserAuth();
         } else {
           setIsLoadingAuth(false);
