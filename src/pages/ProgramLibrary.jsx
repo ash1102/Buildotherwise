@@ -7,13 +7,11 @@ import {
   loadLibraryResources,
   loadOutsideResources,
   loadReadingSteps,
-  loadResearchBriefs,
   moduleTitle,
 } from "@/lib/library";
 import { downloadText } from "@/lib/download";
 import LibraryCard from "@/components/library/LibraryCard";
 import LibraryFilters from "@/components/library/LibraryFilters";
-import ResearchBriefCard from "@/components/library/ResearchBriefCard";
 import OutsideSourceCard from "@/components/library/OutsideSourceCard";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 
@@ -25,7 +23,6 @@ export default function ProgramLibrary() {
   const [activeStep, setActiveStep] = useState("all");
   const [steps, setSteps] = useState([]);
   const [resources, setResources] = useState(null);
-  const [research, setResearch] = useState([]);
   const [outside, setOutside] = useState([]);
   const [outsideKind, setOutsideKind] = useState("all");
   const [loading, setLoading] = useState(true);
@@ -77,9 +74,6 @@ export default function ProgramLibrary() {
 
   useEffect(() => {
     let active = true;
-    loadResearchBriefs().then((items) => {
-      if (active) setResearch(items);
-    });
     loadOutsideResources().then((items) => {
       if (active) setOutside(items);
     });
@@ -113,7 +107,7 @@ export default function ProgramLibrary() {
         item.body || item.summary || ""
       }\n${item.source_label ? `\nSource: ${item.source_label}\n` : ""}`;
     });
-    const briefLines = research.map((brief) => {
+    const briefLines = [].map((brief) => {
       const head = `## ${brief.title}\n_Build Otherwise research note · summary only_\n\n${brief.summary || ""}`;
       const status = brief.review_status ? `\n\nLimit: ${brief.review_status}` : "";
       return `${head}${status}\n`;
@@ -274,7 +268,7 @@ export default function ProgramLibrary() {
         </section>
       ) : null}
 
-      {research.length ? (
+      {false ? (
         <section className="rounded-lg border border-dashed border-natural-deep bg-card/60 p-6">
           <h3 className="workbook-label">Build Otherwise's own research notes</h3>
           <h4 className="mt-1.5 font-heading text-[19px]">How the curriculum was checked against research</h4>
