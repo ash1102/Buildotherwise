@@ -285,22 +285,25 @@ function PartLook({ lesson, answers }) {
         <P>You noticed something in your experience and selected {encounterCards.map(card => card.title).join(", ")}. They might connect, or they might not. You decide.</P>
         <PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index="connection" label="A connection or question worth exploring (optional)" variant="inline" />
       </Panel> : null}
-      <div className="space-y-2">
-        <p className="text-[15px] text-muted-foreground">Some things people notice:</p>
-        <ul className="list-disc space-y-1 pl-5 text-[15px] text-muted-foreground">
-          <li>Something familiar was interesting.</li>
-          <li>Something unfamiliar raised a question.</li>
-          <li>Something was frustrating or surprising.</li>
-          <li>Nothing stood out yet.</li>
-        </ul>
-      </div>
-      <PromptField
-        lessonCode={lesson.code}
-        lessonTitle={lesson.title}
-        index="stood-out"
-        label="What, if anything, stood out to you? (optional)"
-        variant="inline"
-      />
+      {readAnswer(answers, lesson.code, "connection") ? (
+        <Panel tone="note" title="You have a thought worth keeping">
+          <P>You’ve already put something into words. You don’t need to answer another question about it. You can carry it forward, keep exploring, or change your mind.</P>
+        </Panel>
+      ) : (
+        <div className="space-y-3">
+          <P>After exploring these possibilities, is there anything you’d like to understand or try next?</P>
+          <p className="text-[15px] text-muted-foreground">A thought, question, or idea is enough. You can also leave this blank.</p>
+        </div>
+      )}
+      {(!readAnswer(answers, lesson.code, "connection") || readAnswer(answers, lesson.code, "stood-out")) ? (
+        <PromptField
+          lessonCode={lesson.code}
+          lessonTitle={lesson.title}
+          index="stood-out"
+          label={readAnswer(answers, lesson.code, "stood-out") ? "Another thought you saved (optional)" : "Anything you want to explore further? (optional)"}
+          variant="inline"
+        />
+      ) : null}
     </div>
   );
 }
