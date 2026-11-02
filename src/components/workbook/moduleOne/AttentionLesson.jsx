@@ -162,7 +162,7 @@ function PartClose({ lesson, answers }) {
 export default function AttentionLesson({ lesson }) {
   const answers = useAnswers();
   const parts = [
-    { id: "compare", short: "Compare", title: "Caseye activity. Different reasons.", content: <PartCompare lesson={lesson} answers={answers} /> },
+    { id: "compare", short: "Compare", title: "Same activity. Different reasons.", content: <PartCompare lesson={lesson} answers={answers} /> },
     { id: "reading", short: "Read", title: "What attention can—and can’t—tell us", content: <PartReading /> },
     { id: "yours", short: "Your turn", title: "What takes up your attention?", content: <PartYours lesson={lesson} answers={answers} /> },
     { id: "close", short: "Takeaway", title: "Before you go", content: <PartClose lesson={lesson} answers={answers} /> },
