@@ -1,62 +1,114 @@
-# Base44 Project
+# Entrepalooza
 
-Use this repository to run and edit the app locally, then publish changes back through Base44.
+Entrepalooza is the workbook app for [Build Otherwise](https://buildotherwise.org), founded by Ashley Zeck in Houston. It is an adult education pilot, and it has not been run with a group yet. People use it to look at what they could build or do next. Starting a business is one option among many.
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+The app was built on Base44 and is moving to Vercel (project `entrepalooza-workbook`) and Supabase. One codebase runs both. The client uses Supabase when `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are both set. With those unset, it uses the Base44 SDK.
 
-## Prerequisites
+## What is in the app
 
-1. Clone the repository using the project's Git URL.
-2. Navigate to the project directory.
-3. Install dependencies: `npm install`.
-4. Install the Base44 CLI: `npm install -g base44@latest`.
-5. Install [Deno](https://docs.deno.com/runtime/getting_started/installation/) — the local Base44 backend runs on it.
+Signed-in people work through Getting Started and the modules. A module is a set of short lessons.
 
-Run `base44 --help` (or see the [CLI reference](https://docs.base44.com/developers/references/cli/commands/introduction)) for the full command surface.
+The Conversation Journal keeps notes, including lesson responses. The reflection partner is optional. It only sees the entries someone chooses to send, and nothing is sent until they send it.
 
-## Run Locally
+The Discovery Record is a place to keep discoveries on your own account.
 
-Three commands, from the project root:
+AI runs only when someone asks for it:
 
-```bash
-base44 login   # one-time per machine
-base44 link    # one-time per clone
-base44 dev     # local backend + frontend together
-```
+- Journal reflection partner. On Vercel this is `api/journalReflection.js`. On Base44 it is the `conversation_journal_reflection` agent.
+- Answer feedback, from the Get feedback button on one answer or one Discovery Record entry. On Vercel this is `api/answerFeedback.js` and the reply comes from Gemini. On Base44 the `answerFeedback` function still calls Claude.
+- Discovery companion. Admin only, and not wired to a page. On Vercel this is `api/discoveryCompanion.js`. On Base44 it is `base44/functions/discoveryCompanion`.
 
-Open the frontend URL that `base44 dev` prints (typically `http://localhost:5173`).
+On Vercel those three functions call Google Gemini. They need `GEMINI_API_KEY` on the server. `GEMINI_MODEL` and `GEMINI_THINKING_LEVEL` are optional. Unset, the model is `gemini-3.8-flash` and the thinking level is `low`. Accepted thinking levels are `low`, `medium`, `high`, and `off`. `minimal` is treated as `low`.
 
-Notes:
+An account with role `admin` can open the course review copy at `/preview`. The discovery companion checks that same role.
 
-- **Every fresh clone needs `base44 link`.** It writes `base44/.app.jsonc` (the app-id pointer), which is deliberately gitignored. Your app id is in the Builder URL (`app.base44.com/apps/<id>/...`); `base44 link --help` shows the non-interactive flags.
-- **`base44 dev` runs the frontend for you** (via `site.serveCommand` in this repo's `base44/config.jsonc`) — never run `npm run dev` yourself: alone it serves a UI with no backend behind it (`[base44] Proxy not enabled`, every `/api` call fails), and alongside `base44 dev` the second Vite silently takes the next port and you end up looking at the wrong one.
-- **The app must be published at least once for the UI to load under `base44 dev`.** The frontend boots by fetching app settings from the hosted app; before the first publish that fails and every page redirects to login. The local API works regardless.
-- Entities, functions, and auth run locally — entity data is **in-memory only**, wiped when `base44 dev` restarts. Everything else (Core integrations, OAuth login) is forwarded to your deployed app. Full breakdown: [Local development overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview).
-
-## Frontend Only, Hosted Backend
-
-To work on just the frontend against your app's live hosted backend:
+## Run it locally
 
 ```bash
-base44 dev --remote
+npm install
 ```
 
-⚠️ In this mode writes go to your app's **production data** — plain `base44 dev` keeps everything local.
+Put local values in `.env.local`. That file is gitignored. Use the variable names below. Do not commit values.
 
-## Publish Your Changes
+### Base44
 
-After pushing your changes to git, open the Base44 dashboard and publish the app:
+Leave the Supabase variables unset. Install the [Base44 CLI](https://docs.base44.com/developers/references/cli/get-started/overview.md) and [Deno](https://docs.deno.com/runtime/getting_started/installation/). The local Base44 backend runs on Deno.
+
+```bash
+npm install -g base44@latest
+base44 login
+base44 link
+base44 dev
+```
+
+`base44 login` is once per machine. `base44 link` is once per clone. It writes `base44/.app.jsonc`, which is gitignored.
+
+`base44 dev` starts the local backend and the frontend. The frontend command is `npm run dev`, from `site.serveCommand` in `base44/config.jsonc`. Open the URL it prints.
+
+`base44 dev --remote` points the frontend at the hosted Base44 backend. Writes in that mode go to the hosted app. Plain `base44 dev` keeps entity data local, in memory, and that data is gone when the process stops.
+
+`npm run dev` on its own, with no Supabase variables, serves the UI with no Base44 proxy. Use `base44 dev` for Base44 work.
+
+The UI under `base44 dev` loads app settings from the hosted app, so the app has to have been published once.
+
+### Vercel and Supabase
+
+Set both of these. The client switches only when both are set. `VITE_SUPABASE_URL` alone turns the Base44 Vite plugin off, and the client still does not use Supabase.
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+The Vercel functions read `SUPABASE_URL` and `SUPABASE_ANON_KEY`, and fall back to the `VITE_` names. AI calls need `GEMINI_API_KEY`. `GEMINI_MODEL` and `GEMINI_THINKING_LEVEL` are optional.
+
+```bash
+npm run dev
+npm run build
+npm run test:all
+```
+
+`npm run dev` is the Vite frontend on port 5173. It does not start the functions in `api/`. Those run on Vercel.
+
+`npm run build` is the production build (`vite build`). Vercel uses that same command.
+
+`npm run test:all` runs the tests in `src/lib`. `package.json` also has smaller scripts for one area (`test:journal`, `test:discovery-record`, and the others). `npm run lint` and `npm run typecheck` are the other checks.
+
+## Deploy
+
+The Vercel project is `entrepalooza-workbook`. `vercel.json` builds with `npm run build`, serves `dist`, and sends non-API routes to `index.html`. The database is Supabase.
+
+Schema and seed live in `migration/supabase/schema.sql` and `migration/supabase/seed.sql`. Regenerate them from the Base44 entities and the content export:
+
+```bash
+node migration/scripts/generate-supabase-schema.mjs
+node migration/scripts/generate-seed.mjs
+```
+
+`migration/content/` is that content export. Facilitator-only notes (`internal_notes`, and `full_text_uri` on library resources) are stored in `admin_fields`, which only an admin can read. That is why this repo is private.
+
+Preview deployments are for review. A live release waits for Ashley's approval.
+
+Pushes still sync to the Base44 builder. Publish that copy from the dashboard:
 
 ```bash
 base44 dashboard open
 ```
 
-This repo syncs to Base44 through git, so publish from the dashboard rather than `base44 deploy` — a CLI deploy ships your local tree directly, bypassing the sync, and the deployed state silently diverges from the repo.
+`base44 deploy` ships the local tree and skips that sync, so the deployed Base44 app can drift from the repo.
 
-## Docs & Support
+## Still off on Vercel
 
-GitHub integration: [https://docs.base44.com/developers/app-code/local-development/github](https://docs.base44.com/developers/app-code/local-development/github)
+These still exist on Base44. They do not run on the Vercel build.
 
-Local development: [https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview)
+- Get Involved email. The form calls `submitInquiry`. That function is only `base44/functions/submitInquiry`, and there is no `api/submitInquiry.js`. On the Supabase client, `SendEmail` returns that email is not available yet.
+- Notion import (`base44/functions/notionSourceRead`).
+- Research-brief import (`base44/functions/researchBriefImport`).
+- File upload (`integrations.Core.UploadFile`).
+- Connect your AI assistant. `/connect` shows `/api/mcp`. That MCP server belongs to Base44. There is no Vercel function for it.
 
-Support: [https://app.base44.com/support](https://app.base44.com/support)
+## Privacy
+
+What someone writes is saved to their account. Other people in the workbook cannot see it. It stays private unless they choose to share it. Build Otherwise runs the app, so the team has technical access to what is stored.
+
+Send real writing only through Gemini's paid tier.
+
+`GEMINI_API_KEY` stays on the server. Do not put it, or any other secret, in a `VITE_` variable or in client code. Vite copies every `VITE_` variable into the browser bundle. `VITE_SUPABASE_ANON_KEY` is the public anon key, and the client is supposed to have it.
