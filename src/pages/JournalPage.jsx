@@ -30,6 +30,7 @@ export default function JournalPage() {
   const [params] = useSearchParams();
   const stepCode = params.get("step") || "";
   const [tab, setTab] = useState("all");
+  const [search, setSearch] = useState("");
   const [selected, setSelected] = useState([]);
   const [pending, setPending] = useState(null);
   const [copying, setCopying] = useState(null);
@@ -62,10 +63,15 @@ export default function JournalPage() {
   }, [entries]);
 
   const visible = useMemo(() => {
-    if (tab === "free") return entries.filter((entry) => entry.kind === "free");
-    if (tab === "lesson") return entries.filter((entry) => entry.kind !== "free");
-    return entries;
-  }, [entries, tab]);
+    const term = search.trim().toLocaleLowerCase();
+    return entries.filter((entry) => {
+      if (tab === "free" && entry.kind !== "free") return false;
+      if (tab === "lesson" && entry.kind === "free") return false;
+      if (stepCode && entry.lesson_code !== stepCode) return false;
+      if (!term) return true;
+      return [entry.body, entry.prompt_label, entry.lesson_title, entry.lesson_code].some((value) => String(value || "").toLocaleLowerCase().includes(term));
+    });
+  }, [entries, tab, stepCode, search]);
 
   /** Follow-ups are shown under the entry they answer, never as their own row. */
   const topLevel = useMemo(
@@ -221,6 +227,11 @@ export default function JournalPage() {
 
       <JournalConnections entries={entries} />
 
+      <div className="no-print space-y-3">
+        <label htmlFor="journal-search" className="block text-[15px] font-medium text-foreground">Search your journal</label>
+        <input id="journal-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search your words, prompts, or lessons" className="w-full rounded-md border border-input bg-card px-3 py-2 text-[16px] text-foreground" />
+        {stepCode ? <div className="text-[14px] text-muted-foreground">Showing entries from {stepCode}. <Link to="/journal" className="text-accent-ink underline underline-offset-2">Show all journal entries</Link></div> : null}
+      </div>
       <div className="no-print flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           {TABS.map((item) => (
@@ -274,7 +285,7 @@ export default function JournalPage() {
         <section className="rounded-xl border border-border bg-secondary p-5">
           <p className="workbook-label">Confirm exactly what you are sharing</p>
           <p className="mt-2 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-            Scope: <strong className="font-semibold text-foreground">{pending.label}</strong>. Nothing else goes with it,
+            Recipient: <strong className="font-semibold text-foreground">the Build Otherwise program team</strong>. Scope: <strong className="font-semibold text-foreground">{pending.label}</strong>. Nothing else goes with it,
             and no other part of your journal is visible. You can withdraw this later by telling the program creator.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
@@ -332,7 +343,7 @@ export default function JournalPage() {
         <div className="space-y-8">
           {topLevel.length === 0 ? (
             <p className="rounded-xl border border-dashed border-input bg-card p-5 text-[17px] leading-relaxed text-muted-foreground">
-              Nothing in this view yet. Your other entries are still here under a different filter.
+              No entries match this view. Clear the search or filters to see your other entries.
             </p>
           ) : null}
 
