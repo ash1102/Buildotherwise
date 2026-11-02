@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, BookOpen } from "lucide-react";
+import { ArrowRight, BookOpen, Check, Plus } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import PrivacyNote from "./PrivacyNote";
 import { getAnswer, setAnswer, useAnswers, answerKey } from "@/lib/workbook";
 import { entryForPrompt, journalStepHref, saveAnswer } from "@/lib/journal";
-import { GO_DEEPER_KEY, JOURNAL_INTRO, goDeeperFor } from "@/lib/journalPrompts";
+import { GO_DEEPER_KEY, JOURNAL_INTRO, addStarter, goDeeperFor, hasStarter } from "@/lib/journalPrompts";
 import { plainValue } from "@/lib/moduleOne";
 
 /** The lesson title, provided by LessonView, so journal entries are filed under the lesson. */
@@ -36,6 +36,10 @@ export default function GoDeeperJournal({ lessonCode: codeProp = "", lessonTitle
   const id = useId();
   const [value, setValue] = useState(() => savedText(lessonCode));
   const [state, setState] = useState("idle");
+  // Session-only view choices. Never saved, never counted.
+  const [cardsOpen, setCardsOpen] = useState(true);
+  const [passed, setPassed] = useState(false);
+  const textRef = useRef(null);
   const timer = useRef(null);
   const pending = useRef(null);
   const label = set ? set.primary : "";
@@ -43,6 +47,8 @@ export default function GoDeeperJournal({ lessonCode: codeProp = "", lessonTitle
   useEffect(() => {
     setValue(savedText(lessonCode));
     setState("idle");
+    setCardsOpen(true);
+    setPassed(false);
   }, [lessonCode]);
 
   const write = (text) => {
@@ -80,8 +86,7 @@ export default function GoDeeperJournal({ lessonCode: codeProp = "", lessonTitle
 
   if (!set) return null;
 
-  const onChange = (event) => {
-    const next = event.target.value;
+  const update = (next) => {
     setValue(next);
     setState("saving");
     pending.current = next;
@@ -92,6 +97,29 @@ export default function GoDeeperJournal({ lessonCode: codeProp = "", lessonTitle
       write(next);
       setState(savedText(lessonCode) === next ? "saved" : "error");
     }, 700);
+  };
+
+  const onChange = (event) => update(event.target.value);
+
+  const focusText = () => {
+    window.requestAnimationFrame(() => {
+      const el = textRef.current;
+      if (!el) return;
+      el.focus();
+      const end = el.value.length;
+      el.setSelectionRange(end, end);
+    });
+  };
+
+  const onPick = (question) => {
+    const next = addStarter(value, question);
+    if (next !== value) update(next);
+    focusText();
+  };
+
+  const onOwnWay = () => {
+    setCardsOpen(false);
+    focusText();
   };
 
   const earlier = set.earlier ? plainValue((answers || {})[set.earlier.key]).trim() : "";
@@ -112,13 +140,73 @@ export default function GoDeeperJournal({ lessonCode: codeProp = "", lessonTitle
         {set.primary}
       </label>
 
+      {passed ? (
+        <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <p className="text-[16px] text-muted-foreground">Skipped for now. Nothing is lost.</p>
+          <button
+            type="button"
+            onClick={() => setPassed(false)}
+            className="inline-flex min-h-[44px] items-center text-[15px] font-medium text-accent-ink underline underline-offset-2"
+          >
+            Open it again
+          </button>
+        </div>
+      ) : (
+      <>
       <div className="mt-4">
-        <p className="text-[14px] font-semibold uppercase tracking-wide text-muted-faint">If you want somewhere to go next</p>
-        <ul className="mt-2 space-y-1.5 pl-5 text-[16px] leading-relaxed text-foreground list-disc">
-          {set.followUps.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
+        <p id={`${headingId}-next`} className="text-[14px] font-semibold uppercase tracking-wide text-muted-faint">
+          If you want somewhere to go next{cardsOpen ? ", tap one or skip" : ""}
+        </p>
+        {cardsOpen ? (
+          <>
+            <ul aria-labelledby={`${headingId}-next`} className="mt-2 grid gap-2">
+              {set.followUps.map((item) => {
+                const added = hasStarter(value, item);
+                return (
+                  <li key={item}>
+                    <button
+                      type="button"
+                      onClick={() => onPick(item)}
+                      aria-label={added ? `${item} (already in your writing box)` : `Add to my writing: ${item}`}
+                      className={`flex w-full min-h-[44px] items-start gap-2.5 rounded-xl border px-4 py-3 text-left text-[16px] leading-relaxed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${added ? "border-primary/50 bg-primary/5 text-foreground" : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-primary/5"}`}
+                    >
+                      {added ? (
+                        <Check className="mt-1 h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
+                      ) : (
+                        <Plus className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                      )}
+                      <span>{item}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+              <button
+                type="button"
+                onClick={onOwnWay}
+                className="inline-flex min-h-[44px] items-center text-[15px] font-medium text-accent-ink underline underline-offset-2"
+              >
+                None of these. I’ll start my own way
+              </button>
+              <button
+                type="button"
+                onClick={() => setPassed(true)}
+                className="inline-flex min-h-[44px] items-center text-[15px] font-medium text-muted-foreground underline underline-offset-2"
+              >
+                Pass for now
+              </button>
+            </div>
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setCardsOpen(true)}
+            className="mt-1 inline-flex min-h-[44px] items-center text-[15px] font-medium text-accent-ink underline underline-offset-2"
+          >
+            Show the questions again
+          </button>
+        )}
       </div>
 
       {set.note ? <p className="mt-4 max-w-[68ch] text-[15px] leading-relaxed text-muted-foreground">{set.note}</p> : null}
@@ -132,6 +220,7 @@ export default function GoDeeperJournal({ lessonCode: codeProp = "", lessonTitle
 
       <div className="mt-5">
         <Textarea
+          ref={textRef}
           id={`${headingId}-text`}
           value={value}
           onChange={onChange}
@@ -152,6 +241,8 @@ export default function GoDeeperJournal({ lessonCode: codeProp = "", lessonTitle
           </Link>
         </div>
       </div>
+      </>
+      )}
 
       <div className="mt-4 space-y-1">
         <PrivacyNote>

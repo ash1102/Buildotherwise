@@ -37,3 +37,15 @@ test("M2-L2 follows what actually happened, without pretending the try was done"
     assert.ok(notYet.note);
   }
 });
+
+import { addStarter, hasStarter, starterLine } from "./journalPrompts.js";
+
+test("tapping a follow-up adds it once as an editable starter line", () => {
+  const q = "Did your reactions surprise you?";
+  assert.equal(addStarter("", q), `${starterLine(q)}\n`);
+  const withText = addStarter("Something I wrote.  \n", q);
+  assert.equal(withText, `Something I wrote.\n\n${starterLine(q)}\n`);
+  assert.equal(addStarter(withText, q), withText);
+  assert.equal(hasStarter(withText, q), true);
+  assert.equal(hasStarter("Something I wrote.", q), false);
+});
