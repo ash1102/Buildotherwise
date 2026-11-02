@@ -35,9 +35,9 @@ export function PartFlow({ lessonCode, parts }) {
   return (
     <div ref={topRef} className="scroll-mt-24 space-y-5">
       <nav aria-label="Parts of this lesson">
-        <ol className={parts.length > 5 ? "flex gap-2 overflow-x-auto pb-2" : "flex gap-1.5"} role="list">
+        <ol className={parts.length > 5 ? "grid grid-cols-4 gap-x-2 gap-y-3 sm:grid-cols-7" : "flex gap-1.5"} role="list">
           {parts.map((item, i) => (
-            <li key={item.id} className={parts.length > 5 ? "min-w-[90px] flex-1" : "min-w-0 flex-1"}>
+            <li key={item.id} className={parts.length > 5 ? "min-w-0" : "min-w-0 flex-1"}>
               <button
                 type="button"
                 onClick={() => go(i)}
@@ -51,7 +51,7 @@ export function PartFlow({ lessonCode, parts }) {
                 />
                 <span
                   aria-hidden="true"
-                  className={`mt-1.5 block text-[12px] font-semibold uppercase leading-snug tracking-wide ${parts.length > 5 ? "whitespace-normal" : "truncate"} ${i === index ? "text-accent-ink" : "text-muted-faint group-hover:text-muted-foreground"}`}
+                  className={`mt-1.5 block text-[11px] sm:text-[12px] font-semibold uppercase leading-snug tracking-wide ${parts.length > 5 ? "break-words" : "truncate"} ${i === index ? "text-accent-ink" : "text-muted-faint group-hover:text-muted-foreground"}`}
                 >
                   {item.short}
                 </span>
