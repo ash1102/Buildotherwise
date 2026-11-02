@@ -98,7 +98,7 @@ create trigger on_auth_user_created after insert on auth.users
   for each row execute function public.handle_new_user();
 
 create or replace function public.touch_updated_date() returns trigger
-language plpgsql as $$ begin new.updated_date = now(); return new; end; $$;
+language plpgsql set search_path = public as $$ begin new.updated_date = now(); return new; end; $$;
 
 -- Admin-only fields (Base44 field-level rls) live here, never in the readable tables.
 create table if not exists public.admin_fields (
