@@ -25,6 +25,7 @@ export default function ProgramLibrary() {
   const [activeStep, setActiveStep] = useState("all");
   const [steps, setSteps] = useState([]);
   const [resources, setResources] = useState(null);
+  const [searchError, setSearchError] = useState("");
   const [research, setResearch] = useState([]);
   const [outside, setOutside] = useState([]);
   const [outsideKind, setOutsideKind] = useState("all");
@@ -47,7 +48,16 @@ export default function ProgramLibrary() {
       lessonCode: activeStep === "all" ? null : activeStep,
     })
       .then((items) => {
-        if (active) setResources(items);
+        if (!active) return;
+        setResources(items);
+        setSearchError("");
+      })
+      .catch(() => {
+        // Clear the list rather than leaving the previous results on screen, so a
+        // failed search never looks like it answered the current term.
+        if (!active) return;
+        setResources([]);
+        setSearchError("That search couldn't be run. Try different words.");
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -173,6 +183,10 @@ export default function ProgramLibrary() {
 
         {busy ? (
           <p className="py-8 text-[14px] text-ink-faint">Opening the library…</p>
+        ) : searchError ? (
+          <p className="rounded-lg border border-dashed border-destructive/40 bg-destructive/5 p-6 text-[14px] leading-relaxed text-destructive">
+            {searchError}
+          </p>
         ) : resources.length === 0 ? (
           <p className="rounded-lg border border-dashed border-natural-deep bg-card/60 p-6 text-[14px] leading-relaxed text-ink-soft">
             {narrowed

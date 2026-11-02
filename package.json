@@ -20,7 +20,7 @@
     "test:phase-one": "node --import ./scripts/register-js-extension.mjs --test src/lib/phaseOneAccess.test.js src/lib/privacyWording.test.js",
     "test:phase-two": "node --import ./scripts/register-js-extension.mjs --test src/lib/phaseTwoA.test.js",
     "test:discovery-record": "node --import ./scripts/register-js-extension.mjs --test src/lib/discoveryRecordMerge.test.js",
-    "test:all": "node --import ./scripts/register-js-extension.mjs --test src/lib/*.test.js"
+    "test:all": "node --import ./scripts/register-js-extension.mjs --test src/lib/*.test.js src/lib/preview/*.test.js"
   },
   "dependencies": {
     "@base44/sdk": "^0.8.57",

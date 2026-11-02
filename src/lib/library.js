@@ -29,6 +29,15 @@ export function moduleTitle(modules, order) {
 }
 
 /**
+ * Escape regex metacharacters so a search reads as text. Without this a term
+ * like "C++" or "(parents)" becomes a pattern: the dot wildcard matches the
+ * wrong rows, and an unbalanced bracket makes the server reject the filter.
+ */
+export function escapeRegex(value) {
+  return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
  * Search, module and step are all resolved by the server, so the page never
  * narrows a list it has already loaded.
  */
@@ -36,7 +45,7 @@ export async function loadLibraryResources({ search = "", moduleOrder = null, le
   const query = { status: "published", audience: { $ne: "program_team" }, kind: { $nin: OUTSIDE_KINDS } };
   if (moduleOrder !== null && moduleOrder !== undefined) query.module_order = moduleOrder;
   if (lessonCode) query.lesson_code = lessonCode;
-  const term = search.trim();
+  const term = escapeRegex(search.trim());
   if (term) {
     query.$or = [
       { title: { $regex: term, $options: "i" } },
@@ -111,8 +120,11 @@ export async function loadTribeThreads() {
 }
 
 export async function loadTribeReplies() {
-  const page = await base44.entities.TribeReply.filter({}, { sort: "created_date", limit: 200 });
-  return page.items;
+  // Fetch newest-first so the 200-row cap keeps the most recent replies rather
+  // than the oldest; reverse back to chronological order, which is how the
+  // thread cards render them.
+  const page = await base44.entities.TribeReply.filter({}, { sort: "-created_date", limit: 200 });
+  return page.items.slice().reverse();
 }
 
 export function subscribeTribeReplies(handler) {
