@@ -1,0 +1,73 @@
+{
+  "name": "AnswerFeedback",
+  "description": "Feedback from Claude that a participant asked for on one of their own answers or Discovery Record entries. Only created when the person taps Get feedback. Kept on their account; they can delete it.",
+  "type": "object",
+  "properties": {
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "workbook_answer",
+        "discovery_record"
+      ],
+      "description": "What the feedback is about."
+    },
+    "source_key": {
+      "type": "string",
+      "description": "Which answer or entry: the workbook prompt key (lessonCode#index) or the Discovery Record entry id."
+    },
+    "source_label": {
+      "type": "string",
+      "description": "The question asked, or the entry title, as shown at the time."
+    },
+    "lesson_title": {
+      "type": "string"
+    },
+    "answer_snapshot": {
+      "type": "string",
+      "description": "The exact words the person sent for feedback, so it is clear which version the feedback refers to."
+    },
+    "summary": {
+      "type": "string",
+      "description": "A faithful summary of what the person wrote."
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Up to three grounded observations. Never a score, type or readiness signal."
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Up to two optional questions that could take the answer further."
+    },
+    "model": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "description": "Short preview text."
+    }
+  },
+  "required": [
+    "source_type",
+    "source_key"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}
