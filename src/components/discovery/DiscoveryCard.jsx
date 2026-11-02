@@ -7,6 +7,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { contextRows, removeDiscovery, reviseDecision, updateDiscovery } from "@/lib/discoveries";
 import DiscoveryForm from "./DiscoveryForm";
 import DecisionChips from "./DecisionChips";
+import AnswerFeedback from "@/components/feedback/AnswerFeedback";
+
+/** The entry as one block of text, in the participant's own words, for feedback. */
+function entryText(entry, rows) {
+  return [
+    entry.title ? `Title: ${entry.title}` : null,
+    entry.body ? `What I noticed: ${entry.body}` : null,
+    ...rows.map((row) => `${row.label}: ${row.value}`),
+    entry.decision ? `Next decision: ${entry.decision}` : null,
+    entry.decision_note ? `Decision note: ${entry.decision_note}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
 
 const LINK_CLASS =
   "rounded underline decoration-natural underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper";
@@ -136,6 +150,15 @@ export default function DiscoveryCard({ entry }) {
           Delete
         </button>
       </div>
+
+      <AnswerFeedback
+        className="mt-3"
+        sourceType="discovery_record"
+        sourceKey={`discovery:${entry.id}`}
+        sourceLabel={entry.title || "Discovery Record entry"}
+        lessonTitle={source?.lesson_title || ""}
+        getText={() => entryText(entry, rows)}
+      />
 
       {mode === "revisit" ? (
         <section className="mt-3 rounded-lg border border-natural bg-ivory/70 p-4">
