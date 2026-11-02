@@ -3,6 +3,7 @@ import moment from "moment";
 import { MessageSquareText, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
+import { USE_SUPABASE } from "@/api/supabaseCompat";
 import { useAuth } from "@/lib/AuthContext";
 
 const LINK_CLASS =
@@ -12,7 +13,8 @@ const MIN_CHARS = 10;
 
 /**
  * "Get feedback" for one of the person's own answers or Discovery Record entries.
- * Nothing is sent unless they tap the button. Feedback is saved on their account and can be deleted.
+ * Nothing is sent unless they tap the button. On Vercel the reply comes from Gemini.
+ * Feedback is saved on their account and can be deleted.
  */
 export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, lessonTitle, getText, className = "" }) {
   const { isAuthenticated, navigateToLogin } = useAuth();
@@ -98,9 +100,10 @@ export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, les
           ) : (
             <>
               <p className="text-[12.5px] leading-relaxed text-ink-soft">
-                Optional. Tapping the button sends this answer to Claude (an AI made by Anthropic) for a short response:
-                what you wrote, what stands out, and a question or two. No scores. The feedback is saved with your
-                account, and you can delete it.
+                Optional. Tapping the button sends this answer to{" "}
+                {USE_SUPABASE ? "Gemini (an AI made by Google)" : "Claude (an AI made by Anthropic)"} for a short
+                response: what you wrote, what stands out, and a question or two. No scores. The feedback is saved with
+                your account, and you can delete it.
               </p>
 
               {latest ? (

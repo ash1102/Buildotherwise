@@ -8,6 +8,7 @@
  */
 import { createClient } from '@supabase/supabase-js';
 import TABLES from './supabaseTables.json';
+import { createReflectionAgents } from './reflectionAgent';
 
 const url = import.meta.env.VITE_SUPABASE_URL;
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -273,13 +274,7 @@ const notYet = (what) => async () => {
   throw apiError(`${what} isn't available on this version yet.`, 501);
 };
 
-const agents = {
-  createConversation: notYet('The reflection partner'),
-  addMessage: notYet('The reflection partner'),
-  getConversation: notYet('The reflection partner'),
-  listConversations: async () => [],
-  subscribeToConversation: () => () => {},
-};
+const agents = createReflectionAgents({ entities, functions, apiError });
 
 const integrations = {
   Core: {
