@@ -321,6 +321,12 @@ function PartKeep({ lesson, answers }) {
           have to do next.
         </P>
       </Panel>
+      {readAnswer(answers, lesson.code, "connection") ? <Panel tone="yours" label="A connection or question you saved"><Quote>{readAnswer(answers, lesson.code, "connection")}</Quote></Panel> : null}
+      {ENCOUNTER_CARDS.filter(card => readAnswer(answers, lesson.code, "explore-" + card.id)).map(card => (
+        <Panel key={card.id} tone="yours" label={"Explored: " + card.title}>
+          <Quote>{readAnswer(answers, lesson.code, "explore-" + card.id)}</Quote>
+        </Panel>
+      ))}
       <EarlierAnswers code={lesson.code} answers={answers} />
       <FinishControl code={lesson.code} answers={answers} />
     </div>
