@@ -108,7 +108,7 @@ function PartSupport({ lesson, answers }) {
               onClick={bringIn}
               className="inline-flex min-h-[44px] items-center rounded-full border border-input bg-card px-4 text-[15px] font-medium text-foreground hover:bg-secondary"
             >
-              Bring these words into my agreement
+              Bring these words into My Way Forward
             </button>
             <Link to="/lesson/O.4" className="text-[15px] text-accent-ink underline underline-offset-2">
               Change them there
@@ -168,7 +168,7 @@ function PartAgreement({ answers }) {
   const hasEarlier = earlier.why || earlier.approach || earlier.note;
   const [copied, setCopied] = useState(false);
   const copy = async () => {
-    const text = ["My Entrepalooza learning agreement", ...lines.map((line) => `${line.label}: ${line.value}`)].join("\n");
+    const text = ["My Way Forward", ...lines.map((line) => `${line.label}: ${line.value}`)].join("\n");
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -179,7 +179,7 @@ function PartAgreement({ answers }) {
   };
   return (
     <div className="space-y-5">
-      <Panel tone="yours" label="My learning agreement">
+      <Panel tone="yours" label="My Way Forward">
         {lines.length ? (
           <dl className="space-y-3">
             {lines.map((line) => (
@@ -202,7 +202,7 @@ function PartAgreement({ answers }) {
             className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-input bg-card px-4 text-[15px] font-medium text-foreground hover:bg-secondary"
           >
             {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
-            {copied ? "Copied" : "Copy my agreement"}
+            {copied ? "Copied" : "Copy My Way Forward"}
           </button>
         ) : null}
       </Panel>
@@ -224,7 +224,7 @@ function PartAgreement({ answers }) {
         </P>
         <P>Your choices, boundaries, and privacy matter.</P>
         <P>We’ll distinguish support that is available from support that is still being developed.</P>
-        <P>You can revise your agreement, change direction, pause, or decide something isn’t for you.</P>
+        <P>You can revise My Way Forward, change direction, pause, or decide something isn’t for you.</P>
       </Panel>
     </div>
   );
@@ -276,7 +276,7 @@ function PartClose({ lesson, answers }) {
   );
 }
 
-/** M1-L3 · Your learning agreement. */
+/** M1-L3 · My Way Forward. */
 export default function AgreementLesson({ lesson }) {
   const answers = useAnswers();
   const parts = [
@@ -317,7 +317,7 @@ export default function AgreementLesson({ lesson }) {
     {
       id: "revisit",
       short: "Revisit",
-      title: "When should the agreement be revisited?",
+      title: "When would you like to revisit My Way Forward?",
       content: (
         <ChoicePart
           lesson={lesson}
@@ -325,11 +325,11 @@ export default function AgreementLesson({ lesson }) {
           answerKeyName="revisit"
           legend="Pick one."
           options={REVISIT_OPTIONS}
-          journalLabel="When I'll revisit my agreement"
+          journalLabel="When I want to revisit My Way Forward"
         />
       ),
     },
-    { id: "agreement", short: "Agreement", title: "Your learning agreement", content: <PartAgreement answers={answers} /> },
+    { id: "agreement", short: "My Way Forward", title: "My Way Forward", content: <PartAgreement answers={answers} /> },
     { id: "close", short: "Next", title: "You don’t need to have it figured out.", content: <PartClose lesson={lesson} answers={answers} /> },
   ];
   return <PartFlow lessonCode={lesson.code} parts={parts} />;
