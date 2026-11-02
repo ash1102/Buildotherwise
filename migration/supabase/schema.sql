@@ -38,7 +38,7 @@ create trigger on_auth_user_created after insert on auth.users
   for each row execute function public.handle_new_user();
 
 create or replace function public.touch_updated_date() returns trigger
-language plpgsql as $$ begin new.updated_date = now(); return new; end; $$;
+language plpgsql set search_path = public as $$ begin new.updated_date = now(); return new; end; $$;
 
 -- Admin-only fields (Base44 field-level rls) live here, never in the readable tables.
 create table if not exists public.admin_fields (
@@ -77,7 +77,7 @@ create trigger answer_feedback_touch before update on public.answer_feedback for
 drop policy if exists answer_feedback_read on public.answer_feedback;
 create policy answer_feedback_read on public.answer_feedback for select using (created_by_id = auth.uid());
 drop policy if exists answer_feedback_create on public.answer_feedback;
-create policy answer_feedback_create on public.answer_feedback for insert with check (auth.uid() is not null and (created_by_id is null or created_by_id = auth.uid()));
+create policy answer_feedback_create on public.answer_feedback for insert with check (created_by_id = auth.uid());
 drop policy if exists answer_feedback_update on public.answer_feedback;
 create policy answer_feedback_update on public.answer_feedback for update using (created_by_id = auth.uid()) with check (created_by_id = auth.uid());
 drop policy if exists answer_feedback_delete on public.answer_feedback;
@@ -105,7 +105,7 @@ create trigger discovery_record_touch before update on public.discovery_record f
 drop policy if exists discovery_record_read on public.discovery_record;
 create policy discovery_record_read on public.discovery_record for select using (created_by_id = auth.uid());
 drop policy if exists discovery_record_create on public.discovery_record;
-create policy discovery_record_create on public.discovery_record for insert with check (auth.uid() is not null and (created_by_id is null or created_by_id = auth.uid()));
+create policy discovery_record_create on public.discovery_record for insert with check (created_by_id = auth.uid());
 drop policy if exists discovery_record_update on public.discovery_record;
 create policy discovery_record_update on public.discovery_record for update using (created_by_id = auth.uid()) with check (created_by_id = auth.uid());
 drop policy if exists discovery_record_delete on public.discovery_record;
@@ -136,7 +136,7 @@ create trigger discovery_thread_touch before update on public.discovery_thread f
 drop policy if exists discovery_thread_read on public.discovery_thread;
 create policy discovery_thread_read on public.discovery_thread for select using (created_by_id = auth.uid());
 drop policy if exists discovery_thread_create on public.discovery_thread;
-create policy discovery_thread_create on public.discovery_thread for insert with check (auth.uid() is not null and (created_by_id is null or created_by_id = auth.uid()));
+create policy discovery_thread_create on public.discovery_thread for insert with check (created_by_id = auth.uid());
 drop policy if exists discovery_thread_update on public.discovery_thread;
 create policy discovery_thread_update on public.discovery_thread for update using (created_by_id = auth.uid()) with check (created_by_id = auth.uid());
 drop policy if exists discovery_thread_delete on public.discovery_thread;
@@ -188,7 +188,7 @@ create trigger getting_started_submission_touch before update on public.getting_
 drop policy if exists getting_started_submission_read on public.getting_started_submission;
 create policy getting_started_submission_read on public.getting_started_submission for select using (public.is_admin());
 drop policy if exists getting_started_submission_create on public.getting_started_submission;
-create policy getting_started_submission_create on public.getting_started_submission for insert with check (auth.uid() is not null and (created_by_id is null or created_by_id = auth.uid()));
+create policy getting_started_submission_create on public.getting_started_submission for insert with check (created_by_id = auth.uid());
 drop policy if exists getting_started_submission_update on public.getting_started_submission;
 create policy getting_started_submission_update on public.getting_started_submission for update using (public.is_admin()) with check (public.is_admin());
 drop policy if exists getting_started_submission_delete on public.getting_started_submission;
@@ -240,7 +240,7 @@ create trigger learner_record_touch before update on public.learner_record for e
 drop policy if exists learner_record_read on public.learner_record;
 create policy learner_record_read on public.learner_record for select using (created_by_id = auth.uid());
 drop policy if exists learner_record_create on public.learner_record;
-create policy learner_record_create on public.learner_record for insert with check (auth.uid() is not null and (created_by_id is null or created_by_id = auth.uid()));
+create policy learner_record_create on public.learner_record for insert with check (created_by_id = auth.uid());
 drop policy if exists learner_record_update on public.learner_record;
 create policy learner_record_update on public.learner_record for update using (created_by_id = auth.uid()) with check (created_by_id = auth.uid());
 drop policy if exists learner_record_delete on public.learner_record;
@@ -430,7 +430,7 @@ create trigger preview_response_touch before update on public.preview_response f
 drop policy if exists preview_response_read on public.preview_response;
 create policy preview_response_read on public.preview_response for select using (created_by_id = auth.uid());
 drop policy if exists preview_response_create on public.preview_response;
-create policy preview_response_create on public.preview_response for insert with check (auth.uid() is not null and (created_by_id is null or created_by_id = auth.uid()));
+create policy preview_response_create on public.preview_response for insert with check (created_by_id = auth.uid());
 drop policy if exists preview_response_update on public.preview_response;
 create policy preview_response_update on public.preview_response for update using (created_by_id = auth.uid()) with check (created_by_id = auth.uid());
 drop policy if exists preview_response_delete on public.preview_response;
@@ -456,7 +456,7 @@ create trigger tribe_reply_touch before update on public.tribe_reply for each ro
 drop policy if exists tribe_reply_read on public.tribe_reply;
 create policy tribe_reply_read on public.tribe_reply for select using ((auth.uid() is not null or public.is_admin()));
 drop policy if exists tribe_reply_create on public.tribe_reply;
-create policy tribe_reply_create on public.tribe_reply for insert with check (auth.uid() is not null and (created_by_id is null or created_by_id = auth.uid()));
+create policy tribe_reply_create on public.tribe_reply for insert with check (created_by_id = auth.uid());
 drop policy if exists tribe_reply_update on public.tribe_reply;
 create policy tribe_reply_update on public.tribe_reply for update using ((created_by_id = auth.uid() or public.is_admin())) with check ((created_by_id = auth.uid() or public.is_admin()));
 drop policy if exists tribe_reply_delete on public.tribe_reply;
@@ -509,7 +509,7 @@ create trigger user_store_touch before update on public.user_store for each row 
 drop policy if exists user_store_read on public.user_store;
 create policy user_store_read on public.user_store for select using (created_by_id = auth.uid());
 drop policy if exists user_store_create on public.user_store;
-create policy user_store_create on public.user_store for insert with check (auth.uid() is not null and (created_by_id is null or created_by_id = auth.uid()));
+create policy user_store_create on public.user_store for insert with check (created_by_id = auth.uid());
 drop policy if exists user_store_update on public.user_store;
 create policy user_store_update on public.user_store for update using (created_by_id = auth.uid()) with check (created_by_id = auth.uid());
 drop policy if exists user_store_delete on public.user_store;
