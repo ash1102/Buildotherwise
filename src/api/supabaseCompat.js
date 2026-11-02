@@ -12,9 +12,14 @@ import TABLES from './supabaseTables.json';
 const url = import.meta.env.VITE_SUPABASE_URL;
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(url, anonKey, {
-  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'pkce' },
-});
+/** True on the Vercel build. On Base44 nothing below is created. */
+export const USE_SUPABASE = Boolean(url && anonKey);
+
+export const supabase = USE_SUPABASE
+  ? createClient(url, anonKey, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'pkce' },
+    })
+  : null;
 
 /** Same shape as the SDK's errors, so existing catch blocks keep reading `status`, `message`, `response.data`. */
 function apiError(message, status = 400, data = undefined) {
