@@ -40,8 +40,8 @@ export default function Login() {
   return (
     <AuthLayout
       icon={LogIn}
-      title="Welcome back"
-      subtitle="Pick up where you left off."
+      title="Welcome to Entrepalooza"
+      subtitle="Log in to continue, or create an account to begin. Your place and notes are saved when you return."
       footer={
         <>
           Don't have an account?{" "}
@@ -55,6 +55,7 @@ export default function Login() {
             Why an account? It opens your journal, the workbook modules and group threads, and it keeps what you
             write in your account. Other participants can’t see it. Sharing anything is a separate choice.
           </span>
+          <span className="mt-3 block text-[13px] leading-relaxed text-muted-foreground">Want to look around first? <Link to="/programs" className="font-medium text-primary underline underline-offset-2">See how the program works</Link>.</span>
         </>
       }
     >
