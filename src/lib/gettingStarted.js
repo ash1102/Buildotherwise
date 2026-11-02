@@ -59,15 +59,15 @@ export const AGREEMENT_APPROACH = 3;
 export const AGREEMENT_NOTE = 4;
 export const SOMETHING_ELSE = "Something else";
 export const WHY_CHOICES = [
-  "I'm trying to figure out what I want.",
-  "I'm ready for something to change.",
-  "I have ideas I want to explore.",
-  "I'm curious. That's all I know.",
+  "I'm figuring out what I want, and I don't have all the answers.",
+  "Something in my life needs to be different.",
+  "I have things I've wanted to try or figure out.",
+  "I'm just looking around right now.",
   SOMETHING_ELSE,
 ];
-export const APPROACH_CHOICES = ["At my own pace.", "One small step at a time.", "I'm not sure yet."];
+export const APPROACH_CHOICES = ["I want to take my time.", "I want to try one thing at a time.", "I'm not sure yet, and that's okay."];
 export const AGREEMENT_PERMISSION =
-  "I give myself permission to explore, question, experiment, change direction, and move at a pace that works for me.";
+  "I don’t have to have it all figured out. I can show up as I am, try what makes sense to me, ask questions, change my mind, take a break, or come back later. This is my experience, and I get a say in how it goes.";
 
 /** "Something else — my words" reads back as the choice plus the typed words. */
 export function splitWhy(value) {
