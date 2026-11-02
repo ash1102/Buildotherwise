@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { USE_SUPABASE } from "@/api/supabaseCompat";
 import { useAuth } from "@/lib/AuthContext";
+import { feedbackItems } from "@/components/feedback/feedbackItems";
 
 const LINK_CLASS =
   "rounded underline decoration-natural underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper";
@@ -74,6 +75,7 @@ export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, les
   };
 
   const latest = items?.[0] || null;
+  const questions = feedbackItems(latest?.questions);
   const currentText = String(getText?.() || "").trim();
   const isOlder = latest && latest.answer_snapshot && latest.answer_snapshot.trim() !== currentText;
 
@@ -131,11 +133,11 @@ export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, les
                       </ul>
                     </div>
                   ) : null}
-                  {latest.questions?.length ? (
+                  {questions.length ? (
                     <div>
                       <p className="workbook-label text-copper">If you want to take it further</p>
                       <ul className="mt-1 space-y-1 text-[13.5px] leading-relaxed text-ink-soft">
-                        {latest.questions.map((item, i) => (
+                        {questions.map((item, i) => (
                           <li key={i}>{item}</li>
                         ))}
                       </ul>

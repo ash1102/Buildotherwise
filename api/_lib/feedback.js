@@ -141,7 +141,7 @@ export async function handleAnswerFeedback({ payload, auth, env, fetchImpl }) {
       answer_snapshot: text,
       summary: clean(parsed.summary, 1200),
       observations: cleanList(parsed.observations, 3),
-      questions: cleanList(parsed.questions, 2),
+      questions: cleanList(parsed.questions, 1),
       model: data?.modelVersion || model,
       description: `Feedback: ${(sourceLabel || lessonTitle || 'answer').slice(0, 120)}`,
     };

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { FEEDBACK_SYSTEM_PROMPT, COMPANION_SYSTEM_INSTRUCTION, REFLECTION_AGENT_INSTRUCTIONS } from './prompts.js';
+import { FEEDBACK_SYSTEM_PROMPT, COMPANION_SYSTEM_INSTRUCTION, REFLECTION_AGENT_INSTRUCTIONS, REFLECTION_SHARED_PROTECTIONS } from './prompts.js';
 import { handleAnswerFeedback, parseReply, buildUserMessage, feedbackThinkingLevel, MAX_PER_HOUR, MAX_OUTPUT_TOKENS } from './feedback.js';
 import { feedbackContext, FEEDBACK_SLICE_MAX, getKnowledge } from './knowledge.js';
 import { buildRequestBody } from './gemini.js';
@@ -23,6 +23,12 @@ test('prompts are copied verbatim from the Base44 functions', () => {
   const agent = JSON.parse(fs.readFileSync('base44/agents/conversation_journal_reflection.jsonc', 'utf8')).instructions;
   assert.equal(REFLECTION_AGENT_INSTRUCTIONS, agent);
   assert.match(FEEDBACK_SYSTEM_PROMPT, /Do not treat entrepreneurship/);
+  assert.match(FEEDBACK_SYSTEM_PROMPT, /One useful observation is better than three thin ones/);
+  assert.match(FEEDBACK_SYSTEM_PROMPT, /USING THE LESSON/);
+  assert.match(FEEDBACK_SYSTEM_PROMPT, /Zero or one optional question/);
+  assert.doesNotMatch(FEEDBACK_SYSTEM_PROMPT, /Name what is already clear or specific/);
+  assert.doesNotMatch(FEEDBACK_SYSTEM_PROMPT, /Use tentative language \("it may be"/);
+  assert.match(REFLECTION_SHARED_PROTECTIONS, /No therapy, recovery, corporate, or motivational clichés\. No praise inflation\. No shame\./);
   assert.match(COMPANION_SYSTEM_INSTRUCTION, /not a crisis service/);
 });
 
@@ -64,7 +70,7 @@ test('answerFeedback: uses Gemini only, saves trimmed feedback, never returns th
   const out = await body(res);
   assert.equal(out.status, 200);
   assert.equal(client.inserted[0].observations.length, 3);
-  assert.equal(client.inserted[0].questions.length, 2);
+  assert.equal(client.inserted[0].questions.length, 1);
   assert.ok(!JSON.stringify(out).includes('secret-k'));
   assert.equal(calls.length, 1);
   assert.match(calls[0].url, /generativelanguage\.googleapis\.com\/v1beta\/models\/m:generateContent/);
@@ -85,6 +91,29 @@ test('answerFeedback: hourly limit, provider failure, unreadable reply', async (
   const auth = { user: { id: 'u' }, client: fakeClient() };
   assert.equal((await handleAnswerFeedback({ payload: goodPayload, auth, env, fetchImpl: async () => ({ ok: false, status: 500, text: async () => '' }) })).status, 502);
   assert.equal((await handleAnswerFeedback({ payload: goodPayload, auth, env, fetchImpl: async () => okJson({ candidates: [{ content: { parts: [{ text: 'no json' }] } }] }) })).status, 502);
+});
+
+test('answerFeedback: an empty questions list is saved, and blank strings are dropped', async () => {
+  const emptyClient = fakeClient();
+  const emptyReply = { modelVersion: 'g-1', candidates: [{ content: { parts: [{ text: '{"summary":"S","observations":["A distinction in the answer."],"questions":[]}' }] } }] };
+  const emptyRes = await handleAnswerFeedback({
+    payload: goodPayload,
+    auth: { user: { id: 'u' }, client: emptyClient },
+    env: { GEMINI_API_KEY: 'k', GEMINI_MODEL: 'm' },
+    fetchImpl: async () => okJson(emptyReply),
+  });
+  assert.equal(emptyRes.status, 200);
+  assert.deepEqual(emptyClient.inserted[0].questions, []);
+
+  const blankClient = fakeClient();
+  const blankReply = { modelVersion: 'g-1', candidates: [{ content: { parts: [{ text: '{"summary":"S","observations":["One"],"questions":["","  ","Could the quiet be the part you noticed?"]}' }] } }] };
+  await handleAnswerFeedback({
+    payload: goodPayload,
+    auth: { user: { id: 'u' }, client: blankClient },
+    env: { GEMINI_API_KEY: 'k', GEMINI_MODEL: 'm' },
+    fetchImpl: async () => okJson(blankReply),
+  });
+  assert.deepEqual(blankClient.inserted[0].questions, ['Could the quiet be the part you noticed?']);
 });
 
 test('answerFeedback helpers', () => {
