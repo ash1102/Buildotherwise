@@ -34,7 +34,7 @@ export default function StepNav({
   const nextControl = next ? (
     <Link
       to={`/lesson/${next.code}`}
-      aria-label={nameNext ? `Next: ${destination}` : nextLabel ? `${nextLabel}: ${next.title}` : undefined}
+      aria-label={`Continue to ${destination}`}
       className="inline-flex max-w-full items-center gap-2 self-start rounded-md bg-primary px-4 py-2.5 text-[15px] font-medium text-primary-foreground transition hover:bg-primary/90"
     >
       {nameNext ? (
@@ -43,7 +43,7 @@ export default function StepNav({
           <span className="block truncate">{destination}</span>
         </span>
       ) : nextLabel ? (
-        <span>{nextLabel}</span>
+        <span>{nextLabel === "Next" ? `Continue to ${next.title}` : nextLabel}</span>
       ) : (
         <span className="min-w-0">
           <span className="block text-[13px] text-primary-foreground/80">
