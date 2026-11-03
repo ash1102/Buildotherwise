@@ -21,8 +21,14 @@ export function PartFlow({ lessonCode, parts }) {
   useEffect(() => {
     if (!moved.current) return;
     moved.current = false;
-    if (topRef.current) topRef.current.scrollIntoView({ block: "start" });
-    if (headingRef.current) headingRef.current.focus({ preventScroll: true });
+    window.requestAnimationFrame(() => {
+      const element = topRef.current;
+      if (!element) return;
+      const top = window.scrollY + element.getBoundingClientRect().top - 96;
+      const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+      window.scrollTo({ top: Math.max(0, top), behavior });
+      if (headingRef.current) headingRef.current.focus({ preventScroll: true });
+    });
   }, [index]);
 
   const go = (next) => {
@@ -33,16 +39,17 @@ export function PartFlow({ lessonCode, parts }) {
 
   return (
     <div ref={topRef} className="scroll-mt-24 space-y-5">
-      <nav aria-label="Parts of this lesson">
-        <ol className="flex gap-1.5" role="list">
+      <nav aria-label="Parts of this lesson" className="overflow-x-auto pb-1">
+        <p className="mb-2 text-[13px] text-muted-faint">Tap a part to jump back to it.</p>
+        <ol className="flex min-w-[546px] gap-2 sm:min-w-0" role="list">
           {parts.map((item, i) => (
-            <li key={item.id} className="min-w-0 flex-1">
+            <li key={item.id} className="w-[74px] shrink-0 sm:min-w-0 sm:flex-1">
               <button
                 type="button"
                 onClick={() => go(i)}
                 aria-current={i === index ? "step" : undefined}
                 aria-label={`Part ${i + 1} of ${parts.length}: ${item.short}`}
-                className="group block w-full min-h-[44px] text-left"
+                className={`group block min-h-[58px] w-full rounded-lg border px-2 py-2 text-left transition-colors ${i === index ? "border-primary bg-primary/5" : "border-input bg-card hover:bg-secondary"}`}
               >
                 <span
                   aria-hidden="true"
@@ -50,11 +57,10 @@ export function PartFlow({ lessonCode, parts }) {
                 />
                 <span
                   aria-hidden="true"
-                  className={`mt-1.5 truncate text-[12px] font-semibold uppercase tracking-wide ${
-                    parts.length > 5 ? "hidden sm:block" : "block"
-                  } ${i === index ? "text-accent-ink" : "text-muted-faint group-hover:text-muted-foreground"}`}
+                  className={`mt-1.5 block truncate text-center text-[11px] font-semibold text-accent-ink`}
                 >
-                  {item.short}
+                  <span className="block">Part {i + 1}</span>
+                  <span className="block truncate font-medium">{item.short}</span>
                 </span>
               </button>
             </li>
