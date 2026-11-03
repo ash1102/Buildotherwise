@@ -11,7 +11,6 @@ import {
   APPROACH_CHOICES,
   SOMETHING_ELSE,
   WHY_CHOICES,
-  readAgreement,
   splitWhy,
   whyText,
 } from "@/lib/gettingStarted";
