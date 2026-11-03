@@ -184,7 +184,7 @@ function PartWays() {
       <Panel tone="reading">
         <P>A small try gives you clues, not a verdict. What you imagined may differ from what you notice, and the setting, time, support, and access all shape the experience.</P>
         <P>Interest, frustration, uncertainty, or a barrier are all information. One encounter cannot prove your ability or decide your direction.</P>
-        <Link to="/program-library" className="text-[15px] font-medium text-accent-ink underline underline-offset-2">Read the full explanation in the Library</Link>
+        <Link to="/program-library?lesson=M2-L1" className="text-[15px] font-medium text-accent-ink underline underline-offset-2">Read the full explanation in the Library</Link>
       </Panel>
     </div>
   );
