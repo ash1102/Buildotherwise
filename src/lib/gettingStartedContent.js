@@ -25,7 +25,14 @@
 
 export const RETIRED_GS_CODES = ["O.2"];
 
-export const PENDING_LESSON_CONTENT = {};
+export const PENDING_LESSON_CONTENT = {
+  // M1-L3: ensure a previously cached or stale lesson row cannot reinstate the retired title.
+  "M1-L3": {
+    title: "My Way Forward",
+    description: "Choose how you want to explore next, what might help, and what you want to leave open. You can change your mind as you go.",
+    purpose: "Choose how you want to explore next, what might help, and what you want to leave open. You can change your mind as you go.",
+  },
+};
 
 /** Apply pending lesson text and drop retired steps. Other lessons pass through untouched. */
 export function applyGettingStartedContent(rows) {
