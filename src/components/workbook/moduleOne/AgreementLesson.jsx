@@ -190,7 +190,7 @@ function PartAgreement({ answers }) {
             ))}
           </dl>
         ) : (
-          <p className="text-[15px] text-muted-foreground">Nothing chosen yet. Your agreement can stay open.</p>
+          <p className="text-[15px] text-muted-foreground">Nothing chosen yet. You can leave this open.</p>
         )}
         <p className="text-[14px] text-muted-faint">
           Built only from your choices. To change it, tap any part above. This isn’t a contract, a test, or a score.
@@ -282,55 +282,56 @@ export default function AgreementLesson({ lesson }) {
   const parts = [
     { id: "look", short: "Look back", title: "You’ve already started exploring.", content: <PartLookBack lesson={lesson} answers={answers} /> },
     {
-      id: "try",
-      short: "Try",
-      title: "What are you willing to try?",
+      id: "explore",
+      short: "Explore",
+      title: "How would you like to explore?",
       content: (
-        <ChoicePart
-          lesson={lesson}
-          answers={answers}
-          answerKeyName="willing"
-          legend="Pick the one that fits best for now."
-          options={WILLING_OPTIONS}
-          note="This is a starting approach, not a promise of an outcome."
-          journalLabel="What I'm willing to try"
-        />
+        <div className="space-y-8">
+          <section className="space-y-3" aria-label="What you're willing to try">
+            <h3 className="text-[19px] font-semibold text-foreground">What are you willing to try?</h3>
+            <ChoicePart
+              lesson={lesson} answers={answers} answerKeyName="willing"
+              legend="Pick the one that fits best for now." options={WILLING_OPTIONS}
+              note="This is a starting approach, not a promise of an outcome."
+              journalLabel="What I'm willing to try"
+            />
+          </section>
+          <section className="space-y-3 border-t border-border pt-6" aria-label="How you'd like to approach it">
+            <h3 className="text-[19px] font-semibold text-foreground">How would you approach it?</h3>
+            <ChoicePart
+              lesson={lesson} answers={answers} answerKeyName="approach"
+              legend="Pick the one that fits best for now." options={APPROACH_OPTIONS}
+              note="Observing first is as valid as trying something hands-on."
+              journalLabel="How I'll approach the experience"
+            />
+          </section>
+        </div>
       ),
     },
+    { id: "workable", short: "Make it work", title: "What would make exploring workable?", content: <PartSupport lesson={lesson} answers={answers} /> },
     {
-      id: "approach",
-      short: "Approach",
-      title: "How will you approach the experience?",
+      id: "forward",
+      short: "My Way Forward",
+      title: "My Way Forward",
       content: (
-        <ChoicePart
-          lesson={lesson}
-          answers={answers}
-          answerKeyName="approach"
-          legend="Pick the one that fits best for now."
-          options={APPROACH_OPTIONS}
-          note="Observing first is as valid as trying something hands-on."
-          journalLabel="How I'll approach the experience"
-        />
+        <div className="space-y-8">
+          <section className="space-y-3">
+            <h3 className="text-[19px] font-semibold text-foreground">When would you like to revisit this?</h3>
+            <ChoicePart
+              lesson={lesson} answers={answers} answerKeyName="revisit"
+              legend="Pick one." options={REVISIT_OPTIONS}
+              journalLabel="When I want to revisit My Way Forward"
+            />
+          </section>
+          <section className="border-t border-border pt-6">
+            <PartAgreement answers={answers} />
+          </section>
+          <section className="border-t border-border pt-6">
+            <PartClose lesson={lesson} answers={answers} />
+          </section>
+        </div>
       ),
     },
-    { id: "support", short: "Support", title: "What makes exploration workable?", content: <PartSupport lesson={lesson} answers={answers} /> },
-    {
-      id: "revisit",
-      short: "Revisit",
-      title: "When would you like to revisit My Way Forward?",
-      content: (
-        <ChoicePart
-          lesson={lesson}
-          answers={answers}
-          answerKeyName="revisit"
-          legend="Pick one."
-          options={REVISIT_OPTIONS}
-          journalLabel="When I want to revisit My Way Forward"
-        />
-      ),
-    },
-    { id: "agreement", short: "My Way Forward", title: "My Way Forward", content: <PartAgreement answers={answers} /> },
-    { id: "close", short: "Next", title: "You don’t need to have it figured out.", content: <PartClose lesson={lesson} answers={answers} /> },
   ];
-  return <PartFlow lessonCode={lesson.code} parts={parts} />;
+  return <PartFlow lessonCode={lesson.code} parts={parts} storageVersion={2} />;
 }
