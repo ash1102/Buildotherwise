@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Check, Copy } from "lucide-react";
+import React from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { answerKey, setAnswer, useAnswers } from "@/lib/workbook";
 import { saveAnswer } from "@/lib/journal";
@@ -12,7 +11,6 @@ import {
   APPROACH_CHOICES,
   SOMETHING_ELSE,
   WHY_CHOICES,
-  agreementText,
   readAgreement,
   splitWhy,
   whyText,
@@ -52,13 +50,11 @@ function Choices({ legend, options, value, onPick }) {
 }
 
 /**
- * Getting Started step 3: the learning agreement. Every answer saves to the
- * participant's workbook as it changes and is copied into their journal, like
- * any other step. The copy button gives them their agreement as plain text.
+ * Getting Started step 3: a few optional notes about beginning. Answers save as
+ * they change; none of them is a promise or a requirement.
  */
 export default function LearningAgreement({ lessonTitle = "Make this experience yours" }) {
   const answers = useAnswers();
-  const [copied, setCopied] = useState(false);
   const raw = (index) => String((answers || {})[answerKey(AGREEMENT_CODE, index)] || "");
 
   const record = (index, text) => {
@@ -75,27 +71,6 @@ export default function LearningAgreement({ lessonTitle = "Make this experience 
   const { choice: whyChoice, other } = splitWhy(raw(AGREEMENT_WHY));
   const approach = raw(AGREEMENT_APPROACH).trim();
   const note = raw(AGREEMENT_NOTE);
-  const text = agreementText(readAgreement(answers));
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      const area = document.createElement("textarea");
-      area.value = text;
-      document.body.appendChild(area);
-      area.select();
-      try {
-        document.execCommand("copy");
-      } catch {
-        /* nothing else to try */
-      }
-      document.body.removeChild(area);
-    }
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 2000);
-  };
-
   return (
     <div className="space-y-6">
       <div>
@@ -144,19 +119,11 @@ export default function LearningAgreement({ lessonTitle = "Make this experience 
       </div>
 
       <div className="rounded-xl border border-border bg-card px-4 py-4">
-        <p className="text-[16px] font-semibold text-foreground">Your learning agreement</p>
+        <p className="text-[16px] font-semibold text-foreground">A note for yourself</p>
         <p className="mt-2 text-[16px] leading-relaxed text-foreground">{AGREEMENT_PERMISSION}</p>
         <p className="mt-3 text-[13px] text-muted-faint">Saved to your workbook as you go. You can change it anytime.</p>
       </div>
 
-      <button
-        type="button"
-        onClick={copy}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-input bg-card px-4 py-3 text-[15px] font-medium text-foreground transition hover:bg-secondary"
-      >
-        {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
-        {copied ? "Copied" : "Copy my agreement"}
-      </button>
     </div>
   );
 }
