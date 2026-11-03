@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useCurriculum from "@/hooks/useCurriculum";
@@ -16,11 +17,15 @@ import OutsideSourceCard from "@/components/library/OutsideSourceCard";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 
 export default function ProgramLibrary() {
+  const [searchParams] = useSearchParams();
+  const requestedLesson = searchParams.get("lesson") || "";
+  const readingAnchor = useRef(null);
+  const moduleInitialized = useRef(false);
   const { modules, lessonsByCode, loading: curriculumLoading } = useCurriculum();
   const [search, setSearch] = useState("");
   const [term, setTerm] = useState("");
   const [activeModule, setActiveModule] = useState("all");
-  const [activeStep, setActiveStep] = useState("all");
+  const [activeStep, setActiveStep] = useState(requestedLesson || "all");
   const [steps, setSteps] = useState([]);
   const [resources, setResources] = useState(null);
   const [outside, setOutside] = useState([]);
@@ -57,7 +62,8 @@ export default function ProgramLibrary() {
   /** Choosing a module clears the step narrowing and offers that module's own steps. */
   useEffect(() => {
     let active = true;
-    setActiveStep("all");
+    if (moduleInitialized.current) setActiveStep("all");
+    moduleInitialized.current = true;
     if (moduleOrder === null) {
       setSteps([]);
       return () => {
@@ -121,6 +127,12 @@ export default function ProgramLibrary() {
 
   const busy = curriculumLoading || resources === null;
 
+  useEffect(() => {
+    if (!busy && requestedLesson && readingAnchor.current) {
+      readingAnchor.current.scrollIntoView({ block: "start" });
+    }
+  }, [busy, requestedLesson]);
+
   return (
     <div className="space-y-8">
       <header className="border-b border-border pb-5">
@@ -141,7 +153,7 @@ export default function ProgramLibrary() {
         </div>
       </header>
 
-      <section className="space-y-7">
+      <section ref={readingAnchor} className="scroll-mt-8 space-y-7">
         <div>
           <h2 className="workbook-label">Participant readings</h2>
           <h3 className="mt-1.5 text-[20px]">Find what the step asked you to read</h3>
@@ -175,7 +187,7 @@ export default function ProgramLibrary() {
                 <h2 className="font-heading text-xl">{order === null ? "Program research" : moduleTitle(modules, order)}</h2>
                 <div className="mt-3 space-y-4">
                   {items.map((item) => (
-                    <LibraryCard key={item.id} resource={item} />
+                    <LibraryCard key={item.id} resource={item} autoOpen={Boolean(requestedLesson && item.lesson_code === requestedLesson)} />
                   ))}
                 </div>
               </section>
