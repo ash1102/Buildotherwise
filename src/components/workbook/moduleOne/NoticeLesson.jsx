@@ -174,51 +174,27 @@ function PartReading() {
   return (
     <div className="space-y-4">
       <Panel tone="reading">
-        {/* DRAFT (Claude): the spec's opening and points, joined to sentences kept from the
-            published reading "How Interests Begin". The original stays unchanged in the Library. */}
-        <P>A few minutes ago, you encountered possibilities you may never have thought about. That’s one way interests can begin.</P>
+        <P>Some things become interesting only after you encounter them, get access, or learn how they work.</P>
         <P>
-          People are often told to find their passion, as though it already exists in finished form. But nobody is born
-          knowing every interest they will develop. Some things only become interesting once you have access to them, meet
-          people involved in them, or learn enough to see what is possible.
+          Curiosity can grow, change, fade, or stay small. It does not have to become a job, a business, or a lifelong
+          identity.
         </P>
-        <P>
-          Exposure, experience, conversation, practice, and opportunity can all introduce new possibilities. Once
-          something catches your attention, the interest can grow stronger as you come back to it, learn more, and find
-          out whether it matters to you.
-        </P>
-        <P>
-          But initial curiosity doesn’t guarantee a lasting passion. Some interests fade. Others change direction. Some
-          become personally meaningful over time. All of that is part of exploring.
-        </P>
-        <P>Not everything important has to become a job, business, or lifelong identity. An interest can enrich your life without becoming a plan.</P>
-        <div className="rounded-lg bg-secondary p-3 sm:p-4">
-          <p className="text-[15px] leading-relaxed text-foreground">
-            <strong>Research connection:</strong> Hidi and Renninger’s four-phase model describes how interest may develop
-            from triggered situational interest toward more enduring individual interest. It is a developmental model, not
-            a promise about any one person’s future.
-          </p>
-          <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+        <P>Hidi and Renninger describe one possible path for interest to develop—not a path everyone follows.</P>
+      </Panel>
+      <details className="rounded-xl border border-border bg-card p-4 sm:p-5">
+        <summary className="cursor-pointer text-[16px] font-medium text-foreground">Research and reading (optional)</summary>
+        <div className="mt-3 space-y-3">
+          <P>
+            Their four-phase model describes triggered situational interest, maintained situational interest, emerging
+            individual interest, and well-developed individual interest. The phases describe possibilities, not a
+            prediction about any one person.
+          </P>
+          <p className="text-[14px] leading-relaxed text-muted-foreground">
             Hidi, S., &amp; Renninger, K. A. (2006). The four-phase model of interest development.{" "}
             <em>Educational Psychologist, 41</em>(2), 111–127.
           </p>
-        </div>
-      </Panel>
-      <details className="rounded-xl border border-border bg-card p-4 sm:p-5">
-        <summary className="cursor-pointer text-[16px] font-medium text-foreground">Go deeper into the research (optional)</summary>
-        <div className="mt-3 space-y-3">
-          {/* DRAFT (Claude): summary of the cited article. Needs Ashley's review. */}
-          <P>
-            The model names four phases: triggered situational interest, maintained situational interest, emerging
-            individual interest, and well-developed individual interest.
-          </P>
-          <P>
-            In the model, other people, the setting, and chances to come back to something can all help an interest
-            develop. Without that kind of support, an interest can fade.
-          </P>
-          <P>The phases describe a possible path. They don’t mean everyone follows the same one, or that every early curiosity becomes a passion.</P>
           <Link to="/program-library" className="inline-flex items-center gap-1.5 text-[15px] font-medium text-accent-ink underline underline-offset-2">
-            Read the original “How Interests Begin” in the Library
+            Read “How Interests Begin” in the Library
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
