@@ -45,7 +45,7 @@ function PartLookBack({ lesson, answers }) {
       <div className="space-y-3">
         <P>In the first lesson, you noticed something that caught your attention—or recognized that you’re still looking.</P>
         <P>In the second, you considered how curiosity, responsibility, enjoyment, and pressure can overlap.</P>
-        <P>Now let’s decide how you want to approach what comes next.</P>
+        <P>Now you can decide what feels worth exploring next. Nothing you choose here has to be final.</P>
       </div>
       {anything ? (
         <Panel tone="yours" label="From Lesson 1">
@@ -60,7 +60,7 @@ function PartLookBack({ lesson, answers }) {
         </p>
       )}
       <SingleChoice
-        legend="What would you like to do with your starting point?"
+        legend="What would you like to carry forward, if anything?"
         options={CARRY_MODES}
         value={mode}
         onChange={(next) => recordAnswer(lesson, "carry-mode", next, "My Module 1 starting point")}
@@ -118,7 +118,7 @@ function PartSupport({ lesson, answers }) {
         </Panel>
       ) : null}
       <MultiChoice
-        legend="What would make exploring workable for you?"
+        legend="What might help you explore? "
         hint="Choose any that fit. These are your preferences, not a list of what the program already provides."
         options={SUPPORT_OPTIONS}
         values={chosen}
@@ -190,10 +190,10 @@ function PartAgreement({ answers }) {
             ))}
           </dl>
         ) : (
-          <p className="text-[15px] text-muted-foreground">Nothing chosen yet. You can leave this open.</p>
+          <p className="text-[15px] text-muted-foreground">Nothing chosen yet. You can leave My Way Forward open and return whenever you want.</p>
         )}
         <p className="text-[14px] text-muted-faint">
-          Built only from your choices. To change it, tap any part above. This isn’t a contract, a test, or a score.
+          This is your way forward for now—not a contract or a promise. You can change any answer, leave things open, or choose a different direction.
         </p>
         {lines.length ? (
           <button
@@ -224,7 +224,7 @@ function PartAgreement({ answers }) {
         </P>
         <P>Your choices, boundaries, and privacy matter.</P>
         <P>We’ll distinguish support that is available from support that is still being developed.</P>
-        <P>You can revise My Way Forward, change direction, pause, or decide something isn’t for you.</P>
+        <P>My Way Forward can change with you. You can pause, come back, or decide something isn’t for you.</P>
       </Panel>
     </div>
   );
@@ -288,19 +288,19 @@ export default function AgreementLesson({ lesson }) {
       content: (
         <div className="space-y-8">
           <section className="space-y-3" aria-label="What you're willing to try">
-            <h3 className="text-[19px] font-semibold text-foreground">What are you willing to try?</h3>
+            <h3 className="text-[19px] font-semibold text-foreground">What sounds worth trying or exploring?</h3>
             <ChoicePart
               lesson={lesson} answers={answers} answerKeyName="willing"
-              legend="Pick the one that fits best for now." options={WILLING_OPTIONS}
-              note="This is a starting approach, not a promise of an outcome."
+              legend="Choose what fits for now. You can change your mind." options={WILLING_OPTIONS}
+              note="Choose whatever feels possible now. You can change it later."
               journalLabel="What I'm willing to try"
             />
           </section>
           <section className="space-y-3 border-t border-border pt-6" aria-label="How you'd like to approach it">
-            <h3 className="text-[19px] font-semibold text-foreground">How would you approach it?</h3>
+            <h3 className="text-[19px] font-semibold text-foreground">How would you like to explore?</h3>
             <ChoicePart
               lesson={lesson} answers={answers} answerKeyName="approach"
-              legend="Pick the one that fits best for now." options={APPROACH_OPTIONS}
+              legend="Choose what fits for now. You can change your mind." options={APPROACH_OPTIONS}
               note="Observing first is as valid as trying something hands-on."
               journalLabel="How I'll approach the experience"
             />
@@ -316,7 +316,7 @@ export default function AgreementLesson({ lesson }) {
       content: (
         <div className="space-y-8">
           <section className="space-y-3">
-            <h3 className="text-[19px] font-semibold text-foreground">When would you like to revisit this?</h3>
+            <h3 className="text-[19px] font-semibold text-foreground">When might you want to revisit My Way Forward?</h3>
             <ChoicePart
               lesson={lesson} answers={answers} answerKeyName="revisit"
               legend="Pick one." options={REVISIT_OPTIONS}
