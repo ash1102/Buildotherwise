@@ -88,10 +88,10 @@ function PartNotice({ lesson, answers }) {
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <P>Think about the last few days.</P>
+        <P>You can start with something current, familiar, or unfamiliar—or with nothing that comes to mind.</P>
         <P>
-          Maybe something made you curious. Maybe something irritated you. Maybe you noticed somebody doing something and
-          wondered how they learned.
+          A question, a problem, something you already know, or a new possibility can all be starting points. You do not
+          need to enjoy something for it to be worth exploring.
         </P>
         <P>You don’t have to love something for it to be worth exploring.</P>
       </div>
@@ -101,7 +101,7 @@ function PartNotice({ lesson, answers }) {
         value={route}
         onChange={(next) => recordAnswer(lesson, "notice-route", next, "What feels closest to something you've noticed?")}
       />
-      {option ? (
+      {option?.prompt ? (
         <div aria-live="polite">
           <PromptField
             lessonCode={lesson.code}
@@ -234,6 +234,7 @@ function PartLook({ lesson, answers }) {
   const encounterIds = selectedEncounterIds(readAnswer(answers, lesson.code, "encounter"));
   const encounterCards = ENCOUNTER_CARDS.filter((card) => encounterIds.includes(card.id));
   const anything = text || map || encounterCards.length || route;
+  const nothingYet = route === NOTICE_OPTIONS.find((item) => item.id === "nothing-yet")?.label;
   return (
     <div className="space-y-5">
       {anything ? (
@@ -276,13 +277,19 @@ function PartLook({ lesson, answers }) {
           <li>Nothing stood out yet.</li>
         </ul>
       </div>
-      <PromptField
-        lessonCode={lesson.code}
-        lessonTitle={lesson.title}
-        index="stood-out"
-        label="What, if anything, stood out to you? (optional)"
-        variant="inline"
-      />
+      {nothingYet ? (
+        <p className="text-[15px] leading-relaxed text-muted-foreground">
+          You already said nothing comes to mind. That is a complete answer; continue, go back, or leave this open.
+        </p>
+      ) : (
+        <PromptField
+          lessonCode={lesson.code}
+          lessonTitle={lesson.title}
+          index="stood-out"
+          label="What, if anything, would you like to note here? (optional)"
+          variant="inline"
+        />
+      )}
     </div>
   );
 }
