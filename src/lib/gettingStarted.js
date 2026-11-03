@@ -67,7 +67,7 @@ export const WHY_CHOICES = [
 ];
 export const APPROACH_CHOICES = ["At my own pace.", "One small step at a time.", "I'm not sure yet."];
 export const AGREEMENT_PERMISSION =
-  "I give myself permission to explore, question, experiment, change direction, and move at a pace that works for me.";
+  "You can explore, change direction, pause, or stop. You do not need to explain your choice.";
 
 /** "Something else — my words" reads back as the choice plus the typed words. */
 export function splitWhy(value) {
@@ -98,7 +98,7 @@ export function readAgreement(answers) {
 
 /** The copy-button text. Lines nobody filled in are left out. */
 export function agreementText({ why, approach, note }) {
-  const lines = ["My Entrepalooza learning agreement"];
+  const lines = ["My notes about starting"];
   if (why) lines.push(`Why I'm here: ${why}`);
   if (approach) lines.push(`My approach: ${approach}`);
   if (note) lines.push(`My note: ${note}`);

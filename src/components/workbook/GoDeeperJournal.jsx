@@ -129,10 +129,10 @@ export default function GoDeeperJournal({ lessonCode: codeProp = "", lessonTitle
     <section aria-labelledby={headingId} className="rounded-2xl border-2 border-primary/30 bg-card p-5 sm:p-7">
       <p className="flex items-center gap-2 workbook-label">
         <BookOpen className="h-4 w-4" aria-hidden="true" />
-        Private reflection
+        Optional writing
       </p>
       <h2 id={headingId} className="mt-1 text-[clamp(1.35rem,1.1rem+1vw,1.75rem)] leading-tight">
-        Conversation Journal — Go Deeper
+        Write a little more (optional)
       </h2>
       <p className="mt-3 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">{intro || JOURNAL_INTRO}</p>
 
@@ -224,9 +224,9 @@ export default function GoDeeperJournal({ lessonCode: codeProp = "", lessonTitle
           id={`${headingId}-text`}
           value={value}
           onChange={onChange}
-          rows={9}
+          rows={5}
           placeholder="Write as much or as little as you like."
-          className="min-h-[14rem] resize-y text-[17px]"
+          className="min-h-[9rem] resize-y text-[17px]"
         />
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
           <span aria-live="polite" className="text-[14px] text-accent-ink">

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, Copy } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import PromptField from "../PromptField";
 import PrivacyNote from "../PrivacyNote";
 import { BridgeOut } from "../ModuleBridge";
@@ -108,7 +108,7 @@ function PartSupport({ lesson, answers }) {
               onClick={bringIn}
               className="inline-flex min-h-[44px] items-center rounded-full border border-input bg-card px-4 text-[15px] font-medium text-foreground hover:bg-secondary"
             >
-              Bring these words into my agreement
+              Bring these words into my notes
             </button>
             <Link to="/lesson/O.4" className="text-[15px] text-accent-ink underline underline-offset-2">
               Change them there
@@ -157,7 +157,7 @@ function agreementLines(answers) {
     { label: "How I’ll approach it", value: readAnswer(answers, "M1-L3", "approach") },
     { label: "What makes it workable", value: support.join(", ") },
     { label: "In my words", value: supportOther },
-    { label: "When I’ll revisit this", value: readAnswer(answers, "M1-L3", "revisit") },
+    { label: "Check-in, if I chose one", value: readAnswer(answers, "M1-L3", "revisit") },
   ];
   return lines.filter((line) => line.value);
 }
@@ -166,20 +166,9 @@ function PartAgreement({ answers }) {
   const lines = agreementLines(answers);
   const earlier = readAgreement(answers);
   const hasEarlier = earlier.why || earlier.approach || earlier.note;
-  const [copied, setCopied] = useState(false);
-  const copy = async () => {
-    const text = ["My Entrepalooza learning agreement", ...lines.map((line) => `${line.label}: ${line.value}`)].join("\n");
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* copying isn't available here; the agreement is still saved */
-    }
-  };
   return (
     <div className="space-y-5">
-      <Panel tone="yours" label="My learning agreement">
+      <Panel tone="yours" label="My starting point">
         {lines.length ? (
           <dl className="space-y-3">
             {lines.map((line) => (
@@ -190,21 +179,11 @@ function PartAgreement({ answers }) {
             ))}
           </dl>
         ) : (
-          <p className="text-[15px] text-muted-foreground">Nothing chosen yet. Your agreement can stay open.</p>
+          <p className="text-[15px] text-muted-foreground">Nothing chosen yet. You can move on or leave this open.</p>
         )}
         <p className="text-[14px] text-muted-faint">
-          Built only from your choices. To change it, tap any part above. This isn’t a contract, a test, or a score.
+          These are choices for now. You can change direction, pause, or leave anything open.
         </p>
-        {lines.length ? (
-          <button
-            type="button"
-            onClick={copy}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-input bg-card px-4 text-[15px] font-medium text-foreground hover:bg-secondary"
-          >
-            {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
-            {copied ? "Copied" : "Copy my agreement"}
-          </button>
-        ) : null}
       </Panel>
       {hasEarlier ? (
         <details className="rounded-xl border border-border bg-card p-4">
@@ -224,7 +203,7 @@ function PartAgreement({ answers }) {
         </P>
         <P>Your choices, boundaries, and privacy matter.</P>
         <P>We’ll distinguish support that is available from support that is still being developed.</P>
-        <P>You can revise your agreement, change direction, pause, or decide something isn’t for you.</P>
+        <P>You can revise your starting point, change direction, pause, or decide something isn’t for you.</P>
       </Panel>
     </div>
   );
@@ -239,7 +218,7 @@ function PartClose({ lesson, answers }) {
           lessonCode={lesson.code}
           lessonTitle={lesson.title}
           index={4}
-          label="What’s one thing you believe about yourself that you haven’t had the opportunity to test?"
+          label="Is there something small you’d be curious to try or learn more about? (optional)"
           variant="inline"
         />
         <p className="text-[14px] leading-relaxed text-muted-faint">
@@ -276,7 +255,7 @@ function PartClose({ lesson, answers }) {
   );
 }
 
-/** M1-L3 · Your learning agreement. */
+/** M1-L3 · Choose a starting point. */
 export default function AgreementLesson({ lesson }) {
   const answers = useAnswers();
   const parts = [
@@ -316,8 +295,8 @@ export default function AgreementLesson({ lesson }) {
     { id: "support", short: "Support", title: "What makes exploration workable?", content: <PartSupport lesson={lesson} answers={answers} /> },
     {
       id: "revisit",
-      short: "Revisit",
-      title: "When should the agreement be revisited?",
+      short: "Check-in",
+      title: "Would a check-in be useful later?",
       content: (
         <ChoicePart
           lesson={lesson}
@@ -325,11 +304,11 @@ export default function AgreementLesson({ lesson }) {
           answerKeyName="revisit"
           legend="Pick one."
           options={REVISIT_OPTIONS}
-          journalLabel="When I'll revisit my agreement"
+          journalLabel="When I might check in"
         />
       ),
     },
-    { id: "agreement", short: "Agreement", title: "Your learning agreement", content: <PartAgreement answers={answers} /> },
+    { id: "agreement", short: "Your notes", title: "Your starting point", content: <PartAgreement answers={answers} /> },
     { id: "close", short: "Next", title: "You don’t need to have it figured out.", content: <PartClose lesson={lesson} answers={answers} /> },
   ];
   return <PartFlow lessonCode={lesson.code} parts={parts} />;
