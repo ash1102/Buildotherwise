@@ -263,8 +263,7 @@ export default function CloseLesson({ lesson }) {
     { id: "review", short: "Review", title: "What you're thinking now", content: <PartReview lesson={lesson} answers={answers} /> },
     { id: "impression", short: "Impression", title: "Check an impression", content: <PartImpression lesson={lesson} answers={answers} /> },
     { id: "journal", short: "Journal", title: "Looking back", content: <PartJournal lesson={lesson} /> },
-    { id: "next", short: "Next", title: "Choose what comes next", content: <PartNext lesson={lesson} answers={answers} /> },
-    { id: "close", short: "Close", title: "Where this leaves you", content: <PartClose lesson={lesson} answers={answers} /> },
+    { id: "close", short: "Next", title: "Choose what comes next", content: <div className="space-y-8"><PartNext lesson={lesson} answers={answers} /><div className="border-t border-border pt-6"><PartClose lesson={lesson} answers={answers} /></div></div> },
   ];
   return <PartFlow lessonCode={lesson.code} parts={parts} />;
 }
