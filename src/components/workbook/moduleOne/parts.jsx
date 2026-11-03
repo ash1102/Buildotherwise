@@ -12,8 +12,8 @@ import { partFlowAddsGoDeeper } from "@/lib/journalPrompts";
  * list at the top at any time, answers are saved as they change, and going back
  * never clears anything. The part someone was on is remembered on this device only.
  */
-export function PartFlow({ lessonCode, parts }) {
-  const [stored, setStored] = useStore(`m1Part.${lessonCode}`, 0);
+export function PartFlow({ lessonCode, parts, storageVersion = 1 }) {
+  const [stored, setStored] = useStore(`m1Part${storageVersion > 1 ? `.v${storageVersion}` : ""}.${lessonCode}`, 0);
   const index = Math.min(Math.max(Number(stored) || 0, 0), parts.length - 1);
   const headingRef = useRef(null);
   const topRef = useRef(null);
