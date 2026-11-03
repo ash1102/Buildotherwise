@@ -53,8 +53,8 @@ export const NOTICE_OPTIONS = [
   { id: "curious", label: "Something I'm curious about", prompt: "What's something you've wondered about or wanted to understand better?" },
   { id: "frustrates", label: "Something that frustrates me", prompt: "What's something you keep wishing someone would fix or do differently?" },
   { id: "know-how", label: "Something I know how to do", prompt: "What's something you've learned through experience that you might explore further?" },
-  { id: "never-tried", label: "Something I've never tried", prompt: "What's something you've encountered that seems interesting, even if you know almost nothing about it?" },
-  { id: "nothing-yet", label: "Nothing comes to mind yet", prompt: "That's okay. Think of something you saw, heard, or came across recently. What could you learn more about?" },
+  { id: "never-tried", label: "Something I've never tried", prompt: "Is there something you have encountered but not tried, if you want to name it?" },
+  { id: "nothing-yet", label: "Nothing comes to mind yet", prompt: "" },
 ];
 
 /**
@@ -157,7 +157,7 @@ export const SUPPORT_OPTIONS = [
 ];
 export const SUPPORT_NONE = "Nothing additional right now";
 
-export const REVISIT_OPTIONS = ["After my first experience", "When my circumstances change", "Whenever I decide it's useful"];
+export const REVISIT_OPTIONS = ["After I try something", "When something changes", "Whenever I decide it's useful", "No check-in planned"];
 
 /** O.4 "What makes it work for you": its three live answer slots. */
 export const WHAT_MAKES_IT_WORK = [
