@@ -98,7 +98,9 @@ export default function GlobalDiscoveryCompanion() {
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + session.access_token },
         body: JSON.stringify({ mode: "chat", module: pathname, prompt_context: "Current program location: " + pageName(pathname) + ". Getting Started is onboarding before the program, not part of this tour. Do not send participants back there. Program navigation: " + TOUR.map(t => t.title + " at " + t.path + ": " + t.detail).join("; ") + ". When asked for a tour, give a real spoken walkthrough: explain what Entrepalooza is, describe workbook modules, Journal, Life Map, Discovery Record, and Resources, and how they fit together. Explain before asking any question. Do not just list destinations, do not divert to personal reflection, and do not pretend to navigate. Links are optional supplements.", messages: next }),
       });
-      const data = await response.json();
+      const raw = await response.text();
+      let data;
+      try { data = JSON.parse(raw); } catch { throw new Error("Companion server returned an error (HTTP " + response.status + "). Please try again after the server issue is fixed."); }
       if (!response.ok || !data.ok) throw new Error(data.error || "The companion couldn't respond.");
       setTurns([...next, { role: "model", text: data.reply }]);
     } catch (e) {
