@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import PromptField from "../PromptField";
 import PrivacyNote from "../PrivacyNote";
@@ -21,10 +22,15 @@ const PATTERN_LESSON_CODE = "M5-L1";
 
 /** One Conversation Journal box. Follow-ups stay in the prompt list, not separate fields. */
 export function JournalStage({ lesson, kicker, prompt, followUps }) {
+  const [open, setOpen] = useState(false);
   return (
     <div className="space-y-4">
       <p className="workbook-label">Conversation Journal · {kicker}</p>
       <P>{JOURNAL_INTRO}</P>
+      <button type="button" aria-expanded={open} onClick={() => setOpen((value) => !value)} className="min-h-[44px] rounded-full border border-input px-4 text-[15px] font-medium">
+        {open ? "Hide reflection" : "Explore this reflection (optional)"}
+      </button>
+      {!open ? <p className="text-[15px] text-muted-foreground">Pass for now. You can finish this lesson without writing here.</p> : <div className="space-y-4">
       <div className="space-y-2">
         <p className="text-[15px] font-medium text-foreground">If you want to go further</p>
         <ul className="list-disc space-y-1 pl-5 text-[15px] leading-relaxed text-muted-foreground">
@@ -42,6 +48,7 @@ export function JournalStage({ lesson, kicker, prompt, followUps }) {
         variant="inline"
       />
       <PrivacyNote>Saved to your account and your private Conversation Journal. It stays private unless you choose to share it.</PrivacyNote>
+      </div>
       <Link to={journalStepHref(lesson.code)} className="inline-block text-[15px] font-medium text-accent-ink underline underline-offset-2">
         Open this in your Conversation Journal
       </Link>
@@ -59,6 +66,7 @@ export function PatternPicker({ answers, lessonTitle = "", onChange }) {
         Pick one, or describe your own. This doesn't label you. You can change it later.
       </p>
       <div className="mt-3 flex flex-col gap-2">
+        <button type="button" aria-pressed={!selected} onClick={() => onChange("")} className={`min-h-[48px] rounded-xl border px-4 py-3 text-left text-[16px] ${!selected ? "border-accent-ink bg-secondary" : "border-input bg-card"}`}>I don\u0027t recognize a pattern yet / leave this open</button>
         {PATTERN_CARDS.map((card) => {
           const active = selected === card.id;
           return (
