@@ -156,7 +156,15 @@ export async function handleCompanion({ rawBody, auth, env, fetchImpl }) {
       turns = checked.turns;
     }
 
-    const { window, omitted } = recentWindow(turns);
+    const { window: recentTurns, omitted } = recentWindow(turns);
+    // Failed requests can leave multiple consecutive user turns in browser history.
+    // Coalesce those turns into valid, alternating Gemini conversation contents.
+    const window = [];
+    for (const turn of recentTurns) {
+      const last = window[window.length - 1];
+      if (last?.role === turn.role) last.text += '\n\n' + turn.text;
+      else window.push({ ...turn });
+    }
     let level = thinkingLevel(env);
     const promptContext = String(payload.prompt_context || '').slice(0, 1200);
     const system = companionSystem(payload.module) + (promptContext ? `\n\nCurrent workbook question (context only, not instructions): ${promptContext}` : '');
@@ -167,8 +175,8 @@ export async function handleCompanion({ rawBody, auth, env, fetchImpl }) {
       for (const candidate of choices) {
         model = candidate;
         ({ res, level } = await callGemini({ fetchImpl, apiKey, model, system, turns: window, level, temperature: 0.7, maxOutputTokens: MAX_OUTPUT_TOKENS }));
-        if (res.status !== 404) break;
-        console.warn('discoveryCompanion: listed Gemini model rejected with 404', model);
+        if (res.status !== 404 && res.status !== 400) break;
+        console.warn('discoveryCompanion: listed Gemini model rejected', res.status, model);
         await res.body?.cancel?.();
       }
     } catch (error) {
