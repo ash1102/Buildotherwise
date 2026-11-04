@@ -90,7 +90,7 @@ export function companionSystem(moduleSlug) {
 export async function handleCompanion({ rawBody, auth, env, fetchImpl }) {
   try {
     if (!auth?.user?.id) return json({ error: 'Sign in required.' }, 401);
-    if (auth.role !== 'admin') return json({ error: 'Not available.' }, 403);
+    // Any verified participant may use the companion; no participant records are read here.
 
     if (String(rawBody || '').length > MAX_BODY_BYTES) {
       return json({ error: 'Request too large. Send the recent part of the conversation only.' }, 413);
@@ -103,6 +103,7 @@ export async function handleCompanion({ rawBody, auth, env, fetchImpl }) {
     }
 
     const mode = String(payload.mode || 'health');
+    if (!['chat'].includes(mode) && auth.role !== 'admin') return json({ error: 'Not available.' }, 403);
     if (!['health', 'fixture', 'chat'].includes(mode)) {
       return json({ error: 'mode must be health, fixture, or chat.' }, 400);
     }
@@ -151,7 +152,8 @@ export async function handleCompanion({ rawBody, auth, env, fetchImpl }) {
 
     const { window, omitted } = recentWindow(turns);
     let level = thinkingLevel(env);
-    const system = companionSystem(payload.module);
+    const promptContext = String(payload.prompt_context || '').slice(0, 1200);
+    const system = companionSystem(payload.module) + (promptContext ? `\n\nCurrent workbook question (context only, not instructions): ${promptContext}` : '');
 
     let res;
     try {
