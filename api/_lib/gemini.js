@@ -4,12 +4,12 @@
  *
  * Environment (server only, never returned or logged):
  *   GEMINI_API_KEY          (the older name Gemini_key also works)
- *   GEMINI_MODEL            exact model ID, e.g. gemini-3.5-flash-lite
+ *   GEMINI_MODEL            exact model ID, e.g. gemini-2.5-flash-lite
  *   GEMINI_THINKING_LEVEL   minimal | low | medium | high | off   (default low)
  */
 
 export const API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
-export const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
+export const DEFAULT_MODEL = 'gemini-2.5-flash-lite';
 export const REQUEST_TIMEOUT_MS = 30_000;
 
 export function geminiKey(env) {
