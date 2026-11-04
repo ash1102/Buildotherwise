@@ -20,6 +20,20 @@ export function geminiModel(env) {
   return String(env.GEMINI_MODEL || DEFAULT_MODEL).trim().replace(/^models\//, '');
 }
 
+/** Discover an actual generateContent-capable model for this API key without exposing the key. */
+export async function discoverGeminiModel(fetchImpl, apiKey, preferred) {
+  const response = await fetchWithTimeout(fetchImpl, API_BASE + '/models?pageSize=100', {
+    headers: { 'x-goog-api-key': apiKey },
+  });
+  if (!response.ok) return { model: null, status: response.status };
+  const data = await response.json();
+  const available = (data.models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
+    .map(m => String(m.name || '').replace(/^models\\//, ''));
+  const candidates = [preferred, 'gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemini-2.0-flash-lite', 'gemini-2.0-flash'];
+  const model = candidates.find(name => available.includes(name)) || available.find(name => /flash/i.test(name)) || available[0] || null;
+  return { model, status: response.status };
+}
+
 export function thinkingLevel(env) {
   const level = String(env.GEMINI_THINKING_LEVEL || 'low').trim().toLowerCase();
   if (level === 'off' || level === '') return null;
