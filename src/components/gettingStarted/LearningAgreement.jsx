@@ -118,11 +118,10 @@ export default function LearningAgreement({ lessonTitle = "Make this experience 
       </div>
 
       <div className="rounded-xl border border-border bg-card px-4 py-4">
-        <p className="text-[16px] font-semibold text-foreground">A note for yourself</p>
+        <p className="text-[16px] font-semibold text-foreground">My Way Forward</p>
         <p className="mt-2 text-[16px] leading-relaxed text-foreground">{AGREEMENT_PERMISSION}</p>
         <p className="mt-3 text-[13px] text-muted-faint">Saved to your workbook as you go. You can change it anytime.</p>
       </div>
-
     </div>
   );
 }

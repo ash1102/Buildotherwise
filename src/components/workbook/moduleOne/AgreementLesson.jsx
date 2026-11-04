@@ -45,7 +45,7 @@ function PartLookBack({ lesson, answers }) {
       <div className="space-y-3">
         <P>In the first lesson, you noticed something that caught your attention—or recognized that you’re still looking.</P>
         <P>In the second, you considered how curiosity, responsibility, enjoyment, and pressure can overlap.</P>
-        <P>Now let’s decide how you want to approach what comes next.</P>
+        <P>Now you can decide what feels worth exploring next. Nothing you choose here has to be final.</P>
       </div>
       {anything ? (
         <Panel tone="yours" label="From Lesson 1">
@@ -60,7 +60,7 @@ function PartLookBack({ lesson, answers }) {
         </p>
       )}
       <SingleChoice
-        legend="What would you like to do with your starting point?"
+        legend="What would you like to carry forward, if anything?"
         options={CARRY_MODES}
         value={mode}
         onChange={(next) => recordAnswer(lesson, "carry-mode", next, "My Module 1 starting point")}
@@ -108,7 +108,7 @@ function PartSupport({ lesson, answers }) {
               onClick={bringIn}
               className="inline-flex min-h-[44px] items-center rounded-full border border-input bg-card px-4 text-[15px] font-medium text-foreground hover:bg-secondary"
             >
-              Bring these words into my notes
+              Bring these words into My Way Forward
             </button>
             <Link to="/lesson/O.4" className="text-[15px] text-accent-ink underline underline-offset-2">
               Change them there
@@ -118,7 +118,7 @@ function PartSupport({ lesson, answers }) {
         </Panel>
       ) : null}
       <MultiChoice
-        legend="What would make exploring workable for you?"
+        legend="What might help you explore? "
         hint="Choose any that fit. These are your preferences, not a list of what the program already provides."
         options={SUPPORT_OPTIONS}
         values={chosen}
@@ -168,7 +168,7 @@ function PartAgreement({ answers }) {
   const hasEarlier = earlier.why || earlier.approach || earlier.note;
   return (
     <div className="space-y-5">
-      <Panel tone="yours" label="My starting point">
+      <Panel tone="yours" label="My Way Forward">
         {lines.length ? (
           <dl className="space-y-3">
             {lines.map((line) => (
@@ -255,61 +255,62 @@ function PartClose({ lesson, answers }) {
   );
 }
 
-/** M1-L3 · Choose a starting point. */
+/** M1-L3 · My Way Forward. */
 export default function AgreementLesson({ lesson }) {
   const answers = useAnswers();
   const parts = [
     { id: "look", short: "Look back", title: "You’ve already started exploring.", content: <PartLookBack lesson={lesson} answers={answers} /> },
     {
-      id: "try",
-      short: "Try",
-      title: "What are you willing to try?",
+      id: "explore",
+      short: "Explore",
+      title: "How would you like to explore?",
       content: (
-        <ChoicePart
-          lesson={lesson}
-          answers={answers}
-          answerKeyName="willing"
-          legend="Pick the one that fits best for now."
-          options={WILLING_OPTIONS}
-          note="This is a starting approach, not a promise of an outcome."
-          journalLabel="What I'm willing to try"
-        />
+        <div className="space-y-8">
+          <section className="space-y-3" aria-label="What you're willing to try">
+            <h3 className="text-[19px] font-semibold text-foreground">What sounds worth trying or exploring?</h3>
+            <ChoicePart
+              lesson={lesson} answers={answers} answerKeyName="willing"
+              legend="Choose what fits for now. You can change your mind." options={WILLING_OPTIONS}
+              note="Choose whatever feels possible now. You can change it later."
+              journalLabel="What I'm willing to try"
+            />
+          </section>
+          <section className="space-y-3 border-t border-border pt-6" aria-label="How you'd like to approach it">
+            <h3 className="text-[19px] font-semibold text-foreground">How would you like to explore?</h3>
+            <ChoicePart
+              lesson={lesson} answers={answers} answerKeyName="approach"
+              legend="Choose what fits for now. You can change your mind." options={APPROACH_OPTIONS}
+              note="Observing first is as valid as trying something hands-on."
+              journalLabel="How I'll approach the experience"
+            />
+          </section>
+        </div>
       ),
     },
+    { id: "workable", short: "Make it work", title: "What would make exploring workable?", content: <PartSupport lesson={lesson} answers={answers} /> },
     {
-      id: "approach",
-      short: "Approach",
-      title: "How will you approach the experience?",
+      id: "forward",
+      short: "My Way Forward",
+      title: "My Way Forward",
       content: (
-        <ChoicePart
-          lesson={lesson}
-          answers={answers}
-          answerKeyName="approach"
-          legend="Pick the one that fits best for now."
-          options={APPROACH_OPTIONS}
-          note="Observing first is as valid as trying something hands-on."
-          journalLabel="How I'll approach the experience"
-        />
+        <div className="space-y-8">
+          <section className="space-y-3">
+            <h3 className="text-[19px] font-semibold text-foreground">Would a check-in be useful later?</h3>
+            <ChoicePart
+              lesson={lesson} answers={answers} answerKeyName="revisit"
+              legend="Pick one." options={REVISIT_OPTIONS}
+              journalLabel="When I might check in"
+            />
+          </section>
+          <section className="border-t border-border pt-6">
+            <PartAgreement answers={answers} />
+          </section>
+          <section className="border-t border-border pt-6">
+            <PartClose lesson={lesson} answers={answers} />
+          </section>
+        </div>
       ),
     },
-    { id: "support", short: "Support", title: "What makes exploration workable?", content: <PartSupport lesson={lesson} answers={answers} /> },
-    {
-      id: "revisit",
-      short: "Check-in",
-      title: "Would a check-in be useful later?",
-      content: (
-        <ChoicePart
-          lesson={lesson}
-          answers={answers}
-          answerKeyName="revisit"
-          legend="Pick one."
-          options={REVISIT_OPTIONS}
-          journalLabel="When I might check in"
-        />
-      ),
-    },
-    { id: "agreement", short: "Your notes", title: "Your starting point", content: <PartAgreement answers={answers} /> },
-    { id: "close", short: "Next", title: "You don’t need to have it figured out.", content: <PartClose lesson={lesson} answers={answers} /> },
   ];
-  return <PartFlow lessonCode={lesson.code} parts={parts} />;
+  return <PartFlow lessonCode={lesson.code} parts={parts} storageVersion={2} />;
 }

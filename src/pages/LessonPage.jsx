@@ -136,7 +136,7 @@ export default function LessonPage() {
         ? "Getting Started"
         : `Module ${module.order}: ${module.title}`;
   const workbookLink = gsLesson || (module && module.kind === "orientation") ? "/getting-started" : opener ? "/" : `/module/${module.slug}`;
-  const backLabel = gsLesson ? "Back to Getting Started" : "Back to the workbook";
+  const backLabel = gsLesson ? "Back to Getting Started" : opener ? "Back to the workbook" : `Back to Module ${module.order}: ${module.title}`;
   const stepsDone = gettingStartedFinished(lessons, answers, states);
   /**
    * The last Getting Started step never dead-ends.

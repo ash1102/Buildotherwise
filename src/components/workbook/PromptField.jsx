@@ -121,7 +121,8 @@ export default function PromptField({
             sourceType="workbook_answer"
             sourceKey={`${lessonCode}#${index}`}
             sourceLabel={label}
-            lessonTitle={lessonTitle}
+            lessonCode={lessonCode}
+            promptId={index}
             getText={() => valueRef.current}
           />
         ) : (

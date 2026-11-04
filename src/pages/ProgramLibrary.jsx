@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useCurriculum from "@/hooks/useCurriculum";
@@ -7,25 +8,26 @@ import {
   loadLibraryResources,
   loadOutsideResources,
   loadReadingSteps,
-  loadResearchBriefs,
   moduleTitle,
 } from "@/lib/library";
 import { downloadText } from "@/lib/download";
 import LibraryCard from "@/components/library/LibraryCard";
 import LibraryFilters from "@/components/library/LibraryFilters";
-import ResearchBriefCard from "@/components/library/ResearchBriefCard";
 import OutsideSourceCard from "@/components/library/OutsideSourceCard";
 import PrivacyNote from "@/components/workbook/PrivacyNote";
 
 export default function ProgramLibrary() {
+  const [searchParams] = useSearchParams();
+  const requestedLesson = searchParams.get("lesson") || "";
+  const readingAnchor = useRef(null);
+  const moduleInitialized = useRef(false);
   const { modules, lessonsByCode, loading: curriculumLoading } = useCurriculum();
   const [search, setSearch] = useState("");
   const [term, setTerm] = useState("");
   const [activeModule, setActiveModule] = useState("all");
-  const [activeStep, setActiveStep] = useState("all");
+  const [activeStep, setActiveStep] = useState(requestedLesson || "all");
   const [steps, setSteps] = useState([]);
   const [resources, setResources] = useState(null);
-  const [research, setResearch] = useState([]);
   const [outside, setOutside] = useState([]);
   const [outsideKind, setOutsideKind] = useState("all");
   const [loading, setLoading] = useState(true);
@@ -60,7 +62,8 @@ export default function ProgramLibrary() {
   /** Choosing a module clears the step narrowing and offers that module's own steps. */
   useEffect(() => {
     let active = true;
-    setActiveStep("all");
+    if (moduleInitialized.current) setActiveStep("all");
+    moduleInitialized.current = true;
     if (moduleOrder === null) {
       setSteps([]);
       return () => {
@@ -77,9 +80,6 @@ export default function ProgramLibrary() {
 
   useEffect(() => {
     let active = true;
-    loadResearchBriefs().then((items) => {
-      if (active) setResearch(items);
-    });
     loadOutsideResources().then((items) => {
       if (active) setOutside(items);
     });
@@ -113,11 +113,6 @@ export default function ProgramLibrary() {
         item.body || item.summary || ""
       }\n${item.source_label ? `\nSource: ${item.source_label}\n` : ""}`;
     });
-    const briefLines = research.map((brief) => {
-      const head = `## ${brief.title}\n_Build Otherwise research note · summary only_\n\n${brief.summary || ""}`;
-      const status = brief.review_status ? `\n\nLimit: ${brief.review_status}` : "";
-      return `${head}${status}\n`;
-    });
     const outsideLines = outside.map((item) => {
       const byline = [item.creator, item.publisher, item.year].filter(Boolean).join(" · ");
       return `## ${item.title}\n_${KIND_LABELS[item.kind] || "Outside source"}${byline ? ` · ${byline}` : ""}_\n\n${item.summary || ""}${
@@ -126,11 +121,17 @@ export default function ProgramLibrary() {
     });
     downloadText(
       "entrepalooza-program-library.md",
-      `# Program Library\n\n${[...readingLines, ...outsideLines, ...briefLines].join("\n\n")}`
+      `# Program Library\n\n${[...readingLines, ...outsideLines].join("\n\n")}`
     );
   };
 
   const busy = curriculumLoading || resources === null;
+
+  useEffect(() => {
+    if (!busy && requestedLesson && readingAnchor.current) {
+      readingAnchor.current.scrollIntoView({ block: "start" });
+    }
+  }, [busy, requestedLesson]);
 
   return (
     <div className="space-y-8">
@@ -152,7 +153,7 @@ export default function ProgramLibrary() {
         </div>
       </header>
 
-      <section className="space-y-7">
+      <section ref={readingAnchor} className="scroll-mt-8 space-y-7">
         <div>
           <h2 className="workbook-label">Participant readings</h2>
           <h3 className="mt-1.5 text-[20px]">Find what the step asked you to read</h3>
@@ -186,7 +187,7 @@ export default function ProgramLibrary() {
                 <h2 className="font-heading text-xl">{order === null ? "Program research" : moduleTitle(modules, order)}</h2>
                 <div className="mt-3 space-y-4">
                   {items.map((item) => (
-                    <LibraryCard key={item.id} resource={item} />
+                    <LibraryCard key={item.id} resource={item} autoOpen={Boolean(requestedLesson && item.lesson_code === requestedLesson)} />
                   ))}
                 </div>
               </section>
@@ -274,21 +275,6 @@ export default function ProgramLibrary() {
         </section>
       ) : null}
 
-      {research.length ? (
-        <section className="rounded-lg border border-dashed border-natural-deep bg-card/60 p-6">
-          <h3 className="workbook-label">Build Otherwise's own research notes</h3>
-          <h4 className="mt-1.5 font-heading text-[19px]">How the curriculum was checked against research</h4>
-          <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-ink-soft">
-            These are working design documents, not lessons. You'll see a short summary of each and the limit it states
-            for itself. The full documents stay private while they're reviewed.
-          </p>
-          <ul className="mt-5 space-y-4">
-            {research.map((brief) => (
-              <ResearchBriefCard key={brief.id} brief={brief} />
-            ))}
-          </ul>
-        </section>
-      ) : null}
       </section>
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { answerKey } from "@/lib/workbook";
@@ -11,8 +12,8 @@ import { partFlowAddsGoDeeper } from "@/lib/journalPrompts";
  * list at the top at any time, answers are saved as they change, and going back
  * never clears anything. The part someone was on is remembered on this device only.
  */
-export function PartFlow({ lessonCode, parts }) {
-  const [stored, setStored] = useStore(`m1Part.${lessonCode}`, 0);
+export function PartFlow({ lessonCode, parts, storageVersion = 1 }) {
+  const [stored, setStored] = useStore(`m1Part${storageVersion > 1 ? `.v${storageVersion}` : ""}.${lessonCode}`, 0);
   const index = Math.min(Math.max(Number(stored) || 0, 0), parts.length - 1);
   const headingRef = useRef(null);
   const topRef = useRef(null);
@@ -41,9 +42,9 @@ export function PartFlow({ lessonCode, parts }) {
     <div ref={topRef} className="scroll-mt-24 space-y-5">
       <nav aria-label="Parts of this lesson" className="overflow-x-auto pb-1">
         <p className="mb-2 text-[13px] text-muted-faint">Tap a part to jump back to it.</p>
-        <ol className="flex min-w-[546px] gap-2 sm:min-w-0" role="list">
+        <ol className="flex gap-2" role="list">
           {parts.map((item, i) => (
-            <li key={item.id} className="w-[74px] shrink-0 sm:min-w-0 sm:flex-1">
+            <li key={item.id} className="min-w-[74px] flex-1">
               <button
                 type="button"
                 onClick={() => go(i)}
@@ -57,7 +58,7 @@ export function PartFlow({ lessonCode, parts }) {
                 />
                 <span
                   aria-hidden="true"
-                  className={`mt-1.5 block truncate text-center text-[11px] font-semibold text-accent-ink`}
+                  className="mt-1.5 block truncate text-center text-[11px] font-semibold text-accent-ink"
                 >
                   <span className="block">Part {i + 1}</span>
                   <span className="block truncate font-medium">{item.short}</span>
@@ -260,6 +261,7 @@ export function FinishControl({ code, answers }) {
         <Check className="h-4 w-4" aria-hidden="true" />
         Marked done
       </span>
+      <Link to="/" className="inline-flex min-h-[44px] items-center text-[15px] font-medium text-accent-ink underline underline-offset-2">Choose another lesson</Link>
       <button type="button" onClick={() => markFinished(code, false)} className="text-[14px] text-muted-foreground underline underline-offset-2">
         Undo
       </button>

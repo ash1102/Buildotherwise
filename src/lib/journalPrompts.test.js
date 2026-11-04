@@ -9,7 +9,8 @@ test("all twelve lessons in Modules 1–4 have a Go Deeper prompt, and nothing e
   for (const code of CODES) {
     const set = goDeeperFor(code, {});
     assert.ok(set.primary.length > 20, code);
-    assert.ok(set.followUps.length >= 2 && set.followUps.length <= 3, code);
+    const followUpLimit = code === "M1-L2" ? 4 : 3;
+    assert.ok(set.followUps.length >= 2 && set.followUps.length <= followUpLimit, code);
   }
   assert.equal(hasGoDeeper("M5-L1"), false);
   assert.equal(hasGoDeeper("O.1"), false);
@@ -18,12 +19,19 @@ test("all twelve lessons in Modules 1–4 have a Go Deeper prompt, and nothing e
 test("the intro is the approved wording", () => {
   assert.equal(
     JOURNAL_INTRO,
-    "You don't have to answer every question. Start wherever something catches your attention. You can explore a memory, question an assumption, disagree with an idea, or follow a thought somewhere unexpected."
+    "This is an optional space to write, ask a question, or disagree with something here. You can skip it or leave it blank; it does not need to be personal."
   );
 });
 
 test("spot-check approved primary prompts", () => {
-  assert.equal(goDeeperFor("M1-L1", {}).primary, "What catches your attention, and what do you think draws you toward it? Have you noticed similar interests or patterns elsewhere in your life?");
+  assert.equal(
+    goDeeperFor("M1-L1", {}).primary,
+    "Is there anything from this lesson you want to keep exploring? A question, an observation, “nothing yet,” or a blank space are all fine.",
+  );
+  assert.ok(
+    goDeeperFor("M1-L2", {}).followUps.some((prompt) => prompt.includes("difficult experience")),
+    "M1-L2 keeps the optional lived-experience follow-up",
+  );
   assert.equal(goDeeperFor("M3-L2", {}).primary, "What assumptions do you have about how you work best? Where might those assumptions have come from?");
   assert.equal(goDeeperFor("M4-L3", {}).primary, "What are you beginning to understand differently about yourself? What still feels uncertain, contradictory, or unfinished?");
 });

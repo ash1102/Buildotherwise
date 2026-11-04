@@ -1,4 +1,5 @@
 import { getAccessToken } from '@base44/sdk';
+import { USE_SUPABASE, storedAccessToken } from '@/api/supabaseCompat';
 
 const isNode = typeof window === 'undefined';
 
@@ -16,7 +17,7 @@ const getAppParams = () => {
 	}
 	return {
 		appId: import.meta.env.VITE_BASE44_APP_ID,
-		token: getAccessToken(),
+		token: USE_SUPABASE ? storedAccessToken() : getAccessToken(),
 		functionsVersion: import.meta.env.VITE_BASE44_FUNCTIONS_VERSION,
 		appBaseUrl: import.meta.env.VITE_BASE44_APP_BASE_URL,
 	}

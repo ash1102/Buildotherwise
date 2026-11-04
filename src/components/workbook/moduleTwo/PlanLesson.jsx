@@ -181,47 +181,12 @@ function PartWays() {
           );
         })}
       </ul>
+      <Panel tone="reading">
+        <P>A small try gives you clues, not a verdict. What you imagined may differ from what you notice, and the setting, time, support, and access all shape the experience.</P>
+        <P>Interest, frustration, uncertainty, or a barrier are all information. One encounter cannot prove your ability or decide your direction.</P>
+        <Link to="/program-library?lesson=M2-L1" className="text-[15px] font-medium text-accent-ink underline underline-offset-2">Read the full explanation in the Library</Link>
+      </Panel>
     </div>
-  );
-}
-
-function PartReading() {
-  return (
-    <Panel tone="reading">
-      {/* DRAFT (Claude): built from the published reading "What Can a Small Try Actually Tell You?"
-          and the four points in the Module 2 instructions. The original stays in the Library. */}
-      <P>
-        A description of an activity isn’t the activity itself. You can admire a kind of work and dislike its daily tasks.
-        You can expect something to be boring and find that learning it changes your mind. What you predict and what you
-        notice when you’re actually there aren’t always the same.
-      </P>
-      <P>
-        That’s one reason interest can grow through experience. Getting closer to something gives you information you
-        can’t get by imagining it.
-      </P>
-      <P>
-        But one experience doesn’t settle whether something is right for you. A first try can’t establish lasting interest,
-        ability, or the right direction. The setting, the instructions, the timing, and how familiar the task was all
-        affect what happens.
-      </P>
-      <P>
-        Whatever you notice is useful. Enjoyment, frustration, boredom, uncertainty, and surprise all tell you something.
-        So does finding out that you’d want more information before deciding.
-      </P>
-      <P>
-        Practical barriers matter too. If you can’t get to an opportunity because of time, money, transportation,
-        caregiving, or access, that tells you about your circumstances, not about you. It isn’t a personal failure.
-      </P>
-      <p className="text-[14px] leading-relaxed text-muted-foreground">
-        Source: Entrepalooza Module 2 reading, “What Can a Small Try Actually Tell You?” On interest growing through
-        experience, see the research connection in Module 1, Lesson 1 (Hidi &amp; Renninger, 2006). The small-try approach
-        is an Entrepalooza design choice, not a tested program.
-      </p>
-      <Link to="/program-library" className="inline-flex items-center gap-1.5 text-[15px] font-medium text-accent-ink underline underline-offset-2">
-        Read the full reading in the Library
-        <ArrowRight className="h-4 w-4" aria-hidden="true" />
-      </Link>
-    </Panel>
   );
 }
 
@@ -358,7 +323,6 @@ export default function PlanLesson({ lesson }) {
     { id: "start", short: "Start", title: "Bring forward a possibility", content: <PartStart lesson={lesson} answers={answers} onSetExplore={setExplore} /> },
     { id: "gallery", short: "Explore", title: "The Exploration Gallery", content: <PartGallery lesson={lesson} answers={answers} onStart={choosePossibility} /> },
     { id: "ways", short: "Ways", title: "What counts as trying something?", content: <PartWays /> },
-    { id: "read", short: "Read", title: "A small try can teach you something", content: <PartReading /> },
     {
       id: "plan",
       short: "Plan",

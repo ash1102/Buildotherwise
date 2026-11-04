@@ -37,3 +37,7 @@ dist-ssr
 
 # Local link to a Base44 app, written by `base44 link`
 base44/.app.jsonc
+
+# Local Gemini feedback trials. The script writes these. They are not program content.
+migration/scripts/try-feedback.preview.json
+migration/scripts/try-feedback.results.json

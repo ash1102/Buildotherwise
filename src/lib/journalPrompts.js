@@ -36,6 +36,7 @@ export const GO_DEEPER = {
       "Which explanation seems useful to you, if any?",
       "Did anything in the examples seem incomplete or different from your experience?",
       "Would you rather move on without adding anything?",
+      "Have you ever become curious about or good at something because of a difficult experience—even if you wouldn’t choose to go through it again?",
     ],
   },
   "M1-L3": {

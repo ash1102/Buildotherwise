@@ -5,8 +5,8 @@ import { KIND_LABELS } from "@/lib/library";
 import Prose from "@/components/workbook/Prose";
 
 /** One reading. It opens in place, so revisiting never means leaving the page. */
-export default function LibraryCard({ resource }) {
-  const [open, setOpen] = useState(false);
+export default function LibraryCard({ resource, autoOpen = false }) {
+  const [open, setOpen] = useState(autoOpen);
 
   return (
     <article className="workbook-card p-5">

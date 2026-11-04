@@ -105,8 +105,14 @@ export default function JournalReflection() {
       const refreshed = await base44.agents.getConversation(conversation.id);
       if (refreshed) setMessages(refreshed.messages || []);
       return true;
-    } catch {
-      setError("That didn't send. Nothing was lost. Try again in a moment.");
+    } catch (err) {
+      const status = err?.response?.status || err?.status || err?.response?.data?.status;
+      const message = err?.response?.data?.error || err?.data?.error;
+      if (status === 402 || /credit|quota|payment required|limit reached/i.test(String(message || err?.message || ""))) {
+        setError("The AI reflection service is currently unavailable because its usage limit has been reached. Retrying immediately will not fix this. Your draft is still in the text box.");
+      } else {
+        setError(message || "The reflection service could not complete your request. Your draft is still here; check the conversation before retrying in case the message was received.");
+      }
       return false;
     } finally {
       setSending(false);

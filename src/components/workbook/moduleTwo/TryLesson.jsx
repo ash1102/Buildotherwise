@@ -33,7 +33,7 @@ const CODE = "M2-L2";
 const PLAN_CODE = "M2-L1";
 const PLAN_TITLE = "Find Something to Try";
 /** The plan part of M2-L1 (0-based), so "Change my plan" opens it directly. */
-const PLAN_PART_INDEX = 4;
+const PLAN_PART_INDEX = 3;
 
 function openPlan() {
   writeStore(`m1Part.${PLAN_CODE}`, PLAN_PART_INDEX);

@@ -1,6 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import PromptField from "../PromptField";
 import PrivacyNote from "../PrivacyNote";
 import { useAnswers } from "@/lib/workbook";
@@ -30,9 +28,9 @@ function PartCompare({ lesson, answers }) {
             usually feels comfortable stopping when something else needs attention.
           </P>
         </Panel>
-        <Panel tone="example" label="Fictional example" title="Riley">
+        <Panel tone="example" label="Fictional example" title="Casey">
           <P>
-            Riley repairs motorcycles to earn money and meet family responsibilities. Riley sometimes enjoys the work, but often
+            Casey repairs motorcycles to earn money and meet family responsibilities. Casey sometimes enjoys the work, but often
             continues because bills need paying.
           </P>
         </Panel>
@@ -41,7 +39,7 @@ function PartCompare({ lesson, answers }) {
         legend="Both spend considerable time on the activity. What can we reasonably conclude?"
         options={COMPARE_OPTIONS.map((item) => item.label)}
         value={choice}
-        onChange={(next) => recordAnswer(lesson, "compare", next, "Jordan and Riley: what can we reasonably conclude?")}
+        onChange={(next) => recordAnswer(lesson, "compare", next, "Jordan and Casey: what can we reasonably conclude?")}
       />
       <div aria-live="polite">
         {option ? (
@@ -60,8 +58,6 @@ function PartReading() {
   return (
     <div className="space-y-4">
       <Panel tone="reading">
-        {/* DRAFT (Claude): the spec's points joined to sentences kept from the published
-            reading "Attention is not a passion". The original stays unchanged in the Library. */}
         <P>People give their attention to activities for many reasons:</P>
         <ul className="grid max-w-[68ch] list-disc gap-x-8 gap-y-1 pl-5 text-[17px] leading-relaxed text-foreground sm:grid-cols-2">
           <li>enjoyment</li>
@@ -89,14 +85,10 @@ function PartReading() {
           something.
         </P>
         <p className="text-[14px] leading-relaxed text-muted-foreground">
-          Source: Entrepalooza Module 1 reading, “Attention is not a passion.” On interest growing through experience, see
-          the research connection in Lesson 1 (Hidi &amp; Renninger, 2006).
+          Research connection: Interests can develop through experience over time. Hidi and Renninger (2006)
+          describe one model of how interest develops. See the research explanation in Module 1, Lesson 1.
         </p>
       </Panel>
-      <Link to="/program-library" className="inline-flex items-center gap-1.5 text-[15px] font-medium text-accent-ink underline underline-offset-2">
-        Read the original “Attention is not a passion” in the Library
-        <ArrowRight className="h-4 w-4" aria-hidden="true" />
-      </Link>
     </div>
   );
 }
@@ -104,7 +96,8 @@ function PartReading() {
 function PartYours({ lesson, answers }) {
   const lens = readAnswer(answers, lesson.code, "lens");
   const reasons = splitMulti(readAnswer(answers, lesson.code, "reasons"));
-  const fictional = lens === LENS_OPTIONS[1];
+  const fictional =
+    lens === LENS_OPTIONS[1] || lens === "I'll use Alex or Sam instead" || lens === "I'll use Jordan or Riley instead";
   return (
     <div className="space-y-6">
       <P>
@@ -113,19 +106,19 @@ function PartYours({ lesson, answers }) {
       </P>
       <SingleChoice
         legend="Which would you like to use?"
-        hint="Both work the same way. Using Jordan or Riley is a complete way to do this part."
+        hint="Both work the same way. Using Jordan or Casey is a complete way to do this part."
         options={LENS_OPTIONS}
-        value={lens}
+        value={fictional ? LENS_OPTIONS[1] : lens}
         onChange={(next) => recordAnswer(lesson, "lens", next, "Which example I used")}
       />
       <MultiChoice
-        legend={fictional ? "What might keep Jordan or Riley involved?" : "What might keep you involved?"}
+        legend={fictional ? "What might keep Jordan or Casey involved?" : "What might keep you involved?"}
         hint="Choose any that fit. More than one is fine."
         options={REASON_OPTIONS}
         values={reasons}
         only={NOT_SURE}
         onChange={(next) =>
-          recordAnswer(lesson, "reasons", joinMulti(next), fictional ? "What might keep Jordan or Riley involved?" : "What might keep me involved?")
+          recordAnswer(lesson, "reasons", joinMulti(next), fictional ? "What might keep Jordan or Casey involved?" : "What might keep me involved?")
         }
       />
       <PromptField

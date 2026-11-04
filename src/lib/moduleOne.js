@@ -22,7 +22,7 @@ import { saveAnswer } from "./journal";
  *                         as that card; it is only rewritten if the participant changes it.
  *   M1-L1#stood-out       optional: what, if anything, stood out
  *   M1-L1#carry-choice    what they want to carry into Module 2 (one of CARRY_OPTIONS)
- *   M1-L2#compare         their answer to the Jordan/Riley question
+ *   M1-L2#compare         their answer to the Jordan/Casey question
  *   M1-L2#lens            whether they used a personal activity or the fictional example
  *   M1-L2#reasons         reasons that might keep them involved (multi)
  *   M1-L2#surprise        optional: did anything about those reasons surprise you
@@ -99,12 +99,12 @@ export const COMPARE_OPTIONS = [
     label: "They're equally passionate about motorcycles.",
     // DRAFT feedback (Claude), built from the four points in the spec.
     feedback:
-      "That's one possibility, but the time they spend doesn't tell us that. Jordan mentions enjoying the problems and stopping when something else needs attention. Riley mentions bills and family responsibilities.",
+      "That's one possibility, but the time they spend doesn't tell us that. Jordan mentions enjoying the problems and stopping when something else needs attention. Casey mentions bills and family responsibilities.",
   },
   {
     label: "Their reasons for engaging may be different.",
     feedback:
-      "That's what the descriptions suggest. Jordan talks about enjoyment; Riley talks about money and responsibility. Even so, the reasons can overlap. Riley sometimes enjoys the work too.",
+      "That's what the descriptions suggest. Jordan talks about enjoyment; Casey talks about money and responsibility. Even so, the reasons can overlap. Casey sometimes enjoys the work too.",
   },
   {
     label: "We need more information before deciding how either person feels.",
@@ -117,7 +117,7 @@ export const COMPARE_OPTIONS = [
 export const COMPARE_TAKEAWAY =
   "Time spent, on its own, doesn't establish passion. Reasons and circumstances matter, and motivation usually has several influences at once.";
 
-export const LENS_OPTIONS = ["I'm thinking of an activity from my life", "I'll use Jordan or Riley instead"];
+export const LENS_OPTIONS = ["I'm thinking of an activity from my life", "I'll use Jordan or Casey instead"];
 
 export const REASON_OPTIONS = [
   "I enjoy it.",

@@ -138,6 +138,20 @@ function PartEncounter({ lesson, answers }) {
         </p>
       </div>
       <DiscoveryGallery selectedIds={selectedIds} onToggle={toggle} />
+      {ENCOUNTER_CARDS.filter(card => selectedIds.includes(card.id)).map(card => (
+        <details key={card.id} className="rounded-xl border border-border bg-card p-4">
+          <summary className="cursor-pointer text-[16px] font-medium">Explore {card.title} now (optional)</summary>
+          <p className="mt-3 text-[15px] leading-relaxed">{card.description}</p>
+          {card.id === "behavior" ? <div className="mt-3 space-y-3 rounded-lg bg-secondary p-3">
+            <p className="text-[15px] font-medium">Try a human behavior thought experiment</p>
+            <P>Two people get the same feedback. One feels encouraged, the other feels dismissed. What might account for the difference?</P>
+            <p className="text-[14px] text-muted-foreground">Try imagining two explanations. What information would you need before making a judgment? You do not need to decide who is right.</p>
+          </div> : null}
+          <p className="mt-2 text-[15px] text-muted-foreground">What would you want to understand, watch, ask, or try to learn more about this possibility?</p>
+          <div className="mt-3"><PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index={"explore-" + card.id} label="My question or small experiment (optional)" variant="inline" /></div>
+          <p className="mt-2 text-[14px] text-muted-foreground">No right answer. You can leave it, come back, or change direction.</p>
+        </details>
+      ))}
       {selectedIds.length ? (
         <div aria-live="polite">
           <Panel tone="note">
@@ -165,7 +179,7 @@ function PartEncounter({ lesson, answers }) {
       ) : (
         <p className="text-[15px] text-muted-foreground">You don’t need to select anything. Looking counts.</p>
       )}
-      <p className="text-[14px] text-muted-faint">There’s more room to explore possibilities like these in Module 2.</p>
+      <p className="text-[14px] text-muted-faint">You can investigate a possibility here, or explore more in Module 2.</p>
     </div>
   );
 }
@@ -211,6 +225,9 @@ function PartLook({ lesson, answers }) {
   const encounterCards = ENCOUNTER_CARDS.filter((card) => encounterIds.includes(card.id));
   const anything = text || map || encounterCards.length || route;
   const nothingYet = route === NOTICE_OPTIONS.find((item) => item.id === "nothing-yet")?.label;
+  const savedConnection = readAnswer(answers, lesson.code, "connection");
+  const savedNote = readAnswer(answers, lesson.code, "stood-out");
+  const showNote = (!savedConnection && !nothingYet) || (savedConnection && savedNote);
   return (
     <div className="space-y-5">
       {anything ? (
@@ -244,20 +261,34 @@ function PartLook({ lesson, answers }) {
           Nothing is saved from earlier in this lesson. You can go back, answer from memory below, or leave it.
         </p>
       )}
-      <div className="space-y-2">
-        <p className="text-[15px] text-muted-foreground">Some things people notice:</p>
-        <ul className="list-disc space-y-1 pl-5 text-[15px] text-muted-foreground">
-          <li>Something familiar was interesting.</li>
-          <li>Something unfamiliar raised a question.</li>
-          <li>Something was frustrating or surprising.</li>
-          <li>Nothing stood out yet.</li>
-        </ul>
-      </div>
-      {nothingYet ? (
+      {encounterCards.length && (text || map) ? (
+        <Panel tone="note" title="Could there be a connection?">
+          <P>
+            You noticed something in your experience and selected {encounterCards.map((card) => card.title).join(", ")}. They
+            might connect, or they might not. You decide.
+          </P>
+          <PromptField
+            lessonCode={lesson.code}
+            lessonTitle={lesson.title}
+            index="connection"
+            label="A connection or question worth exploring (optional)"
+            variant="inline"
+          />
+        </Panel>
+      ) : null}
+      {savedConnection ? (
+        <Panel tone="note" title="You have a thought worth keeping">
+          <P>
+            You’ve already put something into words. You don’t need to answer another question about it. You can carry it
+            forward, keep exploring, or change your mind.
+          </P>
+        </Panel>
+      ) : nothingYet ? (
         <p className="text-[15px] leading-relaxed text-muted-foreground">
           You already said nothing comes to mind. That is a complete answer; continue, go back, or leave this open.
         </p>
-      ) : (
+      ) : null}
+      {showNote ? (
         <PromptField
           lessonCode={lesson.code}
           lessonTitle={lesson.title}
@@ -265,7 +296,7 @@ function PartLook({ lesson, answers }) {
           label="What, if anything, would you like to note here? (optional)"
           variant="inline"
         />
-      )}
+      ) : null}
     </div>
   );
 }
@@ -291,6 +322,12 @@ function PartKeep({ lesson, answers }) {
           have to do next.
         </P>
       </Panel>
+      {readAnswer(answers, lesson.code, "connection") ? <Panel tone="yours" label="A connection or question you saved"><Quote>{readAnswer(answers, lesson.code, "connection")}</Quote></Panel> : null}
+      {ENCOUNTER_CARDS.filter(card => readAnswer(answers, lesson.code, "explore-" + card.id)).map(card => (
+        <Panel key={card.id} tone="yours" label={"Explored: " + card.title}>
+          <Quote>{readAnswer(answers, lesson.code, "explore-" + card.id)}</Quote>
+        </Panel>
+      ))}
       <EarlierAnswers code={lesson.code} answers={answers} />
       <FinishControl code={lesson.code} answers={answers} />
     </div>
