@@ -43,9 +43,11 @@ export default function GlobalDiscoveryCompanion() {
   const speech = useRef(null);
   const [listening, setListening] = useState(false);
   const [speechError, setSpeechError] = useState("");
+  const [turns, setTurns] = useState([]);
+  const [loadedHistoryKey, setLoadedHistoryKey] = useState(null);
   const storageKey = user?.id ? "entrepalooza_companion_history_" + user.id : null;
-  useEffect(() => { if (!storageKey) return; try { const saved = JSON.parse(localStorage.getItem(storageKey) || "[]"); setTurns(Array.isArray(saved) ? saved.filter(t => (t.role === "user" || t.role === "model") && typeof t.text === "string").slice(-60) : []); } catch { setTurns([]); } }, [storageKey]);
-  useEffect(() => { if (!storageKey) return; try { localStorage.setItem(storageKey, JSON.stringify(turns.slice(-60))); } catch { /* Storage may be disabled. */ } }, [turns, storageKey]);
+  useEffect(() => { if (!storageKey) return; try { const saved = JSON.parse(localStorage.getItem(storageKey) || "[]"); setTurns(Array.isArray(saved) ? saved.filter(t => (t.role === "user" || t.role === "model") && typeof t.text === "string").slice(-60) : []); } catch { setTurns([]); } setLoadedHistoryKey(storageKey); }, [storageKey]);
+  useEffect(() => { if (!storageKey || loadedHistoryKey !== storageKey) return; try { localStorage.setItem(storageKey, JSON.stringify(turns.slice(-60))); } catch { /* Storage may be disabled. */ } }, [turns, storageKey, loadedHistoryKey]);
   useEffect(() => () => speech.current?.dispose(), []);
   const toggleDictation = () => {
     if (listening) { speech.current?.stop(); return; }
@@ -56,7 +58,6 @@ export default function GlobalDiscoveryCompanion() {
     speech.current = createSpeechSession({ Recognition, onText: words => setDraft(prev => (prev.trim() ? prev.trimEnd() + " " : "") + words), onState: active => setListening(active), onError: setSpeechError });
     speech.current.start();
   };
-  const [turns, setTurns] = useState([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
