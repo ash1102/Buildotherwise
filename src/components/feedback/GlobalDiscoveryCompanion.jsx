@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { supabase, USE_SUPABASE } from "@/api/supabaseCompat";
 import { Button } from "@/components/ui/button";
+import { createSpeechSession } from "@/lib/speechSession";
+import { useRef } from "react";
 import { useWorkbookGate } from "@/components/WorkbookGate";
 
 const TOUR = [
@@ -38,6 +40,22 @@ export default function GlobalDiscoveryCompanion() {
   const { pathname } = useLocation();
   const gate = useWorkbookGate();
   const [open, setOpen] = useState(false);
+  const speech = useRef(null);
+  const [listening, setListening] = useState(false);
+  const [speechError, setSpeechError] = useState("");
+  const storageKey = user?.id ? "entrepalooza_companion_history_" + user.id : null;
+  useEffect(() => { if (!storageKey) return; try { const saved = JSON.parse(localStorage.getItem(storageKey) || "[]"); setTurns(Array.isArray(saved) ? saved.filter(t => (t.role === "user" || t.role === "model") && typeof t.text === "string").slice(-60) : []); } catch { setTurns([]); } }, [storageKey]);
+  useEffect(() => { if (!storageKey) return; try { localStorage.setItem(storageKey, JSON.stringify(turns.slice(-60))); } catch { /* Storage may be disabled. */ } }, [turns, storageKey]);
+  useEffect(() => () => speech.current?.dispose(), []);
+  const toggleDictation = () => {
+    if (listening) { speech.current?.stop(); return; }
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Recognition) { setSpeechError("Speech recognition is not available in this browser. Try your keyboard microphone."); return; }
+    setSpeechError("");
+    speech.current?.dispose();
+    speech.current = createSpeechSession({ Recognition, onText: words => setDraft(prev => (prev.trim() ? prev.trimEnd() + " " : "") + words), onState: active => setListening(active), onError: setSpeechError });
+    speech.current.start();
+  };
   const [turns, setTurns] = useState([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
@@ -45,7 +63,7 @@ export default function GlobalDiscoveryCompanion() {
   const [disabled, setDisabled] = useState(() => localStorage.getItem("entrepalooza_companion_auto") === "off");
   const [showTour, setShowTour] = useState(false);
   useEffect(() => {
-    if (!isAuthenticated || !user?.id || gate.pending || !gate.finished) { setOpen(false); setTurns([]); setShowTour(false); return; }
+    if (!isAuthenticated || !user?.id || gate.pending || !gate.finished) { setOpen(false); setShowTour(false); return; }
     const key = "entrepalooza_companion_welcomed_" + user.id;
     if (!disabled && !sessionStorage.getItem(key)) {
       setOpen(true);
@@ -66,6 +84,7 @@ export default function GlobalDiscoveryCompanion() {
     if (!text || busy) return;
     if (wantsTour(text)) setShowTour(true);
     const next = [...turns, { role: "user", text }];
+    speech.current?.stop();
     setTurns(next);
     setDraft("");
     setBusy(true);
@@ -108,13 +127,15 @@ export default function GlobalDiscoveryCompanion() {
           <form onSubmit={e => { e.preventDefault(); send(draft); }} className="flex gap-2">
             <label className="sr-only" htmlFor="global-companion-reply">Message the companion</label>
             <input id="global-companion-reply" className="min-w-0 flex-1 rounded-lg border bg-background px-3 py-2 text-sm" placeholder="Ask or share anything…" maxLength={4000} value={draft} onChange={e => setDraft(e.target.value)} />
+            <button type="button" onClick={toggleDictation} aria-label={listening ? "Stop dictation" : "Dictate message"} aria-pressed={listening} className="rounded-lg border px-3 py-2 text-sm">{listening ? "Stop" : "🎤"}</button>
             <Button type="submit" disabled={busy || !draft.trim()}>Send</Button>
           </form>
+          {speechError && <p role="alert" className="mt-2 text-xs text-destructive">{speechError}</p>}
           <div className="mt-2 flex justify-between gap-3 text-xs">
-            <button type="button" className="underline" onClick={() => { setTurns([]); setShowTour(false); setError(""); }}>Clear chat</button>
+            <button type="button" className="underline" onClick={() => { setTurns([]); if (storageKey) localStorage.removeItem(storageKey); setShowTour(false); setError(""); }}>Clear chat</button>
             <button type="button" className="underline" onClick={() => { const next = !disabled; setDisabled(next); localStorage.setItem("entrepalooza_companion_auto", next ? "off" : "on"); }}>{disabled ? "Enable welcome" : "Don't open automatically"}</button>
           </div>
-          <p className="mt-2 text-[11px] text-muted-foreground">Messages are sent to Gemini only when you submit. This chat isn't saved to your account.</p>
+          <p className="mt-2 text-[11px] text-muted-foreground">Messages are sent to Gemini only when you submit. History is kept in this browser on this device, not synced to your account. Clear chat removes it here.</p>
         </div>
       </section>}
   </aside>;
