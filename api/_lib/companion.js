@@ -119,7 +119,7 @@ export async function handleCompanion({ rawBody, auth, env, fetchImpl }) {
     try { discovery = await discoverGeminiModel(fetchImpl, apiKey, preferredModel); }
     catch { return json({ ok: false, error: 'Could not check Gemini model availability.' }, 503); }
     if (!discovery.model) return json({ ok: false, error: discovery.status === 200 ? 'No compatible Gemini models were returned for this key.' : 'Gemini model access check failed.', upstream_status: discovery.status }, 503);
-    const model = discovery.model;
+    let model = discovery.model;
 
     if (mode === 'health') {
       let available = false;
@@ -163,7 +163,14 @@ export async function handleCompanion({ rawBody, auth, env, fetchImpl }) {
 
     let res;
     try {
-      ({ res, level } = await callGemini({ fetchImpl, apiKey, model, system, turns: window, level, temperature: 0.7, maxOutputTokens: MAX_OUTPUT_TOKENS }));
+      const choices = (discovery.models || [model]).slice(0, 5);
+      for (const candidate of choices) {
+        model = candidate;
+        ({ res, level } = await callGemini({ fetchImpl, apiKey, model, system, turns: window, level, temperature: 0.7, maxOutputTokens: MAX_OUTPUT_TOKENS }));
+        if (res.status !== 404) break;
+        console.warn('discoveryCompanion: listed Gemini model rejected with 404', model);
+        await res.body?.cancel?.();
+      }
     } catch (error) {
       const aborted = error?.name === 'AbortError';
       console.error('discoveryCompanion: request error', aborted ? 'timeout' : redact(error?.message));
