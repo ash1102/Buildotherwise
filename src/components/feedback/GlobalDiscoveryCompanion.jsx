@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { supabase, USE_SUPABASE } from "@/api/supabaseCompat";
 import { Button } from "@/components/ui/button";
 
+const TOUR = [
+{title:"Getting Started",path:"/getting-started",detail:"An introduction to the program and how to begin."},
+{title:"Workbook modules",path:"/#workbook",detail:"Explore activities at your own pace. Modules 1–5 are open."},
+{title:"Journal",path:"/journal",detail:"Your notes and reflections."},
+{title:"Life Map",path:"/map",detail:"An optional way to notice connections."},
+{title:"Discovery Record",path:"/record",detail:"Discoveries you choose to keep."},
+{title:"Resources",path:"/program-library",detail:"Explore program materials."}
+];
+const wantsTour = text => /show me around|give me a tour|tour of|where (do|should|can) i start|completely new|new here|how (do|does) (i|this) (start|work)/i.test(text);
 const welcome = "Welcome to Entrepalooza. I'm your AI Discovery Companion. I can show you around, explain activities, or talk through ideas with you. You decide how much help you want. Would you like a quick introduction, or would you rather explore on your own?";
 const pageName = (path) => {
   if (path === "/") return "Program home";
@@ -26,21 +35,22 @@ export default function GlobalDiscoveryCompanion() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [disabled, setDisabled] = useState(() => localStorage.getItem("entrepalooza_companion_auto") === "off");
-  const [seen, setSeen] = useState(false);
+  const [showTour, setShowTour] = useState(false);
   useEffect(() => {
-    if (!isAuthenticated || !user?.id) { setOpen(false); setTurns([]); setSeen(false); return; }
+    if (!isAuthenticated || !user?.id) { setOpen(false); setTurns([]); setShowTour(false); return; }
     const key = "entrepalooza_companion_welcomed_" + user.id;
     if (!disabled && !sessionStorage.getItem(key)) {
       setOpen(true);
       sessionStorage.setItem(key, "yes");
     }
-    setSeen(true);
+
   }, [isAuthenticated, user?.id, disabled]);
   if (!USE_SUPABASE || !isAuthenticated || pathname.startsWith("/preview")) return null;
 
   const send = async (message) => {
     const text = String(message || "").trim();
     if (!text || busy) return;
+    if (wantsTour(text)) { setShowTour(true); setTurns(prev => [...prev, { role: "user", text }, { role: "model", text: "Here is a tour of the actual program. You can open any of these sections. Getting Started is an easy place to begin, but you decide where to go." }]); setDraft(""); return; }
     const next = [...turns, { role: "user", text }];
     setTurns(next);
     setDraft("");
@@ -52,7 +62,7 @@ export default function GlobalDiscoveryCompanion() {
       const response = await fetch("/api/discoveryCompanion", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + session.access_token },
-        body: JSON.stringify({ mode: "chat", module: pathname, prompt_context: "Current program location: " + pageName(pathname), messages: next }),
+        body: JSON.stringify({ mode: "chat", module: pathname, prompt_context: "Current program location: " + pageName(pathname) + ". Program navigation: " + TOUR.map(t => t.title + " at " + t.path + ": " + t.detail).join("; ") + ". Answer navigation requests with actual sections and routes, not reflection questions.", messages: next }),
       });
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || "The companion couldn't respond.");
@@ -72,6 +82,7 @@ export default function GlobalDiscoveryCompanion() {
         <div className="flex-1 space-y-3 overflow-y-auto p-4 text-sm" aria-live="polite">
           <p><strong>Companion:</strong> {welcome}</p>
           {turns.map((t, i) => <p key={i} className="leading-relaxed"><strong>{t.role === "user" ? "You" : "Companion"}:</strong> {t.text}</p>)}
+          {showTour && <nav aria-label="Program tour" className="space-y-2">{TOUR.map(item => <Link key={item.path} to={item.path} onClick={() => setOpen(false)} className="block rounded-lg border p-3 hover:bg-secondary"><strong className="block">{item.title}</strong><span className="block text-xs text-muted-foreground">{item.detail}</span></Link>)}</nav>}
           {busy && <p role="status">Thinking…</p>}
           {error && <p role="alert" className="text-destructive">{error}</p>}
         </div>
@@ -86,7 +97,7 @@ export default function GlobalDiscoveryCompanion() {
             <Button type="submit" disabled={busy || !draft.trim()}>Send</Button>
           </form>
           <div className="mt-2 flex justify-between gap-3 text-xs">
-            <button type="button" className="underline" onClick={() => { setTurns([]); setError(""); }}>Clear chat</button>
+            <button type="button" className="underline" onClick={() => { setTurns([]); setShowTour(false); setError(""); }}>Clear chat</button>
             <button type="button" className="underline" onClick={() => { const next = !disabled; setDisabled(next); localStorage.setItem("entrepalooza_companion_auto", next ? "off" : "on"); }}>{disabled ? "Enable welcome" : "Don't open automatically"}</button>
           </div>
           <p className="mt-2 text-[11px] text-muted-foreground">Messages are sent to Gemini only when you submit. This chat isn't saved to your account.</p>
