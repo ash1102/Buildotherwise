@@ -66,7 +66,7 @@ export const GO_DEEPER = {
       const outcome = String((answers || {})[answerKey("M2-L2", "outcome")] || "").trim();
       if (!NOT_TRIED_M2.includes(outcome)) return null;
       return {
-        primary: "What did you notice about yourself while planning, trying to get started, or running into barriers—not just what happened, but how you responded?",
+        primary: "What happened while planning or getting started, if anything? A barrier, a pause, or not trying yet all count.",
         followUps: [
           "Did any of your reactions surprise you?",
           "What did you find yourself drawn toward or pulling away from?",
@@ -93,18 +93,18 @@ export const GO_DEEPER = {
     ],
   },
   "M3-L2": {
-    primary: "What assumptions do you have about how you work best? Where might those assumptions have come from?",
+    primary: "What setup might make a small activity more workable for you? You can guess or leave it open.",
     followUps: [
-      "Have earlier experiences shaped what you expect from yourself?",
+      "What might you expect from this setup, even if you haven't tried it?",
       "Are there circumstances where those assumptions don't seem to fit?",
       "What would you be curious to test or understand better?",
     ],
   },
   "M3-L3": {
-    primary: "Has this experiment changed how you interpret any previous experiences? What might you want to reconsider?",
+    primary: "If you tried something, did the setup make a difference? If not, what would you want to compare someday?",
     followUps: [
-      "Have you ever attributed a difficulty entirely to yourself?",
-      "Did changing the conditions reveal any alternative explanations?",
+      "Could the conditions explain part of the difficulty?",
+      "What other explanations might fit?",
       "What remains uncertain or complicated?",
     ],
     // DRAFT (Claude): keeps the setup from becoming the whole explanation.
@@ -119,10 +119,10 @@ export const GO_DEEPER = {
     ],
   },
   "M4-L2": {
-    primary: "Is there a belief about yourself you've rarely had the opportunity to question? What would you genuinely want to understand about it?",
+    primary: "Want to test a claim or assumption? It can be about a fictional example, an everyday task, or yourself—your choice.",
     followUps: [
-      "What experiences seem to support the belief?",
-      "What experiences might complicate it?",
+      "What observations, if any, support that claim?",
+      "What might offer a different explanation?",
       "What kind of evidence might help you understand it more accurately?",
     ],
     // DRAFT (Claude): keeps the choice low-stakes.
