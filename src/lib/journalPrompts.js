@@ -47,7 +47,7 @@ export const GO_DEEPER = {
     ],
   },
   "M2-L1": {
-    primary: "Why does this possibility interest you? Does it connect to something you've experienced, wanted, avoided, or wondered about?",
+    primary: "Is there anything here you want to explore, question, or leave open? You don't need a reason or a past interest.",
     followUps: [
       "What first brought this possibility to your attention?",
       "What assumptions do you already have about it?",
@@ -55,7 +55,7 @@ export const GO_DEEPER = {
     ],
   },
   "M2-L2": {
-    primary: "What did you notice about yourself during the experience—not just what happened, but how you responded?",
+    primary: "What happened, if anything? You can write about trying, observing, planning, a barrier, or not starting yet.",
     followUps: [
       "Did your reactions surprise you?",
       "What did you find yourself drawn toward or pulling away from?",
@@ -77,7 +77,7 @@ export const GO_DEEPER = {
     },
   },
   "M2-L3": {
-    primary: "Did this experience reveal, challenge, or complicate anything you previously believed about your interests or abilities?",
+    primary: "Did anything stand out, even if you haven't tried it? 'Nothing yet' is a complete answer.",
     followUps: [
       "Was anything different from what you expected?",
       "Are there assumptions you're less certain about now?",
@@ -85,7 +85,7 @@ export const GO_DEEPER = {
     ],
   },
   "M3-L1": {
-    primary: "What patterns have you noticed in the environments or situations where you find it easier or harder to engage?",
+    primary: "Would you like to compare two different setups, or just imagine which might be easier to try? No past example needed.",
     followUps: [
       "Are there conditions that seem to affect your attention or energy?",
       "Have you noticed these patterns in different areas of your life?",
@@ -111,7 +111,7 @@ export const GO_DEEPER = {
     note: "Conditions can explain some things and not others. Both can be true at once.",
   },
   "M4-L1": {
-    primary: "What stories have you developed about yourself through your experiences? How might those stories influence the possibilities you consider?",
+    primary: "Want to examine how an event can lead to different interpretations? You can use the lesson's example instead of your own life.",
     followUps: [
       "Can you remember an experience that helped shape one of those stories?",
       "Which parts are based on events, and which parts are interpretations?",
@@ -131,7 +131,7 @@ export const GO_DEEPER = {
     earlier: { key: "M1-L3#4", label: "In Module 1, you noted a belief you hadn’t had the chance to test" },
   },
   "M4-L3": {
-    primary: "What are you beginning to understand differently about yourself? What still feels uncertain, contradictory, or unfinished?",
+    primary: "Is there a question, example, or possibility you want to carry forward? Nothing needs to have changed.",
     followUps: [
       "Did your experience support or challenge an earlier interpretation?",
       "Has your perspective changed or become more complicated?",
