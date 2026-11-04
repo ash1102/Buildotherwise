@@ -104,11 +104,11 @@ test("journal introduction, prompts, and closing stay verbatim", () => {
   );
   assert.deepEqual(CLOSING_PARAGRAPHS, [
     "You don't have to leave with a complete plan, a new identity, or a clear answer about your future.",
-    "You may have discovered an interest, questioned an assumption, noticed a pattern, or found a question worth pursuing.",
+    "You might have found something to explore, questioned an assumption, or simply looked at possibilities. Nothing needs to have changed.",
     "What you do with that information is yours to decide.",
   ]);
-  assert.match(JOURNAL_PROMPTS["M5-L1"].prompt, /^Are there patterns in the way you respond/);
-  assert.match(JOURNAL_PROMPTS["M5-L2"].prompt, /^When you think about the ways you respond/);
+  assert.match(JOURNAL_PROMPTS["M5-L1"].prompt, /^Would you like to examine/);
+  assert.match(JOURNAL_PROMPTS["M5-L2"].prompt, /^Is there anything in the example/);
   assert.match(JOURNAL_PROMPTS["M5-L3"].prompt, /^When you look back at what you've explored/);
   assert.equal(JOURNAL_PROMPTS["M5-L1"].followUps.length, 3);
   assert.equal(JOURNAL_PROMPTS["M5-L2"].followUps.length, 3);
