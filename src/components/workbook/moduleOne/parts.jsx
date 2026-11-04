@@ -24,9 +24,9 @@ export function PartFlow({ lessonCode, parts }) {
     window.requestAnimationFrame(() => {
       const element = topRef.current;
       if (!element) return;
-      const top = window.scrollY + element.getBoundingClientRect().top - 96;
-      const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
-      window.scrollTo({ top: Math.max(0, top), behavior });
+      const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
+      // Scroll the nearest scrolling container as well as the page, when applicable.
+      element.scrollIntoView({ block: "start", behavior });
       if (headingRef.current) headingRef.current.focus({ preventScroll: true });
     });
   }, [index]);
@@ -38,18 +38,18 @@ export function PartFlow({ lessonCode, parts }) {
   const part = parts[index];
 
   return (
-    <div ref={topRef} className="scroll-mt-24 space-y-5">
-      <nav aria-label="Parts of this lesson" className="overflow-x-auto pb-1">
+    <div ref={topRef} className="scroll-mt-28 space-y-5">
+      <nav aria-label="Parts of this lesson" className="max-w-full overflow-x-auto pb-2">
         <p className="mb-2 text-[13px] text-muted-faint">Tap a part to jump back to it.</p>
-        <ol className="flex min-w-[546px] gap-2 sm:min-w-0" role="list">
+        <ol className="flex w-full min-w-0 gap-2" role="list">
           {parts.map((item, i) => (
-            <li key={item.id} className="w-[74px] shrink-0 sm:min-w-0 sm:flex-1">
+            <li key={item.id} className="min-w-0 flex-1">
               <button
                 type="button"
                 onClick={() => go(i)}
                 aria-current={i === index ? "step" : undefined}
                 aria-label={`Part ${i + 1} of ${parts.length}: ${item.short}`}
-                className={`group block min-h-[58px] w-full rounded-lg border px-2 py-2 text-left transition-colors ${i === index ? "border-primary bg-primary/5" : "border-input bg-card hover:bg-secondary"}`}
+                className={`group block min-h-[58px] w-full rounded-lg border px-1 py-2 text-left transition-colors ${i === index ? "border-primary bg-primary/5" : "border-input bg-card hover:bg-secondary"}`}
               >
                 <span
                   aria-hidden="true"
