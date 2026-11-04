@@ -15,6 +15,7 @@ import {
   callGemini, extractReply, describeFailure, recentWindow as windowTurns,
 } from './gemini.js';
 import { programContext } from './knowledge.js';
+import { FACILITATOR_GUIDE } from './facilitatorGuide.js';
 
 export { thinkingLevel, redact, upstreamReason, extractReply };
 export const configuredModel = geminiModel;
@@ -81,7 +82,7 @@ export function recentWindow(turns) {
 /** The companion's instruction plus read-only program background (optionally for one module). */
 export function companionSystem(moduleSlug) {
   const background = programContext({ moduleSlug });
-  return background ? `${COMPANION_SYSTEM_INSTRUCTION}\n\n${background}` : COMPANION_SYSTEM_INSTRUCTION;
+  return [COMPANION_SYSTEM_INSTRUCTION, FACILITATOR_GUIDE, background].filter(Boolean).join("\n\n");
 }
 
 /**
