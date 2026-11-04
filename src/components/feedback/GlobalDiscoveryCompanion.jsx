@@ -3,9 +3,9 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { supabase, USE_SUPABASE } from "@/api/supabaseCompat";
 import { Button } from "@/components/ui/button";
+import { useWorkbookGate } from "@/components/WorkbookGate";
 
 const TOUR = [
-{title:"Getting Started",path:"/getting-started",detail:"An introduction to the program and how to begin."},
 {title:"Workbook modules",path:"/#workbook",detail:"Explore activities at your own pace. Modules 1–5 are open."},
 {title:"Journal",path:"/journal",detail:"Your notes and reflections."},
 {title:"Life Map",path:"/map",detail:"An optional way to notice connections."},
@@ -29,6 +29,7 @@ const pageName = (path) => {
 export default function GlobalDiscoveryCompanion() {
   const { isAuthenticated, user } = useAuth();
   const { pathname } = useLocation();
+  const gate = useWorkbookGate();
   const [open, setOpen] = useState(false);
   const [turns, setTurns] = useState([]);
   const [draft, setDraft] = useState("");
@@ -37,15 +38,15 @@ export default function GlobalDiscoveryCompanion() {
   const [disabled, setDisabled] = useState(() => localStorage.getItem("entrepalooza_companion_auto") === "off");
   const [showTour, setShowTour] = useState(false);
   useEffect(() => {
-    if (!isAuthenticated || !user?.id) { setOpen(false); setTurns([]); setShowTour(false); return; }
+    if (!isAuthenticated || !user?.id || gate.pending || !gate.finished) { setOpen(false); setTurns([]); setShowTour(false); return; }
     const key = "entrepalooza_companion_welcomed_" + user.id;
     if (!disabled && !sessionStorage.getItem(key)) {
       setOpen(true);
       sessionStorage.setItem(key, "yes");
     }
 
-  }, [isAuthenticated, user?.id, disabled]);
-  if (!USE_SUPABASE || !isAuthenticated || pathname.startsWith("/preview")) return null;
+  }, [isAuthenticated, user?.id, disabled, gate.pending, gate.finished]);
+  if (!USE_SUPABASE || !isAuthenticated || gate.pending || !gate.finished || pathname.startsWith("/preview") || pathname.startsWith("/getting-started")) return null;
 
   const send = async (message) => {
     const text = String(message || "").trim();
@@ -62,7 +63,7 @@ export default function GlobalDiscoveryCompanion() {
       const response = await fetch("/api/discoveryCompanion", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + session.access_token },
-        body: JSON.stringify({ mode: "chat", module: pathname, prompt_context: "Current program location: " + pageName(pathname) + ". Program navigation: " + TOUR.map(t => t.title + " at " + t.path + ": " + t.detail).join("; ") + ". When asked for a tour, give a real spoken walkthrough: explain what Entrepalooza is, describe Getting Started, workbook modules, Journal, Life Map, Discovery Record, and Resources, and how they fit together. Explain before asking any question. Do not just list destinations, do not divert to personal reflection, and do not pretend to navigate. Links are optional supplements.", messages: next }),
+        body: JSON.stringify({ mode: "chat", module: pathname, prompt_context: "Current program location: " + pageName(pathname) + ". Getting Started is onboarding before the program, not part of this tour. Do not send participants back there. Program navigation: " + TOUR.map(t => t.title + " at " + t.path + ": " + t.detail).join("; ") + ". When asked for a tour, give a real spoken walkthrough: explain what Entrepalooza is, describe Getting Started, workbook modules, Journal, Life Map, Discovery Record, and Resources, and how they fit together. Explain before asking any question. Do not just list destinations, do not divert to personal reflection, and do not pretend to navigate. Links are optional supplements.", messages: next }),
       });
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || "The companion couldn't respond.");
