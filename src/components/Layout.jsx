@@ -2,6 +2,7 @@ import React, { Suspense, useEffect, useRef } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { JournalProvider } from "@/components/journal/JournalContext";
 import JournalWidget from "@/components/journal/JournalWidget";
+import GlobalDiscoveryCompanion from "@/components/feedback/GlobalDiscoveryCompanion";
 import SiteHeader from "@/components/SiteHeader";
 import TabPanels from "@/components/TabPanels";
 import BackBar, { needsBackBar } from "@/components/BackBar";
@@ -86,6 +87,7 @@ export default function Layout() {
         <PullToRefresh />
         <JournalWidget />
         <GettingStartedHost />
+        <GlobalDiscoveryCompanion />
       </div>
     </JournalProvider>
   );
