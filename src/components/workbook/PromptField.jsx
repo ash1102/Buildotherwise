@@ -27,6 +27,7 @@ export default function PromptField({
   const [state, setState] = useState("idle");
   const [invitation, setInvitation] = useState(false);
   const [declined, setDeclined] = useState(false);
+  const [explore, setExplore] = useState(false);
   const timer = useRef(null);
   const valueRef = useRef(value);
   const handleRef = useRef(null);
@@ -37,6 +38,7 @@ export default function PromptField({
     setState("idle");
     setInvitation(false);
     setDeclined(false);
+    setExplore(false);
   }, [lessonCode, index]);
 
   // Leaving the step before the pause ends still writes the note, so the journal has it.
@@ -125,7 +127,7 @@ export default function PromptField({
             <p className="font-medium">Want to explore that a little further?</p>
             <p className="mt-1 text-muted-foreground">We can look at your answer together, or you can keep going. Your choice.</p>
             <div className="mt-2 flex gap-3">
-              <button type="button" className="underline underline-offset-2" onClick={() => setInvitation(false)}>Not now</button>
+              <button type="button" className="underline underline-offset-2" onClick={() => { setExplore(true); setInvitation(false); }}>Explore together</button>
               <button type="button" className="underline underline-offset-2" onClick={() => { setDeclined(true); setInvitation(false); }}>Keep going</button>
             </div>
           </div>
@@ -139,6 +141,7 @@ export default function PromptField({
             lessonCode={lessonCode}
             promptId={index}
             getText={() => valueRef.current}
+            openOnInvite={explore}
           />
         ) : (
           <span />
