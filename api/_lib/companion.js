@@ -12,7 +12,7 @@ import { COMPANION_SYSTEM_INSTRUCTION } from './prompts.js';
 import { json, HOUR_MS } from './http.js';
 import {
   API_BASE, geminiKey, geminiModel, thinkingLevel, redact, upstreamReason, fetchWithTimeout,
-  callGemini, extractReply, describeFailure, recentWindow as windowTurns,
+  callGemini, extractReply, describeFailure, discoverGeminiModel, recentWindow as windowTurns,
 } from './gemini.js';
 import { programContext } from './knowledge.js';
 import { FACILITATOR_GUIDE } from './facilitatorGuide.js';
@@ -114,7 +114,12 @@ export async function handleCompanion({ rawBody, auth, env, fetchImpl }) {
 
     if (rateLimited(auth.user.id)) return json({ error: 'Too many requests this hour. Try again later.' }, 429);
 
-    const model = configuredModel(env);
+    const preferredModel = configuredModel(env);
+    let discovery;
+    try { discovery = await discoverGeminiModel(fetchImpl, apiKey, preferredModel); }
+    catch { return json({ ok: false, error: 'Could not check Gemini model availability.' }, 503); }
+    if (!discovery.model) return json({ ok: false, error: discovery.status === 200 ? 'No compatible Gemini models were returned for this key.' : 'Gemini model access check failed.', upstream_status: discovery.status }, 503);
+    const model = discovery.model;
 
     if (mode === 'health') {
       let available = false;
