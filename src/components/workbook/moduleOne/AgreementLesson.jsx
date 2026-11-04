@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, Copy } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import PromptField from "../PromptField";
 import PrivacyNote from "../PrivacyNote";
 import { BridgeOut } from "../ModuleBridge";
@@ -157,7 +157,7 @@ function agreementLines(answers) {
     { label: "How I’ll approach it", value: readAnswer(answers, "M1-L3", "approach") },
     { label: "What makes it workable", value: support.join(", ") },
     { label: "In my words", value: supportOther },
-    { label: "When I’ll revisit this", value: readAnswer(answers, "M1-L3", "revisit") },
+    { label: "Check-in, if I chose one", value: readAnswer(answers, "M1-L3", "revisit") },
   ];
   return lines.filter((line) => line.value);
 }
@@ -166,17 +166,6 @@ function PartAgreement({ answers }) {
   const lines = agreementLines(answers);
   const earlier = readAgreement(answers);
   const hasEarlier = earlier.why || earlier.approach || earlier.note;
-  const [copied, setCopied] = useState(false);
-  const copy = async () => {
-    const text = ["My Way Forward", ...lines.map((line) => `${line.label}: ${line.value}`)].join("\n");
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* copying isn't available here; the agreement is still saved */
-    }
-  };
   return (
     <div className="space-y-5">
       <Panel tone="yours" label="My Way Forward">
@@ -190,21 +179,11 @@ function PartAgreement({ answers }) {
             ))}
           </dl>
         ) : (
-          <p className="text-[15px] text-muted-foreground">Nothing chosen yet. You can leave My Way Forward open and return whenever you want.</p>
+          <p className="text-[15px] text-muted-foreground">Nothing chosen yet. You can move on or leave this open.</p>
         )}
         <p className="text-[14px] text-muted-faint">
-          This is your way forward for now—not a contract or a promise. You can change any answer, leave things open, or choose a different direction.
+          These are choices for now. You can change direction, pause, or leave anything open.
         </p>
-        {lines.length ? (
-          <button
-            type="button"
-            onClick={copy}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-input bg-card px-4 text-[15px] font-medium text-foreground hover:bg-secondary"
-          >
-            {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
-            {copied ? "Copied" : "Copy My Way Forward"}
-          </button>
-        ) : null}
       </Panel>
       {hasEarlier ? (
         <details className="rounded-xl border border-border bg-card p-4">
@@ -224,7 +203,7 @@ function PartAgreement({ answers }) {
         </P>
         <P>Your choices, boundaries, and privacy matter.</P>
         <P>We’ll distinguish support that is available from support that is still being developed.</P>
-        <P>My Way Forward can change with you. You can pause, come back, or decide something isn’t for you.</P>
+        <P>You can revise your starting point, change direction, pause, or decide something isn’t for you.</P>
       </Panel>
     </div>
   );
@@ -239,7 +218,7 @@ function PartClose({ lesson, answers }) {
           lessonCode={lesson.code}
           lessonTitle={lesson.title}
           index={4}
-          label="What’s one thing you believe about yourself that you haven’t had the opportunity to test?"
+          label="Is there something small you’d be curious to try or learn more about? (optional)"
           variant="inline"
         />
         <p className="text-[14px] leading-relaxed text-muted-faint">
@@ -316,11 +295,11 @@ export default function AgreementLesson({ lesson }) {
       content: (
         <div className="space-y-8">
           <section className="space-y-3">
-            <h3 className="text-[19px] font-semibold text-foreground">When might you want to revisit My Way Forward?</h3>
+            <h3 className="text-[19px] font-semibold text-foreground">Would a check-in be useful later?</h3>
             <ChoicePart
               lesson={lesson} answers={answers} answerKeyName="revisit"
               legend="Pick one." options={REVISIT_OPTIONS}
-              journalLabel="When I want to revisit My Way Forward"
+              journalLabel="When I might check in"
             />
           </section>
           <section className="border-t border-border pt-6">

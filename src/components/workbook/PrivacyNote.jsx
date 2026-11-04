@@ -17,7 +17,7 @@ export default function PrivacyNote({ children }) {
         <Lock className="h-3.5 w-3.5 text-accent-ink" aria-hidden="true" />
       </span>
       <span>
-        {children || "Saved to your account. Other participants can’t see it. Build Otherwise runs this app, so our team can see what’s stored on it. Your entries stay private unless you choose to share them."}
+        {children || "Saved to your account. Other participants can’t see it. Build Otherwise’s team can access it. It’s shared only if you choose to share it."}
       </span>
     </p>
   );

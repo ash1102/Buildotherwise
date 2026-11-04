@@ -76,7 +76,7 @@ npm run test:all
 
 ## Deploy
 
-The Vercel project is `entrepalooza-workbook`. `vercel.json` builds with `npm run build`, serves `dist`, and sends non-API routes to `index.html`. The database is Supabase.
+The Vercel project is `entrepalooza-workbook`. `vercel.json` builds with `npm run build` and serves `dist`. A request for an `api/` file that exists in this repo, such as answer feedback, stays on Vercel. Any other `/api` path is proxied to the hosted Base44 app, which is what sign-in uses. Every other path falls back to `index.html`. The database is Supabase.
 
 Schema and seed live in `migration/supabase/schema.sql` and `migration/supabase/seed.sql`. Regenerate them from the Base44 entities and the content export:
 

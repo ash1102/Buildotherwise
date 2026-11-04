@@ -87,8 +87,8 @@ const AuthenticatedApp = () => {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     }
-    // Let signed-out visitors use public routes and email/password login.
-    // ProtectedRoute redirects private pages to the in-app login.
+    // An unauthenticated visitor may still use the public pages and the
+    // app's email/password login. ProtectedRoute handles private pages.
   }
 
   // Render the main app

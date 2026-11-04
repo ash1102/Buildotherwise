@@ -17,34 +17,34 @@ import { answerKey } from "./workbook";
 export const GO_DEEPER_KEY = "go-deeper";
 
 export const JOURNAL_INTRO =
-  "You don't have to answer every question. Start wherever something catches your attention. You can explore a memory, question an assumption, disagree with an idea, or follow a thought somewhere unexpected.";
+  "This is an optional space to write, ask a question, or disagree with something here. You can skip it or leave it blank; it does not need to be personal.";
 
 const NOT_TRIED_M2 = ["I haven’t tried it yet.", "I ran into a barrier."];
 
 export const GO_DEEPER = {
   "M1-L1": {
-    primary: "What catches your attention, and what do you think draws you toward it? Have you noticed similar interests or patterns elsewhere in your life?",
+    primary: "Is there anything from this lesson you want to keep exploring? A question, an observation, “nothing yet,” or a blank space are all fine.",
     followUps: [
-      "Can you remember an earlier experience that connects to this interest?",
-      "What feels interesting about it, even if you don't know why?",
-      "Is there something you've been curious about but haven't had the chance to explore?",
+      "Would you like to keep a question from this lesson?",
+      "Is there a possibility you might want to look at again?",
+      "Would you rather leave this here for now?",
     ],
   },
   "M1-L2": {
-    primary: "When have you felt genuinely interested in something? How did that interest develop, change, or disappear?",
+    primary: "Was there a point in this lesson you want to think through, question, or leave behind?",
     followUps: [
-      "Did your interest grow through experience, or was it immediate?",
-      "Have you ever lost interest in something you once enjoyed?",
-      "What does that suggest about the way your interests can change?",
+      "Which explanation seems useful to you, if any?",
+      "Did anything in the examples seem incomplete or different from your experience?",
+      "Would you rather move on without adding anything?",
       "Have you ever become curious about or good at something because of a difficult experience—even if you wouldn’t choose to go through it again?",
     ],
   },
   "M1-L3": {
-    primary: "What have past experiences taught you about how you learn, what helps you participate, and what makes learning difficult?",
+    primary: "What, if anything, do you want to take with you from this lesson? It could be a practical preference, an open question, or nothing.",
     followUps: [
-      "When have you felt comfortable exploring something unfamiliar?",
-      "What kinds of support or freedom have helped you learn?",
-      "What might you want to approach differently this time?",
+      "What might make an activity easier to try, if you choose to?",
+      "Is there a limit or support you would want to keep in mind?",
+      "Would you rather leave your next step open?",
     ],
   },
   "M2-L1": {

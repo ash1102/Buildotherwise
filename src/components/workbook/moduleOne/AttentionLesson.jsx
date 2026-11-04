@@ -96,7 +96,8 @@ function PartReading() {
 function PartYours({ lesson, answers }) {
   const lens = readAnswer(answers, lesson.code, "lens");
   const reasons = splitMulti(readAnswer(answers, lesson.code, "reasons"));
-  const fictional = lens === LENS_OPTIONS[1] || lens === "I'll use Alex or Sam instead";
+  const fictional =
+    lens === LENS_OPTIONS[1] || lens === "I'll use Alex or Sam instead" || lens === "I'll use Jordan or Riley instead";
   return (
     <div className="space-y-6">
       <P>

@@ -67,7 +67,7 @@ export const WHY_CHOICES = [
 ];
 export const APPROACH_CHOICES = ["I want to take my time.", "I want to try one thing at a time.", "I'm not sure yet, and that's okay."];
 export const AGREEMENT_PERMISSION =
-  "I don’t have to have it all figured out. I can show up as I am, try what makes sense to me, ask questions, change my mind, take a break, or come back later. This is my experience, and I get a say in how it goes.";
+  "You can explore, change direction, pause, or stop. You do not need to explain your choice.";
 
 /** "Something else — my words" reads back as the choice plus the typed words. */
 export function splitWhy(value) {
@@ -96,7 +96,7 @@ export function readAgreement(answers) {
   return { why: whyDisplay(get(AGREEMENT_WHY)), approach: get(AGREEMENT_APPROACH), note: get(AGREEMENT_NOTE) };
 }
 
-/** The copy-button text. Lines nobody filled in are left out. */
+/** Plain text of these notes. Lines nobody filled in are left out. */
 export function agreementText({ why, approach, note }) {
   const lines = ["My Way Forward"];
   if (why) lines.push(`Why I'm here: ${why}`);

@@ -109,7 +109,7 @@ export default function GettingStartedPage() {
           <p className="workbook-label">Your earlier answers</p>
           <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
             These steps used to be part of Getting Started. They aren’t needed anymore, but what you saved is still
-            here. Your learning agreement now lives in Module 1, Lesson 3.
+            here. My Way Forward is in Module 1, Lesson 3.
           </p>
           <ul className="mt-3 space-y-2">
             {earlier.map((lesson) => (

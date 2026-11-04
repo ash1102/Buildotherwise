@@ -88,10 +88,10 @@ function PartNotice({ lesson, answers }) {
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <P>Think about the last few days.</P>
+        <P>You can start with something current, familiar, or unfamiliar—or with nothing that comes to mind.</P>
         <P>
-          Maybe something made you curious. Maybe something irritated you. Maybe you noticed somebody doing something and
-          wondered how they learned.
+          A question, a problem, something you already know, or a new possibility can all be starting points. You do not
+          need to enjoy something for it to be worth exploring.
         </P>
         <P>You don’t have to love something for it to be worth exploring.</P>
       </div>
@@ -101,7 +101,7 @@ function PartNotice({ lesson, answers }) {
         value={route}
         onChange={(next) => recordAnswer(lesson, "notice-route", next, "What feels closest to something you've noticed?")}
       />
-      {option ? (
+      {option?.prompt ? (
         <div aria-live="polite">
           <PromptField
             lessonCode={lesson.code}
@@ -188,51 +188,27 @@ function PartReading() {
   return (
     <div className="space-y-4">
       <Panel tone="reading">
-        {/* DRAFT (Claude): the spec's opening and points, joined to sentences kept from the
-            published reading "How Interests Begin". The original stays unchanged in the Library. */}
-        <P>A few minutes ago, you encountered possibilities you may never have thought about. That’s one way interests can begin.</P>
+        <P>Some things become interesting only after you encounter them, get access, or learn how they work.</P>
         <P>
-          People are often told to find their passion, as though it already exists in finished form. But nobody is born
-          knowing every interest they will develop. Some things only become interesting once you have access to them, meet
-          people involved in them, or learn enough to see what is possible.
+          Curiosity can grow, change, fade, or stay small. It does not have to become a job, a business, or a lifelong
+          identity.
         </P>
-        <P>
-          Exposure, experience, conversation, practice, and opportunity can all introduce new possibilities. Once
-          something catches your attention, the interest can grow stronger as you come back to it, learn more, and find
-          out whether it matters to you.
-        </P>
-        <P>
-          But initial curiosity doesn’t guarantee a lasting passion. Some interests fade. Others change direction. Some
-          become personally meaningful over time. All of that is part of exploring.
-        </P>
-        <P>Not everything important has to become a job, business, or lifelong identity. An interest can enrich your life without becoming a plan.</P>
-        <div className="rounded-lg bg-secondary p-3 sm:p-4">
-          <p className="text-[15px] leading-relaxed text-foreground">
-            <strong>Research connection:</strong> Hidi and Renninger’s four-phase model describes how interest may develop
-            from triggered situational interest toward more enduring individual interest. It is a developmental model, not
-            a promise about any one person’s future.
-          </p>
-          <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+        <P>Hidi and Renninger describe one possible path for interest to develop—not a path everyone follows.</P>
+      </Panel>
+      <details className="rounded-xl border border-border bg-card p-4 sm:p-5">
+        <summary className="cursor-pointer text-[16px] font-medium text-foreground">Research and reading (optional)</summary>
+        <div className="mt-3 space-y-3">
+          <P>
+            Their four-phase model describes triggered situational interest, maintained situational interest, emerging
+            individual interest, and well-developed individual interest. The phases describe possibilities, not a
+            prediction about any one person.
+          </P>
+          <p className="text-[14px] leading-relaxed text-muted-foreground">
             Hidi, S., &amp; Renninger, K. A. (2006). The four-phase model of interest development.{" "}
             <em>Educational Psychologist, 41</em>(2), 111–127.
           </p>
-        </div>
-      </Panel>
-      <details className="rounded-xl border border-border bg-card p-4 sm:p-5">
-        <summary className="cursor-pointer text-[16px] font-medium text-foreground">Go deeper into the research (optional)</summary>
-        <div className="mt-3 space-y-3">
-          {/* DRAFT (Claude): summary of the cited article. Needs Ashley's review. */}
-          <P>
-            The model names four phases: triggered situational interest, maintained situational interest, emerging
-            individual interest, and well-developed individual interest.
-          </P>
-          <P>
-            In the model, other people, the setting, and chances to come back to something can all help an interest
-            develop. Without that kind of support, an interest can fade.
-          </P>
-          <P>The phases describe a possible path. They don’t mean everyone follows the same one, or that every early curiosity becomes a passion.</P>
           <Link to="/program-library" className="inline-flex items-center gap-1.5 text-[15px] font-medium text-accent-ink underline underline-offset-2">
-            Read the original “How Interests Begin” in the Library
+            Read “How Interests Begin” in the Library
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
@@ -248,6 +224,10 @@ function PartLook({ lesson, answers }) {
   const encounterIds = selectedEncounterIds(readAnswer(answers, lesson.code, "encounter"));
   const encounterCards = ENCOUNTER_CARDS.filter((card) => encounterIds.includes(card.id));
   const anything = text || map || encounterCards.length || route;
+  const nothingYet = route === NOTICE_OPTIONS.find((item) => item.id === "nothing-yet")?.label;
+  const savedConnection = readAnswer(answers, lesson.code, "connection");
+  const savedNote = readAnswer(answers, lesson.code, "stood-out");
+  const showNote = (!savedConnection && !nothingYet) || (savedConnection && savedNote);
   return (
     <div className="space-y-5">
       {anything ? (
@@ -281,26 +261,39 @@ function PartLook({ lesson, answers }) {
           Nothing is saved from earlier in this lesson. You can go back, answer from memory below, or leave it.
         </p>
       )}
-      {encounterCards.length && (text || map) ? <Panel tone="note" title="Could there be a connection?">
-        <P>You noticed something in your experience and selected {encounterCards.map(card => card.title).join(", ")}. They might connect, or they might not. You decide.</P>
-        <PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index="connection" label="A connection or question worth exploring (optional)" variant="inline" />
-      </Panel> : null}
-      {readAnswer(answers, lesson.code, "connection") ? (
-        <Panel tone="note" title="You have a thought worth keeping">
-          <P>You’ve already put something into words. You don’t need to answer another question about it. You can carry it forward, keep exploring, or change your mind.</P>
+      {encounterCards.length && (text || map) ? (
+        <Panel tone="note" title="Could there be a connection?">
+          <P>
+            You noticed something in your experience and selected {encounterCards.map((card) => card.title).join(", ")}. They
+            might connect, or they might not. You decide.
+          </P>
+          <PromptField
+            lessonCode={lesson.code}
+            lessonTitle={lesson.title}
+            index="connection"
+            label="A connection or question worth exploring (optional)"
+            variant="inline"
+          />
         </Panel>
-      ) : (
-        <div className="space-y-3">
-          <P>After exploring these possibilities, is there anything you’d like to understand or try next?</P>
-          <p className="text-[15px] text-muted-foreground">A thought, question, or idea is enough. You can also leave this blank.</p>
-        </div>
-      )}
-      {(!readAnswer(answers, lesson.code, "connection") || readAnswer(answers, lesson.code, "stood-out")) ? (
+      ) : null}
+      {savedConnection ? (
+        <Panel tone="note" title="You have a thought worth keeping">
+          <P>
+            You’ve already put something into words. You don’t need to answer another question about it. You can carry it
+            forward, keep exploring, or change your mind.
+          </P>
+        </Panel>
+      ) : nothingYet ? (
+        <p className="text-[15px] leading-relaxed text-muted-foreground">
+          You already said nothing comes to mind. That is a complete answer; continue, go back, or leave this open.
+        </p>
+      ) : null}
+      {showNote ? (
         <PromptField
           lessonCode={lesson.code}
           lessonTitle={lesson.title}
           index="stood-out"
-          label={readAnswer(answers, lesson.code, "stood-out") ? "Another thought you saved (optional)" : "Anything you want to explore further? (optional)"}
+          label="What, if anything, would you like to note here? (optional)"
           variant="inline"
         />
       ) : null}

@@ -26,11 +26,11 @@
 export const RETIRED_GS_CODES = ["O.2"];
 
 export const PENDING_LESSON_CONTENT = {
-  // M1-L3: ensure a previously cached or stale lesson row cannot reinstate the retired title.
+  // M1-L3: a cached lesson row must not bring back an older title.
   "M1-L3": {
     title: "My Way Forward",
-    description: "Choose how you want to explore next, what might help, and what you want to leave open. You can change your mind as you go.",
-    purpose: "Choose how you want to explore next, what might help, and what you want to leave open. You can change your mind as you go.",
+    description: "Choose how you might approach Module 2. You can leave any part open, change your mind, or decide not to continue.",
+    purpose: "Choose how you might approach Module 2. You can leave any part open, change your mind, or decide not to continue.",
   },
 };
 
