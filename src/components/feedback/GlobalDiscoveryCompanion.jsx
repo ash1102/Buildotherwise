@@ -12,6 +12,13 @@ const TOUR = [
 {title:"Discovery Record",path:"/record",detail:"Discoveries you choose to keep."},
 {title:"Resources",path:"/program-library",detail:"Explore program materials."}
 ];
+const SECTION_INTROS = {
+  "/": "This is your program home. The workbook modules are here. You can explore activities at your own pace, revisit them, and choose what to try next. There is no required order or deadline.",
+  "/journal": "This is your Journal. It's a private space to write down thoughts or observations as you go. You can use it however you like; nothing needs to become a formal discovery.",
+  "/map": "This is your Life Map. It's an optional way to see connections among experiences, interests, and possibilities. It isn't a test or a fixed picture of who you are.",
+  "/record": "Welcome to your Discovery Record. Workbook answers stay in the steps where you wrote them. This page is different: it holds only the discoveries you choose to carry forward. You can add one here or save one from Discovery on your dashboard, revisit it, change it, or try something related. Nothing is added automatically. Since you're looking around, you don't need to fill anything out. Ask me about any part of this page, or we can keep exploring.",
+  "/program-library": "This is the Program Library, where you can browse supporting materials and resources. You can explore them when they are useful; you don't have to read everything before moving on."
+};
 const wantsTour = text => /show me around|give me a tour|tour of|where (do|should|can) i start|completely new|new here|how (do|does) (i|this) (start|work)/i.test(text);
 const welcome = "Welcome to Entrepalooza. I'm your AI Discovery Companion. I can show you around, explain activities, or talk through ideas with you. You decide how much help you want. Would you like a quick introduction, or would you rather explore on your own?";
 const pageName = (path) => {
@@ -48,6 +55,12 @@ export default function GlobalDiscoveryCompanion() {
   }, [isAuthenticated, user?.id, disabled, gate.pending, gate.finished]);
   if (!USE_SUPABASE || !isAuthenticated || gate.pending || !gate.finished || pathname.startsWith("/preview") || pathname.startsWith("/getting-started")) return null;
 
+  const visitSection = (item) => {
+    setShowTour(true);
+    setOpen(true);
+    setTurns(prev => [...prev, { role: "model", text: SECTION_INTROS[item.path === "/#workbook" ? "/" : item.path] || "We’re here. Ask me about what you see, or we can continue the tour." }]);
+  };
+
   const send = async (message) => {
     const text = String(message || "").trim();
     if (!text || busy) return;
@@ -63,7 +76,7 @@ export default function GlobalDiscoveryCompanion() {
       const response = await fetch("/api/discoveryCompanion", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + session.access_token },
-        body: JSON.stringify({ mode: "chat", module: pathname, prompt_context: "Current program location: " + pageName(pathname) + ". Getting Started is onboarding before the program, not part of this tour. Do not send participants back there. Program navigation: " + TOUR.map(t => t.title + " at " + t.path + ": " + t.detail).join("; ") + ". When asked for a tour, give a real spoken walkthrough: explain what Entrepalooza is, describe Getting Started, workbook modules, Journal, Life Map, Discovery Record, and Resources, and how they fit together. Explain before asking any question. Do not just list destinations, do not divert to personal reflection, and do not pretend to navigate. Links are optional supplements.", messages: next }),
+        body: JSON.stringify({ mode: "chat", module: pathname, prompt_context: "Current program location: " + pageName(pathname) + ". Getting Started is onboarding before the program, not part of this tour. Do not send participants back there. Program navigation: " + TOUR.map(t => t.title + " at " + t.path + ": " + t.detail).join("; ") + ". When asked for a tour, give a real spoken walkthrough: explain what Entrepalooza is, describe workbook modules, Journal, Life Map, Discovery Record, and Resources, and how they fit together. Explain before asking any question. Do not just list destinations, do not divert to personal reflection, and do not pretend to navigate. Links are optional supplements.", messages: next }),
       });
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || "The companion couldn't respond.");
@@ -83,7 +96,7 @@ export default function GlobalDiscoveryCompanion() {
         <div className="flex-1 space-y-3 overflow-y-auto p-4 text-sm" aria-live="polite">
           <p><strong>Companion:</strong> {welcome}</p>
           {turns.map((t, i) => <p key={i} className="leading-relaxed"><strong>{t.role === "user" ? "You" : "Companion"}:</strong> {t.text}</p>)}
-          {showTour && <details className="rounded-lg border p-3 text-xs"><summary className="cursor-pointer font-semibold">Open a program section (optional)</summary><nav aria-label="Program links" className="mt-2 space-y-2">{TOUR.map(item => <Link key={item.path} to={item.path} onClick={() => setOpen(false)} className="block rounded border p-2 hover:bg-secondary"><strong className="block">{item.title}</strong><span className="block text-muted-foreground">{item.detail}</span></Link>)}</nav></details>}
+          {showTour && <details className="rounded-lg border p-3 text-xs"><summary className="cursor-pointer font-semibold">Open a program section (optional)</summary><nav aria-label="Program links" className="mt-2 space-y-2">{TOUR.map(item => <Link key={item.path} to={item.path} onClick={() => visitSection(item)} className="block rounded border p-2 hover:bg-secondary"><strong className="block">{item.title}</strong><span className="block text-muted-foreground">{item.detail}</span></Link>)}</nav></details>}
           {busy && <p role="status">Thinking…</p>}
           {error && <p role="alert" className="text-destructive">{error}</p>}
         </div>
