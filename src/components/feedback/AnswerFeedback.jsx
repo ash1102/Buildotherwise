@@ -17,9 +17,10 @@ const MIN_CHARS = 10;
  * Nothing is sent unless they tap the button. On Vercel the reply comes from Gemini.
  * Feedback is saved on their account and can be deleted.
  */
-export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, lessonCode = "", promptId = "", getText, className = "" }) {
+export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, lessonCode = "", promptId = "", getText, className = "", openOnInvite = false }) {
   const { isAuthenticated, navigateToLogin } = useAuth();
   const [open, setOpen] = useState(false);
+  useEffect(() => { if (openOnInvite) setOpen(true); }, [openOnInvite]);
   const [items, setItems] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
