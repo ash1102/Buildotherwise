@@ -25,6 +25,8 @@ export default function PromptField({
 }) {
   const [value, setValue] = useState(() => getAnswer(lessonCode, index));
   const [state, setState] = useState("idle");
+  const [invitation, setInvitation] = useState(false);
+  const [declined, setDeclined] = useState(false);
   const timer = useRef(null);
   const valueRef = useRef(value);
   const handleRef = useRef(null);
@@ -33,6 +35,8 @@ export default function PromptField({
   useEffect(() => {
     setValue(getAnswer(lessonCode, index));
     setState("idle");
+    setInvitation(false);
+    setDeclined(false);
   }, [lessonCode, index]);
 
   // Leaving the step before the pause ends still writes the note, so the journal has it.
@@ -89,6 +93,7 @@ export default function PromptField({
       });
       // "Saved" is only shown once the words really read back from the browser's storage.
       setState(String(getAnswer(lessonCode, index)) === String(next) ? "saved" : "error");
+      if (!declined && next.trim().length >= 10) setInvitation(true);
       if (onSaved) onSaved();
     }, 650);
   };
@@ -115,6 +120,16 @@ export default function PromptField({
         }`}
       />
       <div className="mt-2 flex flex-wrap items-start justify-between gap-2">
+        {!compact && String(value || "").trim().length >= 10 && invitation && !declined ? (
+          <div className="w-full rounded-lg border border-border bg-card p-3 text-sm" role="group" aria-label="Optional discovery invitation">
+            <p className="font-medium">Want to explore that a little further?</p>
+            <p className="mt-1 text-muted-foreground">We can look at your answer together, or you can keep going. Your choice.</p>
+            <div className="mt-2 flex gap-3">
+              <button type="button" className="underline underline-offset-2" onClick={() => setInvitation(false)}>Not now</button>
+              <button type="button" className="underline underline-offset-2" onClick={() => { setDeclined(true); setInvitation(false); }}>Keep going</button>
+            </div>
+          </div>
+        ) : null}
         {!compact && String(value || "").trim().length >= 10 ? (
           <AnswerFeedback
             className="min-w-0 flex-1"
