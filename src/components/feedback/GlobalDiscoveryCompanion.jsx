@@ -50,7 +50,7 @@ export default function GlobalDiscoveryCompanion() {
   const send = async (message) => {
     const text = String(message || "").trim();
     if (!text || busy) return;
-    if (wantsTour(text)) { setShowTour(true); setTurns(prev => [...prev, { role: "user", text }, { role: "model", text: "Here is a tour of the actual program. You can open any of these sections. Getting Started is an easy place to begin, but you decide where to go." }]); setDraft(""); return; }
+    if (wantsTour(text)) setShowTour(true);
     const next = [...turns, { role: "user", text }];
     setTurns(next);
     setDraft("");
@@ -62,7 +62,7 @@ export default function GlobalDiscoveryCompanion() {
       const response = await fetch("/api/discoveryCompanion", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + session.access_token },
-        body: JSON.stringify({ mode: "chat", module: pathname, prompt_context: "Current program location: " + pageName(pathname) + ". Program navigation: " + TOUR.map(t => t.title + " at " + t.path + ": " + t.detail).join("; ") + ". Answer navigation requests with actual sections and routes, not reflection questions.", messages: next }),
+        body: JSON.stringify({ mode: "chat", module: pathname, prompt_context: "Current program location: " + pageName(pathname) + ". Program navigation: " + TOUR.map(t => t.title + " at " + t.path + ": " + t.detail).join("; ") + ". When asked for a tour, give a real spoken walkthrough: explain what Entrepalooza is, describe Getting Started, workbook modules, Journal, Life Map, Discovery Record, and Resources, and how they fit together. Explain before asking any question. Do not just list destinations, do not divert to personal reflection, and do not pretend to navigate. Links are optional supplements.", messages: next }),
       });
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || "The companion couldn't respond.");
@@ -82,7 +82,7 @@ export default function GlobalDiscoveryCompanion() {
         <div className="flex-1 space-y-3 overflow-y-auto p-4 text-sm" aria-live="polite">
           <p><strong>Companion:</strong> {welcome}</p>
           {turns.map((t, i) => <p key={i} className="leading-relaxed"><strong>{t.role === "user" ? "You" : "Companion"}:</strong> {t.text}</p>)}
-          {showTour && <nav aria-label="Program tour" className="space-y-2">{TOUR.map(item => <Link key={item.path} to={item.path} onClick={() => setOpen(false)} className="block rounded-lg border p-3 hover:bg-secondary"><strong className="block">{item.title}</strong><span className="block text-xs text-muted-foreground">{item.detail}</span></Link>)}</nav>}
+          {showTour && <details className="rounded-lg border p-3 text-xs"><summary className="cursor-pointer font-semibold">Open a program section (optional)</summary><nav aria-label="Program links" className="mt-2 space-y-2">{TOUR.map(item => <Link key={item.path} to={item.path} onClick={() => setOpen(false)} className="block rounded border p-2 hover:bg-secondary"><strong className="block">{item.title}</strong><span className="block text-muted-foreground">{item.detail}</span></Link>)}</nav></details>}
           {busy && <p role="status">Thinking…</p>}
           {error && <p role="alert" className="text-destructive">{error}</p>}
         </div>
