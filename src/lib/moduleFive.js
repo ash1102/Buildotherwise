@@ -50,7 +50,7 @@ export const JOURNAL_INTRO =
 
 export const CLOSING_PARAGRAPHS = [
   "You don't have to leave with a complete plan, a new identity, or a clear answer about your future.",
-  "You may have discovered an interest, questioned an assumption, noticed a pattern, or found a question worth pursuing.",
+  "You might have found something to explore, questioned an assumption, or simply looked at possibilities. Nothing needs to have changed.",
   "What you do with that information is yours to decide.",
 ];
 
@@ -185,7 +185,7 @@ export const JOURNAL_PROMPTS = {
   "M5-L1": {
     kicker: "Go deeper",
     prompt:
-      "Are there patterns in the way you respond to situations that you've noticed throughout your life? How have those patterns helped you, complicated things, or changed over time?",
+      "Would you like to examine one of the pattern examples, or something you noticed? You can leave this open.",
     followUps: [
       "Have you ever viewed a characteristic of yours as entirely negative or entirely positive?",
       "Does the same characteristic show up differently depending on the situation?",
@@ -195,7 +195,7 @@ export const JOURNAL_PROMPTS = {
   "M5-L2": {
     kicker: "Go deeper",
     prompt:
-      "When you think about the ways you respond to challenges, opportunities, or strong interests, what parts of yourself would you want to preserve? Are there parts you'd like more choice over?",
+      "Is there anything in the example or your own notes you would keep, adjust, or leave undecided?",
     followUps: [
       "Have you ever tried to change something about yourself that also served an important purpose?",
       "What would a more sustainable version of that pattern look like?",
@@ -205,7 +205,7 @@ export const JOURNAL_PROMPTS = {
   "M5-L3": {
     kicker: "Looking back",
     prompt:
-      "When you look back at what you've explored, questioned, and experienced, what stands out to you? Has anything changed in how you understand yourself, your possibilities, or the direction you might want to take?",
+      "Looking back, is there anything worth keeping, questioning, or leaving open? 'Nothing yet' is also a complete response.",
     followUps: [
       "What surprised you about the process?",
       "Was there anything you resisted, disagreed with, or found unhelpful?",
@@ -355,7 +355,7 @@ export const JOURNEY_GROUPS = [
     about: "A condition you investigated",
     items: [
       { key: "M3-L1#1", label: "A part of the setup you described" },
-      { key: "M3-L2#0", label: "The condition you considered changing" },
+      { key: "M3-L2#0", label: "What you recorded about the setup" },
       { key: "M3-L3#0", label: "The task and condition you tried" },
       { key: "M3-L3#1", label: "What changed" },
     ],
