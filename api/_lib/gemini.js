@@ -28,7 +28,7 @@ export async function discoverGeminiModel(fetchImpl, apiKey, preferred) {
   if (!response.ok) return { model: null, status: response.status };
   const data = await response.json();
   const available = (data.models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
-    .map(m => String(m.name || '').replace(/^models\\//, ''));
+    .map(m => String(m.name || '').replace('models/', ''));
   const candidates = [preferred, 'gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemini-2.0-flash-lite', 'gemini-2.0-flash'];
   const model = candidates.find(name => available.includes(name)) || available.find(name => /flash/i.test(name)) || available[0] || null;
   return { model, status: response.status };
