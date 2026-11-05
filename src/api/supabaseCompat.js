@@ -214,7 +214,7 @@ const auth = {
     }));
   },
   async register({ email, password }) {
-    return unwrap(await supabase.auth.signUp({ email, password }));
+    return unwrap(await supabase.auth.signUp({ email, password, options: { emailRedirectTo: new URL('/login', window.location.origin).href } }));
   },
   /** The sign-up email carries a 6-digit code (Supabase "Confirm signup" template uses {{ .Token }}). */
   async verifyOtp({ email, otpCode }) {
