@@ -172,6 +172,15 @@ function PartCondition({ answers }) {
               </button>
             );
           })}
+          <button
+            type="button"
+            aria-pressed={x.condition === "unsure"}
+            onClick={() => record("condition", "unsure", "The condition I’ll change")}
+            className={`min-h-[56px] w-full rounded-lg border px-4 py-3 text-left text-[16px] font-medium ${x.condition === "unsure" ? "border-accent-ink bg-accent-ink text-primary-foreground" : "border-input bg-card text-foreground hover:bg-secondary"}`}
+          >
+            Not sure yet — keep looking
+          </button>
+          {x.condition === "unsure" ? <p className="text-[15px] text-muted-foreground">You can continue without choosing a condition or doing another experiment.</p> : null}
         </div>
       </fieldset>
       <Panel tone="note">

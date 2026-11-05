@@ -10,6 +10,7 @@ import AuthLayout from "@/components/AuthLayout";
 import { toast } from "@/components/ui/use-toast";
 import { safeReturnTo } from "@/lib/authReturnTo";
 import { destinationAfterAuth } from "@/lib/destinationAfterAuth";
+import { USE_SUPABASE } from "@/api/supabaseCompat";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -59,8 +60,8 @@ export default function Register() {
     try {
       await base44.auth.resendOtp(email);
       toast({
-        title: "Code sent",
-        description: "Check your email for the new code.",
+        title: "Verification email sent",
+        description: "Check your email for a confirmation link or code.",
       });
     } catch (err) {
       setError(err.message || "Failed to resend code");
@@ -72,13 +73,14 @@ export default function Register() {
       <AuthLayout
         icon={Mail}
         title="Verify your email"
-        subtitle={`We sent a code to ${email}`}
+        subtitle={USE_SUPABASE ? `Check ${email} for your confirmation link or a 6-digit code.` : `We sent a code to ${email}`}
       >
         {error && (
           <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
             {error}
           </div>
         )}
+        {USE_SUPABASE && <p className="mb-4 text-sm text-muted-foreground">If your email contains a confirmation link, open it instead of entering a code here. Return to this site and log in after confirming.</p>}
         <div className="flex justify-center mb-6">
           <InputOTP
             maxLength={6}

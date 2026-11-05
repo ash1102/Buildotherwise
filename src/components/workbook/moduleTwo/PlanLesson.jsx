@@ -201,7 +201,7 @@ function PartPlan({ lesson, answers, rev, onUseStep, onClearPossibility }) {
       : [];
   return (
     <div className="space-y-6">
-      <P>Keep it small enough to fit your time, money, energy, and responsibilities. You can change any of this later.</P>
+      <P>Choose just one small thing you might explore. The extra planning questions below are optional, and you can change your mind.</P>
       {plan.possibility ? (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-secondary p-3 text-[15px]">
           <span className="text-foreground">
@@ -240,6 +240,10 @@ function PartPlan({ lesson, answers, rev, onUseStep, onClearPossibility }) {
           </details>
         ) : null}
       </div>
+      <details className="rounded-lg border border-border bg-card p-4">
+        <summary className="cursor-pointer text-[16px] font-medium text-foreground">Add timing, possible barriers, or a smaller version (optional)</summary>
+        <p className="mt-2 text-[15px] text-muted-foreground">You can leave these blank and still continue. This is an idea to explore, not a commitment.</p>
+        <div className="mt-4 space-y-5">
       <SingleChoice
         legend="When might you do it?"
         options={WHEN_OPTIONS}
@@ -261,6 +265,8 @@ function PartPlan({ lesson, answers, rev, onUseStep, onClearPossibility }) {
         label="Is there a smaller or more accessible version? (optional)"
         variant="inline"
       />
+        </div>
+      </details>
       <details className="rounded-lg border border-border p-3">
         <summary className="cursor-pointer text-[15px] font-medium text-foreground">See an example plan (optional)</summary>
         <dl className="mt-2 space-y-1.5 text-[15px] text-foreground">

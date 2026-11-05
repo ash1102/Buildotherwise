@@ -274,6 +274,7 @@ export function taskFromL1(answers) {
 /** The condition M3-L2 is about: saved choice first, then the one named in M3-L1, then the example's. */
 export function effectiveCondition(answers) {
   const saved = readKey(answers, "M3-L2", "condition");
+  if (saved === FOCUS_UNSURE) return { id: FOCUS_UNSURE, from: "l2" };
   if (CONDITION_BY_ID[saved]) return { id: saved, from: "l2" };
   const focus = readKey(answers, "M3-L1", "focus");
   if (CONDITION_BY_ID[focus]) return { id: focus, from: "l1" };
@@ -318,7 +319,8 @@ export function hasResult(x) {
 export function planSentences(x) {
   const lines = [];
   if (x.task) lines.push(`Task: ${x.task}`);
-  if (x.condition) lines.push(`Condition to change: ${CONDITION_BY_ID[x.condition].option}`);
+  if (x.condition === FOCUS_UNSURE) lines.push("Condition: Not sure yet — still exploring");
+  else if (CONDITION_BY_ID[x.condition]) lines.push(`Condition to change: ${CONDITION_BY_ID[x.condition].option}`);
   if (x.adjustment) lines.push(`What I’ll try differently: ${x.adjustment}`);
   if (x.limit) lines.push(`Limit or stopping point: ${x.limit}`);
   return lines.join("\n");
@@ -354,7 +356,7 @@ export function carrySuggestions(answers) {
   const x = readExperiment(answers);
   const out = [];
   if (x.observation) out.push(x.observation);
-  const condition = x.condition ? CONDITION_BY_ID[x.condition].noun : "";
+  const condition = CONDITION_BY_ID[x.condition]?.noun || "";
   if (hasResult(x) && condition) out.push(`Was it ${condition} that made the difference, or something else?`);
   if (condition && !hasResult(x)) out.push(`What would I notice if I changed ${condition}?`);
   out.push("Would the same setup help with a different task?");
