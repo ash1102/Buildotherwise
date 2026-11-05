@@ -40,8 +40,8 @@ export function PartFlow({ lessonCode, parts, storageVersion = 1 }) {
 
   return (
     <div ref={topRef} className="scroll-mt-24 space-y-5">
-      <nav aria-label="Parts of this lesson" className="overflow-x-auto pb-1">
-        <p className="mb-2 text-[13px] text-muted-faint">Tap a part to jump back to it.</p>
+      <nav aria-label="Lesson sections" className="overflow-x-auto pb-1">
+        <p className="mb-2 text-[13px] text-muted-faint">Choose a title to jump to that section.</p>
         <ol className="flex gap-2" role="list">
           {parts.map((item, i) => (
             <li key={item.id} className="min-w-[74px] flex-1">
@@ -49,7 +49,7 @@ export function PartFlow({ lessonCode, parts, storageVersion = 1 }) {
                 type="button"
                 onClick={() => go(i)}
                 aria-current={i === index ? "step" : undefined}
-                aria-label={`Part ${i + 1} of ${parts.length}: ${item.short}`}
+                aria-label={item.short}
                 className={`group block min-h-[58px] w-full rounded-lg border px-2 py-2 text-left transition-colors ${i === index ? "border-primary bg-primary/5" : "border-input bg-card hover:bg-secondary"}`}
               >
                 <span
@@ -60,7 +60,6 @@ export function PartFlow({ lessonCode, parts, storageVersion = 1 }) {
                   aria-hidden="true"
                   className="mt-1.5 block truncate text-center text-[11px] font-semibold text-accent-ink"
                 >
-                  <span className="block">Part {i + 1}</span>
                   <span className="block truncate font-medium">{item.short}</span>
                 </span>
               </button>
@@ -71,9 +70,6 @@ export function PartFlow({ lessonCode, parts, storageVersion = 1 }) {
 
       <section aria-labelledby={`part-${lessonCode}-${part.id}`} className="space-y-5">
         <div>
-          <p className="text-[13px] text-muted-faint">
-            Part {index + 1} of {parts.length}
-          </p>
           <h2
             id={`part-${lessonCode}-${part.id}`}
             ref={headingRef}
