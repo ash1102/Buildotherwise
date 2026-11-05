@@ -280,7 +280,14 @@ function PartNotice({ lesson, answers }) {
       />
       <p className="text-[15px] text-muted-foreground">What you saved here will be waiting in Lesson 3.</p>
       <EarlierM2 code={CODE} answers={answers} />
-      <FinishControl code={CODE} answers={answers} />
+      {TRIED_OUTCOMES.includes(outcome) ? (
+        <FinishControl code={CODE} answers={answers} />
+      ) : (
+        <Panel tone="note" label="Your experiment is still open">
+          <P>This lesson counts as completed once you have attempted a real-world activity, observation, conversation, or investigation. You can pause, revise your plan, and visit other modules at any time.</P>
+          <P>You do not need to prove what happened or share private details. When you have tried something, return to “What happened?” and record the outcome.</P>
+        </Panel>
+      )}
     </div>
   );
 }
