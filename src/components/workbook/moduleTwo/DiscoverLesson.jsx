@@ -8,6 +8,7 @@ import { useAnswers } from "@/lib/workbook";
 import { DIRECTIONS, KEEP_KINDS, OUTCOMES, readKey, readPlan, recordM2, splitMulti } from "@/lib/moduleTwo";
 import { FinishControl, P, Panel, PartFlow, Quote, SingleChoice } from "../moduleOne/parts";
 import { EarlierM2, PlanCard, usePlanSync } from "./common";
+import { TRIED_OUTCOMES } from "@/lib/moduleTwo";
 
 const CODE = "M2-L3";
 const KEEP_LABEL = "What do you want to remember?";
@@ -187,7 +188,15 @@ function PartKeep({ lesson, answers }) {
         </details>
       ) : null}
       <EarlierM2 code={CODE} answers={answers} />
-      <FinishControl code={CODE} answers={answers} />
+      {TRIED_OUTCOMES.includes(happened.outcome) ? (
+        <FinishControl code={CODE} answers={answers} />
+      ) : (
+        <Panel tone="note" label="Your experiment is still open">
+          <P>Module 2 counts as completed after you attempt at least one real-world experiment. Doing, observing, asking, or investigating can all count. A small attempt is enough; you do not need proof or a successful outcome.</P>
+          <P>You can still explore other lessons and modules, pause, or change your plan. Your progress is saved.</P>
+          <Link to="/lesson/M2-L2" className="text-[15px] font-medium text-accent-ink underline underline-offset-2">Return to your experiment</Link>
+        </Panel>
+      )}
     </div>
   );
 }
