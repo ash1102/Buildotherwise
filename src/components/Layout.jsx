@@ -87,7 +87,7 @@ export default function Layout() {
         <PullToRefresh />
         <JournalWidget />
         <GettingStartedHost />
-        <GlobalDiscoveryCompanion />
+        {pathname !== "/lesson/O.1" ? <GlobalDiscoveryCompanion /> : null}
       </div>
     </JournalProvider>
   );
