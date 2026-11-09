@@ -2,17 +2,11 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
-import StepList from "@/components/workbook/StepList";
 import { useAuth } from "@/lib/AuthContext";
 import LoginRedirect from "@/components/LoginRedirect";
 import {
-  EARLIER_GS_CODES,
-  GS_CODES,
-  OPTIONAL_GS_CODES,
   firstOpenGettingStartedStep,
   gettingStartedFinished,
-  gettingStartedStepDone,
-  gettingStartedSteps,
 } from "@/lib/gettingStarted";
 import { useWorkbook } from "@/lib/workbook";
 
@@ -22,7 +16,7 @@ import { useWorkbook } from "@/lib/workbook";
  * Earlier Getting Started steps stay readable for anyone who answered them.
  */
 export default function GettingStartedPage() {
-  const { lessons, loading, error } = useCurriculum();
+  const { lessons, loading } = useCurriculum();
   useEffect(() => {
     if (loading) return;
     const story = document.querySelector(".gs-story");
@@ -56,18 +50,9 @@ export default function GettingStartedPage() {
     return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); if (frame) cancelAnimationFrame(frame); };
   }, [loading]);
   const { answers, states } = useWorkbook();
-  const { user, isAuthenticated, isLoadingAuth } = useAuth();
-  const admin = Boolean(isAuthenticated && user?.role === "admin");
-  const steps = gettingStartedSteps(lessons);
+  const { isAuthenticated, isLoadingAuth } = useAuth();
   const stepsDone = gettingStartedFinished(lessons, answers, states);
   const open = firstOpenGettingStartedStep(lessons, answers, states);
-  const anyDone = steps.some((lesson) => gettingStartedStepDone(lesson, answers, states));
-  const missing = GS_CODES.filter((code) => !steps.some((lesson) => lesson.code === code));
-  const optional = OPTIONAL_GS_CODES.map((code) => (lessons || []).find((lesson) => lesson.code === code)).filter(Boolean);
-  /** Former Getting Started steps, listed only when this person saved something there. */
-  const earlier = EARLIER_GS_CODES.map((code) => (lessons || []).find((lesson) => lesson.code === code))
-    .filter(Boolean)
-    .filter((lesson) => Object.keys(answers || {}).some((key) => key.startsWith(`${lesson.code}#`) && String(answers[key] || "").trim()));
 
   if (isLoadingAuth || loading) {
     return <p className="py-10 text-[16px] text-muted-faint">Opening Getting Started…</p>;
@@ -75,7 +60,7 @@ export default function GettingStartedPage() {
 
   // Finished people can still come back here (the Back link on every step points here).
   // They see a way forward instead of being bounced to the Life Map.
-  if (!admin && stepsDone && !isAuthenticated) return <LoginRedirect />;
+  if (stepsDone && !isAuthenticated) return <LoginRedirect />;
 
   return (
     <div className="space-y-8">
@@ -125,100 +110,15 @@ export default function GettingStartedPage() {
         </div>
       </section>
 
-      <section aria-label="Your next step" className="mx-auto max-w-[68ch] px-1 py-7 sm:py-10">
-        <p className="workbook-label">Getting Started</p>
-        <h2 className="mt-3 text-[clamp(1.65rem,5vw,2.5rem)] font-semibold leading-tight tracking-tight">
-          {stepsDone ? "Where you go next is up to you." : "A few things worth knowing before you begin."}
-        </h2>
-        <p className="mt-4 text-[17px] leading-relaxed text-muted-foreground">
-          {stepsDone
-            ? "You've completed the welcome. You can return to it whenever you want, or explore what's next."
-            : "Before you explore, take a few minutes to learn what this is, what it isn't, and what stays yours. You can pause, pass, or change your mind."}
-        </p>
-        {stepsDone ? (
-          <Link
-            to="/"
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[16px] font-medium text-primary-foreground"
-          >
-            Explore your dashboard
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
-        ) : open ? (
-          <Link
-            to={`/lesson/${open.code}`}
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[16px] font-medium text-primary-foreground"
-          >
-            {anyDone ? "Continue the welcome" : "Read the welcome"}
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
-        ) : null}
-        <p className="mt-4 text-[14px] leading-relaxed text-muted-faint">
-          {stepsDone
-            ? "Your Life Map is always available in its own tab."
-            : "About five minutes. Afterward, your dashboard opens. Your Life Map is optional."}
-        </p>
-      </section>
-
-      {error && !steps.length ? (
-        <p className="text-[16px] text-muted-foreground">Getting Started didn’t load. Refresh the page.</p>
-      ) : null}
-
-      {missing.length ? (
-        <p className="text-[16px] text-muted-foreground">
-          These steps are not in this build yet: {missing.join(", ")}.
-        </p>
-      ) : null}
-
-      <StepList lessons={steps} scopeLabel="in Getting Started" numberByIndex />
-
-      {admin ? (
-        <p className="text-[14px] text-muted-faint">
-          Admin access: <Link to="/" className="underline underline-offset-2">Open the workbook</Link>
-        </p>
-      ) : null}
-
-      {earlier.length ? (
-        <section className="rounded-xl border border-border bg-card p-5 sm:p-6">
-          <p className="workbook-label">Your earlier answers</p>
-          <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
-            These steps used to be part of Getting Started. They aren’t needed anymore, but what you saved is still
-            here. My Way Forward is in Module 1, Lesson 3.
-          </p>
-          <ul className="mt-3 space-y-2">
-            {earlier.map((lesson) => (
-              <li key={lesson.code}>
-                <Link to={`/lesson/${lesson.code}`} className="text-[16px] font-medium text-accent-ink underline underline-offset-2">
-                  {lesson.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {optional.length ? (
-        <section className="rounded-xl border border-dashed border-input bg-card p-5 sm:p-6">
-          <p className="workbook-label">Optional, later</p>
-          <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
-            Not needed to open the workbook. Worth a look before you reply to anyone in Tribe threads.
-          </p>
-          <ul className="mt-3 space-y-1">
-            {optional.map((lesson) => (
-              <li key={lesson.code} className="text-[16px] text-foreground">
-                {lesson.title}
-                {lesson.duration_min ? <span className="text-muted-faint"> · About {lesson.duration_min} min</span> : null}
-                <span className="block text-[14px] text-muted-faint">Opens once the steps above are done.</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {!isAuthenticated ? (
-        <Link to="/" className="inline-block text-[16px] font-medium text-accent-ink underline underline-offset-2">
-          Back to the main site
+      <section aria-label="Continue" className="flex min-h-[34svh] items-center justify-center px-4 py-16 text-center">
+        <Link
+          to={stepsDone ? "/" : open ? `/lesson/${open.code}` : "/"}
+          className="inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 text-[18px] font-medium text-primary-foreground transition-opacity hover:opacity-90"
+        >
+          Continue
+          <ArrowRight className="h-5 w-5" aria-hidden="true" />
         </Link>
-      ) : null}
+      </section>
     </div>
   );
 }
