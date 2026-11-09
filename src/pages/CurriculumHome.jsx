@@ -244,22 +244,7 @@ function MemberHome() {
           <div className="space-y-4">
             <DiscoveryStart onSkip={goToWorkbook} headingLevel="h1" />
 
-            {started && next ? (
-              <section aria-labelledby="continue-heading" className="rounded-xl border border-border bg-card px-4 py-4 sm:px-5">
-                <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3">
-                  <div className="min-w-0 flex-1 basis-[16rem]">
-                    <p className="text-[13px] font-semibold text-accent-ink">Continue where you left off</p>
-                    <h2 id="continue-heading" className="mt-1 text-[17px] leading-snug text-foreground">
-                      {nextLabel ? `${nextLabel} · ${next.title}` : next.title}
-                    </h2>
-                  </div>
-                  <Link to={`/lesson/${next.code}`} className={dashboardButton}>
-                    Continue
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                </div>
-              </section>
-            ) : null}
+
           </div>
 
 
