@@ -79,19 +79,6 @@ export default function GettingStartedPage() {
 
   return (
     <div className="space-y-8">
-      <header className="border-b border-border pb-5">
-        <p className="workbook-label">Getting Started</p>
-        <h1 className="mt-2">Start here. You can decide as you go.</h1>
-        <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-          Entrepalooza helps you explore interests and possibilities through learning, conversation, and small
-          real-world experiences. You can pass, pause, or change your mind.
-        </p>
-        <p className="mt-2 max-w-[68ch] text-[15px] leading-relaxed text-muted-faint">
-          One short welcome, about five minutes. Then your dashboard opens. Your Life Map is always there in its own tab if
-          you want it.
-        </p>
-      </header>
-
       <section aria-label="What shaped you" className="gs-story relative -mx-4 sm:-mx-8" style={{ height: "1350svh" }}>
         <style>{`
           .gs-story { --gs-progress: 0; }
@@ -136,6 +123,17 @@ export default function GettingStartedPage() {
           <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-statement">You get to explore what stays, what changes, and what you want to do differently.</p></div>
           <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-hero">That's where we begin.</p></div>
         </div>
+      </section>
+
+      <section aria-label="Your invitation" className="mx-auto max-w-[68ch] space-y-3 px-1 py-3">
+        <p className="text-[17px] leading-relaxed text-muted-foreground">
+          Entrepalooza is a place to explore interests and possibilities through learning, conversation, and small real-world experiences.
+          You can pass, pause, or change your mind.
+        </p>
+        <p className="text-[15px] leading-relaxed text-muted-faint">
+          Begin with a short welcome, about five minutes. Then your dashboard opens.
+          Your Life Map is there in its own tab whenever you want it.
+        </p>
       </section>
 
       {error && !steps.length ? (
