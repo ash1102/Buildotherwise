@@ -87,11 +87,9 @@ function PartNotice({ lesson, answers }) {
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <P>You can start with something current, familiar, or unfamiliar—or with nothing that comes to mind.</P>
-        <P>
-          Sometimes we overlook what comes naturally to us, especially when other people have taught us to see it as a flaw.
-          What gets your attention may be a clue—not a label, and not a verdict.
-        </P>
+        <P>Some things become so familiar that we barely give them a second thought.</P>
+        <P>The things we do without thinking. The problems we keep returning to. The questions that won't leave us alone.</P>
+        <P>Sometimes what we've overlooked is worth another look.</P>
 
       </div>
       <SingleChoice
@@ -121,7 +119,6 @@ function PartNotice({ lesson, answers }) {
 
 function PartEncounter({ lesson, answers }) {
   const selectedIds = selectedEncounterIds(readAnswer(answers, lesson.code, "encounter"));
-  const several = selectedIds.length > 1;
   // Same journal prompt key as before, so the existing journal entry is updated, never duplicated.
   const toggle = (id) => {
     const next = selectedIds.includes(id) ? selectedIds.filter((item) => item !== id) : [...selectedIds, id];
@@ -130,8 +127,8 @@ function PartEncounter({ lesson, answers }) {
   return (
     <div className="space-y-5">
       <div className="space-y-3">
-        <P>Who gets to decide what counts as talent, potential, or a worthwhile interest?</P>
-        <P>Explore a few possibilities, including ones you might have ruled out before. Notice what draws you in—and what you dismiss without a second look.</P>
+        <P>Some possibilities only come into view when we encounter them.</P>
+        <P>Explore what catches your attention, including things you might not have considered before.</P>
         <p className="text-[15px] leading-relaxed text-muted-foreground">
           Look at as many or as few as you like. Tap any that catch your attention: one, several, or none.
         </p>
@@ -153,18 +150,14 @@ function PartEncounter({ lesson, answers }) {
       ))}
       {selectedIds.length ? (
         <div aria-live="polite">
-          <Panel tone="note" title="What made you stop and look?">
-            <P>
-              {several
-                ? "Was it something familiar, something unexpected, or a question you hadn't thought to ask? What made these possibilities stand out?"
-                : "Was it something familiar, something unexpected, or a question you hadn't thought to ask? What made this possibility stand out?"}
-            </P>
-            <P>And consider the other side: is there something you've learned to dismiss because someone else didn't see its value?</P>
+          <Panel tone="note" title="Something caught your attention.">
+            <P>Maybe you expected it. Maybe you didn't.</P>
+            <P>What would happen if you followed that curiosity a little further?</P>
           </Panel>
         </div>
       ) : (
-        <Panel tone="note" title="What did you rule out?">
-          <P>Did anything seem like it wasn't for you? Where did that impression come from—experience, assumption, or someone else's expectations?</P>
+        <Panel tone="note" title="What did you notice?">
+          <P>Even when nothing stands out, it's worth asking what you expected to find.</P>
         </Panel>
       )}
       <p className="text-[14px] text-muted-faint">You can investigate a possibility here, or explore more in Module 2.</p>
@@ -302,7 +295,7 @@ function PartKeep({ lesson, answers }) {
       </p>
       <Panel tone="note">
         <P>
-          <strong>The takeaway:</strong> A possibility is not a promise. But questioning what you have overlooked—or been taught to overlook—can change what you try next.
+          <strong>Take this with you:</strong> You don't have to know where something leads to take a closer look. Sometimes a question is enough to begin.
         </P>
       </Panel>
       {readAnswer(answers, lesson.code, "connection") ? <Panel tone="yours" label="A connection or question you saved"><Quote>{readAnswer(answers, lesson.code, "connection")}</Quote></Panel> : null}
