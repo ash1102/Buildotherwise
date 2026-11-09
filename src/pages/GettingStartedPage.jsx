@@ -22,6 +22,7 @@ import { useWorkbook } from "@/lib/workbook";
  * Earlier Getting Started steps stay readable for anyone who answered them.
  */
 export default function GettingStartedPage() {
+  const { lessons, loading, error } = useCurriculum();
   useEffect(() => {
     const nodes = document.querySelectorAll("[data-gs-reveal]");
     if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -39,7 +40,6 @@ export default function GettingStartedPage() {
     nodes.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
   }, [loading]);
-  const { lessons, loading, error } = useCurriculum();
   const { answers, states } = useWorkbook();
   const { user, isAuthenticated, isLoadingAuth } = useAuth();
   const admin = Boolean(isAuthenticated && user?.role === "admin");
