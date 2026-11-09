@@ -28,9 +28,7 @@ export const RETIRED_GS_CODES = ["O.2"];
 export const PENDING_LESSON_CONTENT = {
   "O.1": {
     description: "A few things worth knowing about Entrepalooza, your choices, and your privacy.",
-    teach: `## Welcome
-
-You don't have to know who you want to become or what direction you want to take before you begin.
+    teach: `You don't have to know who you want to become or what direction you want to take before you begin.
 
 Entrepalooza is a place to get curious about yourself, explore your interests, strengths, and experiences, and discover what feels meaningful to you.
 
