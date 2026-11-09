@@ -128,10 +128,10 @@ function PartEncounter({ lesson, answers }) {
   return (
     <div className="space-y-5">
       <div className="space-y-3">
-        <P>Some possibilities only come into view when we encounter them.</P>
-        <P>Explore what catches your attention, including things you might not have considered before.</P>
+        <P>There's more out there than any one of us has had a chance to try.</P>
+        <P>Take a look through these possibilities. Some may feel familiar. Others might surprise you.</P>
         <p className="text-[15px] leading-relaxed text-muted-foreground">
-          Look at as many or as few as you like. Tap any that catch your attention: one, several, or none.
+          Tap anything that makes you curious. You can choose more than one—or keep exploring without choosing.
         </p>
       </div>
       <DiscoveryGallery selectedIds={selectedIds} onToggle={toggle} />
@@ -153,15 +153,15 @@ function PartEncounter({ lesson, answers }) {
         <div aria-live="polite">
           <Panel tone="note" title="Something caught your attention.">
             <P>Maybe you expected it. Maybe you didn't.</P>
-            <P>What would happen if you followed that curiosity a little further?</P>
+            <P>What's one thing you'd like to find out about it? You can explore a question above, or simply keep it in mind.</P>
           </Panel>
         </div>
       ) : (
-        <Panel tone="note" title="What did you notice?">
-          <P>Even when nothing stands out, it's worth asking what you expected to find.</P>
+        <Panel tone="note" title="Nothing caught your attention yet?">
+          <P>That's useful to know, too. What kinds of possibilities would you have liked to see?</P>
         </Panel>
       )}
-      <p className="text-[14px] text-muted-faint">You can investigate a possibility here, or explore more in Module 2.</p>
+      <p className="text-[14px] text-muted-faint">You can return to these possibilities later.</p>
     </div>
   );
 }
