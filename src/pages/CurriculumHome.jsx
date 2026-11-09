@@ -267,10 +267,11 @@ function MemberHome() {
               <span className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                 <span className="min-w-0">
                   <span className="block text-[13px] font-semibold text-accent-ink">{row.label}</span>
-                  {isCurrentModule && <span className="mt-2 inline-flex rounded-lg bg-primary-soft px-3 py-1.5 text-[13px] font-bold text-[hsl(277_34%_16%)] shadow-sm">Continue where you left off →</span>}
+                  
                   <span className="block text-[16px] leading-snug text-foreground">{module.title}</span>
                 </span>
                 <span className="flex shrink-0 items-center gap-2">
+                  {isCurrentModule && <span className="inline-flex rounded-lg bg-primary-soft px-3 py-2 text-[13px] font-bold text-[hsl(277_34%_16%)] shadow-sm">Continue where you left off →</span>}
                   <span aria-hidden="true" className={`text-[13px] font-medium ${status.muted ? "text-muted-faint" : "text-foreground"}`}>
                     {status.text}
                   </span>
