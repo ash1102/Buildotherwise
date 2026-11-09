@@ -87,9 +87,10 @@ function PartNotice({ lesson, answers }) {
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <P>Some things become so familiar that we barely give them a second thought.</P>
-        <P>The things we do without thinking. The problems we keep returning to. The questions that won't leave us alone.</P>
-        <P>Sometimes what we've overlooked is worth another look.</P>
+        <P>Think about the things you find yourself drawn to.</P>
+        <P>Maybe it's a problem you can't stop thinking about. Something you enjoy doing. A question you keep asking. Or something that frustrates you enough to want to change it.</P>
+        <P>You might not think of these things as interests or strengths. You might not have given them much thought at all.</P>
+        <P><strong>That's what we're looking for.</strong> Start with something that comes to mind.</P>
 
       </div>
       <SingleChoice
