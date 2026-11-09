@@ -89,8 +89,8 @@ function PartNotice({ lesson, answers }) {
       <div className="space-y-3">
         <P>You can start with something current, familiar, or unfamiliar—or with nothing that comes to mind.</P>
         <P>
-          A question, a problem, something you already know, or a new possibility can all be starting points. You do not
-          need to enjoy something for it to be worth exploring.
+          Sometimes we overlook what comes naturally to us, especially when other people have taught us to see it as a flaw.
+          What gets your attention may be a clue—not a label, and not a verdict.
         </P>
 
       </div>
@@ -130,8 +130,8 @@ function PartEncounter({ lesson, answers }) {
   return (
     <div className="space-y-5">
       <div className="space-y-3">
-        <P>Sometimes you don’t know whether something interests you until you encounter it.</P>
-        <P>Take a look at these possibilities. You don’t have to choose one for your future. Just notice your reaction.</P>
+        <P>Who gets to decide what counts as talent, potential, or a worthwhile interest?</P>
+        <P>Explore a few possibilities, including ones you might have ruled out before. Notice what draws you in—and what you dismiss without a second look.</P>
         <p className="text-[15px] leading-relaxed text-muted-foreground">
           Look at as many or as few as you like. Tap any that catch your attention: one, several, or none.
         </p>
@@ -153,30 +153,19 @@ function PartEncounter({ lesson, answers }) {
       ))}
       {selectedIds.length ? (
         <div aria-live="polite">
-          <Panel tone="note">
-            {several ? (
-              <>
-                <P>A moment ago, these were just possibilities among many.</P>
-                <P>
-                  Did you select them because they seemed interesting, because you already knew something about them,
-                  because they raised a question—or for another reason?
-                </P>
-                <P>You don’t need to decide whether you like them. You’ve encountered something you can now investigate.</P>
-              </>
-            ) : (
-              <>
-                <P>A moment ago, this was just one possibility among many.</P>
-                <P>
-                  Did you select it because it seemed interesting, because you already knew something about it, because it
-                  raised a question—or for another reason?
-                </P>
-                <P>You don’t need to decide whether you like it. You’ve encountered something you can now investigate.</P>
-              </>
-            )}
+          <Panel tone="note" title="What made you stop and look?">
+            <P>
+              {several
+                ? "Was it something familiar, something unexpected, or a question you hadn't thought to ask? What made these possibilities stand out?"
+                : "Was it something familiar, something unexpected, or a question you hadn't thought to ask? What made this possibility stand out?"}
+            </P>
+            <P>And consider the other side: is there something you've learned to dismiss because someone else didn't see its value?</P>
           </Panel>
         </div>
       ) : (
-        <p className="text-[15px] text-muted-foreground">You don’t need to select anything. Looking counts.</p>
+        <Panel tone="note" title="What did you rule out?">
+          <P>Did anything seem like it wasn't for you? Where did that impression come from—experience, assumption, or someone else's expectations?</P>
+        </Panel>
       )}
       <p className="text-[14px] text-muted-faint">You can investigate a possibility here, or explore more in Module 2.</p>
     </div>
@@ -187,7 +176,7 @@ function PartReading() {
   return (
     <div className="space-y-4">
       <Panel tone="reading">
-        <P>Some things become interesting only after you encounter them, get access, or learn how they work.</P>
+        <P>Opportunity shapes discovery. It is hard to recognize a possibility you have never been invited to explore.</P>
         <P>Curiosity can grow, change, fade, or stay small. Sometimes an unexpected encounter is what starts it.</P>
         <P>Hidi and Renninger describe one possible path for interest to develop—not a path everyone follows.</P>
       </Panel>
@@ -247,7 +236,7 @@ function PartLook({ lesson, answers }) {
                 ))}
               </ul>
               <p className="text-[14px] text-muted-foreground">
-                Selecting something isn’t the same as being interested in it. Only you decide what it means.
+                What drew your attention is worth questioning, not labeling.
               </p>
             </Panel>
           ) : null}
@@ -275,8 +264,7 @@ function PartLook({ lesson, answers }) {
       {savedConnection ? (
         <Panel tone="note" title="You have a thought worth keeping">
           <P>
-            You’ve already put something into words. You don’t need to answer another question about it. You can carry it
-            forward, keep exploring, or change your mind.
+            You spotted a possible connection. What would help you test whether it holds up outside this workbook?
           </P>
         </Panel>
       ) : nothingYet ? (
@@ -314,8 +302,7 @@ function PartKeep({ lesson, answers }) {
       </p>
       <Panel tone="note">
         <P>
-          <strong>The takeaway:</strong> Noticing gives you somewhere to begin. It doesn’t tell you who you are or what you
-          have to do next.
+          <strong>The takeaway:</strong> A possibility is not a promise. But questioning what you have overlooked—or been taught to overlook—can change what you try next.
         </P>
       </Panel>
       {readAnswer(answers, lesson.code, "connection") ? <Panel tone="yours" label="A connection or question you saved"><Quote>{readAnswer(answers, lesson.code, "connection")}</Quote></Panel> : null}
