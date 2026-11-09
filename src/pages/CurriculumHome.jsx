@@ -281,9 +281,9 @@ function MemberHome() {
                   </span>
                 </span>
                 {isCurrentModule && (
-                  <span className="mt-3 flex justify-end">
-                    <span className="inline-flex rounded-lg bg-primary-soft px-4 py-2.5 text-[13px] font-bold text-[hsl(277_34%_16%)] shadow-sm">
-                      Continue where you left off →
+                  <span className="mt-2 flex justify-end">
+                    <span className="inline-flex rounded-md bg-primary-soft px-2.5 py-1.5 text-[12px] font-semibold leading-tight text-[hsl(277_34%_16%)]">
+                      Continue →
                     </span>
                   </span>
                 )}
