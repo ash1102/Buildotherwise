@@ -39,11 +39,13 @@ export default function GettingStartedPage() {
       const position = progress * (scenes.length - 1);
       scenes.forEach((node, index) => {
         const difference = Math.abs(position - index);
-        const opacity = Math.max(0, Math.min(1, (1.12 - difference) / 0.5));
+        // Keep adjacent passages from being readable simultaneously.
+        const opacity = Math.max(0, Math.min(1, (0.52 - difference) / 0.22));
         node.style.opacity = String(opacity);
-        node.style.transform = `translateY(${(index - position) * 24}px) scale(${1 - Math.min(difference, 1) * .035})`;
+        node.style.transform = `translateY(${(index - position) * 12}px)`;
+        node.style.visibility = opacity < 0.02 ? "hidden" : "visible";
         node.style.pointerEvents = opacity > .9 ? "auto" : "none";
-        node.setAttribute("aria-hidden", opacity < .2 ? "true" : "false");
+        node.setAttribute("aria-hidden", opacity < .5 ? "true" : "false");
       });
       story.style.setProperty("--gs-progress", String(progress));
     };
@@ -90,23 +92,24 @@ export default function GettingStartedPage() {
         </p>
       </header>
 
-      <section aria-label="What shaped you" className="gs-story relative -mx-4 sm:-mx-8" style={{ height: "1050svh" }}>
+      <section aria-label="What shaped you" className="gs-story relative -mx-4 sm:-mx-8" style={{ height: "1350svh" }}>
         <style>{`
           .gs-story { --gs-progress: 0; }
           .gs-story .gs-stage { position: sticky; top: 0; height: 100svh; min-height: 500px; overflow: hidden; display: grid; place-items: center; isolation: isolate; background: #19151f; }
           .gs-story .gs-stage:before { content: ""; position: absolute; inset: -20%; z-index: -1; background: radial-gradient(ellipse at 65% 35%, rgba(176,115,201,.24), transparent 45%), radial-gradient(ellipse at 12% 85%, rgba(123,84,155,.16), transparent 50%); transform: translateY(calc(var(--gs-progress) * -12%)); }
           .gs-story .gs-stage:after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(145deg, transparent 35%, rgba(224,187,232,.07)); opacity: var(--gs-progress); }
           .gs-story .gs-frame { position: absolute; inset: 0; padding: clamp(1.5rem, 6vw, 5rem); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; opacity: 0; will-change: opacity, transform; color: #f5edf7; }
-          .gs-story .gs-frame:first-of-type { opacity: 1; }
+
           .gs-story .gs-frame:nth-of-type(3n) { align-items: flex-end; text-align: right; }
           .gs-story .gs-frame:nth-of-type(4n) { align-items: center; text-align: center; }
-          .gs-story .gs-frame p { max-width: 18ch; text-wrap: balance; }
-          .gs-story .gs-hero { font-size: clamp(2.65rem, 8vw, 6.5rem); font-weight: 650; line-height: 1.08; letter-spacing: -.055em; }
-          .gs-story .gs-statement { font-size: clamp(2rem, 5.5vw, 4.6rem); line-height: 1.2; letter-spacing: -.035em; }
-          .gs-story .gs-body { font-size: clamp(1.45rem, 3.3vw, 2.7rem); line-height: 1.5; max-width: 32ch !important; }
+          .gs-story .gs-frame p { max-width: min(24ch, 100%); text-wrap: balance; overflow-wrap: break-word; }
+          .gs-story .gs-hero { font-size: clamp(2rem, 7vw, 5.1rem); font-weight: 650; line-height: 1.08; letter-spacing: -.055em; }
+          .gs-story .gs-statement { font-size: clamp(1.7rem, 5vw, 3.6rem); line-height: 1.2; letter-spacing: -.035em; }
+          .gs-story .gs-body { font-size: clamp(1.25rem, 3vw, 2.15rem); line-height: 1.5; max-width: min(36ch, 100%) !important; }
           .gs-story .gs-rule { height: 3px; width: 64px; background: #d3a9e8; margin-bottom: 2rem; border-radius: 3px; }
           .gs-story .gs-progress { position: absolute; bottom: 3.5rem; left: 8%; right: 8%; height: 2px; background: rgba(255,255,255,.18); }
           .gs-story .gs-progress span { display: block; height: 100%; width: calc(var(--gs-progress) * 100%); background: #d3a9e8; }
+          @media (max-width: 640px) { .gs-story .gs-frame { padding: 1.5rem 1.75rem 5rem; } .gs-story .gs-frame p { max-width: 100%; } .gs-story .gs-body { line-height: 1.42; } }
           .gs-story .gs-cue { position: absolute; bottom: 4.7rem; left: 8%; color: #c6b5ce; font-size: .75rem; letter-spacing: .18em; text-transform: uppercase; }
           @media (prefers-reduced-motion: reduce) {
             .gs-story { height: auto !important; }
