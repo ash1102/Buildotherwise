@@ -262,59 +262,7 @@ function MemberHome() {
             ) : null}
           </div>
 
-          <nav aria-label="Your tools">
-            <ul className="grid gap-3 sm:grid-cols-2">
-              <li>
-                <Link to="/journal" className={toolLink}>
-                  <BookOpen className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
-                  <span>
-                    <span className="block font-semibold">Your Journal</span>
-                    <span className="block text-[15px] text-muted-foreground">Notes you have saved.</span>
-                  </span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/map" className={toolLink}>
-                  <Map className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
-                  <span>
-                    <span className="block font-semibold">Your Life Map</span>
-                    <span className="block text-[15px] text-muted-foreground">
-                      {mapPlaced
-                        ? "Recent places, activities, people, observations, and possible threads."
-                        : "Look for connections among experiences, interests, and possibilities."}
-                    </span>
-                  </span>
-                </Link>
-              </li>
-              <li>
-                <button type="button" onClick={goToWorkbook} className={`${toolLink} w-full`}>
-                  <Layers className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
-                  <span>
-                    <span className="block font-semibold">Explore the Workbook</span>
-                    <span className="block text-[15px] text-muted-foreground">Browse activities and choose where to begin.</span>
-                  </span>
-                </button>
-              </li>
-              <li>
-                <Link to="/record" className={toolLink}>
-                  <Compass className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
-                  <span>
-                    <span className="block font-semibold">Discovery Record</span>
-                    <span className="block text-[15px] text-muted-foreground">What you chose to keep.</span>
-                  </span>
-                </Link>
-              </li>
-              <li>
-                <Link to="/my-records" className={toolLink}>
-                  <Archive className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
-                  <span>
-                    <span className="block font-semibold">Records</span>
-                    <span className="block text-[15px] text-muted-foreground">What you chose to keep.</span>
-                  </span>
-                </Link>
-              </li>
-            </ul>
-          </nav>
+
         </>
       )}
 
@@ -366,6 +314,51 @@ function MemberHome() {
         </p>
       </section>
 
+
+          <nav aria-label="Your tools">
+            <ul className="grid gap-3 sm:grid-cols-2">
+              <li>
+                <Link to="/journal" className={toolLink}>
+                  <BookOpen className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
+                  <span>
+                    <span className="block font-semibold">Your Journal</span>
+                    <span className="block text-[15px] text-muted-foreground">Notes you have saved.</span>
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/map" className={toolLink}>
+                  <Map className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
+                  <span>
+                    <span className="block font-semibold">Your Life Map</span>
+                    <span className="block text-[15px] text-muted-foreground">
+                      {mapPlaced
+                        ? "Recent places, activities, people, observations, and possible threads."
+                        : "Look for connections among experiences, interests, and possibilities."}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/record" className={toolLink}>
+                  <Compass className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
+                  <span>
+                    <span className="block font-semibold">Discovery Record</span>
+                    <span className="block text-[15px] text-muted-foreground">What you chose to keep.</span>
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link to="/my-records" className={toolLink}>
+                  <Archive className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
+                  <span>
+                    <span className="block font-semibold">Records</span>
+                    <span className="block text-[15px] text-muted-foreground">What you chose to keep.</span>
+                  </span>
+                </Link>
+              </li>
+            </ul>
+          </nav>
       <PrivacyNote />
     </div>
   );
