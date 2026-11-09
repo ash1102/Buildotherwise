@@ -24,21 +24,34 @@ import { useWorkbook } from "@/lib/workbook";
 export default function GettingStartedPage() {
   const { lessons, loading, error } = useCurriculum();
   useEffect(() => {
-    const nodes = document.querySelectorAll("[data-gs-reveal]");
-    if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      nodes.forEach((node) => node.classList.add("gs-visible"));
-      return;
-    }
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("gs-visible");
-          observer.unobserve(entry.target);
-        }
+    if (loading) return;
+    const story = document.querySelector(".gs-story");
+    if (!story) return;
+    const scenes = Array.from(story.querySelectorAll(".gs-frame"));
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) { story.classList.add("gs-reduced"); return; }
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const rect = story.getBoundingClientRect();
+      const distance = Math.max(1, story.offsetHeight - window.innerHeight);
+      const progress = Math.max(0, Math.min(1, -rect.top / distance));
+      const position = progress * (scenes.length - 1);
+      scenes.forEach((node, index) => {
+        const difference = Math.abs(position - index);
+        const opacity = Math.max(0, Math.min(1, (1.12 - difference) / 0.5));
+        node.style.opacity = String(opacity);
+        node.style.transform = `translateY(${(index - position) * 24}px) scale(${1 - Math.min(difference, 1) * .035})`;
+        node.style.pointerEvents = opacity > .9 ? "auto" : "none";
+        node.setAttribute("aria-hidden", opacity < .2 ? "true" : "false");
       });
-    }, { threshold: 0.4, rootMargin: "0px 0px -12% 0px" });
-    nodes.forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
+      story.style.setProperty("--gs-progress", String(progress));
+    };
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); if (frame) cancelAnimationFrame(frame); };
   }, [loading]);
   const { answers, states } = useWorkbook();
   const { user, isAuthenticated, isLoadingAuth } = useAuth();
@@ -77,41 +90,49 @@ export default function GettingStartedPage() {
         </p>
       </header>
 
-      <section aria-label="What shaped you" className="gs-story relative -mx-4 sm:-mx-8 px-5 sm:px-10 overflow-hidden">
+      <section aria-label="What shaped you" className="gs-story relative -mx-4 sm:-mx-8" style={{ height: "1050svh" }}>
         <style>{`
-          .gs-story { background: radial-gradient(ellipse at 90% 12%, rgba(184,143,215,.12), transparent 32%), radial-gradient(ellipse at 5% 75%, rgba(184,143,215,.07), transparent 35%); }
-          .gs-story .gs-scene { min-height: 68svh; display: flex; align-items: center; padding: 5rem 0; border-bottom: 1px solid rgba(184,143,215,.12); }
-          .gs-story .gs-scene:nth-of-type(3n) .gs-copy { margin-left: auto; }
-          .gs-story .gs-copy { max-width: 780px; width: 100%; }
-          .gs-story .gs-accent { width: 42px; height: 2px; background: #c8a6df; margin-bottom: 1.5rem; }
-          .gs-story .gs-hero { font-size: clamp(2.3rem, 6vw, 5.3rem); line-height: 1.08; letter-spacing: -.045em; font-weight: 650; }
-          .gs-story .gs-statement { font-size: clamp(1.9rem, 4vw, 3.5rem); line-height: 1.24; letter-spacing: -.025em; }
-          .gs-story .gs-line { font-size: clamp(1.55rem, 3vw, 2.6rem); line-height: 1.35; letter-spacing: -.015em; }
-          .gs-story .gs-scene:nth-of-type(4n) .gs-copy { padding-left: 1.2rem; border-left: 2px solid rgba(200,166,223,.55); }
-          @media (prefers-reduced-motion: no-preference) {
-            .gs-story [data-gs-reveal]:not(.gs-visible) { opacity: 0; transform: translateY(46px); filter: blur(5px); }
-            .gs-story [data-gs-reveal] { transition: opacity 1700ms cubic-bezier(.22,1,.36,1) 180ms, transform 1700ms cubic-bezier(.22,1,.36,1) 180ms, filter 1700ms ease 180ms; }
+          .gs-story { --gs-progress: 0; }
+          .gs-story .gs-stage { position: sticky; top: 0; height: 100svh; min-height: 500px; overflow: hidden; display: grid; place-items: center; isolation: isolate; background: #19151f; }
+          .gs-story .gs-stage:before { content: ""; position: absolute; inset: -20%; z-index: -1; background: radial-gradient(ellipse at 65% 35%, rgba(176,115,201,.24), transparent 45%), radial-gradient(ellipse at 12% 85%, rgba(123,84,155,.16), transparent 50%); transform: translateY(calc(var(--gs-progress) * -12%)); }
+          .gs-story .gs-stage:after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(145deg, transparent 35%, rgba(224,187,232,.07)); opacity: var(--gs-progress); }
+          .gs-story .gs-frame { position: absolute; inset: 0; padding: clamp(1.5rem, 6vw, 5rem); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; opacity: 0; will-change: opacity, transform; color: #f5edf7; }
+          .gs-story .gs-frame:first-of-type { opacity: 1; }
+          .gs-story .gs-frame:nth-of-type(3n) { align-items: flex-end; text-align: right; }
+          .gs-story .gs-frame:nth-of-type(4n) { align-items: center; text-align: center; }
+          .gs-story .gs-frame p { max-width: 18ch; text-wrap: balance; }
+          .gs-story .gs-hero { font-size: clamp(2.65rem, 8vw, 6.5rem); font-weight: 650; line-height: 1.08; letter-spacing: -.055em; }
+          .gs-story .gs-statement { font-size: clamp(2rem, 5.5vw, 4.6rem); line-height: 1.2; letter-spacing: -.035em; }
+          .gs-story .gs-body { font-size: clamp(1.45rem, 3.3vw, 2.7rem); line-height: 1.5; max-width: 32ch !important; }
+          .gs-story .gs-rule { height: 3px; width: 64px; background: #d3a9e8; margin-bottom: 2rem; border-radius: 3px; }
+          .gs-story .gs-progress { position: absolute; bottom: 3.5rem; left: 8%; right: 8%; height: 2px; background: rgba(255,255,255,.18); }
+          .gs-story .gs-progress span { display: block; height: 100%; width: calc(var(--gs-progress) * 100%); background: #d3a9e8; }
+          .gs-story .gs-cue { position: absolute; bottom: 4.7rem; left: 8%; color: #c6b5ce; font-size: .75rem; letter-spacing: .18em; text-transform: uppercase; }
+          @media (prefers-reduced-motion: reduce) {
+            .gs-story { height: auto !important; }
+            .gs-story .gs-stage { height: auto; min-height: 0; display: block; padding: 3rem 0; }
+            .gs-story .gs-frame { position: relative; opacity: 1 !important; transform: none !important; min-height: 40vh; }
+            .gs-story .gs-progress, .gs-story .gs-cue { display: none; }
           }
-          @media (prefers-reduced-motion: reduce) { .gs-story [data-gs-reveal] { opacity: 1 !important; transform: none !important; filter: none !important; } }
         `}</style>
-        <div className="pt-12 text-sm tracking-[.24em] uppercase text-accent-ink">A place to begin <span aria-hidden="true" className="ml-3">↓</span></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-hero">What shaped you doesn't have to define you.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-statement">Some experiences change us.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-line">Sometimes we learn to stay quiet to avoid conflict.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-line">Sometimes we become fiercely independent because depending on someone wasn't an option.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-line">Sometimes we learn to read a room before we've even said a word.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-statement">We might become guarded, stubborn, sensitive, restless, or determined.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-line">And somewhere along the way, those ways of responding can become part of how we describe ourselves—or how other people describe us.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-hero">But there's a difference between who you are and what you've learned to do.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-line">Maybe something that once protected you now holds you back.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-line">Maybe something you've always considered a shortcoming has another side you haven't explored.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-line">Maybe an ability you developed during a difficult time could serve a completely different purpose today.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-line">And maybe there are things you simply want to leave behind.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-statement">You don't have to be grateful for what happened. You don't have to call it a blessing or find a lesson in it.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-hero">You also don't have to let it write the rest of your story.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-statement">You get to explore what stays, what changes, and what you want to do differently.</p></div></div>
-        <div className="gs-scene"><div className="gs-copy" data-gs-reveal><div className="gs-accent" aria-hidden="true" /><p className="gs-hero">That's where we begin.</p></div></div>
-        <div className="py-16 text-base text-muted-foreground">You can take your time, skip a question, or change your mind along the way.</div>
+        <div className="gs-stage">
+          <div className="gs-cue" aria-hidden="true">Scroll to explore ↓</div>
+          <div className="gs-progress" aria-hidden="true"><span /></div>
+          <div className="gs-frame" aria-hidden="false"><div className="gs-rule" aria-hidden="true" /><p className="gs-hero">What shaped you doesn't have to define you.</p></div>
+          <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-statement">Some experiences change us.</p></div>
+          <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-body">Sometimes we learn to stay quiet to avoid conflict. Sometimes we become fiercely independent because depending on someone wasn't an option. Sometimes we learn to read a room before we've even said a word.</p></div>
+          <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-statement">We might become guarded, stubborn, sensitive, restless, or determined.</p></div>
+          <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-body">And somewhere along the way, those ways of responding can become part of how we describe ourselves—or how other people describe us.</p></div>
+          <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-hero">But there's a difference between who you are and what you've learned to do.</p></div>
+          <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-statement">Maybe something that once protected you now holds you back.</p></div>
+          <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-statement">Maybe something you've always considered a shortcoming has another side you haven't explored.</p></div>
+          <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-statement">Maybe an ability you developed during a difficult time could serve a completely different purpose today.</p></div>
+          <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-statement">And maybe there are things you simply want to leave behind.</p></div>
+          <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-body">You don't have to be grateful for what happened. You don't have to call it a blessing or find a lesson in it.</p></div>
+          <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-hero">You also don't have to let it write the rest of your story.</p></div>
+          <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-statement">You get to explore what stays, what changes, and what you want to do differently.</p></div>
+          <div className="gs-frame" aria-hidden="true"><div className="gs-rule" aria-hidden="true" /><p className="gs-hero">That's where we begin.</p></div>
+        </div>
       </section>
 
       {error && !steps.length ? (
