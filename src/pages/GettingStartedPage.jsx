@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import useCurriculum from "@/hooks/useCurriculum";
@@ -22,6 +22,23 @@ import { useWorkbook } from "@/lib/workbook";
  * Earlier Getting Started steps stay readable for anyone who answered them.
  */
 export default function GettingStartedPage() {
+  useEffect(() => {
+    const nodes = document.querySelectorAll("[data-gs-reveal]");
+    if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      nodes.forEach((node) => node.classList.add("gs-visible"));
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("gs-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -5% 0px" });
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, []);
   const { lessons, loading, error } = useCurriculum();
   const { answers, states } = useWorkbook();
   const { user, isAuthenticated, isLoadingAuth } = useAuth();
@@ -59,6 +76,46 @@ export default function GettingStartedPage() {
           you want it.
         </p>
       </header>
+
+      <section aria-label="What shaped you" className="gs-story space-y-16 sm:space-y-24 py-8 sm:py-12">
+        <style>{`
+          .gs-story [data-gs-reveal] { opacity: 1; transform: none; }
+          @media (prefers-reduced-motion: no-preference) {
+            .gs-story [data-gs-reveal]:not(.gs-visible) { opacity: 0; transform: translateY(24px); }
+            .gs-story [data-gs-reveal] { transition: opacity 850ms ease, transform 850ms ease; }
+          }
+        `}</style>
+        <div data-gs-reveal className="max-w-[68ch]">
+          <p className="workbook-label mb-4">A place to begin</p>
+          <h2 className="text-3xl sm:text-5xl leading-tight font-semibold tracking-tight">What shaped you doesn't have to define you.</h2>
+        </div>
+        <div data-gs-reveal className="max-w-[62ch] space-y-5 text-xl sm:text-2xl leading-relaxed">
+          <p>Some experiences change us.</p>
+          <p>Sometimes we learn to stay quiet to avoid conflict.</p>
+          <p>Sometimes we become fiercely independent because depending on someone wasn't an option.</p>
+          <p>Sometimes we learn to read a room before we've even said a word.</p>
+        </div>
+        <div data-gs-reveal className="max-w-[62ch] space-y-5 text-lg sm:text-xl leading-relaxed">
+          <p>We might become guarded, stubborn, sensitive, restless, or determined.</p>
+          <p>And somewhere along the way, those ways of responding can become part of how we describe ourselves—or how other people describe us.</p>
+          <p className="font-semibold text-foreground">But there's a difference between who you are and what you've learned to do.</p>
+        </div>
+        <div data-gs-reveal className="max-w-[62ch] space-y-5 text-lg sm:text-xl leading-relaxed">
+          <p>Maybe something that once protected you now holds you back.</p>
+          <p>Maybe something you've always considered a shortcoming has another side you haven't explored.</p>
+          <p>Maybe an ability you developed during a difficult time could serve a completely different purpose today.</p>
+          <p>And maybe there are things you simply want to leave behind.</p>
+        </div>
+        <div data-gs-reveal className="max-w-[62ch] space-y-5 text-lg sm:text-xl leading-relaxed">
+          <p>You don't have to be grateful for what happened. You don't have to call it a blessing or find a lesson in it.</p>
+          <p className="text-2xl sm:text-3xl font-semibold leading-snug">You also don't have to let it write the rest of your story.</p>
+        </div>
+        <div data-gs-reveal className="max-w-[62ch] space-y-5 text-lg sm:text-xl leading-relaxed">
+          <p>You get to explore what stays, what changes, and what you want to do differently.</p>
+          <p className="text-2xl sm:text-3xl font-semibold">That's where we begin.</p>
+          <p className="text-base text-muted-foreground">You can take your time, skip a question, or change your mind along the way.</p>
+        </div>
+      </section>
 
       {error && !steps.length ? (
         <p className="text-[16px] text-muted-foreground">Getting Started didn’t load. Refresh the page.</p>
