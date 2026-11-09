@@ -28,8 +28,7 @@ function LifeMapInvite() {
         Your Life Map helps you look at where your time and energy go, what matters to you, and what you might want to
         understand better.
       </P>
-      <P>You can use it to notice patterns or return to it as things change.</P>
-      <P>You don’t have to complete it to continue.</P>
+      <P>Come back to it whenever you notice a new connection.</P>
       <Link
         to={MAP_LINK}
         className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-input bg-card px-4 text-[15px] font-medium text-foreground hover:bg-secondary"
@@ -93,7 +92,7 @@ function PartNotice({ lesson, answers }) {
           A question, a problem, something you already know, or a new possibility can all be starting points. You do not
           need to enjoy something for it to be worth exploring.
         </P>
-        <P>You don’t have to love something for it to be worth exploring.</P>
+
       </div>
       <SingleChoice
         legend="What feels closest to something you’ve noticed?"
@@ -112,7 +111,7 @@ function PartNotice({ lesson, answers }) {
           />
         </div>
       ) : null}
-      <p className="text-[15px] text-muted-foreground">You don’t need to answer to continue.</p>
+
       <MapContext lesson={lesson} answers={answers} />
       <PrivacyNote />
       <LifeMapInvite />
@@ -149,7 +148,7 @@ function PartEncounter({ lesson, answers }) {
           </div> : null}
           <p className="mt-2 text-[15px] text-muted-foreground">What would you want to understand, watch, ask, or try to learn more about this possibility?</p>
           <div className="mt-3"><PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index={"explore-" + card.id} label="My question or small experiment (optional)" variant="inline" /></div>
-          <p className="mt-2 text-[14px] text-muted-foreground">No right answer. You can leave it, come back, or change direction.</p>
+
         </details>
       ))}
       {selectedIds.length ? (
@@ -189,10 +188,7 @@ function PartReading() {
     <div className="space-y-4">
       <Panel tone="reading">
         <P>Some things become interesting only after you encounter them, get access, or learn how they work.</P>
-        <P>
-          Curiosity can grow, change, fade, or stay small. It does not have to become a job, a business, or a lifelong
-          identity.
-        </P>
+        <P>Curiosity can grow, change, fade, or stay small. Sometimes an unexpected encounter is what starts it.</P>
         <P>Hidi and Renninger describe one possible path for interest to develop—not a path everyone follows.</P>
       </Panel>
       <details className="rounded-xl border border-border bg-card p-4 sm:p-5">
