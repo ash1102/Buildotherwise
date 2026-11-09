@@ -69,18 +69,7 @@ export default function Layout() {
                 Contact Ashley
               </Link>
             </nav>
-            <p className="font-medium text-foreground/80">Entrepalooza is an educational workbook, not therapy or treatment.</p>
-            <p className="mt-2">
-              {preview
-                ? "Preview answers are saved to your account when you choose save."
-                : "Your workbook and journal are saved to your account. Other participants can’t see them."}{" "}
-              Messages and feedback go out only when you hit submit.
-            </p>
-            <p className="mt-2">
-              Tribe Threads are group discussions on the workbook’s practices. Replies there are shared with your group,
-              under your name, and only if you post one.
-            </p>
-            <p className="mt-2">Getting Started and Modules 1–5 are open. Modules 6–10 are locked. © Build Otherwise.</p>
+            <p className="mt-2">© Build Otherwise. <Link to="/contact" className="underline underline-offset-2">Questions or concerns?</Link></p>
           </div>
         </footer>
 
