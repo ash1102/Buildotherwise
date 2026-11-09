@@ -110,13 +110,16 @@ export default function GettingStartedPage() {
         </div>
       </section>
 
-      <section aria-label="Continue" className="flex min-h-[34svh] items-center justify-center px-4 py-16 text-center">
+      <section aria-label="Continue" className="flex min-h-[34svh] flex-col items-center justify-center px-4 py-16 text-center">
         <Link
           to={stepsDone ? "/" : open ? `/lesson/${open.code}` : "/"}
           className="inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 text-[18px] font-medium text-primary-foreground transition-opacity hover:opacity-90"
         >
           Continue
           <ArrowRight className="h-5 w-5" aria-hidden="true" />
+        </Link>
+        <Link to="/lesson/O.1" className="mt-5 text-[15px] text-muted-foreground underline underline-offset-4">
+          What this is &amp; what stays private
         </Link>
       </section>
     </div>
