@@ -125,14 +125,37 @@ export default function GettingStartedPage() {
         </div>
       </section>
 
-      <section aria-label="Your invitation" className="mx-auto max-w-[68ch] space-y-3 px-1 py-3">
-        <p className="text-[17px] leading-relaxed text-muted-foreground">
-          Entrepalooza is a place to explore interests and possibilities through learning, conversation, and small real-world experiences.
-          You can pass, pause, or change your mind.
+      <section aria-label="Your next step" className="mx-auto max-w-[68ch] px-1 py-7 sm:py-10">
+        <p className="workbook-label">Getting Started</p>
+        <h2 className="mt-3 text-[clamp(1.65rem,5vw,2.5rem)] font-semibold leading-tight tracking-tight">
+          {stepsDone ? "Where you go next is up to you." : "A few things worth knowing before you begin."}
+        </h2>
+        <p className="mt-4 text-[17px] leading-relaxed text-muted-foreground">
+          {stepsDone
+            ? "You've completed the welcome. You can return to it whenever you want, or explore what's next."
+            : "Before you explore, take a few minutes to learn what this is, what it isn't, and what stays yours. You can pause, pass, or change your mind."}
         </p>
-        <p className="text-[15px] leading-relaxed text-muted-faint">
-          Begin with a short welcome, about five minutes. Then your dashboard opens.
-          Your Life Map is there in its own tab whenever you want it.
+        {stepsDone ? (
+          <Link
+            to="/"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[16px] font-medium text-primary-foreground"
+          >
+            Explore your dashboard
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        ) : open ? (
+          <Link
+            to={`/lesson/${open.code}`}
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[16px] font-medium text-primary-foreground"
+          >
+            {anyDone ? "Continue the welcome" : "Read the welcome"}
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        ) : null}
+        <p className="mt-4 text-[14px] leading-relaxed text-muted-faint">
+          {stepsDone
+            ? "Your Life Map is always available in its own tab."
+            : "About five minutes. Afterward, your dashboard opens. Your Life Map is optional."}
         </p>
       </section>
 
@@ -146,39 +169,13 @@ export default function GettingStartedPage() {
         </p>
       ) : null}
 
-      {stepsDone ? (
-        <div className="space-y-3">
-          <p className="text-[16px] text-muted-foreground">You’re through the welcome. You can reread it below.</p>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[16px] font-medium text-primary-foreground"
-          >
-            Next: your dashboard
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
-        </div>
-      ) : null}
-
-      {open ? (
-        <Link
-          to={`/lesson/${open.code}`}
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[16px] font-medium text-primary-foreground"
-        >
-          {anyDone ? `Continue: ${open.title}` : "Start"}
-          <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </Link>
-      ) : null}
+      <StepList lessons={steps} scopeLabel="in Getting Started" numberByIndex />
 
       {admin ? (
-        <p className="text-[15px] text-muted-foreground">
-          Admins can open the workbook before these steps are done.{" "}
-          <Link to="/" className="font-medium text-accent-ink underline underline-offset-2">
-            Open the workbook
-          </Link>
+        <p className="text-[14px] text-muted-faint">
+          Admin access: <Link to="/" className="underline underline-offset-2">Open the workbook</Link>
         </p>
       ) : null}
-
-      <StepList lessons={steps} scopeLabel="in Getting Started" numberByIndex />
 
       {earlier.length ? (
         <section className="rounded-xl border border-border bg-card p-5 sm:p-6">
