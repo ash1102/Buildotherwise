@@ -264,22 +264,29 @@ function MemberHome() {
             const status = moduleProgressLabel(row);
             const isCurrentModule = started && next && nextModule?.order === module.order;
             const content = (
-              <span className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                <span className="min-w-0">
-                  <span className="block text-[13px] font-semibold text-accent-ink">{row.label}</span>
-                  
-                  <span className="block text-[16px] leading-snug text-foreground">{module.title}</span>
-                </span>
-                <span className="flex shrink-0 items-center gap-2">
-                  {isCurrentModule && <span className="inline-flex rounded-lg bg-primary-soft px-3 py-2 text-[13px] font-bold text-[hsl(277_34%_16%)] shadow-sm">Continue where you left off →</span>}
-                  <span aria-hidden="true" className={`text-[13px] font-medium ${status.muted ? "text-muted-faint" : "text-foreground"}`}>
-                    {status.text}
+              <span className="block">
+                <span className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                  <span className="min-w-0">
+                    <span className="block text-[13px] font-semibold text-accent-ink">{row.label}</span>
+                    <span className="block text-[16px] leading-snug text-foreground">{module.title}</span>
                   </span>
-                  <span className="sr-only">{moduleProgressDescription(row)}</span>
-                  <span aria-hidden="true" className="h-2 w-20 overflow-hidden rounded-full bg-secondary sm:w-28">
-                    <span className="block h-full rounded-full bg-accent-ink" style={{ width: `${pct}%` }} />
+                  <span className="flex shrink-0 items-center gap-2">
+                    <span aria-hidden="true" className={`text-[13px] font-medium ${status.muted ? "text-muted-faint" : "text-foreground"}`}>
+                      {status.text}
+                    </span>
+                    <span className="sr-only">{moduleProgressDescription(row)}</span>
+                    <span aria-hidden="true" className="h-2 w-20 overflow-hidden rounded-full bg-secondary sm:w-28">
+                      <span className="block h-full rounded-full bg-accent-ink" style={{ width: `${pct}%` }} />
+                    </span>
                   </span>
                 </span>
+                {isCurrentModule && (
+                  <span className="mt-3 flex justify-end">
+                    <span className="inline-flex rounded-lg bg-primary-soft px-4 py-2.5 text-[13px] font-bold text-[hsl(277_34%_16%)] shadow-sm">
+                      Continue where you left off →
+                    </span>
+                  </span>
+                )}
               </span>
             );
             return (
