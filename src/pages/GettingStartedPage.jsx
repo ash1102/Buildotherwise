@@ -38,7 +38,7 @@ export default function GettingStartedPage() {
     }, { threshold: 0.12, rootMargin: "0px 0px -5% 0px" });
     nodes.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, []);
+  }, [loading]);
   const { lessons, loading, error } = useCurriculum();
   const { answers, states } = useWorkbook();
   const { user, isAuthenticated, isLoadingAuth } = useAuth();
