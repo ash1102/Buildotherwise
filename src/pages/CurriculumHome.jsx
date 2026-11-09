@@ -221,7 +221,7 @@ function MemberHome() {
   const started = orderedLessons.some((lesson) => isWorkbookLesson(lesson) && stepComplete(lesson, answers, states));
   const liveModules = modules.filter((module) => module.status === "live" && module.kind !== "orientation");
   const nextModule = next ? modules.find((module) => module.order === next.module_order) : null;
-  const nextLabel = nextModule ? `Module ${nextModule.order}` : "";
+
 
   /** "Skip discovery": go straight to the module list. Respects reduced motion and moves focus there. */
   const goToWorkbook = useCallback(() => {
@@ -240,7 +240,7 @@ function MemberHome() {
         <div aria-busy="true" className="h-[220px] animate-pulse rounded-2xl bg-border/60" />
       ) : (
         <>
-          {/* Discovery leads the page and holds the h1. "Continue where you left off" is a smaller, secondary card right below it. */}
+          {/* Discovery leads the page; resume appears within the current module row. */}
           <div className="space-y-4">
             <DiscoveryStart onSkip={goToWorkbook} headingLevel="h1" />
 
@@ -262,10 +262,12 @@ function MemberHome() {
             if (!row) return null;
             const pct = row.stepCount ? Math.round((row.writtenCount / row.stepCount) * 100) : 0;
             const status = moduleProgressLabel(row);
+            const isCurrentModule = started && next && nextModule?.order === module.order;
             const content = (
               <span className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                 <span className="min-w-0">
                   <span className="block text-[13px] font-semibold text-accent-ink">{row.label}</span>
+                  {isCurrentModule && <span className="mt-1 block text-[13px] font-medium text-accent-ink">Continue where you left off</span>}
                   <span className="block text-[16px] leading-snug text-foreground">{module.title}</span>
                 </span>
                 <span className="flex shrink-0 items-center gap-2">
@@ -282,7 +284,7 @@ function MemberHome() {
             return (
               <li key={module.id || module.slug}>
                 <Link
-                  to={`/module/${module.slug}`}
+                  to={isCurrentModule ? `/lesson/${next.code}` : `/module/${module.slug}`}
                   className="block rounded-xl border border-border bg-card px-4 py-3 transition hover:bg-secondary"
                 >
                   {content}
