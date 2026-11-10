@@ -9,6 +9,7 @@ import ScrollToTop from './components/ScrollToTop';
 import Layout from '@/components/Layout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import LoginRedirect from '@/components/LoginRedirect';
+import { Analytics } from '@vercel/analytics/react';
 
 // Every route loads its own code on first visit, so the first screen starts faster in the WebView.
 const PageNotFound = lazy(() => import('./lib/PageNotFound'));
@@ -164,6 +165,7 @@ function App() {
           <AuthenticatedApp />
         </Router>
         <Toaster />
+        <Analytics />
       </QueryClientProvider>
     </AuthProvider></AppErrorBoundary>
   )
