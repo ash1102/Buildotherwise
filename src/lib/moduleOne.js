@@ -53,7 +53,7 @@ export const NOTICE_OPTIONS = [
   { id: "curious", label: "Something I'm curious about", prompt: "What's something you've wondered about or wanted to understand better?" },
   { id: "frustrates", label: "Something that frustrates me", prompt: "What's something you keep wishing someone would fix or do differently?" },
   { id: "know-how", label: "Something I know how to do", prompt: "What's something you've learned through experience that you might explore further?" },
-  { id: "never-tried", label: "Something I've never tried", prompt: "Is there something you have encountered but not tried, if you want to name it?" },
+  { id: "never-tried", label: "Something I've never tried", prompt: "What’s something you’ve seen but never tried?" },
   { id: "nothing-yet", label: "Nothing comes to mind yet", prompt: "" },
 ];
 
