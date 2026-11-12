@@ -59,7 +59,7 @@ function PartPlan({ answers }) {
         <P>Here’s the plan you saved in Lesson 1.</P>
         <PlanCard plan={plan} empty="" />
         <ChangePlanLink />
-        <p className="text-[15px] text-muted-foreground">Plans change. If you’ve already done something different, that’s fine. You can say so in Part 3.</p>
+        <p className="text-[15px] text-muted-foreground">Plans change. Already did something different? Say so in Part 3.</p>
       </div>
     );
   }
@@ -67,11 +67,11 @@ function PartPlan({ answers }) {
   return (
     <div className="space-y-5">
       <p className="rounded-lg border border-dashed border-input p-3 text-[15px] text-muted-foreground">
-        There’s no saved plan from Lesson 1. You can make a quick one here, go back to Lesson 1, or simply keep going.
+        No saved plan from Lesson 1. Make a quick one here, go back, or keep going.
       </p>
-      <PromptField lessonCode={PLAN_CODE} lessonTitle={PLAN_TITLE} index={0} label="What will you explore? (optional)" variant="inline" />
+      <PromptField lessonCode={PLAN_CODE} lessonTitle={PLAN_TITLE} index={0} label="What will you explore?" variant="inline" />
       <SingleChoice
-        legend="How will you explore it? (optional)"
+        legend="How will you explore it?"
         options={METHODS.map((item) => `${item.label}: ${item.short}`)}
         value={method ? `${METHOD_BY_ID[method].label}: ${METHOD_BY_ID[method].short}` : ""}
         onChange={(next) => {
@@ -111,10 +111,10 @@ function PartTry() {
             <PauseCircle className="h-4 w-4" aria-hidden="true" />
             I’ll come back after my try
           </Link>
-          <p className="text-[15px] text-muted-foreground">When you return, you’ll pick up right here. Tap Continue when you’re ready.</p>
+          <p className="text-[15px] text-muted-foreground">You’ll pick up right here. Tap Continue when you’re back.</p>
         </div>
         <fieldset className="mt-2">
-          <legend className="text-[15px] font-medium text-foreground">Want a reminder? (optional)</legend>
+          <legend className="text-[15px] font-medium text-foreground">Want a reminder?</legend>
           <p className="mt-1 text-[14px] text-muted-foreground">This downloads a calendar file for your own calendar. Nothing is sent to anyone.</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {REMINDER_OPTIONS.map((option) => (
@@ -186,13 +186,13 @@ function PartHappened({ lesson, answers }) {
             label={outcome === OUTCOMES[2] ? "What did you do instead? A sentence or two is enough." : "What did you actually do or observe? A sentence or two is enough."}
             variant="inline"
           />
-          <p className="text-[14px] text-muted-foreground">Describe what happened, not what it says about you. The next part is for what you noticed.</p>
+          <p className="text-[14px] text-muted-foreground">Say what happened, not what it means about you. The next part is for what you noticed.</p>
         </div>
       ) : null}
       {notYet ? (
         <div className="space-y-5" aria-live="polite">
           <Panel tone="note">
-            <P>That’s fine. Life gets in the way, and opportunities don’t always line up. Not yet isn’t a failure.</P>
+            <P>Life gets in the way. Not yet is still a real answer.</P>
           </Panel>
           <SingleChoice
             legend="What would you like to do?"
@@ -211,11 +211,11 @@ function PartHappened({ lesson, answers }) {
       {barrier ? (
         <div className="space-y-5" aria-live="polite">
           <Panel tone="note">
-            <P>A barrier tells you about conditions, not about you. Naming it can help you plan around it, or decide to look elsewhere.</P>
+            <P>A barrier tells you about the conditions, not about you. Name it, then plan around it or look elsewhere.</P>
           </Panel>
           <MultiChoice
             legend="What got in the way?"
-            hint="Pick any that fit. No explanation needed, and you can pick none."
+            hint="Pick any that fit, or none. No explanation needed."
             options={BARRIERS}
             values={barriers}
             onChange={(next) => recordM2(CODE, lesson.title, 30, joinMulti(next), "What got in the way?")}
@@ -230,7 +230,7 @@ function PartHappened({ lesson, answers }) {
           {move === "Look for support" ? (
             <div className="space-y-4">
               <AskHelp />
-              <PromptField lessonCode={CODE} lessonTitle={lesson.title} index={32} label="Who or what might know a way around it? (optional)" variant="inline" />
+              <PromptField lessonCode={CODE} lessonTitle={lesson.title} index={32} label="Who or what might know a way around it?" variant="inline" />
             </div>
           ) : null}
           {move === "Choose a smaller step" ? (
@@ -262,7 +262,7 @@ function PartNotice({ lesson, answers }) {
           something, you can note it here.
         </p>
       ) : (
-        <P>Notice what happened without deciding what it means yet. All of this is optional.</P>
+        <P>Notice what happened before you decide what it means. Answer what helps. Skip the rest.</P>
       )}
       <MultiChoice
         legend="What did you notice?"
@@ -275,17 +275,17 @@ function PartNotice({ lesson, answers }) {
         lessonCode={CODE}
         lessonTitle={lesson.title}
         index={2}
-        label="Anything you want to remember? What caught your attention, what surprised you, what felt difficult or satisfying, or what you’re still unsure about. (optional)"
+        label="What do you want to remember? What caught your attention, surprised you, felt hard or satisfying, or still feels unclear."
         variant="inline"
       />
-      <p className="text-[15px] text-muted-foreground">What you saved here will be waiting in Lesson 3.</p>
+      <p className="text-[15px] text-muted-foreground">What you save here waits for you in Lesson 3.</p>
       <EarlierM2 code={CODE} answers={answers} />
       {TRIED_OUTCOMES.includes(outcome) ? (
         <FinishControl code={CODE} answers={answers} />
       ) : (
         <Panel tone="note" label="Your experiment is still open">
-          <P>This lesson counts as completed once you have attempted a real-world activity, observation, conversation, or investigation. You can pause, revise your plan, and visit other modules at any time.</P>
-          <P>You do not need to prove what happened or share private details. When you have tried something, return to “What happened?” and record the outcome.</P>
+          <P>This lesson counts once you’ve tried something real: an activity, observation, conversation or bit of research. Pause, change your plan, or visit other modules anytime.</P>
+          <P>You don’t have to prove anything or share private details. When you’ve tried something, come back to “What happened?” and record it.</P>
         </Panel>
       )}
     </div>
@@ -307,7 +307,7 @@ export default function TryLesson({ lesson }) {
     { id: "plan", short: "Your plan", title: "Return to your plan", content: <PartPlan answers={answers} /> },
     { id: "try", short: "Try it", title: "Try it in the real world", content: <PartTry /> },
     { id: "happened", short: "What happened", title: "What happened?", content: <PartHappened lesson={lesson} answers={answers} /> },
-    { id: "notice", short: "Notice", title: "Notice, without forcing a conclusion", content: <PartNotice lesson={lesson} answers={answers} /> },
+    { id: "notice", short: "Notice", title: "Notice. Don’t force a conclusion.", content: <PartNotice lesson={lesson} answers={answers} /> },
   ];
   return <PartFlow lessonCode={lesson.code} parts={parts} />;
 }

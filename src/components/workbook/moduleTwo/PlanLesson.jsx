@@ -42,8 +42,8 @@ function PartStart({ lesson, answers, onSetExplore }) {
   return (
     <div className="space-y-5">
       <div className="space-y-3">
-        <P>Module 1 asked what catches your attention. Module 2 asks what a possibility is actually about, and how you could get a little closer to it.</P>
-        <P>Anything you noticed earlier is a possible starting point, not a commitment. You don’t need to already know what interests you.</P>
+        <P>Module 1 was about what pulls at you. Module 2 is about getting closer to one of those things and finding out what it’s really like.</P>
+        <P>Anything you noticed earlier can be your starting point. You don’t have to know what interests you yet.</P>
       </div>
       {earlier.length ? (
         <Panel tone="yours" label="From Module 1">
@@ -55,7 +55,7 @@ function PartStart({ lesson, answers, onSetExplore }) {
         </Panel>
       ) : (
         <p className="rounded-lg border border-dashed border-input p-3 text-[15px] text-muted-foreground">
-          Nothing is saved from Module 1. That’s fine. The Exploration Gallery in the next part has plenty to look at.
+          Nothing saved from Module 1. The Exploration Gallery is next. Plenty to look at.
         </p>
       )}
       <SingleChoice
@@ -66,7 +66,7 @@ function PartStart({ lesson, answers, onSetExplore }) {
       />
       {mode === START_MODES[0] && earlier.length ? (
         <div className="space-y-2">
-          <p className="text-[15px] text-muted-foreground">Tap one to use it as what you’ll explore. You can change the wording later.</p>
+          <p className="text-[15px] text-muted-foreground">Tap one to make it what you’ll explore. Reword it anytime.</p>
           {earlier.map((item) => (
             <button
               key={item.key}
@@ -83,7 +83,7 @@ function PartStart({ lesson, answers, onSetExplore }) {
         </div>
       ) : null}
       {mode === START_MODES[0] && !earlier.length ? (
-        <p className="text-[15px] text-muted-foreground">There’s nothing saved to bring forward. You can use your own idea, or browse the gallery next.</p>
+        <p className="text-[15px] text-muted-foreground">Nothing saved to bring forward. Use your own idea, or browse the gallery.</p>
       ) : null}
       {mode === START_MODES[1] ? <p className="text-[15px] text-muted-foreground">Continue to the Exploration Gallery to see what’s out there.</p> : null}
       {mode === START_MODES[2] ? (
@@ -91,7 +91,7 @@ function PartStart({ lesson, answers, onSetExplore }) {
       ) : null}
       {mode === START_MODES[3] ? (
         <Panel tone="note">
-          <P>That’s a fine place to start. Browse the gallery next. You don’t need to pick anything to keep going.</P>
+          <P>Good place to start. Browse the gallery. You don’t have to pick anything to move on.</P>
         </Panel>
       ) : null}
       <PrivacyNote />
@@ -113,12 +113,10 @@ function PartGallery({ lesson, answers, onStart }) {
   return (
     <div className="space-y-4">
       <P>
-        Each area holds several specific possibilities. Open one to see what it involves, what you could explore, and
-        ways to try it without money, special equipment, or contacts.
+        Each area holds specific things you could try. Open one to see what it involves and how to try it without money, special equipment, or contacts.
       </P>
       <p className="text-[15px] text-muted-foreground">
-        You’re not expected to look at everything. Save anything you want to come back to, and choose one starting point
-        when you’re ready, or write your own idea in the plan.
+        Don’t try to see it all. Save what catches you. Pick a starting point when you’re ready, or write your own in the plan.
       </p>
       <ExplorationGallery noticed={noticed} savedIds={savedIds} startId={startId} onToggleSave={toggleSave} onStart={onStart} />
       <div aria-live="polite" className="space-y-1 text-[15px]">
@@ -127,7 +125,7 @@ function PartGallery({ lesson, answers, onStart }) {
             Your starting point: <strong>{start.title}</strong>
           </p>
         ) : (
-          <p className="text-muted-foreground">No starting point chosen yet. That’s fine.</p>
+          <p className="text-muted-foreground">No starting point yet.</p>
         )}
         {savedIds.length ? <p className="text-muted-foreground">Saved to look at again: {savedIds.length}</p> : null}
       </div>
@@ -144,12 +142,10 @@ function PartWays() {
         {/* DRAFT (Claude), from the Module 2 instructions and the published M2-L1 reading. */}
         <P>Exploring something doesn’t mean doing the whole thing. You can learn a lot from a small piece of it.</P>
         <P>
-          There are four ways to get closer to a possibility in the real world. Each gives you different information.
-          Watching doesn’t tell you exactly what doing feels like. A conversation reflects one person’s experience. Doing
-          one beginner task isn’t the same as doing the work every day. All four count.
+          Four ways to get closer to something in real life. Each shows you something different. Watching doesn’t show you what doing feels like. One conversation is one person’s experience. One beginner task isn’t the daily work. All four count.
         </P>
       </Panel>
-      <p className="text-[15px] text-muted-foreground">Tap a card to see what it involves. You’ll choose one in your plan.</p>
+      <p className="text-[15px] text-muted-foreground">Tap a card to see examples. You’ll pick one in your plan.</p>
       <ul className="grid gap-3 sm:grid-cols-2" role="list">
         {METHODS.map((method) => {
           const isOpen = open.includes(method.id);
@@ -182,8 +178,8 @@ function PartWays() {
         })}
       </ul>
       <Panel tone="reading">
-        <P>A small try gives you clues, not a verdict. What you imagined may differ from what you notice, and the setting, time, support, and access all shape the experience.</P>
-        <P>Interest, frustration, uncertainty, or a barrier are all information. One encounter cannot prove your ability or decide your direction.</P>
+        <P>A small try gives you clues, not a verdict. Setting, time, support and access all shape what you see.</P>
+        <P>Interest, frustration, doubt and roadblocks all tell you something. One try can’t prove what you’re capable of or decide where you go.</P>
         <Link to="/program-library?lesson=M2-L1" className="text-[15px] font-medium text-accent-ink underline underline-offset-2">Read the full explanation in the Library</Link>
       </Panel>
     </div>
@@ -201,7 +197,7 @@ function PartPlan({ lesson, answers, rev, onUseStep, onClearPossibility }) {
       : [];
   return (
     <div className="space-y-6">
-      <P>Keep it small enough to fit your time, money, energy, and responsibilities. You can change any of this later.</P>
+      <P>Keep it small enough to fit your time, money, energy and life. Change it anytime.</P>
       {plan.possibility ? (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-secondary p-3 text-[15px]">
           <span className="text-foreground">
@@ -226,7 +222,7 @@ function PartPlan({ lesson, answers, rev, onUseStep, onClearPossibility }) {
         <PromptField key={`step-${rev}`} lessonCode={CODE} lessonTitle={lesson.title} index={1} label={STEP_LABEL} variant="inline" />
         {examples.length ? (
           <details className="rounded-lg border border-border p-3">
-            <summary className="cursor-pointer text-[15px] font-medium text-foreground">Need an idea? (optional)</summary>
+            <summary className="cursor-pointer text-[15px] font-medium text-foreground">Need an idea?</summary>
             <ul className="mt-2 space-y-2">
               {examples.map((text) => (
                 <li key={text} className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
@@ -248,7 +244,7 @@ function PartPlan({ lesson, answers, rev, onUseStep, onClearPossibility }) {
       />
       <MultiChoice
         legend="What might make this difficult?"
-        hint="Pick any that fit. This is planning information, not a judgment."
+        hint="Pick any that fit. This is for planning, not judging."
         options={OBSTACLE_OPTIONS}
         values={obstacles}
         only={OBSTACLE_NONE}
@@ -258,18 +254,18 @@ function PartPlan({ lesson, answers, rev, onUseStep, onClearPossibility }) {
         lessonCode={CODE}
         lessonTitle={lesson.title}
         index="smaller"
-        label="Is there a smaller or more accessible version? (optional)"
+        label="Is there a smaller or easier version?"
         variant="inline"
       />
       <details className="rounded-lg border border-border p-3">
-        <summary className="cursor-pointer text-[15px] font-medium text-foreground">See an example plan (optional)</summary>
+        <summary className="cursor-pointer text-[15px] font-medium text-foreground">See an example plan</summary>
         <dl className="mt-2 space-y-1.5 text-[15px] text-foreground">
           <div><dt className="inline text-muted-foreground">Area: </dt><dd className="inline">Human Behavior</dd></div>
           <div><dt className="inline text-muted-foreground">Possibility: </dt><dd className="inline">Explore how habits develop.</dd></div>
           <div><dt className="inline text-muted-foreground">How: </dt><dd className="inline">Investigate</dd></div>
           <div><dt className="inline text-muted-foreground">Small step: </dt><dd className="inline">Read about how habits form and observe one everyday routine.</dd></div>
         </dl>
-        <p className="mt-2 text-[13px] text-muted-faint">An example only. Yours can look completely different.</p>
+        <p className="mt-2 text-[13px] text-muted-faint">Just an example. Yours can look nothing like it.</p>
       </details>
     </div>
   );
@@ -279,12 +275,12 @@ function PartSummary({ lesson, answers }) {
   const plan = readPlan(answers);
   return (
     <div className="space-y-5">
-      <PlanCard plan={plan} empty="Nothing planned yet. That’s fine. You can still go on to Lesson 2 and plan there, or come back here." />
+      <PlanCard plan={plan} empty="Nothing planned yet. Go on to Lesson 2 and plan there, or come back here." />
       <p className="text-[15px] leading-relaxed text-muted-foreground">
-        To change anything, tap “Plan” above. This plan will be waiting in Lesson 2, so you won’t need to write it again.
+        To change anything, tap “Plan” above. It’ll be waiting in Lesson 2.
       </p>
       <Panel tone="note">
-        <P>A plan is a starting point, not a promise. If it changes, or doesn’t happen, that’s information too.</P>
+        <P>A plan is a starting point. If it changes or doesn’t happen, you still learn something.</P>
       </Panel>
       <EarlierM2 code={CODE} answers={answers} />
       <FinishControl code={CODE} answers={answers} />

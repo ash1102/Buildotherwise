@@ -32,8 +32,8 @@ function PartLook({ answers }) {
   const anything = happened.outcome || happened.did || happened.barriers.length || happened.noticed.length || happened.words;
   return (
     <div className="space-y-5">
-      <P>Here’s what you planned and what you recorded, exactly as you saved it. Nothing needs to be entered again.</P>
-      <PlanCard plan={plan} label="What you planned" empty="No plan was saved in Lesson 1. That’s fine." />
+      <P>Here’s your plan and what you recorded, as you saved it.</P>
+      <PlanCard plan={plan} label="What you planned" empty="No plan saved in Lesson 1." />
       {anything ? (
         <Panel tone="yours" label="What happened">
           {happened.outcome ? <p className="text-[16px] font-medium text-foreground">{happened.outcome}</p> : null}
@@ -56,7 +56,7 @@ function PartLook({ answers }) {
       )}
       {happened.outcome === OUTCOMES[3] || happened.outcome === OUTCOMES[4] ? (
         <div className="space-y-2 rounded-lg border border-border bg-card p-4">
-          <p className="text-[15px] text-muted-foreground">You haven’t had the experience yet, and that’s fine. You can review your plan, choose a different way to explore, or continue with what you know so far. No experience is being assumed.</p>
+          <p className="text-[15px] text-muted-foreground">You haven’t tried it yet. Review your plan, pick a different way in, or keep going with what you know.</p>
           <Link to="/lesson/M2-L1" className="inline-block text-[15px] font-medium text-accent-ink underline underline-offset-2">Go back to my plan</Link>
         </div>
       ) : null}
@@ -71,18 +71,13 @@ function PartReading() {
         {/* DRAFT (Claude): built from the published M2-L2 reading "What Did the Experience Really Show?"
             and the points in the Module 2 instructions. */}
         <P>
-          One experience can raise useful questions. It can’t reliably tell you whether you have a lasting interest, an
-          ability, or the right direction for your life or work.
+          One try raises good questions. It can’t tell you whether you have a lasting interest, an ability, or the right direction.
         </P>
         <P>
-          Context shapes every experience. Access, money, support, timing, how unfamiliar something was, and what else was
-          going on that day all affect how it went. A difficult first try might point to a poor fit, a hard setup, or simply
-          a need for better information. An exciting first try doesn’t guarantee lasting interest either.
+          Context shapes every try: access, money, support, timing, how new it was, what else was going on that day. A hard first try might mean a poor fit, a rough setup, or just not enough information. An exciting one doesn’t guarantee the interest lasts.
         </P>
         <P>
-          It helps to separate <strong>what you observed</strong> from <strong>what you’re assuming</strong>. “I needed help
-          following the instructions” describes something that happened. “I’m not good at this” is a much bigger conclusion
-          that one experience may not support.
+          Keep <strong>what you observed</strong> apart from <strong>what you’re assuming</strong>. “I needed help following the instructions” happened. “I’m not good at this” is a much bigger claim that one try can’t support.
         </P>
       </Panel>
       <div className="grid gap-3 sm:grid-cols-2">
@@ -116,7 +111,7 @@ function PartWhere({ lesson, answers }) {
   const direction = readKey(answers, CODE, "direction");
   return (
     <div className="space-y-5">
-      <P>Whether you tried something, observed from a distance, or have not tried it yet, where would you like to go from here? None of these is better than the others.</P>
+      <P>Tried it, watched it, or haven’t started: where do you want to go from here? Your call.</P>
       <SingleChoice
         legend="Where from here?"
         options={DIRECTIONS}
@@ -127,7 +122,7 @@ function PartWhere({ lesson, answers }) {
         lessonCode={CODE}
         lessonTitle={lesson.title}
         index="direction-why"
-        label="Anything you want to add about that choice? (optional)"
+        label="Anything to add about that choice?"
         variant="inline"
       />
       <p className="text-[14px] text-muted-foreground">You can change this anytime. It’s a next step, not a verdict.</p>
@@ -148,7 +143,7 @@ function PartKeep({ lesson, answers }) {
   const bridge = bridgeOut(2);
   return (
     <div className="space-y-5">
-      <P>Pick one thing worth remembering from Module 2: something you noticed, a question you still have, or a possibility.</P>
+      <P>Pick one thing to take from Module 2: something you noticed, a question you still have, or a possibility.</P>
       <SingleChoice
         legend="What kind of thing is it?"
         options={KEEP_KINDS}
@@ -157,7 +152,7 @@ function PartKeep({ lesson, answers }) {
       />
       {starters.length ? (
         <details className="rounded-lg border border-border p-3">
-          <summary className="cursor-pointer text-[15px] font-medium text-foreground">Start from something you already wrote (optional)</summary>
+          <summary className="cursor-pointer text-[15px] font-medium text-foreground">Start from something you already wrote</summary>
           <ul className="mt-2 space-y-2">
             {starters.map((item) => (
               <li key={item.label}>
@@ -178,10 +173,10 @@ function PartKeep({ lesson, answers }) {
         </details>
       ) : null}
       <PromptField key={rev} lessonCode={CODE} lessonTitle={lesson.title} index={9} label={`${KEEP_LABEL} One line is enough.`} variant="inline" />
-      <p className="text-[15px] text-muted-foreground">Later modules can bring this back when it’s relevant. You can change it anytime.</p>
+      <p className="text-[15px] text-muted-foreground">Later modules can bring this back. Change it anytime.</p>
       {bridge ? (
         <details className="rounded-xl border border-border bg-card p-4">
-          <summary className="cursor-pointer text-[15px] font-medium text-foreground">Get a head start on Module 3 (optional)</summary>
+          <summary className="cursor-pointer text-[15px] font-medium text-foreground">Get a head start on Module 3</summary>
           <div className="mt-3">
             <BridgeOut bridge={bridge} lesson={lesson} />
           </div>
@@ -192,7 +187,7 @@ function PartKeep({ lesson, answers }) {
         <FinishControl code={CODE} answers={answers} />
       ) : (
         <Panel tone="note" label="Your experiment is still open">
-          <P>Module 2 counts as completed after you attempt at least one real-world experiment. Doing, observing, asking, or investigating can all count. A small attempt is enough; you do not need proof or a successful outcome.</P>
+          <P>Module 2 counts once you’ve tried one real-world experiment. Doing, watching, asking and digging into it all count. A small try is enough. No proof needed, and it doesn’t have to go well.</P>
           <P>You can still explore other lessons and modules, pause, or change your plan. Your progress is saved.</P>
           <Link to="/lesson/M2-L2" className="text-[15px] font-medium text-accent-ink underline underline-offset-2">Return to your experiment</Link>
         </Panel>
