@@ -28,8 +28,7 @@ function LifeMapInvite() {
         Your Life Map helps you look at where your time and energy go, what matters to you, and what you might want to
         understand better.
       </P>
-      <P>You can use it to notice patterns or return to it as things change.</P>
-      <P>You don’t have to complete it to continue.</P>
+      <P>Come back to it whenever you notice a new connection.</P>
       <Link
         to={MAP_LINK}
         className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-input bg-card px-4 text-[15px] font-medium text-foreground hover:bg-secondary"
@@ -88,12 +87,11 @@ function PartNotice({ lesson, answers }) {
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <P>You can start with something current, familiar, or unfamiliar—or with nothing that comes to mind.</P>
-        <P>
-          A question, a problem, something you already know, or a new possibility can all be starting points. You do not
-          need to enjoy something for it to be worth exploring.
-        </P>
-        <P>You don’t have to love something for it to be worth exploring.</P>
+        <P>Think about the things you find yourself drawn to.</P>
+        <P>Maybe it's a problem you can't stop thinking about. Something you enjoy doing. A question you keep asking. Or something that frustrates you enough to want to change it.</P>
+        <P>You might not think of these things as interests or strengths. You might not have given them much thought at all.</P>
+        <P><strong>That's what we're looking for.</strong> Start with something that comes to mind.</P>
+
       </div>
       <SingleChoice
         legend="What feels closest to something you’ve noticed?"
@@ -112,7 +110,7 @@ function PartNotice({ lesson, answers }) {
           />
         </div>
       ) : null}
-      <p className="text-[15px] text-muted-foreground">You don’t need to answer to continue.</p>
+
       <MapContext lesson={lesson} answers={answers} />
       <PrivacyNote />
       <LifeMapInvite />
@@ -122,7 +120,6 @@ function PartNotice({ lesson, answers }) {
 
 function PartEncounter({ lesson, answers }) {
   const selectedIds = selectedEncounterIds(readAnswer(answers, lesson.code, "encounter"));
-  const several = selectedIds.length > 1;
   // Same journal prompt key as before, so the existing journal entry is updated, never duplicated.
   const toggle = (id) => {
     const next = selectedIds.includes(id) ? selectedIds.filter((item) => item !== id) : [...selectedIds, id];
@@ -131,10 +128,10 @@ function PartEncounter({ lesson, answers }) {
   return (
     <div className="space-y-5">
       <div className="space-y-3">
-        <P>Sometimes you don’t know whether something interests you until you encounter it.</P>
-        <P>Take a look at these possibilities. You don’t have to choose one for your future. Just notice your reaction.</P>
+        <P>There's more out there than any one of us has had a chance to try.</P>
+        <P>Take a look through these possibilities. Some may feel familiar. Others might surprise you.</P>
         <p className="text-[15px] leading-relaxed text-muted-foreground">
-          Look at as many or as few as you like. Tap any that catch your attention: one, several, or none.
+          Tap anything that makes you curious. You can choose more than one—or keep exploring without choosing.
         </p>
       </div>
       <DiscoveryGallery selectedIds={selectedIds} onToggle={toggle} />
@@ -149,37 +146,22 @@ function PartEncounter({ lesson, answers }) {
           </div> : null}
           <p className="mt-2 text-[15px] text-muted-foreground">What would you want to understand, watch, ask, or try to learn more about this possibility?</p>
           <div className="mt-3"><PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index={"explore-" + card.id} label="My question or small experiment (optional)" variant="inline" /></div>
-          <p className="mt-2 text-[14px] text-muted-foreground">No right answer. You can leave it, come back, or change direction.</p>
+
         </details>
       ))}
       {selectedIds.length ? (
         <div aria-live="polite">
-          <Panel tone="note">
-            {several ? (
-              <>
-                <P>A moment ago, these were just possibilities among many.</P>
-                <P>
-                  Did you select them because they seemed interesting, because you already knew something about them,
-                  because they raised a question—or for another reason?
-                </P>
-                <P>You don’t need to decide whether you like them. You’ve encountered something you can now investigate.</P>
-              </>
-            ) : (
-              <>
-                <P>A moment ago, this was just one possibility among many.</P>
-                <P>
-                  Did you select it because it seemed interesting, because you already knew something about it, because it
-                  raised a question—or for another reason?
-                </P>
-                <P>You don’t need to decide whether you like it. You’ve encountered something you can now investigate.</P>
-              </>
-            )}
+          <Panel tone="note" title="Something caught your attention.">
+            <P>Maybe you expected it. Maybe you didn't.</P>
+            <P>What's one thing you'd like to find out about it? You can explore a question above, or simply keep it in mind.</P>
           </Panel>
         </div>
       ) : (
-        <p className="text-[15px] text-muted-foreground">You don’t need to select anything. Looking counts.</p>
+        <Panel tone="note" title="Nothing caught your attention yet?">
+          <P>That's useful to know, too. What kinds of possibilities would you have liked to see?</P>
+        </Panel>
       )}
-      <p className="text-[14px] text-muted-faint">You can investigate a possibility here, or explore more in Module 2.</p>
+      <p className="text-[14px] text-muted-faint">You can return to these possibilities later.</p>
     </div>
   );
 }
@@ -188,11 +170,8 @@ function PartReading() {
   return (
     <div className="space-y-4">
       <Panel tone="reading">
-        <P>Some things become interesting only after you encounter them, get access, or learn how they work.</P>
-        <P>
-          Curiosity can grow, change, fade, or stay small. It does not have to become a job, a business, or a lifelong
-          identity.
-        </P>
+        <P>Opportunity shapes discovery. It is hard to recognize a possibility you have never been invited to explore.</P>
+        <P>Curiosity can grow, change, fade, or stay small. Sometimes an unexpected encounter is what starts it.</P>
         <P>Hidi and Renninger describe one possible path for interest to develop—not a path everyone follows.</P>
       </Panel>
       <details className="rounded-xl border border-border bg-card p-4 sm:p-5">
@@ -251,7 +230,7 @@ function PartLook({ lesson, answers }) {
                 ))}
               </ul>
               <p className="text-[14px] text-muted-foreground">
-                Selecting something isn’t the same as being interested in it. Only you decide what it means.
+                What drew your attention is worth questioning, not labeling.
               </p>
             </Panel>
           ) : null}
@@ -279,8 +258,7 @@ function PartLook({ lesson, answers }) {
       {savedConnection ? (
         <Panel tone="note" title="You have a thought worth keeping">
           <P>
-            You’ve already put something into words. You don’t need to answer another question about it. You can carry it
-            forward, keep exploring, or change your mind.
+            You spotted a possible connection. What would help you test whether it holds up outside this workbook?
           </P>
         </Panel>
       ) : nothingYet ? (
@@ -318,8 +296,7 @@ function PartKeep({ lesson, answers }) {
       </p>
       <Panel tone="note">
         <P>
-          <strong>The takeaway:</strong> Noticing gives you somewhere to begin. It doesn’t tell you who you are or what you
-          have to do next.
+          <strong>Take this with you:</strong> You don't have to know where something leads to take a closer look. Sometimes a question is enough to begin.
         </P>
       </Panel>
       {readAnswer(answers, lesson.code, "connection") ? <Panel tone="yours" label="A connection or question you saved"><Quote>{readAnswer(answers, lesson.code, "connection")}</Quote></Panel> : null}

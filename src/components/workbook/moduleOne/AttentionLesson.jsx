@@ -78,7 +78,7 @@ function PartReading() {
           An activity can matter to you without being enjoyable. Someone can be skilled at something without wanting to
           pursue it further. And an activity that was unfamiliar at first can become interesting through experience.
         </P>
-        <P>The point is understanding your reasons, not identifying your “true passion.”</P>
+        <P>The question isn’t just how much attention something gets. It’s what draws you in, what keeps you there, and what it costs.</P>
         <P>
           If an activity already matters to you, you can notice whether you still have a choice about it. You can also leave
           that question for later. Module 5 looks at intensity, choice, and pressure after there has been a chance to try
@@ -137,10 +137,7 @@ function PartClose({ lesson, answers }) {
   return (
     <div className="space-y-6">
       <Panel tone="note">
-        <P>
-          Attention can be a starting point for exploration. It isn’t proof of passion, ability, or what you should do with
-          your future.
-        </P>
+        <P>Attention tells part of a story, not the whole thing. The same intensity can serve different purposes in different circumstances.</P>
         <P>
           You can learn more by noticing your reasons, trying different conditions, and paying attention to what changes.
         </P>

@@ -201,12 +201,9 @@ function PartAgreement({ answers }) {
           The program offers possibilities you can explore without committing to them, questions and activities that help
           you learn from experience, and opportunities to adjust your approach.
         </P>
-        <P>You can pass on any question, use an example instead of a personal story, or choose not to share. Passing is a valid way to participate.</P>
-        <P>You decide which words describe you. You do not need to disclose private experiences, explain your boundaries, or accept advice you did not ask for.</P>
-        <P>You can ask for listening, questions, encouragement, or ideas. Support should help you make your own choices, not make them for you.</P>
-        <P>Your privacy matters. What you write in the workbook is saved to your account; review the program’s privacy information for how it is handled and any limits.</P>
+        <P>Bring your questions, try an example, or work from something you've noticed. You can ask for listening, questions, or ideas without handing over the decision.</P>
         <P>We’ll distinguish support that is available from support that is still being developed.</P>
-        <P>You can revise your starting point, change direction, pause, or decide something isn’t for you. Nothing here is a pledge or a permanent commitment.</P>
+        <P>What you choose today can change as you learn more.</P>
       </Panel>
     </div>
   );

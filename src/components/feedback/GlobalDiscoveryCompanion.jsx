@@ -61,17 +61,13 @@ export default function GlobalDiscoveryCompanion() {
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [disabled, setDisabled] = useState(() => localStorage.getItem("entrepalooza_companion_auto") === "off");
   const [showTour, setShowTour] = useState(false);
   useEffect(() => {
-    if (!isAuthenticated || !user?.id || gate.pending || !gate.finished) { setOpen(false); setShowTour(false); return; }
-    const key = "entrepalooza_companion_welcomed_" + user.id;
-    if (!disabled && !sessionStorage.getItem(key)) {
-      setOpen(true);
-      sessionStorage.setItem(key, "yes");
+    if (!isAuthenticated || gate.pending || !gate.finished) {
+      setOpen(false);
+      setShowTour(false);
     }
-
-  }, [isAuthenticated, user?.id, disabled, gate.pending, gate.finished]);
+  }, [isAuthenticated, gate.pending, gate.finished]);
   if (!USE_SUPABASE || !isAuthenticated || gate.pending || !gate.finished || pathname.startsWith("/preview") || pathname.startsWith("/getting-started")) return null;
 
   const visitSection = (item) => {
@@ -109,7 +105,7 @@ export default function GlobalDiscoveryCompanion() {
   };
 
   return <aside className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-3 z-50 sm:bottom-6 sm:right-6" aria-label="Discovery Companion">
-    {!open ? <button type="button" onClick={() => setOpen(true)} className="rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-lg">Discovery Companion</button> :
+    {!open ? <button type="button" onClick={() => setOpen(true)} className="rounded-full border border-border bg-card px-3 py-2 text-xs font-medium text-muted-foreground shadow-md hover:bg-secondary" title="Need a hand? Ask your Discovery Companion">Need a hand?</button> :
       <section className="flex h-[min(70vh,560px)] w-[min(calc(100vw-1.5rem),390px)] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl" aria-label="Discovery Companion conversation">
         <header className="flex items-center justify-between border-b p-3">
           <div><p className="font-semibold">Discovery Companion</p><p className="text-xs text-muted-foreground">AI facilitator · {pageName(pathname)}</p></div>
@@ -134,7 +130,7 @@ export default function GlobalDiscoveryCompanion() {
             <Button type="submit" disabled={busy || !draft.trim()}>Send</Button>
           </form>
           {speechError && <p role="alert" className="mt-2 text-xs text-destructive">{speechError}</p>}
-          <div className="mt-2 flex justify-between gap-3 text-xs">
+          <div className="mt-2 flex gap-3 text-xs">
             <button type="button" className="underline" onClick={() => { setTurns([]); if (storageKey) localStorage.removeItem(storageKey); setShowTour(false); setError(""); }}>Clear chat</button>
             <button type="button" className="underline" onClick={() => { const next = !disabled; setDisabled(next); localStorage.setItem("entrepalooza_companion_auto", next ? "off" : "on"); }}>{disabled ? "Enable welcome" : "Don't open automatically"}</button>
           </div>

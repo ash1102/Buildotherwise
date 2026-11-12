@@ -26,6 +26,56 @@
 export const RETIRED_GS_CODES = ["O.2"];
 
 export const PENDING_LESSON_CONTENT = {
+  "O.1": {
+    title: "Before you begin",
+    purpose: "",
+    description: "A few things worth knowing about Entrepalooza, your choices, and your privacy.",
+    teach: `You don't have to know who you want to become or what direction you want to take before you begin.
+
+Entrepalooza is a place to get curious about yourself, explore your interests, strengths, and experiences, and discover what feels meaningful to you.
+
+Through conversation, learning, and real-world experimentation, you'll have opportunities to try new things, challenge assumptions, and see familiar experiences from different perspectives.
+
+What you discover along the way may surprise you, change your direction, or open possibilities you hadn't considered.
+
+The goal isn't to tell you who you should be or what you should pursue. It's to help you develop the understanding, experience, and confidence to decide for yourself.
+
+## A few things worth knowing
+
+Entrepalooza is an evolving educational experience. There's no predetermined outcome or particular direction you're expected to take.
+
+This isn't therapy or treatment, and participation doesn't guarantee a job, income, or business success.
+
+You don't need to prove you're ready, share personal experiences, or turn your past into a particular kind of story.
+
+## What stays yours
+
+### Your experiences are yours to share—or not.
+
+You decide what you're comfortable sharing. You can skip any question without explaining why. You don't need to disclose personal, medical, or legal information to participate.
+
+### Your words belong to you.
+
+What you write is saved in your account. Other participants can't see your private workbook or journal entries unless you choose to share them. Build Otherwise administrators manage the platform and may have access to information stored in it.
+
+You can download or delete your workbook, journal, Life Map, and related reflections in Settings. My Records is managed separately.
+
+### Your permission matters.
+
+If we want to use something you've written, record a conversation, or contact you for a follow-up, we'll ask for your permission separately. Agreeing to one thing doesn't mean agreeing to everything.
+
+### You can change your mind.
+
+You can change direction, take a break, or leave whenever you choose. You don't owe anyone an explanation.
+
+If you want to pause or leave the program, contact Start@buildotherwise.org.
+
+### Need help?
+
+You can type your responses or use the Dictate button to speak them.
+
+Questions or concerns? Email Start@buildotherwise.org.`,
+  },
   // M1-L3: a cached lesson row must not bring back an older title.
   "M1-L3": {
     title: "My Way Forward",
