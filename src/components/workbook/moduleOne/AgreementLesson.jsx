@@ -22,7 +22,7 @@ import {
 } from "@/lib/moduleOne";
 import { EarlierAnswers, FinishControl, MultiChoice, P, Panel, PartFlow, Quote, SingleChoice } from "./parts";
 
-const CARRY_LABEL = "What observation or question would you like to bring into Module 2? (optional)";
+const CARRY_LABEL = "What observation or question would you like to bring into Module 2?";
 
 /** What Lesson 1 left behind, exactly as saved. */
 function lessonOneWords(answers) {
@@ -45,7 +45,7 @@ function PartLookBack({ lesson, answers }) {
       <div className="space-y-3">
         <P>In the first lesson, you noticed something that caught your attention—or recognized that you’re still looking.</P>
         <P>In the second, you considered how curiosity, responsibility, enjoyment, and pressure can overlap.</P>
-        <P>Now you can decide what feels worth exploring next. Nothing you choose here has to be final.</P>
+        <P>Now decide what’s worth exploring next. You can change it as you learn.</P>
       </div>
       {anything ? (
         <Panel tone="yours" label="From Lesson 1">
@@ -60,7 +60,7 @@ function PartLookBack({ lesson, answers }) {
         </p>
       )}
       <SingleChoice
-        legend="What would you like to carry forward, if anything?"
+        legend="What are you carrying forward?"
         options={CARRY_MODES}
         value={mode}
         onChange={(next) => recordAnswer(lesson, "carry-mode", next, "My Module 1 starting point")}
@@ -118,7 +118,7 @@ function PartSupport({ lesson, answers }) {
         </Panel>
       ) : null}
       <MultiChoice
-        legend="What might help you explore? "
+        legend="What helps you explore? "
         hint="Choose any that fit. These are your preferences, not a list of what the program already provides."
         options={SUPPORT_OPTIONS}
         values={chosen}
@@ -130,7 +130,7 @@ function PartSupport({ lesson, answers }) {
         lessonCode={lesson.code}
         lessonTitle={lesson.title}
         index="support-other"
-        label="Anything else, in your own words (optional)"
+        label="Anything else, in your own words"
         variant="inline"
       />
       <p className="text-[15px] leading-relaxed text-muted-foreground">
@@ -179,7 +179,7 @@ function PartAgreement({ answers }) {
             ))}
           </dl>
         ) : (
-          <p className="text-[15px] text-muted-foreground">Nothing chosen yet. You can move on or leave this open.</p>
+          <p className="text-[15px] text-muted-foreground">Nothing chosen yet. Pick one or leave it open.</p>
         )}
         <p className="text-[14px] text-muted-faint">
           These are choices for now. You can change direction, pause, or leave anything open.
@@ -218,7 +218,7 @@ function PartClose({ lesson, answers }) {
           lessonCode={lesson.code}
           lessonTitle={lesson.title}
           index={4}
-          label="Is there something small you’d be curious to try or learn more about? (optional)"
+          label="Is there something small you’d be curious to try or learn more about?"
           variant="inline"
         />
         <p className="text-[14px] leading-relaxed text-muted-faint">
@@ -227,8 +227,7 @@ function PartClose({ lesson, answers }) {
       </Panel>
       <div className="space-y-3">
         <P>
-          You’ve started noticing possibilities, considered what might be behind your attention, and decided how you’d
-          like to approach exploration.
+          You noticed what pulls at you, looked at what’s behind it, and decided how you’ll explore. That’s Module 1.
         </P>
         <P>In Module 2, you’ll have opportunities to encounter something more directly.</P>
         <P>You can start with the question you brought here, choose something unfamiliar, or keep looking.</P>
@@ -243,7 +242,7 @@ function PartClose({ lesson, answers }) {
       </Link>
       {bridge ? (
         <details className="rounded-xl border border-border bg-card p-4">
-          <summary className="cursor-pointer text-[15px] font-medium text-foreground">Get a head start on Module 2 (optional)</summary>
+          <summary className="cursor-pointer text-[15px] font-medium text-foreground">Get a head start on Module 2</summary>
           <div className="mt-3">
             <BridgeOut bridge={bridge} lesson={lesson} />
           </div>
@@ -280,7 +279,7 @@ export default function AgreementLesson({ lesson }) {
             <ChoicePart
               lesson={lesson} answers={answers} answerKeyName="approach"
               legend="Choose what fits for now. You can change your mind." options={APPROACH_OPTIONS}
-              note="Observing first is as valid as trying something hands-on."
+              note="Watching first counts. So does jumping in."
               journalLabel="How I'll approach the experience"
             />
           </section>

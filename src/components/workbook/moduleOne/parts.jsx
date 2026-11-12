@@ -272,7 +272,7 @@ export function FinishControl({ code, answers }) {
         <Check className="h-4 w-4" aria-hidden="true" />
         I’m done with this lesson for now
       </button>
-      <p className="text-[14px] text-muted-faint">You don’t need to answer anything to move on. You can come back and change answers anytime.</p>
+      <p className="text-[14px] text-muted-faint">Answer what helps. Skip the rest. Come back and change anything, anytime.</p>
     </div>
   );
 }

@@ -50,7 +50,7 @@ function MapContext({ lesson, answers }) {
   return (
     <details className="rounded-xl border border-border bg-card p-4" open={Boolean(chosen)}>
       <summary className="cursor-pointer text-[16px] font-medium text-foreground">
-        Bring in something from your Life Map (optional)
+        Bring in something from your Life Map
       </summary>
       <p className="mt-2 text-[15px] text-muted-foreground">
         Tap one to keep it next to this lesson. It’s copied exactly as you wrote it, and nothing on your map changes.
@@ -89,7 +89,7 @@ function PartNotice({ lesson, answers }) {
       <div className="space-y-3">
         <P>Think about the things you find yourself drawn to.</P>
         <P>Maybe it's a problem you can't stop thinking about. Something you enjoy doing. A question you keep asking. Or something that frustrates you enough to want to change it.</P>
-        <P>You might not think of these things as interests or strengths. You might not have given them much thought at all.</P>
+        <P>Most people don’t call these things interests or strengths. Here, they count.</P>
         <P><strong>That's what we're looking for.</strong> Start with something that comes to mind.</P>
 
       </div>
@@ -105,7 +105,7 @@ function PartNotice({ lesson, answers }) {
             lessonCode={lesson.code}
             lessonTitle={lesson.title}
             index="notice-text"
-            label={`${option.prompt} (optional)`}
+            label={option.prompt}
             variant="inline"
           />
         </div>
@@ -129,7 +129,7 @@ function PartEncounter({ lesson, answers }) {
     <div className="space-y-5">
       <div className="space-y-3">
         <P>There's more out there than any one of us has had a chance to try.</P>
-        <P>Take a look through these possibilities. Some may feel familiar. Others might surprise you.</P>
+        <P>Look through these. Some will feel familiar. Some will surprise you.</P>
         <p className="text-[15px] leading-relaxed text-muted-foreground">
           Tap anything that makes you curious. You can choose more than one—or keep exploring without choosing.
         </p>
@@ -137,15 +137,15 @@ function PartEncounter({ lesson, answers }) {
       <DiscoveryGallery selectedIds={selectedIds} onToggle={toggle} />
       {ENCOUNTER_CARDS.filter(card => selectedIds.includes(card.id)).map(card => (
         <details key={card.id} className="rounded-xl border border-border bg-card p-4">
-          <summary className="cursor-pointer text-[16px] font-medium">Explore {card.title} now (optional)</summary>
+          <summary className="cursor-pointer text-[16px] font-medium">Explore {card.title} now</summary>
           <p className="mt-3 text-[15px] leading-relaxed">{card.description}</p>
           {card.id === "behavior" ? <div className="mt-3 space-y-3 rounded-lg bg-secondary p-3">
             <p className="text-[15px] font-medium">Try a human behavior thought experiment</p>
             <P>Two people get the same feedback. One feels encouraged, the other feels dismissed. What might account for the difference?</P>
-            <p className="text-[14px] text-muted-foreground">Try imagining two explanations. What information would you need before making a judgment? You do not need to decide who is right.</p>
+            <p className="text-[14px] text-muted-foreground">Try imagining two explanations. What information would you need before making a judgment? Hold off on deciding who’s right.</p>
           </div> : null}
           <p className="mt-2 text-[15px] text-muted-foreground">What would you want to understand, watch, ask, or try to learn more about this possibility?</p>
-          <div className="mt-3"><PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index={"explore-" + card.id} label="My question or small experiment (optional)" variant="inline" /></div>
+          <div className="mt-3"><PromptField lessonCode={lesson.code} lessonTitle={lesson.title} index={"explore-" + card.id} label="My question or small experiment" variant="inline" /></div>
 
         </details>
       ))}
@@ -175,7 +175,7 @@ function PartReading() {
         <P>Hidi and Renninger describe one possible path for interest to develop—not a path everyone follows.</P>
       </Panel>
       <details className="rounded-xl border border-border bg-card p-4 sm:p-5">
-        <summary className="cursor-pointer text-[16px] font-medium text-foreground">Research and reading (optional)</summary>
+        <summary className="cursor-pointer text-[16px] font-medium text-foreground">Research and reading</summary>
         <div className="mt-3 space-y-3">
           <P>
             Their four-phase model describes triggered situational interest, maintained situational interest, emerging
@@ -243,14 +243,13 @@ function PartLook({ lesson, answers }) {
       {encounterCards.length && (text || map) ? (
         <Panel tone="note" title="Could there be a connection?">
           <P>
-            You noticed something in your experience and selected {encounterCards.map((card) => card.title).join(", ")}. They
-            might connect, or they might not. You decide.
+            You noticed something in your experience and selected {encounterCards.map((card) => card.title).join(", ")}. Do they connect? Your call.
           </P>
           <PromptField
             lessonCode={lesson.code}
             lessonTitle={lesson.title}
             index="connection"
-            label="A connection or question worth exploring (optional)"
+            label="A connection or question worth exploring"
             variant="inline"
           />
         </Panel>
@@ -271,7 +270,7 @@ function PartLook({ lesson, answers }) {
           lessonCode={lesson.code}
           lessonTitle={lesson.title}
           index="stood-out"
-          label="What, if anything, would you like to note here? (optional)"
+          label="What do you want to remember from this?"
           variant="inline"
         />
       ) : null}
@@ -316,7 +315,7 @@ export default function NoticeLesson({ lesson }) {
   const answers = useAnswers();
   const parts = [
     { id: "notice", short: "Notice", title: "What catches your attention?", content: <PartNotice lesson={lesson} answers={answers} /> },
-    { id: "encounter", short: "Discover", title: "Something you might never have considered", content: <PartEncounter lesson={lesson} answers={answers} /> },
+    { id: "encounter", short: "Discover", title: "Something you’ve never considered", content: <PartEncounter lesson={lesson} answers={answers} /> },
     { id: "reading", short: "Read", title: "How interests begin", content: <PartReading /> },
     { id: "look", short: "Look", title: "Look at what caught your attention", content: <PartLook lesson={lesson} answers={answers} /> },
     { id: "keep", short: "Keep", title: "Keep one possibility or question", content: <PartKeep lesson={lesson} answers={answers} /> },

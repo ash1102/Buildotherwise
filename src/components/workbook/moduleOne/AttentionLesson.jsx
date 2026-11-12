@@ -101,8 +101,7 @@ function PartYours({ lesson, answers }) {
   return (
     <div className="space-y-6">
       <P>
-        Think of an activity that takes up your attention: something you do often, or think about a lot. You don’t need to
-        name it or write it down.
+        Think of an activity that takes up your attention: something you do often, or think about a lot. Keep it to yourself for now.
       </P>
       <SingleChoice
         legend="Which would you like to use?"
@@ -112,7 +111,7 @@ function PartYours({ lesson, answers }) {
         onChange={(next) => recordAnswer(lesson, "lens", next, "Which example I used")}
       />
       <MultiChoice
-        legend={fictional ? "What might keep Jordan or Casey involved?" : "What might keep you involved?"}
+        legend={fictional ? "What might keep Jordan or Casey involved?" : "What keeps you coming back?"}
         hint="Choose any that fit. More than one is fine."
         options={REASON_OPTIONS}
         values={reasons}
@@ -125,7 +124,7 @@ function PartYours({ lesson, answers }) {
         lessonCode={lesson.code}
         lessonTitle={lesson.title}
         index="surprise"
-        label="Did anything about those reasons surprise you? (optional)"
+        label="Did anything about those reasons surprise you?"
         variant="inline"
       />
       <PrivacyNote>Saved to your account and your private journal. Your choices aren’t a score or a label.</PrivacyNote>
