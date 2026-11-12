@@ -28,8 +28,8 @@ export default function Mission() {
         <p className="workbook-label">Build Otherwise</p>
         <h1 className="mt-2">Mission and vision</h1>
         <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-          Build Otherwise is an early-stage social-impact initiative in Houston. We design practical, non-clinical
-          learning for adults working out what comes next.
+          Build Otherwise pushes back on the scripts that decide who gets taken seriously. We build hands-on
+          learning in Houston for adults deciding what comes next.
         </p>
       </header>
 
