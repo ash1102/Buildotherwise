@@ -87,11 +87,11 @@ function PublicHome() {
       <section className="rounded-2xl bg-primary px-5 py-10 text-primary-foreground sm:px-10 sm:py-14">
         <p className="text-[13px] font-semibold text-primary-soft">Entrepalooza · online · from Build Otherwise</p>
         <h1 className="mt-3 max-w-[18ch] text-[clamp(2.2rem,1.4rem+3.6vw,3.6rem)] leading-[1.05] tracking-tight text-primary-foreground">
-          You don’t need your whole life figured out.
+          Not knowing what’s next is where this starts.
         </h1>
         <p className="mt-4 max-w-[58ch] text-[18px] leading-relaxed text-primary-foreground/85">
-          Entrepalooza brings self-discovery, conversation, and real-world experiments together. Notice what interests
-          you, try something, and see what you learn.
+          Entrepalooza is where you find out what you want by testing it in real life. Notice what pulls at you. Try
+          it. See what it teaches you. Decide what’s next.
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
           <StartButton />
@@ -122,7 +122,7 @@ function PublicHome() {
           ))}
         </ol>
         <p className="mt-4 max-w-[60ch] text-[16px] leading-relaxed text-muted-foreground">
-          The point isn’t to settle on a destination. It’s to learn from what happens.
+          Every try teaches you something. That’s the point.
         </p>
       </section>
 
@@ -159,8 +159,7 @@ function PublicHome() {
         <p className="workbook-label">About the workbook</p>
         <h2 className="mt-1.5">The pilot tests the program, not you.</h2>
         <p className="mt-2 text-[17px] leading-relaxed text-muted-foreground">
-          We’re learning what works, what needs to change, and whether these activities are useful in real life.
-          Participant feedback helps shape the next version. Here’s what we’re looking at:
+          The people who use it shape what it becomes. Here’s what we’re testing:
         </p>
         <ol className="mt-4 space-y-2.5">
           {PILOT_QUESTIONS.map((question, index) => (
@@ -177,7 +176,7 @@ function PublicHome() {
       <section className="rounded-2xl bg-primary px-5 py-9 text-primary-foreground sm:px-10">
         <h2 className="text-primary-foreground">Want in?</h2>
         <p className="mt-2 max-w-[60ch] text-[17px] leading-relaxed text-primary-foreground/85">
-          The workbook is online and open now. Begin whenever you like, and join the list if you want updates.
+          The workbook is open. Start today, or join the list for updates.
         </p>
         <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
           <StartButton />
