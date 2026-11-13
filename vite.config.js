@@ -7,7 +7,7 @@ import path from 'node:path'
 export default defineConfig(({ mode }) => {
   const env = { ...process.env, ...loadEnv(mode, process.cwd(), '') };
   // The Vercel build sets VITE_SUPABASE_URL and runs without any Base44 plugin.
-  const onSupabase = Boolean(env.VITE_SUPABASE_URL);
+  const onSupabase = Boolean(env.VITE_SUPABASE_URL) || env.VITE_MODULE_ONE_REVIEW === '1';
 
   return {
     resolve: {

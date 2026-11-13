@@ -1,0 +1,7 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {blankReview,reviseEntry,sourceChanged,KINDS} from './moduleOneRevised.js';
+test('source revisions flag dependent entries without rewriting accepted wording',()=>{const entry={text:'Could I enjoy sound editing?',kind:KINDS[1],sourceKey:'R1-L3.takeaway',sourceText:'Sound caught my attention',revision:1};assert.equal(sourceChanged(entry,{'R1-L3.takeaway':'Sound caught my attention'}),false);assert.equal(sourceChanged(entry,{'R1-L3.takeaway':'Actually the story interested me'}),true);assert.equal(entry.text,'Could I enjoy sound editing?');const next=reviseEntry(entry,'Was it storytelling?',KINDS[1]);assert.equal(next.revision,2);assert.equal(next.history[0].text,entry.text);assert.equal(entry.revision,1);});
+test('blank state keeps response, completion and map independent',()=>{const one=blankReview(),two=blankReview();one.answers.example='fictional';assert.deepEqual(two.answers,{});assert.deepEqual(one.finished,{});assert.deepEqual(one.map,[]);});
+test('review has no network or production storage adapter',()=>{const text=fs.readFileSync('src/components/workbook/moduleOneRevised/RevisionExperience.jsx','utf8');assert.doesNotMatch(text,/fetch\(|supabase|base44|useAuth|setAnswer|writeStore|useWorkbook/);assert.match(text,/entrepalooza\.revision\.nov13\.fictional/);const shared=fs.readFileSync('src/components/workbook/moduleOne/primitives.jsx','utf8');assert.doesNotMatch(shared,/base44|supabase|useAuth|from ['"].*(?:workbook|journal)/);});
