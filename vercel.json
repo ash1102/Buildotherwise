@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "buildCommand": "VITE_MODULE_ONE_REVIEW=1 npm run build",
+  "buildCommand": "if [ \"$VERCEL_ENV\" = \"preview\" ] && [ \"$VERCEL_GIT_COMMIT_REF\" = \"revision/module-one-founder-nov13\" ]; then VITE_MODULE_ONE_REVIEW=1 npm run build; else npm run build; fi",
   "outputDirectory": "dist",
   "rewrites": [
     {

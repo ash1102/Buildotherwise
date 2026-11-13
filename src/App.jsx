@@ -39,6 +39,7 @@ const Connect = lazy(() => import('@/pages/Connect'));
 const Mission = lazy(() => import('@/pages/Mission'));
 const Programs = lazy(() => import('@/pages/Programs'));
 const GetInvolved = lazy(() => import('@/pages/GetInvolved'));
+const RevisedModuleOne = lazy(() => import('@/components/workbook/moduleOneRevised/RevisionExperience'));
 const PreviewHome = lazy(() => import('@/pages/preview/PreviewHome'));
 const PreviewModulePage = lazy(() => import('@/pages/preview/PreviewModulePage'));
 const PreviewStepPage = lazy(() => import('@/pages/preview/PreviewStepPage'));
@@ -127,6 +128,7 @@ const AuthenticatedApp = () => {
           <Route path="/get-involved" element={<GetInvolved />} />
           <Route element={<AdminOnly />}>
             <Route path="/preview" element={<PreviewHome />} />
+            <Route path="/preview/module-one-revised" element={<RevisedModuleOne />} />
             <Route path="/preview/module/:slug" element={<PreviewModulePage />} />
             <Route path="/preview/step/:code" element={<PreviewStepPage />} />
             <Route path="/preview/notes" element={<PreviewNotes />} />
