@@ -4,12 +4,12 @@
  *
  * Environment (server only, never returned or logged):
  *   GEMINI_API_KEY          (the older name Gemini_key also works)
- *   GEMINI_MODEL            exact model ID, e.g. gemini-2.5-flash-lite
+ *   GEMINI_MODEL            exact model ID, e.g. gemini-3.5-flash-lite
  *   GEMINI_THINKING_LEVEL   minimal | low | medium | high | off   (default low)
  */
 
 export const API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
-export const DEFAULT_MODEL = 'gemini-2.5-flash-lite';
+export const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
 export const REQUEST_TIMEOUT_MS = 30_000;
 
 export function geminiKey(env) {
@@ -18,20 +18,6 @@ export function geminiKey(env) {
 
 export function geminiModel(env) {
   return String(env.GEMINI_MODEL || DEFAULT_MODEL).trim().replace(/^models\//, '');
-}
-
-/** Discover an actual generateContent-capable model for this API key without exposing the key. */
-export async function discoverGeminiModel(fetchImpl, apiKey, preferred) {
-  const response = await fetchWithTimeout(fetchImpl, API_BASE + '/models?pageSize=100', {
-    headers: { 'x-goog-api-key': apiKey },
-  });
-  if (!response.ok) return { model: null, status: response.status };
-  const data = await response.json();
-  const available = (data.models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
-    .map(m => String(m.name || '').replace('models/', ''));
-  const candidates = [preferred, 'gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemini-2.0-flash-lite', 'gemini-2.0-flash'];
-  const ordered = [...new Set([...candidates.filter(name => available.includes(name)), ...available.filter(name => /flash/i.test(name)), ...available])];
-  return { model: ordered[0] || null, models: ordered, status: response.status };
 }
 
 export function thinkingLevel(env) {

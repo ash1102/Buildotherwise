@@ -40,8 +40,8 @@ export function PartFlow({ lessonCode, parts, storageVersion = 1 }) {
 
   return (
     <div ref={topRef} className="scroll-mt-24 space-y-5">
-      <nav aria-label="Lesson sections" className="overflow-x-auto pb-1">
-        <p className="mb-2 text-[13px] text-muted-faint">Choose a title to jump to that section.</p>
+      <nav aria-label="Parts of this lesson" className="overflow-x-auto pb-1">
+        <p className="mb-2 text-[13px] text-muted-faint">Tap a part to jump back to it.</p>
         <ol className="flex gap-2" role="list">
           {parts.map((item, i) => (
             <li key={item.id} className="min-w-[74px] flex-1">

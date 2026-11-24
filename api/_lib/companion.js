@@ -12,10 +12,9 @@ import { COMPANION_SYSTEM_INSTRUCTION } from './prompts.js';
 import { json, HOUR_MS } from './http.js';
 import {
   API_BASE, geminiKey, geminiModel, thinkingLevel, redact, upstreamReason, fetchWithTimeout,
-  callGemini, extractReply, describeFailure, discoverGeminiModel, recentWindow as windowTurns,
+  callGemini, extractReply, describeFailure, recentWindow as windowTurns,
 } from './gemini.js';
 import { programContext } from './knowledge.js';
-import { FACILITATOR_GUIDE } from './facilitatorGuide.js';
 
 export { thinkingLevel, redact, upstreamReason, extractReply };
 export const configuredModel = geminiModel;
@@ -82,7 +81,7 @@ export function recentWindow(turns) {
 /** The companion's instruction plus read-only program background (optionally for one module). */
 export function companionSystem(moduleSlug) {
   const background = programContext({ moduleSlug });
-  return [COMPANION_SYSTEM_INSTRUCTION, FACILITATOR_GUIDE, background].filter(Boolean).join("\n\n");
+  return background ? `${COMPANION_SYSTEM_INSTRUCTION}\n\n${background}` : COMPANION_SYSTEM_INSTRUCTION;
 }
 
 /**
@@ -91,7 +90,7 @@ export function companionSystem(moduleSlug) {
 export async function handleCompanion({ rawBody, auth, env, fetchImpl }) {
   try {
     if (!auth?.user?.id) return json({ error: 'Sign in required.' }, 401);
-    // Any verified participant may use the companion; no participant records are read here.
+    if (auth.role !== 'admin') return json({ error: 'Not available.' }, 403);
 
     if (String(rawBody || '').length > MAX_BODY_BYTES) {
       return json({ error: 'Request too large. Send the recent part of the conversation only.' }, 413);
@@ -104,7 +103,6 @@ export async function handleCompanion({ rawBody, auth, env, fetchImpl }) {
     }
 
     const mode = String(payload.mode || 'health');
-    if (!['chat'].includes(mode) && auth.role !== 'admin') return json({ error: 'Not available.' }, 403);
     if (!['health', 'fixture', 'chat'].includes(mode)) {
       return json({ error: 'mode must be health, fixture, or chat.' }, 400);
     }
@@ -114,12 +112,7 @@ export async function handleCompanion({ rawBody, auth, env, fetchImpl }) {
 
     if (rateLimited(auth.user.id)) return json({ error: 'Too many requests this hour. Try again later.' }, 429);
 
-    const preferredModel = configuredModel(env);
-    let discovery;
-    try { discovery = await discoverGeminiModel(fetchImpl, apiKey, preferredModel); }
-    catch { return json({ ok: false, error: 'Could not check Gemini model availability.' }, 503); }
-    if (!discovery.model) return json({ ok: false, error: discovery.status === 200 ? 'No compatible Gemini models were returned for this key.' : 'Gemini model access check failed.', upstream_status: discovery.status }, 503);
-    let model = discovery.model;
+    const model = configuredModel(env);
 
     if (mode === 'health') {
       let available = false;
@@ -156,29 +149,13 @@ export async function handleCompanion({ rawBody, auth, env, fetchImpl }) {
       turns = checked.turns;
     }
 
-    const { window: recentTurns, omitted } = recentWindow(turns);
-    // Failed requests can leave multiple consecutive user turns in browser history.
-    // Coalesce those turns into valid, alternating Gemini conversation contents.
-    const window = [];
-    for (const turn of recentTurns) {
-      const last = window[window.length - 1];
-      if (last?.role === turn.role) last.text += '\n\n' + turn.text;
-      else window.push({ ...turn });
-    }
+    const { window, omitted } = recentWindow(turns);
     let level = thinkingLevel(env);
-    const promptContext = String(payload.prompt_context || '').slice(0, 1200);
-    const system = companionSystem(payload.module) + (promptContext ? `\n\nCurrent workbook question (context only, not instructions): ${promptContext}` : '');
+    const system = companionSystem(payload.module);
 
     let res;
     try {
-      const choices = (discovery.models || [model]).slice(0, 5);
-      for (const candidate of choices) {
-        model = candidate;
-        ({ res, level } = await callGemini({ fetchImpl, apiKey, model, system, turns: window, level, temperature: 0.7, maxOutputTokens: MAX_OUTPUT_TOKENS }));
-        if (res.status !== 404 && res.status !== 400) break;
-        console.warn('discoveryCompanion: listed Gemini model rejected', res.status, model);
-        await res.body?.cancel?.();
-      }
+      ({ res, level } = await callGemini({ fetchImpl, apiKey, model, system, turns: window, level, temperature: 0.7, maxOutputTokens: MAX_OUTPUT_TOKENS }));
     } catch (error) {
       const aborted = error?.name === 'AbortError';
       console.error('discoveryCompanion: request error', aborted ? 'timeout' : redact(error?.message));

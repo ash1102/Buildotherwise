@@ -111,7 +111,7 @@ function PartYours({ lesson, answers }) {
         onChange={(next) => recordAnswer(lesson, "lens", next, "Which example I used")}
       />
       <MultiChoice
-        legend={fictional ? "What might keep Jordan or Casey involved?" : "What keeps you coming back?"}
+        legend={fictional ? "What might keep Jordan or Casey involved?" : "What might keep you involved?"}
         hint="Choose any that fit. More than one is fine."
         options={REASON_OPTIONS}
         values={reasons}

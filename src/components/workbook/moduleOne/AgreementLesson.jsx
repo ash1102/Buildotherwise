@@ -45,7 +45,7 @@ function PartLookBack({ lesson, answers }) {
       <div className="space-y-3">
         <P>In the first lesson, you noticed something that caught your attention—or recognized that you’re still looking.</P>
         <P>In the second, you considered how curiosity, responsibility, enjoyment, and pressure can overlap.</P>
-        <P>Now decide what’s worth exploring next. You can change it as you learn.</P>
+        <P>Now you can decide what feels worth exploring next. Nothing you choose here has to be final.</P>
       </div>
       {anything ? (
         <Panel tone="yours" label="From Lesson 1">
@@ -60,7 +60,7 @@ function PartLookBack({ lesson, answers }) {
         </p>
       )}
       <SingleChoice
-        legend="What are you carrying forward?"
+        legend="What would you like to carry forward, if anything?"
         options={CARRY_MODES}
         value={mode}
         onChange={(next) => recordAnswer(lesson, "carry-mode", next, "My Module 1 starting point")}
@@ -118,7 +118,7 @@ function PartSupport({ lesson, answers }) {
         </Panel>
       ) : null}
       <MultiChoice
-        legend="What helps you explore? "
+        legend="What might help you explore? "
         hint="Choose any that fit. These are your preferences, not a list of what the program already provides."
         options={SUPPORT_OPTIONS}
         values={chosen}
@@ -279,7 +279,7 @@ export default function AgreementLesson({ lesson }) {
             <ChoicePart
               lesson={lesson} answers={answers} answerKeyName="approach"
               legend="Choose what fits for now. You can change your mind." options={APPROACH_OPTIONS}
-              note="Watching first counts. So does jumping in."
+              note="Observing first is as valid as trying something hands-on."
               journalLabel="How I'll approach the experience"
             />
           </section>

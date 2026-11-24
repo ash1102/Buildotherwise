@@ -6,7 +6,6 @@ import { base44 } from "@/api/base44Client";
 import { USE_SUPABASE } from "@/api/supabaseCompat";
 import { useAuth } from "@/lib/AuthContext";
 import { feedbackItems } from "@/components/feedback/feedbackItems";
-import CompanionConversation from "@/components/feedback/CompanionConversation";
 
 const LINK_CLASS =
   "rounded underline decoration-natural underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper";
@@ -18,7 +17,7 @@ const MIN_CHARS = 10;
  * Nothing is sent unless they tap the button. On Vercel the reply comes from Gemini.
  * Feedback is saved on their account and can be deleted.
  */
-export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, lessonCode = "", promptId = "", getText, className = "", openOnInvite = false }) {
+export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, lessonCode = "", promptId = "", getText, className = "" }) {
   const { isAuthenticated, navigateToLogin } = useAuth();
   const [open, setOpen] = useState(false);
   useEffect(() => { if (openOnInvite) setOpen(true); }, [openOnInvite]);
@@ -114,7 +113,7 @@ export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, les
               <p className="text-[12.5px] leading-relaxed text-ink-soft">
                 Optional. Tapping the button sends this answer to{" "}
                 {USE_SUPABASE ? "Gemini (an AI made by Google)" : "Claude (an AI made by Anthropic)"} for a short
-                response grounded in this answer and its lesson, with at most one optional question. No scores or judgments. You can also start an optional conversation below. The feedback is saved with
+                response grounded in this answer and its lesson, with at most one optional question. No scores or judgments. This is a one-answer reflection, not a live chat. The feedback is saved with
                 your account, and you can delete it.
               </p>
 

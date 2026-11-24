@@ -118,8 +118,59 @@ export default function GettingStartedPage() {
           Continue
           <ArrowRight className="h-5 w-5" aria-hidden="true" />
         </Link>
-        <Link to="/lesson/O.1" className="mt-5 text-[15px] text-muted-foreground underline underline-offset-4">
-          What this is &amp; what stays private
+      ) : null}
+
+      {admin ? (
+        <p className="text-[15px] text-muted-foreground">
+          Admins can open the workbook before these steps are done.{" "}
+          <Link to="/" className="font-medium text-accent-ink underline underline-offset-2">
+            Open the workbook
+          </Link>
+        </p>
+      ) : null}
+
+      <StepList lessons={steps} scopeLabel="in Getting Started" numberByIndex />
+
+      {earlier.length ? (
+        <section className="rounded-xl border border-border bg-card p-5 sm:p-6">
+          <p className="workbook-label">Your earlier answers</p>
+          <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
+            These steps used to be part of Getting Started. They aren’t needed anymore, but what you saved is still
+            here. My Way Forward is in Module 1, Lesson 3.
+          </p>
+          <ul className="mt-3 space-y-2">
+            {earlier.map((lesson) => (
+              <li key={lesson.code}>
+                <Link to={`/lesson/${lesson.code}`} className="text-[16px] font-medium text-accent-ink underline underline-offset-2">
+                  {lesson.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {optional.length ? (
+        <section className="rounded-xl border border-dashed border-input bg-card p-5 sm:p-6">
+          <p className="workbook-label">Optional, later</p>
+          <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">
+            Not needed to open the workbook. Worth a look before you reply to anyone in Tribe threads.
+          </p>
+          <ul className="mt-3 space-y-1">
+            {optional.map((lesson) => (
+              <li key={lesson.code} className="text-[16px] text-foreground">
+                {lesson.title}
+                {lesson.duration_min ? <span className="text-muted-faint"> · About {lesson.duration_min} min</span> : null}
+                <span className="block text-[14px] text-muted-faint">Opens once the steps above are done.</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {!isAuthenticated ? (
+        <Link to="/" className="inline-block text-[16px] font-medium text-accent-ink underline underline-offset-2">
+          Back to the main site
         </Link>
       </section>
     </div>
