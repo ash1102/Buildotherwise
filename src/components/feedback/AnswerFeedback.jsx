@@ -20,6 +20,7 @@ const MIN_CHARS = 10;
 export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, lessonCode = "", promptId = "", getText, className = "" }) {
   const { isAuthenticated, navigateToLogin } = useAuth();
   const [open, setOpen] = useState(false);
+  useEffect(() => { if (openOnInvite) setOpen(true); }, [openOnInvite]);
   const [items, setItems] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -164,6 +165,7 @@ export default function AnswerFeedback({ sourceType, sourceKey, sourceLabel, les
                 </div>
               ) : null}
 
+              {USE_SUPABASE && <CompanionConversation lessonCode={lessonCode} question={sourceLabel} getAnswer={getText} />}
               <div className="mt-3 flex flex-wrap items-center gap-3">
                 <Button
                   type="button"

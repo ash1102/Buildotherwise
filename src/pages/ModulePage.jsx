@@ -95,10 +95,10 @@ function ModuleBody() {
 
           {module.order === 5 ? (
             <section id="continue" className="rounded-xl border border-border bg-card p-5 sm:p-6">
-              <p className="workbook-label">The halfway point</p>
+              <p className="workbook-label">Looking back and ahead</p>
               <p className="mt-2 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-                Modules 1–5 end with this module. You can go back through the lessons or open your Conversation Journal
-                anytime. Nothing here signs you up for a group or follow-up support.
+                You’ve reached the end of the first five modules. Revisit a lesson, look through your Journal,
+                or explore the discoveries you’ve saved.
               </p>
               <Link
                 to="/record"

@@ -87,11 +87,11 @@ function PublicHome() {
       <section className="rounded-2xl bg-primary px-5 py-10 text-primary-foreground sm:px-10 sm:py-14">
         <p className="text-[13px] font-semibold text-primary-soft">Entrepalooza · online · from Build Otherwise</p>
         <h1 className="mt-3 max-w-[18ch] text-[clamp(2.2rem,1.4rem+3.6vw,3.6rem)] leading-[1.05] tracking-tight text-primary-foreground">
-          You don’t need your whole life figured out.
+          Not knowing what’s next is where this starts.
         </h1>
         <p className="mt-4 max-w-[58ch] text-[18px] leading-relaxed text-primary-foreground/85">
-          You need one thing worth testing. Entrepalooza helps you try it small, see what actually happened, and choose
-          your next move.
+          Entrepalooza is where you find out what you want by testing it in real life. Notice what pulls at you. Try
+          it. See what it teaches you. Decide what’s next.
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
           <StartButton />
@@ -106,7 +106,7 @@ function PublicHome() {
 
       <section id="how">
         <p className="workbook-label">How it works</p>
-        <h2 className="mt-1.5">Four moves. That’s the whole method.</h2>
+        <h2 className="mt-1.5">A way to explore.</h2>
         <ol className="mt-5 grid gap-3 sm:grid-cols-2">
           {STEPS.map((step, index) => (
             <li key={step.label} className="rounded-xl border border-border bg-card p-5">
@@ -122,7 +122,7 @@ function PublicHome() {
           ))}
         </ol>
         <p className="mt-4 max-w-[60ch] text-[16px] leading-relaxed text-muted-foreground">
-          That isn’t “become a furniture restorer.” It’s knowing more than you did before you tried.
+          Every try teaches you something. That’s the point.
         </p>
       </section>
 
@@ -137,9 +137,8 @@ function PublicHome() {
           ))}
         </ul>
         <p className="mt-4 text-[17px] leading-relaxed text-foreground">
-          No business idea required. Building one is on the table, though. Entrepalooza teaches the skills behind it:
-          testing ideas cheaply, reading what’s working, and making calls without all the answers. Those skills come with
-          you whether you start something or not. A job, training, a project or a pause are real answers here too.
+          You can start with an interest, a question, or something you’ve been wondering about. Explore it through
+          small experiments, pay attention to what happens, and use what you learn to choose your next move.
         </p>
       </section>
 
@@ -160,8 +159,7 @@ function PublicHome() {
         <p className="workbook-label">About the workbook</p>
         <h2 className="mt-1.5">The pilot tests the program, not you.</h2>
         <p className="mt-2 text-[17px] leading-relaxed text-muted-foreground">
-          We’re checking whether Entrepalooza is clear, doable and worth your time. We’re not promising jobs, income or
-          business results. What participants tell us shapes what changes. The questions we’re asking:
+          The people who use it shape what it becomes. Here’s what we’re testing:
         </p>
         <ol className="mt-4 space-y-2.5">
           {PILOT_QUESTIONS.map((question, index) => (
@@ -178,7 +176,7 @@ function PublicHome() {
       <section className="rounded-2xl bg-primary px-5 py-9 text-primary-foreground sm:px-10">
         <h2 className="text-primary-foreground">Want in?</h2>
         <p className="mt-2 max-w-[60ch] text-[17px] leading-relaxed text-primary-foreground/85">
-          The workbook is online and open now. Begin whenever you like, and join the list if you want updates.
+          The workbook is open. Start today, or join the list for updates.
         </p>
         <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
           <StartButton />
@@ -222,7 +220,7 @@ function MemberHome() {
   const started = orderedLessons.some((lesson) => isWorkbookLesson(lesson) && stepComplete(lesson, answers, states));
   const liveModules = modules.filter((module) => module.status === "live" && module.kind !== "orientation");
   const nextModule = next ? modules.find((module) => module.order === next.module_order) : null;
-  const nextLabel = nextModule ? `Module ${nextModule.order}` : "";
+
 
   /** "Skip discovery": go straight to the module list. Respects reduced motion and moves focus there. */
   const goToWorkbook = useCallback(() => {
@@ -241,27 +239,75 @@ function MemberHome() {
         <div aria-busy="true" className="h-[220px] animate-pulse rounded-2xl bg-border/60" />
       ) : (
         <>
-          {/* Discovery leads the page and holds the h1. "Continue where you left off" is a smaller, secondary card right below it. */}
+          {/* Discovery leads the page; resume appears within the current module row. */}
           <div className="space-y-4">
             <DiscoveryStart onSkip={goToWorkbook} headingLevel="h1" />
 
-            {started && next ? (
-              <section aria-labelledby="continue-heading" className="rounded-xl border border-border bg-card px-4 py-4 sm:px-5">
-                <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3">
-                  <div className="min-w-0 flex-1 basis-[16rem]">
-                    <p className="text-[13px] font-semibold text-accent-ink">Continue where you left off</p>
-                    <h2 id="continue-heading" className="mt-1 text-[17px] leading-snug text-foreground">
-                      {nextLabel ? `${nextLabel} · ${next.title}` : next.title}
-                    </h2>
-                  </div>
-                  <Link to={`/lesson/${next.code}`} className={dashboardButton}>
-                    Continue
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                </div>
-              </section>
-            ) : null}
+
           </div>
+
+
+        </>
+      )}
+
+      <section aria-labelledby="workbook">
+        <p className="workbook-label">Your progress</p>
+        <h2 id="workbook" tabIndex={-1} className="mt-1 text-[22px] outline-none">
+          Explore the Workbook
+        </h2>
+        <ol className="mt-3 grid gap-2">
+          {liveModules.map((module) => {
+            const row = progress.byOrder[module.order];
+            if (!row) return null;
+            const pct = row.stepCount ? Math.round((row.writtenCount / row.stepCount) * 100) : 0;
+            const status = moduleProgressLabel(row);
+            const isCurrentModule = started && next && nextModule?.order === module.order;
+            const content = (
+              <span className="block">
+                <span className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                  <span className="min-w-0">
+                    <span className="block text-[13px] font-semibold text-accent-ink">{row.label}</span>
+                    <span className="block text-[16px] leading-snug text-foreground">{module.title}</span>
+                  </span>
+                  <span className="flex shrink-0 items-center gap-2">
+                    <span aria-hidden="true" className={`text-[13px] font-medium ${status.muted ? "text-muted-faint" : "text-foreground"}`}>
+                      {status.text}
+                    </span>
+                    <span className="sr-only">{moduleProgressDescription(row)}</span>
+                    <span aria-hidden="true" className="h-2 w-20 overflow-hidden rounded-full bg-secondary sm:w-28">
+                      <span className="block h-full rounded-full bg-accent-ink" style={{ width: `${pct}%` }} />
+                    </span>
+                  </span>
+                </span>
+                {isCurrentModule && (
+                  <span className="mt-2 flex justify-end">
+                    <span className="inline-flex rounded-md bg-primary-soft px-2.5 py-1.5 text-[12px] font-semibold leading-tight text-[hsl(277_34%_16%)]">
+                      Continue →
+                    </span>
+                  </span>
+                )}
+              </span>
+            );
+            return (
+              <li key={module.id || module.slug}>
+                <Link
+                  to={isCurrentModule ? `/lesson/${next.code}` : `/module/${module.slug}`}
+                  className="block rounded-xl border border-border bg-card px-4 py-3 transition hover:bg-secondary"
+                >
+                  {content}
+                </Link>
+              </li>
+            );
+          })}
+        </ol>
+        <p className="mt-3 text-[14px] leading-relaxed text-muted-faint">
+          Move between activities, revisit earlier discoveries, or pick up where you left off.{" "}
+          <Link to="/aspects" className="font-medium text-accent-ink underline underline-offset-2">
+            How the workbook works
+          </Link>
+        </p>
+      </section>
+
 
           <nav aria-label="Your tools">
             <ul className="grid gap-3 sm:grid-cols-2">
@@ -282,19 +328,10 @@ function MemberHome() {
                     <span className="block text-[15px] text-muted-foreground">
                       {mapPlaced
                         ? "Recent places, activities, people, observations, and possible threads."
-                        : "Optional. A way to look at where your time and energy go, whenever it’s useful."}
+                        : "Look for connections among experiences, interests, and possibilities."}
                     </span>
                   </span>
                 </Link>
-              </li>
-              <li>
-                <button type="button" onClick={goToWorkbook} className={`${toolLink} w-full`}>
-                  <Layers className="mt-0.5 h-5 w-5 shrink-0 text-accent-ink" aria-hidden="true" />
-                  <span>
-                    <span className="block font-semibold">Explore the Workbook</span>
-                    <span className="block text-[15px] text-muted-foreground">All five modules, open in any order.</span>
-                  </span>
-                </button>
               </li>
               <li>
                 <Link to="/record" className={toolLink}>
@@ -316,58 +353,6 @@ function MemberHome() {
               </li>
             </ul>
           </nav>
-        </>
-      )}
-
-      <section aria-labelledby="workbook">
-        <p className="workbook-label">Your progress</p>
-        <h2 id="workbook" tabIndex={-1} className="mt-1 text-[22px] outline-none">
-          Explore the Workbook
-        </h2>
-        <ol className="mt-3 grid gap-2">
-          {liveModules.map((module) => {
-            const row = progress.byOrder[module.order];
-            if (!row) return null;
-            const pct = row.stepCount ? Math.round((row.writtenCount / row.stepCount) * 100) : 0;
-            const status = moduleProgressLabel(row);
-            const content = (
-              <span className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                <span className="min-w-0">
-                  <span className="block text-[13px] font-semibold text-accent-ink">{row.label}</span>
-                  <span className="block text-[16px] leading-snug text-foreground">{module.title}</span>
-                </span>
-                <span className="flex shrink-0 items-center gap-2">
-                  <span aria-hidden="true" className={`text-[13px] font-medium ${status.muted ? "text-muted-faint" : "text-foreground"}`}>
-                    {status.text}
-                  </span>
-                  <span className="sr-only">{moduleProgressDescription(row)}</span>
-                  <span aria-hidden="true" className="h-2 w-20 overflow-hidden rounded-full bg-secondary sm:w-28">
-                    <span className="block h-full rounded-full bg-accent-ink" style={{ width: `${pct}%` }} />
-                  </span>
-                </span>
-              </span>
-            );
-            return (
-              <li key={module.id || module.slug}>
-                <Link
-                  to={`/module/${module.slug}`}
-                  className="block rounded-xl border border-border bg-card px-4 py-3 transition hover:bg-secondary"
-                >
-                  {content}
-                </Link>
-              </li>
-            );
-          })}
-        </ol>
-        <p className="mt-3 text-[14px] leading-relaxed text-muted-faint">
-          Explore the modules at your own pace. You can move between activities, revisit earlier discoveries, and return
-          whenever you’re ready. There’s no required order or deadline.{" "}
-          <Link to="/aspects" className="font-medium text-accent-ink underline underline-offset-2">
-            How the workbook works
-          </Link>
-        </p>
-      </section>
-
       <PrivacyNote />
     </div>
   );

@@ -115,12 +115,14 @@ export default function Programs() {
         </div>
       </section>
 
-      <section className="workbook-section">
-        <h2 className="text-[18px]">What we don’t do</h2>
+      <section id="where-we-draw-the-line" className="workbook-section scroll-mt-24">
+        <h2 className="text-[18px]">Where we draw the line</h2>
+        <p className="mt-2 max-w-[68ch] text-[16px] leading-relaxed text-muted-foreground">Entrepalooza is education. We don’t:</p>
         <ul className="mt-2 max-w-[68ch] list-disc space-y-1.5 pl-5 text-[16px] leading-relaxed text-muted-foreground">
-          <li>Therapy, treatment, diagnosis or crisis support.</li>
+          <li>Offer therapy, treatment, diagnosis or crisis support.</li>
           <li>Promise a job, an income or business success.</li>
           <li>Decide your direction for you.</li>
+          <li>Test whether you’re ready.</li>
         </ul>
       </section>
     </article>

@@ -12,7 +12,7 @@ const BELIEFS = [
     body: "We don’t assume suffering is good for anyone, and nobody has to turn their story into something productive. Skills people built just to get through can still count.",
   },
   {
-    title: "Many answers are complete",
+    title: "Your answer counts",
     body: "A job, training, a project, a business, a pause, or still looking. Building a business is a real option, not the default.",
   },
   {
@@ -28,8 +28,8 @@ export default function Mission() {
         <p className="workbook-label">Build Otherwise</p>
         <h1 className="mt-2">Mission and vision</h1>
         <p className="mt-3 max-w-[68ch] text-[17px] leading-relaxed text-muted-foreground">
-          Build Otherwise is an early-stage social-impact initiative in Houston. We design practical, non-clinical
-          learning for adults working out what comes next.
+          Build Otherwise pushes back on the scripts that decide who gets taken seriously. We build hands-on
+          learning in Houston for adults deciding what comes next.
         </p>
       </header>
 
@@ -42,8 +42,8 @@ export default function Mission() {
             either picks the next step for them or asks for a plan they don’t have yet.
           </p>
           <p>
-            What’s often missing is room to find out. A safe way to try small things in real life, look honestly at what
-            happened, and choose for yourself, with people around you who aren’t steering.
+            What’s missing is room to find out. Try things in real life, look honestly at what happened, and make your
+            own call, with people around you who back it instead of making it for you.
           </p>
         </div>
       </section>

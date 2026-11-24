@@ -14,6 +14,7 @@
  *   Slot 1 (old join choice) is retired and blank. Synced to the database Oct 24; override removed.
  * - Oct 24, 2026: M1-L3 optional baseline question (answer slot M1-L3#4, shown again in the bridge into
  *   Module 4 and in M4-L1's optional sketch). Synced to the database; override removed.
+ * - Nov 11, 2026: O.1 "Before you begin" rewrite and M1-L3 "My Way Forward" text synced to Supabase; overrides removed.
  * - O.2 is retired from the app (folded into O.1). Its record stays in the database, unused.
  * - Oct 24, 2026: O.1 welcome text and title, and Module 2 lesson times (M2-L1 20, M2-L2 10, M2-L3 10 min),
  *   merged from module-2-interactive and synced to the database; overrides removed.

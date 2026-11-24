@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -9,6 +9,7 @@ import ScrollToTop from './components/ScrollToTop';
 import Layout from '@/components/Layout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import LoginRedirect from '@/components/LoginRedirect';
+import { Analytics } from '@vercel/analytics/react';
 
 // Every route loads its own code on first visit, so the first screen starts faster in the WebView.
 const PageNotFound = lazy(() => import('./lib/PageNotFound'));
@@ -144,18 +145,29 @@ const AuthenticatedApp = () => {
 };
 
 
+class AppErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error }; }
+  componentDidCatch(error, info) { console.error('Entrepalooza application error', error, info); }
+  render() {
+    if (this.state.error) return <main style={{padding:'2rem',fontFamily:'system-ui',color:'#222'}}><h1>Entrepalooza couldn't open</h1><p>The preview encountered an application error. Your saved work has not been changed.</p><pre style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{this.state.error.message}</pre><button onClick={() => window.location.reload()}>Try again</button></main>;
+    return this.props.children;
+  }
+}
+
 function App() {
 
   return (
-    <AuthProvider>
+    <AppErrorBoundary><AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
           <ScrollToTop />
           <AuthenticatedApp />
         </Router>
         <Toaster />
+        <Analytics />
       </QueryClientProvider>
-    </AuthProvider>
+    </AuthProvider></AppErrorBoundary>
   )
 }
 
